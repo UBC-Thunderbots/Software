@@ -54,6 +54,7 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
                                   time_since_linear_trajectory_creation_, delta_time);
     auto target_v_local = globalToLocalVelocity(target_v_global, state_.orientation());
 
+    // make sure robot doesn't go faster than max speed
     target_v_local = target_v_local.normalize(
         std::min(target_v_local.length(),
                  static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
@@ -72,29 +73,23 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time)
 {
-    const auto target_w =
+    auto target_w =
         orientation_controller_.step(state_.orientation(), *angular_trajectory_,
                                      time_since_angular_trajectory_creation_, delta_time);
 
-    if (target_w.toRadians() < -robot_constants_.robot_max_ang_speed_rad_per_s)
-    {
-        return AngularVelocity::fromRadians(
-            -robot_constants_.robot_max_ang_speed_rad_per_s);
-    }
-    if (target_w.toRadians() > robot_constants_.robot_max_ang_speed_rad_per_s)
-    {
-        return AngularVelocity::fromRadians(
-            robot_constants_.robot_max_ang_speed_rad_per_s);
-    }
+    // make sure robot doesn't rotate faster than max angular speed
+    const double max_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
+    const double clamped_w = std::clamp(target_w.toRadians(), -max_speed, max_speed);
+    target_w = AngularVelocity::fromRadians(clamped_w);
 
-    // const AngularAcceleration angular_acceleration =
-    //     angular_velocity - state_.angularVelocity();
-    // if (angular_acceleration.toRadians() >
-    //     robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
-    // {
-    //     LOG(WARNING) << "Robot trying to angular accelerate at "
-    //                  << angular_acceleration.toRadians() << "rads/s^2.";
-    // }
+    const auto angular_acceleration =
+        (target_w - state_.angularVelocity()) / delta_time.toSeconds();
+    if (angular_acceleration.toRadians() >
+        robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
+    {
+        LOG(WARNING) << "Robot trying to angular accelerate at "
+                     << angular_acceleration.toRadians() << "rads/s^2.";
+    }
     return target_w;
 }
 
