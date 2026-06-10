@@ -75,7 +75,7 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
 )
 
 # How long AI vs AI runs before ending in CI
-CI_DURATION_S = 180
+CI_DURATION_S = 600
 
 MULTI_PLANE_POINTS = 3
 
