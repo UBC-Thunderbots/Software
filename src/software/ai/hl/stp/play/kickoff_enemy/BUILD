@@ -29,7 +29,6 @@ cc_library(
 py_test(
     name = "kickoff_enemy_play_test",
     srcs = ["kickoff_enemy_play_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
         "//software/simulated_tests/validation:validations",

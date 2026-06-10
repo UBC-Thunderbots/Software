@@ -32,10 +32,6 @@ py_test(
     srcs = [
         "movement_robot_field_test.py",
     ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
         "//software/simulated_tests:tbots_test_runner",
@@ -48,10 +44,6 @@ py_test(
     name = "pivot_kick_field_test",
     srcs = [
         "pivot_kick_field_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
     ],
     deps = [
         "//software:conftest",

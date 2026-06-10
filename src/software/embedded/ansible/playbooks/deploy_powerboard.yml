@@ -3,6 +3,11 @@
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
+    - name: Stop thunderloop service
+      ansible.builtin.include_tasks: ../tasks/stop_service.yml
+      vars:
+        service_name: thunderloop
+
     - name: Copy SSH public key
       ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
 
@@ -33,3 +38,8 @@
         -d /home/{{ ansible_user }}/powerloop/powerloop_main_workdir
       register: result
       changed_when: true
+
+    - name: Start thunderloop service
+      ansible.builtin.include_tasks: ../tasks/start_service.yml
+      vars:
+        service_name: thunderloop
