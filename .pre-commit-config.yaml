@@ -10,6 +10,7 @@ repos:
         name: fix common trivial code errors
         language: system
         entry: scripts/lint_and_format.sh 
+        pass_filenames: false 
 
     -   id: generate_fsm_diagrams
         name: generate new FSM diagrams

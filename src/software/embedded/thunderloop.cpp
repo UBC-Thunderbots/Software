@@ -74,17 +74,12 @@ extern "C"
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
-      motor_status_(std::nullopt),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
       channel_id_(
           std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
       network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
-      kick_coeff_(std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY))),
-      kick_constant_(std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY))),
-      chip_pulse_width_(
-          std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY))),
       primitive_executor_(robot_constants)
 {
     waitForNetworkUp();
@@ -117,7 +112,10 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    power_service_ = std::make_unique<PowerService>();
+    power_service_ = std::make_unique<PowerService>(
+        std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY)),
+        std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY)),
+        std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)));
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
@@ -183,7 +181,8 @@ void Thunderloop::runLoop()
 
     robot_status_.set_thunderloop_version(thunderloop_hash);
     robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
-
+    *(robot_status_.mutable_motor_status()) = TbotsProto::MotorStatus();
+    *(robot_status_.mutable_power_status()) = TbotsProto::PowerStatus();
 
     std::optional<ImuData> imu_poll = imu_service_->poll();
 
@@ -260,14 +259,11 @@ void Thunderloop::runLoop()
                 }
             }
 
-            if (motor_status_.has_value())
-            {
-                auto status = motor_status_.value();
-                // TODO (#3725): use robot localizer to pass in position and orientation
-                primitive_executor_.updateState(
-                    RobotState(Point(), createVector(status.local_velocity()), Angle(),
-                               createAngularVelocity(status.angular_velocity())));
-            }
+            // TODO (#3725): use robot localizer to pass in position and orientation
+            primitive_executor_.updateState(RobotState(
+                Point(), createVector(robot_status_.motor_status().local_velocity()),
+                Angle(),
+                createAngularVelocity(robot_status_.motor_status().angular_velocity())));
 
             // Timeout Overrides for Primitives
             // These should be after the new primitive update section above
@@ -295,8 +291,13 @@ void Thunderloop::runLoop()
             thunderloop_status_.set_primitive_executor_step_time_ms(
                 getMilliseconds(poll_time));
 
+            // Motor Service: execute the motor control command
+            pollMotorService(poll_time, time_since_prev_iter);
+            thunderloop_status_.set_motor_service_poll_time_ms(
+                getMilliseconds(poll_time));
+
             // Power Service: execute the power control command
-            power_status_ = pollPowerService(poll_time);
+            pollPowerService(poll_time);
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
 
@@ -335,12 +336,6 @@ void Thunderloop::runLoop()
                 clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
             }
 
-            // Motor Service: execute the motor control command
-            motor_status_ = pollMotorService(poll_time, direct_control_.motor_control(),
-                                             time_since_prev_iter);
-            thunderloop_status_.set_motor_service_poll_time_ms(
-                getMilliseconds(poll_time));
-
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             time_sent_.set_epoch_timestamp_seconds(
                 static_cast<double>(current_time.tv_sec));
@@ -350,8 +345,6 @@ void Thunderloop::runLoop()
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())          = motor_status_.value();
-            *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
             *(robot_status_.mutable_primitive_executor_status()) =
@@ -415,9 +408,8 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
-TbotsProto::MotorStatus Thunderloop::pollMotorService(
-    struct timespec& poll_time, const TbotsProto::MotorControl& motor_control,
-    const struct timespec& time_since_prev_iteration)
+void Thunderloop::pollMotorService(struct timespec& poll_time,
+                                   const struct timespec& time_since_prev_iteration)
 {
     ScopedTimespecTimer timer(&poll_time);
 
@@ -425,17 +417,17 @@ TbotsProto::MotorStatus Thunderloop::pollMotorService(
 
     double time_since_prev_iteration_s =
         getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
-    return motor_service_->poll(motor_control, time_since_prev_iteration_s);
+
+    motor_service_->poll(direct_control_, robot_status_, time_since_prev_iteration_s);
 }
 
-TbotsProto::PowerStatus Thunderloop::pollPowerService(struct timespec& poll_time)
+void Thunderloop::pollPowerService(struct timespec& poll_time)
 {
     ScopedTimespecTimer timer(&poll_time);
 
     ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
 
-    return power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                kick_constant_, chip_pulse_width_);
+    power_service_->poll(direct_control_, robot_status_);
 }
 
 bool isPowerStable(std::ifstream& log_file)
@@ -472,11 +464,11 @@ void Thunderloop::updateErrorCodes()
     robot_status_.clear_error_code();
 
     // Updates error status
-    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    if (robot_status_.power_status().battery_voltage() <= BATTERY_WARNING_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
     }
-    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    if (robot_status_.power_status().capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
     }
