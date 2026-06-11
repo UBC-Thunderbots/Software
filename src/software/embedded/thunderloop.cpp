@@ -259,6 +259,7 @@ void Thunderloop::runLoop()
                 }
             }
 
+            // TODO (#3725): use robot localizer to pass in position and orientation
             primitive_executor_.updateState(RobotState(
                 Point(), createVector(robot_status_.motor_status().local_velocity()),
                 Angle(),

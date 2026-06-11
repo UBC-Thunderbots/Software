@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/time/duration.h"
 
 /**

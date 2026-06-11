@@ -298,5 +298,49 @@ def test_spinning_move(
     )
 
 
+def test_move_across_x_axis(simulated_test_runner):
+    initial_position = tbots_cpp.Point(-4.4, 0)
+    destination = tbots_cpp.Point(3, 0)
+
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                blue_robot_locations=[
+                    initial_position,
+                ],
+                yellow_robot_locations=[],
+                ball_location=tbots_cpp.Point(-3, -3),
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: MoveTactic(
+                    destination=tbots_cpp.createPointProto(destination),
+                    final_orientation=tbots_cpp.createAngleProto(
+                        tbots_cpp.Angle.zero()
+                    ),
+                )
+            }
+        )
+
+    eventually_validation_sequence_set = [
+        # Robot stays at destination for one second
+        [
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtPosition(0, destination)
+            )
+        ]
+    ]
+
+    simulated_test_runner.run_test(
+        setup=setup,
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        test_timeout_s=6,
+    )
+
+
 if __name__ == "__main__":
     pytest_main(__file__)
