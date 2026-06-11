@@ -19,11 +19,11 @@ py_binary(
         ":estop_helpers",
         ":thunderscope",
         ":util",
+        "//software/evaluation/loggers:stats_logger",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:runtime_manager",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/log/stats",
     ],
 )
 
