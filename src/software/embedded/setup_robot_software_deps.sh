@@ -53,6 +53,7 @@ if ! /usr/local/bin/python3.12 /tmp/tbots_download_cache/get-platformio.py; then
     exit 1
 fi
 
+rm /opt/tbotspython/bin/platformio
 # link platformio to /opt/tbotspython/bin so that bazel can find it
 ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
 
