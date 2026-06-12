@@ -10,7 +10,7 @@
     - setup_wifi_interface
 
 - name: Set up systemd WiFi 6 interface name rule
-  become: true
+  become: truep
   become_method: ansible.builtin.sudo
   ansible.builtin.copy:
     src: ../../linux_configs/systemd/10-persistent-wifi6-net.link
