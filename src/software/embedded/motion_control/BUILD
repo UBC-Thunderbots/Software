@@ -22,6 +22,7 @@ cc_library(
         ":controller",
         ":pid_controller",
         "//software/ai/navigator/trajectory:trajectory_path",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -44,6 +45,9 @@ cc_library(
 
 cc_library(
     name = "pid_controller",
+    srcs = [
+        "pid_controller.cpp",
+    ],
     hdrs = [
         "pid_controller.h",
     ],
