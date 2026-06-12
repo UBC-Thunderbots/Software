@@ -116,6 +116,13 @@ struct RobotConstants
     // Found by sqrt(x^2 + y^2) of a wheel.
     // Front wheel arm = Rear wheel arm. See ASCII image above.
     float expected_lever_arm;
+
+    // Various variances for the robot localizer Kalman filter
+    float kalman_process_noise_variance_rad_per_s_4;
+
+    float kalman_vision_noise_variance_rad_2;
+
+    float kalman_motor_sensor_noise_variance_rad_per_s_2;
 };
 
 /**
@@ -163,7 +170,12 @@ constexpr RobotConstants createRobotConstants()
 
         .wheel_radius_meters = 0.03f,
 
-        .expected_lever_arm = 0.0749f};
+        .expected_lever_arm = 0.0749f,
+
+        // Kalman filter variances for robot localizer
+        .kalman_process_noise_variance_rad_per_s_4      = 1.0f,
+        .kalman_vision_noise_variance_rad_2             = 0.01f * 0.01f,
+        .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5f};
 }
 #elif CHECK_VERSION(2021)
 constexpr RobotConstants createRobotConstants()
@@ -194,7 +206,12 @@ constexpr RobotConstants createRobotConstants()
         .robot_trajectory_max_ang_speed_rad_per_s = 7.0f,
         .robot_max_ang_acceleration_rad_per_s_2   = 30.0f,
 
-        .wheel_radius_meters = 0.03f};
+        .wheel_radius_meters = 0.03f,
+
+        // Kalman filter variances for robot localizer
+        .kalman_process_noise_variance_rad_per_s_4      = 0.5f,
+        .kalman_vision_noise_variance_rad_2             = 0.01f * 0.01f,
+        .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5f * 0.5f};
 }
 #endif
 
