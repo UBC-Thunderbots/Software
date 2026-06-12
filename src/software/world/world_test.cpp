@@ -54,6 +54,17 @@ class WorldTest : public ::testing::Test
     World world;
 };
 
+TEST_F(WorldTest, update_game_state_ball)
+{
+    // updateGameStateBall should not throw or affect the world's own ball_
+    Ball new_ball = Ball(Point(3, 4), Vector(1.0, -0.5), current_time);
+    world.updateGameStateBall(new_ball);
+
+    // The world's ball_ member should be unchanged
+    Ball initial_ball = Ball(Point(1, 2), Vector(-0.3, 0), current_time);
+    EXPECT_EQ(world.ball(), initial_ball);
+}
+
 TEST_F(WorldTest, construction_with_parameters)
 {
     // Check that objects used for construction are returned by the accessors
