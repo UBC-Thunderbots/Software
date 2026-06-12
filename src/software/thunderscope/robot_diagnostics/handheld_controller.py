@@ -8,8 +8,10 @@ except ImportError:
 
 from threading import Thread
 
+from software.thunderscope.robot_diagnostics.controller_base import ControllerBase
 
-class HandheldController:
+
+class HandheldController(ControllerBase):
     """Represents a handheld game controller or input device that can be used
     to manually control our robots.
     """
