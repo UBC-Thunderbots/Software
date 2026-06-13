@@ -204,10 +204,11 @@ class FieldTestRunner(TbotsTestRunner):
 
 def get_runtime_dir():
     """Gets the base runtime directory for the test execution.
+
     TODO: Refactor #3744
 
-    Uses a persistent directory so that UNIX socket paths stay short
-    and replay logs survive after the test ends.
+    Creates a new persistent directory for each test so that tests
+    running in parallel do not interfere with each other.
 
     :return: The path to the runtime directory.
     """
