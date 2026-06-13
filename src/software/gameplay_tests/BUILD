@@ -1,5 +1,5 @@
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,10 +19,10 @@ py_library(
     ],
     deps = [
         "//proto:import_all_protos",
+        "//software/gameplay_tests/validation:validations",
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
-        "//software/gameplay_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope:config",
         "//software/thunderscope:constants",
@@ -44,10 +44,10 @@ py_library(
     deps = [
         ":tbots_test_runner",
         "//proto:import_all_protos",
+        "//software/gameplay_tests/validation:validations",
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
-        "//software/gameplay_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -65,11 +65,11 @@ py_library(
     ],
     deps = [
         "//proto:import_all_protos",
+        "//software/gameplay_tests:tbots_test_runner",
+        "//software/gameplay_tests/validation:validations",
         "//software/logger:py_logger",
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
-        "//software/gameplay_tests:tbots_test_runner",
-        "//software/gameplay_tests/validation:validations",
         "//software/thunderscope",
         "//software/thunderscope:constants",
         "//software/thunderscope:estop_helpers",
