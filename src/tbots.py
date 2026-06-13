@@ -137,7 +137,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     """Builds the bazel command list based on config and pass-through args."""
     if config.test_suite and config.action == ActionArgument.test:
         target = """-- //...                              \\
-                      -//software/field_tests/...         \\
+                      -//software/gameplay_tests/...      \\
                       -//toolchains/cc/...                \\
                       -//software:unix_full_system_tar_gen"""
     else:

@@ -80,7 +80,6 @@ jobs:
             -- //... -//software:unix_full_system   \
             -//software/gameplay_tests/...         \
             -//software/ai/hl/...                   \
-            -//software/field_tests/...             \
             -//software/embedded/...                \
             -//toolchains/cc/...                    \
             -//software:unix_full_system_tar_gen
@@ -123,7 +122,6 @@ jobs:
             -- //... -//software:unix_full_system \
             -//software/gameplay_tests/...  \
             -//software/ai/hl/...            \
-            -//software/field_tests/...      \
             -//software/ai/navigator/...     \
             -//toolchains/cc/...             \
             -//software:unix_full_system_tar_gen
