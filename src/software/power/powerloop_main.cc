@@ -25,6 +25,14 @@
 
 #include <Arduino.h>
 
+#ifdef DEBUG_POWERLOOP
+/**
+ * This section of code is reserved for DIRECT testing on the microcontroller/debug functionality.
+ */
+void setup() {}
+void loop() {}
+#else
+
 // Used for uart communication
 std::vector<uint8_t> buffer;
 bool receiving;
@@ -109,3 +117,4 @@ void loop()
 
     delay(5);
 }
+#endif
