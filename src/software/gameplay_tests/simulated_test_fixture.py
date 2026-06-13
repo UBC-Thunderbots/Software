@@ -8,8 +8,8 @@ import os
 import pytest
 from proto.import_all_protos import *
 
-from software.simulated_tests.validation import validation
-from software.simulated_tests.tbots_test_runner import TbotsTestRunner
+from software.gameplay_tests.validation import validation
+from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND

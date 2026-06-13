@@ -7,7 +7,7 @@ import pytest
 import argparse
 from proto.import_all_protos import *
 
-from software.simulated_tests.validation import validation
+from software.gameplay_tests.validation import validation
 from software.thunderscope.constants import EstopMode, IndividualRobotMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -18,7 +18,7 @@ from software.logger.logger import create_logger
 
 
 from software.thunderscope.thunderscope_config import configure_field_test_view
-from software.simulated_tests.tbots_test_runner import TbotsTestRunner
+from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.estop_helpers import get_estop_config
 from software.py_constants import *

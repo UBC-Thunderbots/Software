@@ -8,22 +8,22 @@ from proto.import_all_protos import (
     MaxAllowedSpeedMode,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_is_off_ground import (
+from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsAlwaysOnGround,
     BallIsEventuallyOffGround,
 )
-from software.simulated_tests.validation.ball_speed_threshold import (
+from software.gameplay_tests.validation.ball_speed_threshold import (
     BallSpeedAlwaysBelowThreshold,
 )
-from software.simulated_tests.validation.delay_validation import DelayValidation
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.delay_validation import DelayValidation
+from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 

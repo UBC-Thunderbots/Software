@@ -2,7 +2,7 @@ from typing import override
 
 from proto.validation_pb2 import ValidationStatus, ValidationType, ValidationGeometry
 from software.py_constants import DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
-from software.simulated_tests.validation.validation import (
+from software.gameplay_tests.validation.validation import (
     Validation,
 )
 
