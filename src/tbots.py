@@ -13,6 +13,12 @@ from thefuzz import process
 from typer import Argument, Context, Typer
 
 from cli.cli_params import (
+    CATEGORY_CHOICES,
+    DEBUG_POWERLOOP_PLAYBOOK,
+    INTERACTIVE_STYLE,
+    LAUNCH_MODE_CHOICES,
+    PLAYBOOK_CHOICES,
+    THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
     ActionArgument,
     AnsiblePlaybook,
     DebugBinary,
@@ -54,6 +60,7 @@ class BuildConfig:
     runs: int | None = None
     robot_name: str | None = None
     ansible_playbook: str | None = None
+    debug_powerloop: bool = False
 
 
 class BazelFlag(tuple, Enum):
@@ -63,6 +70,7 @@ class BazelFlag(tuple, Enum):
     TRACY = ("--cxxopt=-DTRACY_ENABLE",)
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)
+    DEBUG_POWERLOOP = ("--//software/power:debug_powerloop",)
 
 
 app = Typer()
@@ -91,6 +99,32 @@ def main(
     robot_name: RobotName = None,
     ansible_playbook: AnsiblePlaybook = None,
 ) -> None:
+    """Entry point for the tbots CLI.
+
+    Parses the command-line options into a :class:`BuildConfig`, then validates,
+    builds, and executes the corresponding Bazel command. When invoked with no
+    action and no search query, falls back to the interactive menu-driven CLI.
+
+    :param ctx: Typer context carrying any unparsed pass-through args forwarded
+        to the underlying Bazel target as runtime arguments
+    :param action: the Bazel action to perform (build, test, or run)
+    :param search_query: fuzzy search query used to resolve the Bazel target
+    :param print_command: if True, print the generated command instead of running it
+    :param no_optimized_build: compile without -O3 optimizations
+    :param debug_build: compile with debug symbols (-c dbg)
+    :param select_debug_binaries: binaries to launch separately in debug mode
+    :param flash_robots: robot IDs to flash with the deploy_robot_software playbook
+    :param ssh_password: password Ansible uses when SSHing into the robots
+    :param interactive_search: enable interactive fuzzy target selection
+    :param tracy: build with the TRACY_ENABLE macro defined
+    :param test_suite: run the entire test suite instead of a single target
+    :param enable_thunderscope: launch with Thunderscope enabled
+    :param stop_ai_on_start: start the binary with the AI paused
+    :param jobs_option: value passed to Bazel's --jobs flag
+    :param runs: value passed to Bazel's --runs_per_test flag
+    :param robot_name: hostname of the robot targeted by an Ansible playbook
+    :param ansible_playbook: name of the Ansible playbook to run
+    """
     if not action and not search_query:
         start_interactive_cli()
         return
@@ -120,6 +154,13 @@ def main(
 
 
 def validate(config: BuildConfig):
+    """Validate a BuildConfig, exiting with an error message if it is invalid.
+
+    Enforces that flashing or running an Ansible playbook supplies an SSH
+    password, and that a non-suite invocation supplies a search query.
+
+    :param config: the build configuration to validate
+    """
     if bool(config.flash_robots) or bool(config.ansible_playbook):
         if not config.ssh_password:
             print(
@@ -134,7 +175,17 @@ def validate(config: BuildConfig):
 
 
 def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
-    """Builds the bazel command list based on config and pass-through args."""
+    """Build the Bazel command list from a config and pass-through args.
+
+    Resolves the target (or test suite), applies the Bazel flags implied by the
+    config, and appends runtime arguments such as debug flags and Ansible
+    playbook parameters. Runtime args are wrapped as --test_arg values for the
+    test action and appended after a ``--`` separator for the run action.
+
+    :param config: the validated build configuration
+    :param extra_args: unparsed CLI args forwarded as runtime arguments
+    :return: the Bazel command as a list of tokens, ready to be joined and run
+    """
     if config.test_suite and config.action == ActionArgument.test:
         target = """-- //...                              \\
                       -//software/gameplay_tests/...      \\
@@ -157,6 +208,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
+        BazelFlag.DEBUG_POWERLOOP: config.debug_powerloop,
     }
     for flag, condition in flag_conditions.items():
         if condition:
@@ -226,6 +278,11 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
 
 
 def execute_command(command: list[str], print_only: bool = False):
+    """Print or execute a Bazel command, exiting with its return code.
+
+    :param command: the command tokens to join and run
+    :param print_only: if True, only print the command without executing it
+    """
     cmd_str = " ".join(command)
     if print_only:
         print(cmd_str)
@@ -236,12 +293,21 @@ def execute_command(command: list[str], print_only: bool = False):
 
 
 def start_interactive_cli():
-    """Interactive mode that builds BuildConfig and calls execution directly."""
+    """Run the menu-driven interactive CLI.
+
+    Walks the user through a series of questionary prompts to assemble a
+    :class:`BuildConfig`, then validates, builds, and executes the resulting
+    Bazel command. The menu choices (and their inline descriptions) live in
+    cli_params.py. Returns early without running anything if the user aborts
+    the top-level prompt.
+    """
     config = BuildConfig(action=ActionArgument.run)  # Default action
     extra_args = []
 
     category = questionary.select(
-        "What would you like to do?", choices=["Run thunderscope", "Test", "Flash"]
+        "What would you like to do?",
+        choices=CATEGORY_CHOICES,
+        style=INTERACTIVE_STYLE,
     ).ask()
 
     if not category:
@@ -252,41 +318,43 @@ def start_interactive_cli():
             config.action = ActionArgument.run
             config.search_query = "thunderscope"
             launch = questionary.select(
-                "Launch mode?", choices=["Simulator", "Diagnostics"]
+                "Launch mode?",
+                choices=LAUNCH_MODE_CHOICES,
+                style=INTERACTIVE_STYLE,
             ).ask()
             if launch == "Simulator":
                 selected = questionary.checkbox(
                     "Options:",
-                    choices=[
-                        "enable_autoref",
-                        "ci_mode",
-                        "record_stats",
-                        "enable_realism",
-                        "enable_autogc",
-                    ],
+                    choices=THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
+                    style=INTERACTIVE_STYLE,
                 ).ask()
                 for opt in selected:
                     extra_args.extend([f"--{opt}"])
                     if opt == "record_stats":
                         time = questionary.text(
-                            "Enter record stats duration (minutes):"
+                            "Enter record stats duration (minutes):",
+                            style=INTERACTIVE_STYLE,
                         ).ask()
                         extra_args.extend([time])
             else:
-                iface = questionary.text("Network interface?").ask()
+                iface = questionary.text(
+                    "Network interface?", style=INTERACTIVE_STYLE
+                ).ask()
                 extra_args.extend(["--run_diagnostics", "--interface", iface])
 
         case "Test":
             config.action = ActionArgument.test
             test_name = questionary.text(
-                "Enter test name (leave empty for entire suite)"
+                "Enter test name (leave empty for entire suite)",
+                style=INTERACTIVE_STYLE,
             ).ask()
             if not test_name:
                 config.test_suite = True
             else:
                 config.search_query = test_name
                 runs_str = questionary.text(
-                    "Number of times to run each test (leave empty for 1):"
+                    "Number of times to run each test (leave empty for 1):",
+                    style=INTERACTIVE_STYLE,
                 ).ask()
                 if runs_str and runs_str.isdigit() and int(runs_str) > 1:
                     config.runs = int(runs_str)
@@ -294,17 +362,26 @@ def start_interactive_cli():
         case "Flash":
             config.action = ActionArgument.run
             config.search_query = "ansible"
-            config.ansible_playbook = questionary.select(
+            playbook_choice = questionary.select(
                 "Select playbook:",
-                choices=[
-                    "setup_pi.yml",
-                    "deploy_robot_software.yml",
-                    "deploy_powerboard.yml",
-                    "deploy_motor_firmware.yml",
-                ],
+                choices=PLAYBOOK_CHOICES,
+                style=INTERACTIVE_STYLE,
             ).ask()
-            config.robot_name = questionary.text("Robot name?").ask()
-            config.ssh_password = questionary.password("SSH password?").ask()
+            # The DEBUG_POWERLOOP entry reuses the deploy_powerboard playbook but
+            # compiles powerloop_main with the DEBUG_POWERLOOP flag, swapping in
+            # the bare setup()/loop() stubs so arbitrary code can be flashed onto
+            # the powerboard microcontroller for debugging.
+            if playbook_choice == DEBUG_POWERLOOP_PLAYBOOK:
+                config.ansible_playbook = "deploy_powerboard.yml"
+                config.debug_powerloop = True
+            else:
+                config.ansible_playbook = playbook_choice
+            config.robot_name = questionary.text(
+                "Robot name?", style=INTERACTIVE_STYLE
+            ).ask()
+            config.ssh_password = questionary.password(
+                "SSH password?", style=INTERACTIVE_STYLE
+            ).ask()
 
     validate(config)
     command = create_command(config, extra_args)
@@ -314,6 +391,19 @@ def start_interactive_cli():
 def fuzzy_find_target(
     action: ActionArgument, search_query: str, interactive_search: bool
 ) -> str:
+    """Resolve a search query to a concrete Bazel target via fuzzy matching.
+
+    Queries Bazel for the candidate targets relevant to the action (tests,
+    binaries, and/or libraries) and fuzzy-matches the search query against
+    their names. If interactive search is requested, or the best match falls
+    below the confidence threshold, the user picks from the top matches via an
+    fzf prompt; otherwise the best match is used directly.
+
+    :param action: the Bazel action, which determines the candidate target kinds
+    :param search_query: the query to match against target names
+    :param interactive_search: force the interactive fzf picker
+    :return: the fully-qualified Bazel target label
+    """
     test_query = ["bazel", "query", "tests(//...)"]
     binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
     library_query = ["bazel", "query", "kind(.*_library,//...)"]
