@@ -27,7 +27,8 @@
 
 #ifdef DEBUG_POWERLOOP
 /**
- * This section of code is reserved for DIRECT testing on the microcontroller/debug functionality.
+ * This section of code is reserved for DIRECT testing on the microcontroller/debug
+ * functionality.
  */
 void setup() {}
 void loop() {}
