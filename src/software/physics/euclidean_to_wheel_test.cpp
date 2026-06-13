@@ -48,11 +48,11 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_x)
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // Right wheels must be - velocity, left wheels must be + velocity.
-    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
+    // Right wheels must be + velocity, left wheels must be - velocity.
+    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 
 
     // Right wheels must have same velocity magnitude as left wheels, but opposite sign.
@@ -69,11 +69,11 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_x)
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // Right wheels must be + velocity, left wheels must be - velocity.
-    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
+    // Right wheels must be - velocity, left wheels must be + velocity.
+    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 
     // Right wheels must have same velocity magnitude as left wheels, but opposite sign.
     EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
@@ -89,11 +89,11 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_y)
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // Back wheels must be + velocity, front wheels must be - velocity.
-    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
+    // Back wheels must be - velocity, front wheels must be + velocity.
+    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_y)
@@ -103,11 +103,11 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_y)
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // Back wheels must be - velocity, front wheels must be + velocity.
-    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
+    // Back wheels must be + velocity, front wheels must be - velocity.
+    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_sign)
@@ -117,11 +117,11 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_sign)
     calculated_wheel_speeds =
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
-    // Right wheels must be + velocity, Left wheels must be - velocity.
-    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
+    // Right wheels must be - velocity, Left wheels must be + velocity.
+    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_sign)
@@ -132,10 +132,10 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w_sign)
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Right wheels must be + velocity, Left wheels must be - velocity.
-    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
-    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w_magnitude)

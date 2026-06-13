@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
@@ -58,8 +60,8 @@ class StSpinMotorController : public MotorController
 
     static constexpr int RESET_GPIO_PIN = 12;
 
-    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 700;
-    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 30;
+    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 2000;
+    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 200;
 
     static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
     static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;

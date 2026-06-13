@@ -172,9 +172,9 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
         euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
 
     motor_status.mutable_local_velocity()->set_x_component_meters(
-        current_euclidean_velocity[1]);
+        current_euclidean_velocity[0]);
     motor_status.mutable_local_velocity()->set_y_component_meters(
-        -current_euclidean_velocity[0]);
+        current_euclidean_velocity[1]);
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
@@ -197,8 +197,8 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
         const auto& direct_velocity = motor_control.direct_velocity_control();
 
         const EuclideanSpace_t target_euclidean_velocity = {
-            -direct_velocity.velocity().y_component_meters(),
             direct_velocity.velocity().x_component_meters(),
+            direct_velocity.velocity().y_component_meters(),
             direct_velocity.angular_velocity().radians_per_second()};
 
         motor_controller_->updateEuclideanVelocity(target_euclidean_velocity);
@@ -216,9 +216,9 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
         euclidean_to_four_wheel_.getEuclideanVelocity(target_wheel_velocities_);
 
     motor_status.mutable_target_local_velocity()->set_x_component_meters(
-        target_euclidean_velocity[1]);
+        target_euclidean_velocity[0]);
     motor_status.mutable_target_local_velocity()->set_y_component_meters(
-        -target_euclidean_velocity[0]);
+        target_euclidean_velocity[1]);
     motor_status.mutable_target_angular_velocity()->set_radians_per_second(
         target_euclidean_velocity[2]);
 

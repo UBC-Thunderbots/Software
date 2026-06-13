@@ -10,6 +10,7 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
@@ -121,6 +122,45 @@ class Thunderloop
      */
     void waitForNetworkUp();
 
+    /**
+     * Polls the network service for new primitives and updates timing status.
+     *
+     * @param poll_time Output for polling duration
+     * @param last_primitive_received_time Input/Output for tracking last received packet
+     */
+    inline void processNetworkPolling(struct timespec& poll_time,
+                                      struct timespec& last_primitive_received_time);
+
+    /**
+     * Processes robot localization updates from sensors (IMU, Motors) and feeds the
+     * resulting state estimate to the primitive executor.
+     */
+    inline void processLocalizationUpdates();
+
+    /**
+     * Steps the primitive executor and handles timeouts.
+     *
+     * @param poll_time Output for execution duration
+     * @param last_primitive_received_time Input for checking timeouts
+     * @param delta_time The time passed since the last step
+     */
+    inline void processPrimitiveExecution(struct timespec& poll_time,
+                                          struct timespec& last_primitive_received_time,
+                                          const Duration& delta_time);
+
+    /**
+     * Updates internal tracking for chipper/kicker firing events.
+     */
+    inline void updateChickerStatus(struct timespec& last_chipper_fired,
+                                    struct timespec& last_kicker_fired);
+
+    /**
+     * Aggregates and sends the final robot status message.
+     *
+     * @param last_handled_primitive_set The sequence number of the last handled primitive
+     */
+    inline void updateAndSendRobotStatus(uint64_t last_handled_primitive_set);
+
 
     // Input Msg Buffers
     TbotsProto::World world_;
@@ -145,6 +185,9 @@ class Thunderloop
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
+
+    // Robot localization model
+    RobotLocalizer robot_localizer_;
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
