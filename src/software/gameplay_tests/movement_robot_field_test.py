@@ -1,7 +1,7 @@
 from proto.import_all_protos import *
 from software.gameplay_tests.field_test_fixture import *
 
-from software.gameplay_tests.simulated_test_fixture import *
+from software.gameplay_tests.util import pytest_main
 from software.logger.logger import create_logger
 import math
 

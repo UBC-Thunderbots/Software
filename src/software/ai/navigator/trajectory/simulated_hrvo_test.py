@@ -7,7 +7,6 @@ from proto.message_translation.tbots_protobuf import create_world_state
 import math
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
-from software.gameplay_tests.simulated_test_fixture import SimulatedTestRunner
 from software.gameplay_tests.validation.validation import (
     create_validation_types,
     create_validation_geometry,
@@ -166,7 +165,7 @@ def hrvo_setup(
     friendly_robots_final_orientations: list[tbots.Angle],
     enemy_robots_positions: list[tbots.Point],
     enemy_robots_destinations: list[tbots.Point],
-    simulated_test_runner: SimulatedTestRunner,
+    simulated_test_runner,
 ):
     """Setup for the hrvo tests
 
@@ -470,7 +469,7 @@ def hrvo_setup(
     ],
 )
 def test_robot_movement(
-    simulated_test_runner: SimulatedTestRunner,
+    simulated_test_runner,
     friendly_robot_positions: list[tbots.Point],
     friendly_robot_destinations: list[tbots.Point],
     friendly_robots_final_orientations: list[tbots.Angle],

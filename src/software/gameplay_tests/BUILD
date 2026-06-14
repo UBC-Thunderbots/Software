@@ -34,9 +34,9 @@ py_library(
 )
 
 py_library(
-    name = "simulated_test_fixture",
+    name = "fixture",
     srcs = [
-        "simulated_test_fixture.py",
+        "fixture.py",
     ],
     data = [
         "//software:py_constants.so",
