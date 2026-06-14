@@ -125,8 +125,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 #else
-    LOG(INFO)
-        << "THUNDERLOOP: Power Service DISABLED! Next initializing Motor Service";
+    LOG(INFO) << "THUNDERLOOP: Power Service DISABLED! Next initializing Motor Service";
 #endif
 
 #ifndef DISABLE_MOTOR_SERVICE
