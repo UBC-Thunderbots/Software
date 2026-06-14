@@ -3,17 +3,17 @@ import threading
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
     NumberOfRobotsAlwaysStaysInRegion,
     RobotNeverEntersRegion,
 )
-from software.simulated_tests.validation.or_validation import OrValidation
-from software.simulated_tests.validation.ball_enters_region import BallNeverEntersRegion
+from software.gameplay_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.ball_enters_region import BallNeverEntersRegion
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.import_all_protos import Command
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 

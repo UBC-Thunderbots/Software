@@ -3,7 +3,7 @@ import math
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.import_all_protos import *
