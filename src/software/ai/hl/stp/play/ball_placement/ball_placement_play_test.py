@@ -12,9 +12,7 @@ from software.gameplay_tests.validation.ball_enters_region import (
 from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyExitsRegion,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 @pytest.mark.parametrize(

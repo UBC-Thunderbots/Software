@@ -80,6 +80,16 @@ py_library(
     ],
 )
 
+py_library(
+    name = "util",
+    srcs = [
+        "util.py",
+    ],
+    deps = [
+        requirement("pytest"),
+    ],
+)
+
 py_test(
     name = "simulated_test_ball_model",
     srcs = [

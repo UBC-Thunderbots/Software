@@ -10,9 +10,7 @@ from software.gameplay_tests.validation.robot_speed_threshold import *
 from software.gameplay_tests.validation.ball_stops_in_region import *
 from software.gameplay_tests.validation.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 # the friction model currently used in the er-force simulator
 

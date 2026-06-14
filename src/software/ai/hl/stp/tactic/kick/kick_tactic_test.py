@@ -7,9 +7,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 @pytest.mark.parametrize(

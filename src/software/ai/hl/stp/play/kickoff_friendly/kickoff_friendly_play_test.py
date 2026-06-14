@@ -17,9 +17,7 @@ from software.gameplay_tests.validation.or_validation import OrValidation
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import Command
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 def test_kickoff_friendly_play(simulated_test_runner):

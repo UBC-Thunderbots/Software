@@ -17,9 +17,7 @@ from software.gameplay_tests.validation.robot_at_angular_velocity import (
     RobotEventuallyAtAngularVelocity,
 )
 from software.gameplay_tests.validation.duration_validation import DurationValidation
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.import_all_protos import *
 

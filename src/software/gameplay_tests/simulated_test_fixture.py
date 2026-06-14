@@ -535,22 +535,6 @@ def load_command_line_arguments(allow_unrecognized: bool = False) -> argparse.Na
     return parser.parse_known_args()[0] if allow_unrecognized else parser.parse_args()
 
 
-def pytest_main(file):
-    """Runs the pytest file
-
-    :param file: The test file to run
-    """
-    args = load_command_line_arguments(allow_unrecognized=True)
-
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    # -W ignore::DeprecationWarning ignores deprecation warnings that spam the output
-    sys.exit(
-        pytest.main(
-            ["-svv", "-W ignore::DeprecationWarning", "-k", args.test_filter, file]
-        )
-    )
-
-
 @pytest.fixture
 def simulated_test_runner():
     args = load_command_line_arguments()
@@ -571,25 +555,29 @@ def simulated_test_runner():
     test_name = current_test.split("-")[0][:25]
 
     # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}",
-        args.debug_simulator,
-        args.enable_realism,
-    ) as simulator, FullSystem(
-        "software/unix_full_system",
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
-    ) as blue_fs, FullSystem(
-        "software/unix_full_system",
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
-    ) as yellow_fs:
+    with (
+        Simulator(
+            f"{args.simulator_runtime_dir}/test/{test_name}",
+            args.debug_simulator,
+            args.enable_realism,
+        ) as simulator,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+            args.debug_blue_full_system,
+            False,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope and not args.ci_mode,
+        ) as blue_fs,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+            args.debug_yellow_full_system,
+            True,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope and not args.ci_mode,
+        ) as yellow_fs,
+    ):
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:

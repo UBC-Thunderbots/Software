@@ -12,7 +12,7 @@ from software.gameplay_tests.validation.robot_at_orientation import (
 from software.gameplay_tests.validation.robot_received_ball import (
     RobotEventuallyReceivedBall,
 )
-from software.gameplay_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.util import pytest_main
 
 
 def calculate_ball_velocity(passer_point, receiver_point, speed):

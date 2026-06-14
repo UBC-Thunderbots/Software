@@ -23,9 +23,7 @@ from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 def test_not_bumping_ball_towards_net(simulated_test_runner):

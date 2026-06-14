@@ -1,9 +1,7 @@
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,

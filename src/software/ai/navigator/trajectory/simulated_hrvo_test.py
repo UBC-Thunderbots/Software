@@ -1,7 +1,5 @@
 import pytest
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.avoid_collisions import *
 import software.python_bindings as tbots
 from software.py_constants import *

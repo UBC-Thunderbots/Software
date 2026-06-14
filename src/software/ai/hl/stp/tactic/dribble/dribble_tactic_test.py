@@ -21,9 +21,7 @@ from software.gameplay_tests.validation.robot_received_ball import (
 from software.gameplay_tests.validation.delay_validation import (
     DelayValidation,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 def get_enemy_robot_positions():
