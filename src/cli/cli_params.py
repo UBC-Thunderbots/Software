@@ -192,6 +192,20 @@ THUNDERSCOPE_SIMULATOR_OPTION_CHOICES = [
     ),
 ]
 
+# Deploy robot software "Options:" checkbox. Each option compiles Thunderloop
+# with a preprocessor flag that disables the corresponding service, letting
+# Thunderloop run on a robot whose powerboard or motorboard is unavailable.
+DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES = [
+    questionary.Choice(
+        title="DISABLE_POWER_SERVICE",
+        description="Compile Thunderloop without the Power Service (no powerboard)",
+    ),
+    questionary.Choice(
+        title="DISABLE_MOTOR_SERVICE",
+        description="Compile Thunderloop without the Motor Service (no motorboard)",
+    ),
+]
+
 # Marker value returned by the DEBUG_POWERLOOP playbook choice. It maps to the
 # deploy_powerboard.yml playbook but additionally compiles powerloop_main with
 # the DEBUG_POWERLOOP flag, swapping in bare setup()/loop() stubs so arbitrary
