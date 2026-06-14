@@ -60,7 +60,7 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
                  static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 
     const Vector local_acceleration =
-        (target_v_local - state_.localVelocity()) / delta_time.toSeconds();
+        (target_v_local - prev_target_local_velocity_) / delta_time.toSeconds();
 
     if (local_acceleration.length() > robot_constants_.robot_max_acceleration_m_per_s_2)
     {
@@ -68,6 +68,7 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
                      << "m/s^2.";
     }
 
+    prev_target_local_velocity_ = target_v_local;
     return target_v_local;
 }
 
@@ -83,13 +84,14 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time
     target_w               = AngularVelocity::fromRadians(clamped_w);
 
     const auto angular_acceleration =
-        (target_w - state_.angularVelocity()) / delta_time.toSeconds();
-    if (angular_acceleration.toRadians() >
+        (target_w - prev_target_angular_velocity_) / delta_time.toSeconds();
+    if (std::abs(angular_acceleration.toRadians()) >
         robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
     {
         LOG(WARNING) << "Robot trying to angular accelerate at "
                      << angular_acceleration.toRadians() << "rads/s^2.";
     }
+    prev_target_angular_velocity_ = target_w;
     return target_w;
 }
 
@@ -110,10 +112,23 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             status.set_running_primitive(false);
+            setPrevCommandedVelocity(Vector(), AngularVelocity());
             return output;
         }
         case TbotsProto::Primitive::kDirectControl:
         {
+            const auto& motor_control = current_primitive_.direct_control().motor_control();
+            if (motor_control.has_direct_velocity_control())
+            {
+                setPrevCommandedVelocity(
+                    createVector(motor_control.direct_velocity_control().velocity()),
+                    createAngularVelocity(
+                        motor_control.direct_velocity_control().angular_velocity()));
+            }
+            else
+            {
+                setPrevCommandedVelocity(Vector(), AngularVelocity());
+            }
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 current_primitive_.direct_control());
         }
@@ -127,6 +142,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
                 LOG(INFO)
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
+                setPrevCommandedVelocity(Vector(), AngularVelocity());
                 return output;
             }
 
@@ -154,7 +170,15 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // LOG(DEBUG) << "No primitive set!";
         }
     }
+    setPrevCommandedVelocity(Vector(), AngularVelocity());
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
+}
+
+void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
+                                                 const AngularVelocity& angular_velocity)
+{
+    prev_target_local_velocity_   = local_velocity;
+    prev_target_angular_velocity_ = angular_velocity;
 }
 
 void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
