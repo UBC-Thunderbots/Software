@@ -12,7 +12,7 @@
   tasks:
     - name: Echo hello world
       register: res # save the result of this task in the variable "res"
-      tags: echoHelloWorld
+      tags: echoHelloWorld # tagged so we can run only the tasks associated with echoHelloWorld
       ansible.builtin.command: echo hello world
       changed_when: true
 
