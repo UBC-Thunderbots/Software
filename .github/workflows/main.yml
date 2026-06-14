@@ -151,14 +151,14 @@ jobs:
       - uses: ./.github/actions/environment-setup
 
       - name: Simulated Test Run
+          # TODO (#2908): reenable once field tests can be ran as simulated
+          # //software/gameplay_tests/...    \
         run: |
           cd src
           bazel test //software/gameplay_tests:requirements_test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
             --test_arg="--ci_mode"            \
             -- //software:unix_full_system       \
-            # TODO (#2908): reenable once field tests can be ran as simulated
-            # //software/gameplay_tests/...    \
             -//software/gameplay_tests:requirements_test \
             //software/ai/hl/...              \
             //software/ai/navigator/...
