@@ -50,12 +50,12 @@ pip.parse(
 )
 use_repo(pip, "ansible_deps")
 pip.parse(
-    hub_name = "simulated_tests_deps",
+    hub_name = "gameplay_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
-    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+    requirements_lock = "//software/gameplay_tests:requirements_lock.txt",
 )
-use_repo(pip, "simulated_tests_deps")
+use_repo(pip, "gameplay_tests_deps")
 pip.parse(
     hub_name = "robot_diagnostics_cli_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
