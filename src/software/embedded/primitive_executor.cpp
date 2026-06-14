@@ -117,7 +117,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
         case TbotsProto::Primitive::kDirectControl:
         {
-            const auto& motor_control = current_primitive_.direct_control().motor_control();
+            const auto& motor_control =
+                current_primitive_.direct_control().motor_control();
             if (motor_control.has_direct_velocity_control())
             {
                 setPrevCommandedVelocity(
