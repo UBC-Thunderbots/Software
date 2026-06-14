@@ -245,25 +245,19 @@ class FieldTestRunner(TbotsTestRunner):
 
 def get_runtime_dir():
     """Gets the base runtime directory for the test execution.
+
     TODO: Refactor #3744
 
-    If running under Bazel, it uses TEST_TMPDIR to keep tests isolated. To prevent UNIX
-    socket path length limits from being exceeded by Bazel's long paths, it creates a short
-    symlink in /tmp to the TEST_TMPDIR.
+    Creates a new persistent directory for each test so that tests
+    running in parallel do not interfere with each other.
 
     :return: The path to the runtime directory.
     """
-    test_tmpdir = os.environ.get("TEST_TMPDIR")
-    if not test_tmpdir:
-        return "/tmp/tbots"
     import uuid
 
-    symlink_path = os.path.join("/tmp", f"tbt_{uuid.uuid4().hex[:8]}")
-    try:
-        os.symlink(test_tmpdir, symlink_path)
-    except OSError:
-        pass
-    return symlink_path
+    runtime_dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
+    os.makedirs(runtime_dir, exist_ok=True)
+    return runtime_dir
 
 
 RUNTIME_DIR = get_runtime_dir()

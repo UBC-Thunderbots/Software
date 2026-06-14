@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
@@ -5,6 +6,21 @@ load(
 )
 
 package(default_visibility = ["//visibility:public"])
+
+# When enabled, compiles powerloop_main with the DEBUG_POWERLOOP flag, which
+# swaps in the bare setup()/loop() stubs in powerloop_main.cc so arbitrary code
+# can be flashed onto the powerboard microcontroller for debugging.
+bool_flag(
+    name = "debug_powerloop",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "debug_powerloop_enabled",
+    flag_values = {
+        ":debug_powerloop": "True",
+    },
+)
 
 # building the platformio_project will compile the Arduino code, running the platform_io project will flash the PICO
 # more information can be found here: https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
@@ -72,7 +88,11 @@ platformio_project(
     name = "powerloop_main",
     src = "powerloop_main.cc",
     board = "pico32",
-    build_flags = ["-DPB_FIELD_32BIT=1"],  #Makes platformio use 16 bit numbers for size
+    build_flags = ["-DPB_FIELD_32BIT=1"] + select({
+        #Makes platformio use 16 bit numbers for size
+        ":debug_powerloop_enabled": ["-DDEBUG_POWERLOOP"],
+        "//conditions:default": [],
+    }),
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
