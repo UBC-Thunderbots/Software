@@ -82,8 +82,8 @@ def test_penalty_kick(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
 

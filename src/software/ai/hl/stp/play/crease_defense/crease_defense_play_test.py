@@ -70,8 +70,7 @@ def test_crease_defense_play(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,
     )
 

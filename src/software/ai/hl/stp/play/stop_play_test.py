@@ -165,8 +165,7 @@ def test_stop_play(ball_position, blue_robot_positions, simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=always_stop_play_rules,
-        ag_always_validation_sequence_set=always_stop_play_rules,
+        always_validation_sequence_set=always_stop_play_rules,
         test_timeout_s=6,
     )
 

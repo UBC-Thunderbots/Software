@@ -10,9 +10,9 @@ from software.gameplay_tests.util import pytest_main
 
 
 def test_offense_play(simulated_test_runner):
-    def setup(start_point):
-        ball_initial_pos = start_point
+    start_point = tbots_cpp.Point(-4.4, 2.9)
 
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-4.5, 3.0),
             tbots_cpp.Point(-2, 1.5),
@@ -39,7 +39,7 @@ def test_offense_play(simulated_test_runner):
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
+                ball_location=start_point,
                 ball_velocity=tbots_cpp.Vector(0, 0),
             ),
         )
@@ -58,24 +58,21 @@ def test_offense_play(simulated_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Always Validation
-    inv_always_validation_sequence_set = [
+    always_validation_sequence_set = [
         [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
         [NeverExcessivelyDribbles()],
+        [FriendlyAlwaysHasBallPossession()],
     ]
 
-    ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
-
     # Eventually Validation
-    inv_eventually_validation_sequence_set = [[]]
-    ag_eventually_validation_sequence_set = [[FriendlyTeamEventuallyScored()]]
+    eventually_validation_sequence_set = [
+        [FriendlyTeamEventuallyScored()],
+    ]
 
     simulated_test_runner.run_test(
-        params=[tbots_cpp.Point(-4.4, 2.9)],
         setup=setup,
-        inv_eventually_validation_sequence_set=inv_eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=inv_always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=ag_eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=ag_always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
         run_till_end=True,
     )

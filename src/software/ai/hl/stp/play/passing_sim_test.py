@@ -244,7 +244,7 @@ def test_passing_receive_speed(
     ]
 
     simulated_test_runner.run_test(
-        setup=lambda param: setup_pass_and_robots(
+        setup=lambda: setup_pass_and_robots(
             ball_initial_position=ball_initial_position,
             ball_initial_velocity=ball_initial_velocity,
             attacker_robot_position=attacker_robot_position,
@@ -254,9 +254,8 @@ def test_passing_receive_speed(
             simulated_test_runner=simulated_test_runner,
             receive_pass=True,
         ),
-        params=[0],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
         run_till_end=False,
     )
@@ -380,8 +379,8 @@ def test_passing_no_backwards_passes(
     ]
 
     simulated_test_runner.run_test(
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
         run_till_end=False,
     )

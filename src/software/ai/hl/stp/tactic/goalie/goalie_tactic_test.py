@@ -155,10 +155,8 @@ def test_goalie_blocks_shot(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -239,10 +237,8 @@ def test_goalie_clears_from_dead_zone(
     simulated_test_runner.run_test(
         setup=setup,
         test_timeout_s=8,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 

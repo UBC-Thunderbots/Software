@@ -142,10 +142,8 @@ def test_enemy_free_kick_play(
     simulated_test_runner.run_test(
         setup=setup,
         params=[0, 1, 2],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=8,
     )
 

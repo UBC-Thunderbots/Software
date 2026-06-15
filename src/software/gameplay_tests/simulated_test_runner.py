@@ -255,11 +255,9 @@ class SimulatedTestRunner(TbotsTestRunner):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        # TODO (#3744): fix these extra arguments
-        tick_duration_s=0.0166,  # Default to 60hz
+        tick_duration_s=0.0166,
         ci_cmd_with_delay=[],
         run_till_end=True,
-        **kwargs,
     ):
         """Helper function to run a test, with thunderscope if enabled
 
@@ -267,7 +265,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param eventually_validation_sequence_set: validation that should eventually be true
         :param setup: function that sets up the World state and the gamecontroller before running the test
         :param test_timeout_s: how long the test should run before timing out
-        :param tick_duration_s: length of a tick
+        :param tick_duration_s: length of a simulation tick
         :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
                                   [
                                       (time, command, team),

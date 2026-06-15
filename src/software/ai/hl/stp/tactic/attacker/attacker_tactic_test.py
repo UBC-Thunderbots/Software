@@ -170,8 +170,7 @@ def test_attacker_passing(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         run_till_end=False,
         test_timeout_s=7,
     )
@@ -281,8 +280,7 @@ def test_attacker_keep_away(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -382,8 +380,7 @@ def test_attacker_shoot_goal(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         run_till_end=False,
         test_timeout_s=9,
     )

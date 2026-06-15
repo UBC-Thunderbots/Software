@@ -132,12 +132,18 @@ class TbotsTestRunner:
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
+        tick_duration_s=0.0166,
+        ci_cmd_with_delay=[],
+        run_till_end=True,
     ):
         """Begins validating a test based on incoming world protos
 
         :param always_validation_sequence_set: validation set that must always be true
         :param eventually_validation_sequence_set: validation set that must eventually be true
         :param test_timeout_s: how long the test will run
+        :param tick_duration_s: length of a simulation tick (used in simulated tests)
+        :param ci_cmd_with_delay: timed CI commands (used in simulated tests)
+        :param run_till_end: if true, test runs till the end even if eventually validation passes
         """
         raise NotImplementedError("abstract method run_test called from base class")
 

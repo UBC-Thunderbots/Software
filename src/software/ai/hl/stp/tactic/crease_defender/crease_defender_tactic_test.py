@@ -52,8 +52,7 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_always_validation_sequence_set=always_validations,
-        ag_always_validation_sequence_set=always_validations,
+        always_validation_sequence_set=always_validations,
     )
 
 
@@ -174,8 +173,7 @@ def test_crease_region_positioning(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=5,
     )
 
@@ -259,10 +257,8 @@ def test_crease_positioning(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=4,
     )
 
@@ -356,10 +352,8 @@ def test_crease_autochip(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=3,
     )
 
@@ -437,10 +431,8 @@ def test_crease_get_ball(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 

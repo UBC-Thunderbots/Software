@@ -498,10 +498,8 @@ def test_robot_movement(
             simulated_test_runner,
         ),
         params=[0],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=timeout_s,
         run_till_end=run_till_end,
     )

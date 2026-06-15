@@ -84,8 +84,7 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
     )
 
 

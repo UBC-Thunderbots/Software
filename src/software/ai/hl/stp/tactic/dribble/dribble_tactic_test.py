@@ -177,8 +177,7 @@ def test_dribble(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=25,
         run_till_end=False,
     )
@@ -330,10 +329,8 @@ def test_excessive_dribbling_without_enemies(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -378,8 +375,7 @@ def test_dribble_with_excessive_dribbling(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=10,
     )
 
@@ -429,8 +425,7 @@ def test_run_into_enemy_robot_knock_ball_away(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,
     )
 
@@ -475,10 +470,8 @@ def test_robot_not_bumping_ball_when_turning(
 
     simulated_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
-        inv_always_validation_sequence_set=always_validations,
-        ag_always_validation_sequence_set=always_validations,
+        eventually_validation_sequence_set=eventually_validations,
+        always_validation_sequence_set=always_validations,
     )
 
 

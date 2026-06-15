@@ -7,7 +7,7 @@ import pytest
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_state_pb2 import Command
 
-from proto.import_all_protos import ValidationProtoSet
+from proto.import_all_protos import ValidationProtoSet, WorldState
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.gameplay_tests.validation import validation
 from software.logger.logger import create_logger
@@ -95,12 +95,23 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     @override
+    def set_world_state(self, world_state: WorldState):
+        logger.warning(
+            "set_world_state called in field test: "
+            "assuming robots are initialized according to the given parameters"
+        )
+
+    @override
     def run_test(
         self,
         setup=lambda: None,
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
+        # Unused parameters, here for compatibility with sim tests
+        tick_duration_s=None,
+        ci_cmd_with_delay=None,
+        run_till_end=None,
     ):
         """Run a test. In a field test this means beginning validation.
 

@@ -104,8 +104,8 @@ def test_simulator_move_ball(
 
     simulated_test_runner.run_test(
         test_timeout_s=8,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -181,8 +181,8 @@ def test_ball_robot_collision(simulated_test_runner):
     ]
 
     simulated_test_runner.run_test(
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
