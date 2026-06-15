@@ -47,10 +47,9 @@ bool PrimitiveExecutor::isLinearTrajectoryNew(
     // not). Regenerate if the plans ever diverge by more than the deviation threshold.
     const double old_time = time_since_linear_trajectory_creation_.toSeconds();
     const double new_time = VISION_TO_ROBOT_DELAY_S;
-    const double horizon =
-        std::min(std::max(trajectory_path_->getTotalTime() - old_time,
-                          new_trajectory->getTotalTime() - new_time),
-                 TRAJECTORY_DEVIATION_HORIZON_S);
+    const double horizon  = std::min(std::max(trajectory_path_->getTotalTime() - old_time,
+                                              new_trajectory->getTotalTime() - new_time),
+                                     TRAJECTORY_DEVIATION_HORIZON_S);
 
     for (double tau = 0.0; tau <= horizon; tau += TRAJECTORY_DEVIATION_TIME_STEP_S)
     {
@@ -75,7 +74,8 @@ bool PrimitiveExecutor::isAngularTrajectoryNew(
 
     // Regenerate if the destination rotated meaningfully (also catches changes beyond
     // the comparison horizon below).
-    if (!angular_trajectory_->equals(new_trajectory, ANGULAR_DESTINATION_THRESHOLD_DEGREES))
+    if (!angular_trajectory_->equals(new_trajectory,
+                                     ANGULAR_DESTINATION_THRESHOLD_DEGREES))
     {
         return true;
     }
