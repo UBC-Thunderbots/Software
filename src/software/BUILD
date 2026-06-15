@@ -125,7 +125,6 @@ py_library(
     name = "conftest",
     srcs = ["conftest.py"],
     deps = [
-        "//software/gameplay_tests:field_test_fixture",
         "//software/gameplay_tests:fixture",
         "//software/gameplay_tests:util",
     ],

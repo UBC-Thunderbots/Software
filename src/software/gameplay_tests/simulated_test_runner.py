@@ -251,10 +251,11 @@ class SimulatedTestRunner(TbotsTestRunner):
     @override
     def run_test(
         self,
-        always_validation_sequence_set=[],
-        eventually_validation_sequence_set=[],
-        setup=(lambda: None),
+        setup=lambda: None,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
+        # TODO (#3744): fix these extra arguments
         tick_duration_s=0.0166,  # Default to 60hz
         ci_cmd_with_delay=[],
         run_till_end=True,

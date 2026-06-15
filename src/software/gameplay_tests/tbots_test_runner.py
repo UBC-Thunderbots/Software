@@ -1,10 +1,7 @@
 from proto.import_all_protos import *
-from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
 from typing import Any
-
-logger = create_logger(__name__)
 
 
 class TbotsTestRunner:
@@ -120,6 +117,30 @@ class TbotsTestRunner:
         self.blue_full_system_proto_unix_io.send_proto(Play, Play(name=blue_play))
         self.yellow_full_system_proto_unix_io.send_proto(Play, Play(name=yellow_play))
 
+    @abstractmethod
+    def set_world_state(self, world_state: WorldState):
+        """Sets the initial world state of the test.
+
+        :param world_state: The WorldState proto to use
+        """
+        raise NotImplementedError("abstract class method called set_world_state")
+
+    @abstractmethod
+    def run_test(
+        self,
+        setup=lambda: None,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+    ):
+        """Begins validating a test based on incoming world protos
+
+        :param always_validation_sequence_set: validation set that must always be true
+        :param eventually_validation_sequence_set: validation set that must eventually be true
+        :param test_timeout_s: how long the test will run
+        """
+        raise NotImplementedError("abstract method run_test called from base class")
+
     def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
         """Converts dict of tactics to AssignedTacticPlayControlParams message
 
@@ -136,26 +157,3 @@ class TbotsTestRunner:
                     break
 
         return params
-
-    @abstractmethod
-    def set_world_state(self, worldstate: WorldState):
-        """Sets the worldstate for the given team
-
-        :param worldstate: the worldstate proto to use
-        """
-        raise NotImplementedError("abstract class method called set_world_state")
-
-    @abstractmethod
-    def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-    ):
-        """Begins validating a test based on incoming world protos
-
-        :param always_validation_sequence_set: validation set that must always be true
-        :param eventually_validation_sequence_set: validation set that must eventually be true
-        :param test_timeout_s: how long the test will run
-        """
-        raise NotImplementedError("abstract method run_test called from base class")
