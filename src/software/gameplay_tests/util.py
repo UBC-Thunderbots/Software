@@ -71,6 +71,12 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
 
     simulated_group = parser.add_argument_group("Simulated test arguments")
     simulated_group.add_argument(
+        "--ci_mode",
+        action="store_true",
+        default=False,
+        help="Run simulator at faster speed",
+    )
+    simulated_group.add_argument(
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
