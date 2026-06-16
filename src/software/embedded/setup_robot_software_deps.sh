@@ -57,6 +57,9 @@ fi
 rm -f /opt/tbotspython/bin/platformio
 ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
 
+# Install the espressif32 platform for powerboard flashing
+/opt/tbotspython/bin/platformio platform install espressif32
+
 # Programmatically enable serial communication for UART
 sudo raspi-config nonint do_serial_hw 0
 sudo raspi-config nonint do_serial_cons 1
