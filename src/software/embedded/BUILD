@@ -165,3 +165,14 @@ cc_library(
         "@eigen",
     ],
 )
+
+cc_test(
+    name = "robot_localizer_test",
+    srcs = ["robot_localizer_test.cpp"],
+    deps = [
+        ":robot_localizer",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/physics:velocity_conversion_util",
+    ],
+)

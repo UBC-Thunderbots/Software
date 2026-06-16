@@ -297,14 +297,12 @@ inline void Thunderloop::processNetworkPolling(
         primitive_ = new_primitive;
 
         // Feed the trajectory's starting pose to the localizer as a vision update.
-        // The start angle is offset by half a turn to match the robot's convention.
         if (primitive_.has_move())
         {
             const Point position =
                 createPoint(primitive_.move().xy_traj_params().start_position());
             const Angle orientation =
-                createAngle(primitive_.move().w_traj_params().start_angle()) +
-                Angle::half();
+                createAngle(primitive_.move().w_traj_params().start_angle());
 
             robot_localizer_.update(
                 RobotLocalizer::VisionData{position, orientation, RTT_S / 2});

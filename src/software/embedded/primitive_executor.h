@@ -48,26 +48,6 @@ class PrimitiveExecutor
         TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
 
    private:
-    /**
-     * Returns whether the given linear trajectory is meaningfully different from the
-     * one currently being followed (i.e. its destination has moved by more than
-     * LINEAR_DESTINATION_THRESHOLD_METERS), and so should replace it.
-     *
-     * @param new_trajectory The newly generated linear trajectory
-     * @return true if the trajectory should be regenerated, false to keep the current one
-     */
-    bool isLinearTrajectoryNew(const std::optional<TrajectoryPath>& new_trajectory) const;
-
-    /**
-     * Returns whether the given angular trajectory is meaningfully different from the
-     * one currently being followed (i.e. its destination has rotated by more than
-     * ANGULAR_DESTINATION_THRESHOLD_DEGREES), and so should replace it.
-     *
-     * @param new_trajectory The newly generated angular trajectory
-     * @return true if the trajectory should be regenerated, false to keep the current one
-     */
-    bool isAngularTrajectoryNew(const BangBangTrajectory1DAngular& new_trajectory) const;
-
     /*
      * Compute the next target linear _local_ velocity the robot should have.
      * @param delta_time The elapsed time since last time step
@@ -130,21 +110,8 @@ class PrimitiveExecutor
     // to avoid jittering around the destination.
     static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 
-    // If the destination of the current and newly-generated trajectory differ by more
-    // than these, we regenerate the trajectory.
+    // If distance between current linear trajectory destination and new one is larger
+    // than this, we change trajectories.
     static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
-
-    // Even when the destination is unchanged, the path to it may change (e.g. a newly
-    // detected obstacle forces a detour). We compare the current and newly-generated
-    // trajectories over an upcoming time window and regenerate if they ever diverge by
-    // more than these thresholds.
-    static constexpr double LINEAR_TRAJECTORY_DEVIATION_THRESHOLD_METERS   = 0.05;
-    static constexpr double ANGULAR_TRAJECTORY_DEVIATION_THRESHOLD_DEGREES = 10.0;
-
-    // The time window (and sampling step) over which the current and newly-generated
-    // trajectories are compared, anchored at the robot's current point on the
-    // trajectory. Capped so comparison stays cheap for long trajectories.
-    static constexpr double TRAJECTORY_DEVIATION_HORIZON_S   = 1.0;
-    static constexpr double TRAJECTORY_DEVIATION_TIME_STEP_S = 0.1;
 };

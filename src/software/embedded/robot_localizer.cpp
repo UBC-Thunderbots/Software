@@ -159,17 +159,23 @@ void RobotLocalizer::update(const VisionData& data)
         rollback_point = std::prev(history.end());
     }
 
-    // 1. Save the state from the rollback point
+    // 1. Roll the filter back to the state from just before the rollback point's
+    //    operation (its stored state is captured pre-operation).
     filter_.state_estimate   = rollback_point->state_estimate;
     filter_.state_covariance = rollback_point->state_covariance;
 
-    // 2. Truncate history (erase rollback_point and everything older)
-    history.erase(rollback_point, history.end());
+    // 2. Drop everything strictly older than the rollback point, but KEEP the rollback
+    //    point itself so its operation is replayed after the vision measurement is
+    //    inserted. (Erasing the rollback point too would silently drop one
+    //    predict/update step on every vision frame, making the position estimate lag
+    //    and inflating the velocity estimate through the position/velocity covariance.)
+    history.erase(std::next(rollback_point), history.end());
 
-    // 3. Apply the delayed vision measurement
+    // 3. Apply the delayed vision measurement at the rolled-back time.
     updateFilterWithVision(data.position, data.orientation);
 
-    // 4. Replay the remaining history (from oldest to newest)
+    // 4. Replay the remaining history (from oldest to newest), including the rollback
+    //    point's own operation.
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
         if (it->prediction.has_value())
@@ -225,7 +231,29 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
         static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
         static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
 
+    // Vision observes pose (position + orientation), not velocity. The velocity states
+    // are observed directly by the wheel encoders (and IMU for angular velocity), which
+    // are accurate. Letting the vision position/orientation correction also adjust the
+    // velocity states through the position<->velocity covariance coupling is unstable
+    // here: the tight vision noise leaves the position correction lagging, and that
+    // persistent lag is fed into the velocity estimate every frame, inflating it (a
+    // robot moving 1 m/s was estimated at ~1.8 m/s, and worse without delay
+    // compensation). So we hold the velocity states fixed across the vision update.
+    const double x_velocity =
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::X_VELOCITY));
+    const double y_velocity =
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY));
+    const double angular_velocity =
+        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY));
+
     filter_.update(measurement);
+
+    filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
+        x_velocity;
+    filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
+        y_velocity;
+    filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
+        angular_velocity;
 }
 
 void RobotLocalizer::update(const MotorData& data)
