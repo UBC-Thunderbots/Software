@@ -1,7 +1,23 @@
 import argparse
+import os
 import sys
 
 import pytest
+
+
+def get_runtime_dir():
+    """Gets the base runtime directory for the test execution.
+
+    Creates a new persistent directory for each test so that tests
+    running in parallel do not interfere with each other.
+
+    :return: The path to the runtime directory.
+    """
+    import uuid
+
+    runtime_dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
+    os.makedirs(runtime_dir, exist_ok=True)
+    return runtime_dir
 
 
 def load_command_line_arguments(allow_unrecognized: bool = False):
@@ -12,6 +28,9 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
 
     :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
     """
+
+    RUNTIME_DIR = get_runtime_dir()
+
     parser = argparse.ArgumentParser(
         description="Run simulated or field gameplay tests"
     )
@@ -37,13 +56,13 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         "--blue_full_system_runtime_dir",
         type=str,
         help="blue full_system runtime directory",
-        default="/tmp/tbots/blue",
+        default=os.path.join(RUNTIME_DIR, "blue"),
     )
     general_group.add_argument(
         "--yellow_full_system_runtime_dir",
         type=str,
         help="yellow full_system runtime directory",
-        default="/tmp/tbots/yellow",
+        default=os.path.join(RUNTIME_DIR, "yellow"),
     )
     general_group.add_argument(
         "--layout",
@@ -80,7 +99,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
-        default="/tmp/tbots",
+        default=RUNTIME_DIR,
     )
     simulated_group.add_argument(
         "--debug_simulator",

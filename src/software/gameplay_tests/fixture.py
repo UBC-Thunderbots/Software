@@ -32,24 +32,6 @@ logger = create_logger(__name__)
 LAUNCH_DELAY_S = 0.1
 
 
-def get_runtime_dir():
-    """Gets the base runtime directory for the test execution.
-
-    Creates a new persistent directory for each test so that tests
-    running in parallel do not interfere with each other.
-
-    :return: The path to the runtime directory.
-    """
-    import uuid
-
-    runtime_dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
-    os.makedirs(runtime_dir, exist_ok=True)
-    return runtime_dir
-
-
-RUNTIME_DIR = get_runtime_dir()
-
-
 @pytest.fixture
 def simulated_test_runner():
     args = load_command_line_arguments()
