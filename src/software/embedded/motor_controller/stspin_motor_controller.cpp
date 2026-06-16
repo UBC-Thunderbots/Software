@@ -47,6 +47,8 @@ void StSpinMotorController::setup()
     {
         sendAndReceiveFrame(motor, SetPidSpeedKpKiFrame{.kp = SPEED_PID_PROPORTIONAL_GAIN,
                                                         .ki = SPEED_PID_INTEGRAL_GAIN});
+        sendAndReceiveFrame(motor, SetPidTorqueKpKiFrame{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
+                                                        .ki = TORQUE_PID_INTEGRAL_GAIN});
     }
 }
 
@@ -189,6 +191,7 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
 void StSpinMotorController::updateEuclideanVelocity(
     EuclideanSpace_t target_euclidean_velocity)
 {
+#if 0
     const Vector local_velocity(target_euclidean_velocity[1],
                                 target_euclidean_velocity[0]);
 
@@ -237,6 +240,12 @@ void StSpinMotorController::updateEuclideanVelocity(
                         SetSpeedFeedForwardKsFrame{.ks = back_right_ks});
     sendAndReceiveFrame(MotorIndex::BACK_LEFT,
                         SetSpeedFeedForwardKsFrame{.ks = back_left_ks});
+#endif
+    sendMotorStatusToPlotJuggler(MotorIndex::FRONT_LEFT);
+    sendMotorStatusToPlotJuggler(MotorIndex::FRONT_RIGHT);
+    sendMotorStatusToPlotJuggler(MotorIndex::BACK_LEFT);
+    sendMotorStatusToPlotJuggler(MotorIndex::BACK_RIGHT);
+
 }
 
 void StSpinMotorController::immediatelyDisable()
