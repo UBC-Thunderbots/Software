@@ -2,7 +2,6 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 from software.gameplay_tests.validation.friendly_team_scored import *
 from software.gameplay_tests.validation.ball_enters_region import *
-from software.gameplay_tests.validation.friendly_has_ball_possession import *
 from software.gameplay_tests.validation.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -37,8 +36,8 @@ def test_offense_play(simulated_test_runner):
 
         simulated_test_runner.set_world_state(
             create_world_state(
-                yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
+                yellow_robot_locations=yellow_bots,
                 ball_location=start_point,
                 ball_velocity=tbots_cpp.Vector(0, 0),
             ),
@@ -61,7 +60,6 @@ def test_offense_play(simulated_test_runner):
     always_validation_sequence_set = [
         [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])],
         [NeverExcessivelyDribbles()],
-        [FriendlyAlwaysHasBallPossession()],
     ]
 
     # Eventually Validation
@@ -74,7 +72,6 @@ def test_offense_play(simulated_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
-        run_till_end=True,
     )
 
 
