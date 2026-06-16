@@ -16,6 +16,91 @@ PrimitiveExecutor::PrimitiveExecutor(
 {
 }
 
+bool PrimitiveExecutor::isLinearTrajectoryNew(
+    const std::optional<TrajectoryPath>& new_trajectory) const
+{
+    if (new_trajectory.has_value() != trajectory_path_.has_value())
+    {
+        // We either don't have a trajectory and the new one does, or we have one and
+        // the new one doesn't.
+        return true;
+    }
+
+    if (!new_trajectory.has_value())
+    {
+        return false;
+    }
+
+    // Regenerate if the destination moved meaningfully. This also catches changes
+    // beyond the comparison horizon below (e.g. a far-away destination shifting).
+    if (!trajectory_path_->equals(*new_trajectory, LINEAR_DESTINATION_THRESHOLD_METERS))
+    {
+        return true;
+    }
+
+    // The destinations match, but the path to get there may have changed (e.g. a
+    // newly-detected obstacle forces a detour). Compare the two plans over the same
+    // upcoming time window, anchored at where we currently are on the old trajectory,
+    // so timing/speed differences are accounted for (a purely spatial comparison would
+    // not). Regenerate if the plans ever diverge by more than the deviation threshold.
+    const double old_time = time_since_linear_trajectory_creation_.toSeconds();
+    const double new_time = VISION_TO_ROBOT_DELAY_S;
+    const double horizon  = std::min(std::max(trajectory_path_->getTotalTime() - old_time,
+                                              new_trajectory->getTotalTime() - new_time),
+                                     TRAJECTORY_DEVIATION_HORIZON_S);
+
+    for (double tau = 0.0; tau <= horizon; tau += TRAJECTORY_DEVIATION_TIME_STEP_S)
+    {
+        const Point old_pos = trajectory_path_->getPosition(old_time + tau);
+        const Point new_pos = new_trajectory->getPosition(new_time + tau);
+        if (distance(old_pos, new_pos) > LINEAR_TRAJECTORY_DEVIATION_THRESHOLD_METERS)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool PrimitiveExecutor::isAngularTrajectoryNew(
+    const BangBangTrajectory1DAngular& new_trajectory) const
+{
+    if (!angular_trajectory_.has_value())
+    {
+        return true;
+    }
+
+    // Regenerate if the destination rotated meaningfully (also catches changes beyond
+    // the comparison horizon below).
+    if (!angular_trajectory_->equals(new_trajectory,
+                                     ANGULAR_DESTINATION_THRESHOLD_DEGREES))
+    {
+        return true;
+    }
+
+    // Compare the two plans over the same upcoming time window (see isLinearTrajectoryNew
+    // for rationale), regenerating if they ever diverge by more than the threshold.
+    const double old_time = time_since_angular_trajectory_creation_.toSeconds();
+    const double new_time = VISION_TO_ROBOT_DELAY_S;
+    const double horizon =
+        std::min(std::max(angular_trajectory_->getTotalTime() - old_time,
+                          new_trajectory.getTotalTime() - new_time),
+                 TRAJECTORY_DEVIATION_HORIZON_S);
+
+    for (double tau = 0.0; tau <= horizon; tau += TRAJECTORY_DEVIATION_TIME_STEP_S)
+    {
+        const Angle old_orientation = angular_trajectory_->getPosition(old_time + tau);
+        const Angle new_orientation = new_trajectory.getPosition(new_time + tau);
+        if (old_orientation.minDiff(new_orientation).toDegrees() >
+            ANGULAR_TRAJECTORY_DEVIATION_THRESHOLD_DEGREES)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
 {
     current_primitive_ = primitive_msg;
@@ -26,19 +111,29 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
             createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                            state_.velocity(), robot_constants_);
 
+        // Only regenerate the trajectory (and reset the controller/clock) when the
+        // destination has meaningfully changed. The AI re-sends the same primitive
+        // every tick; regenerating unconditionally would pin the robot to the start
+        // of a fresh trajectory forever, so it would never accelerate along it.
+        if (isLinearTrajectoryNew(new_trajectory_path))
+        {
+            trajectory_path_ = new_trajectory_path;
+            position_controller_.reset();
+            time_since_linear_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
+
         const auto new_angular_trajectory =
             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
                                               state_.angularVelocity(), robot_constants_);
 
-        trajectory_path_ = new_trajectory_path;
-        position_controller_.reset();
-        time_since_linear_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
-
-        angular_trajectory_ = new_angular_trajectory;
-        orientation_controller_.reset();
-        time_since_angular_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        if (isAngularTrajectoryNew(new_angular_trajectory))
+        {
+            angular_trajectory_ = new_angular_trajectory;
+            orientation_controller_.reset();
+            time_since_angular_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
     }
 }
 
