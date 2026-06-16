@@ -138,7 +138,7 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
     TbotsProto::MotorStatus motor_status =
         createMotorStatus(current_wheel_velocities, dribbler_rpm);
 
-    #if 0
+#if 0
     if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
                  prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
         RUNAWAY_PROTECTION_THRESHOLD_MPS)

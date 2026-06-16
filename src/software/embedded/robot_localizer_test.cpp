@@ -12,10 +12,9 @@ namespace
 // Mirror the values thunderloop constructs the localizer with (DivB constants).
 RobotLocalizer::RobotLocalizerConfig makeConfig()
 {
-    return RobotLocalizer::RobotLocalizerConfig{
-        /*process_noise_variance=*/1.0,
-        /*vision_noise_variance=*/0.01 * 0.01,
-        /*motor_sensor_noise_variance=*/0.5};
+    return RobotLocalizer::RobotLocalizerConfig{/*process_noise_variance=*/1.0,
+                                                /*vision_noise_variance=*/0.01 * 0.01,
+                                                /*motor_sensor_noise_variance=*/0.5};
 }
 
 constexpr double LOOP_HZ = 300.0;
@@ -54,9 +53,9 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
         // with the reported age.
         if (feed_vision && tick % 5 == 0)
         {
-            localizer.update(RobotLocalizer::VisionData{
-                true_position - true_velocity * vision_age, true_orientation,
-                vision_age});
+            localizer.update(
+                RobotLocalizer::VisionData{true_position - true_velocity * vision_age,
+                                           true_orientation, vision_age});
         }
     }
 
