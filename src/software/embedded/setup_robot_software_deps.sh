@@ -38,6 +38,9 @@ cd /tmp/tbots_download_cache/Python-3.12.0
 make -j$(nproc)
 sudo make altinstall
 
+# Remove outdated /opt/tbotspython
+sudo rm -rf /opt/tbotspython
+
 sudo mkdir -p /opt/tbotspython
 sudo chown -R $USER:$USER /opt/tbotspython
 
@@ -53,8 +56,6 @@ if ! /usr/local/bin/python3.12 /tmp/tbots_download_cache/get-platformio.py; then
     exit 1
 fi
 
-# delete existing symlink and link platformio to /opt/tbotspython/bin so that bazel can find it
-rm -f /opt/tbotspython/bin/platformio
 ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
 
 # Install the espressif32 platform for powerboard flashing
