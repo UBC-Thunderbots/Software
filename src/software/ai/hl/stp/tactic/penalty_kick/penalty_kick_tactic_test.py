@@ -55,7 +55,7 @@ def test_penalty_kick(
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = field.friendlyPenaltyMark()
 
-    def setup(*args):
+    def setup():
         shooter_position = ball_initial_pos - tbots_cpp.Vector(0.1, 0)
 
         simulated_test_runner.set_world_state(

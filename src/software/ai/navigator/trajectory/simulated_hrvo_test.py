@@ -489,7 +489,7 @@ def test_robot_movement(
     )
 
     simulated_test_runner.run_test(
-        setup=lambda param: hrvo_setup(
+        setup=lambda: hrvo_setup(
             friendly_robot_positions,
             friendly_robot_destinations,
             friendly_robots_final_orientations,
@@ -497,7 +497,6 @@ def test_robot_movement(
             enemy_robots_destinations,
             simulated_test_runner,
         ),
-        params=[0],
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=timeout_s,

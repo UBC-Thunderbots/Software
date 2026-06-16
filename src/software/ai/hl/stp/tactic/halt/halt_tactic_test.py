@@ -30,7 +30,7 @@ from software.gameplay_tests.util import pytest_main
     ],
 )
 def test_robot_halt(blue_robot_locations, blue_robot_velocities, simulated_test_runner):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_robot_locations,

@@ -97,7 +97,7 @@ from software.gameplay_tests.util import pytest_main
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
@@ -141,7 +141,6 @@ def test_enemy_free_kick_play(
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2],
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=8,

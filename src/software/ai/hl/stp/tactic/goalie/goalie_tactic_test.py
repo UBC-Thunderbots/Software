@@ -112,7 +112,7 @@ def test_goalie_blocks_shot(
     robot_initial_position,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 [],
@@ -187,7 +187,7 @@ def test_goalie_clears_from_dead_zone(
     should_clear,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 [],

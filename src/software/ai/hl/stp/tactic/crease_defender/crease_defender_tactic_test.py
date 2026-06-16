@@ -29,7 +29,7 @@ from software.gameplay_tests.util import pytest_main
 def test_not_bumping_ball_towards_net(simulated_test_runner):
     enemy_threat_point = tbots_cpp.Point(3, 0)
 
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[tbots_cpp.Point(0, 0)],
@@ -80,7 +80,7 @@ def test_crease_region_positioning(
 ):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[tbots_cpp.Point(-3, 1.5)],
@@ -209,7 +209,7 @@ def test_crease_positioning(
     ball_initial_velocity,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
@@ -317,7 +317,7 @@ def test_crease_autochip(
     should_chip,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],
@@ -387,7 +387,7 @@ def test_crease_get_ball(
     should_dribble,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_bots],

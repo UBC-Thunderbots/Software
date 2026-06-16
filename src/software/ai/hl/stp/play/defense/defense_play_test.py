@@ -34,7 +34,7 @@ from software.gameplay_tests.util import pytest_main
     ],
 )
 def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
-    def setup(*args):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0.93, 0)
 
         simulated_test_runner.set_world_state(
@@ -59,7 +59,6 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
         always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
@@ -97,7 +96,7 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
     ],
 )
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
-    def setup(*args):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0.9, 2.85)
 
         simulated_test_runner.set_world_state(
@@ -122,7 +121,6 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
         always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(

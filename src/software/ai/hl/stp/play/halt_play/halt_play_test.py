@@ -8,7 +8,7 @@ from software.gameplay_tests.util import pytest_main
 # TODO issue  #2599 - Remove Duration parameter from test
 # @pytest.mark.parametrize("run_enemy_ai,test_duration", [(False, 20), (True, 20)])
 def test_halt_play(simulated_test_runner):
-    def setup(*args):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0, 0)
 
         blue_bots = [
@@ -49,14 +49,10 @@ def test_halt_play(simulated_test_runner):
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 
-    # params just have to be a list of length 1 to ensure the test runs at least once
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0],
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
             [RobotSpeedEventuallyBelowThreshold(1e-3)]
         ],
         ci_cmd_with_delay=[

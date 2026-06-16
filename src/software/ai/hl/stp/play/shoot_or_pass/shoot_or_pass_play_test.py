@@ -17,7 +17,7 @@ from software.gameplay_tests.util import pytest_main
 def test_shoot_or_pass_play(simulated_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[

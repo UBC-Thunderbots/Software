@@ -129,7 +129,7 @@ def test_dribble(
     ball_vel,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -296,7 +296,7 @@ def test_excessive_dribbling_without_enemies(
     simulated_test_runner,
     blue_robot_location,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_robot_location],
@@ -339,7 +339,7 @@ def test_dribble_with_excessive_dribbling(simulated_test_runner):
     initial_position = tbots_cpp.Point(4.5, -3.0)
     dribble_orientation = tbots_cpp.Angle.half()
 
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -389,7 +389,7 @@ def test_run_into_enemy_robot_knock_ball_away(
     ball_pos = tbots_cpp.Point(2, -2)
     ball_vel = tbots_cpp.Vector(2, 4)
 
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
@@ -438,7 +438,7 @@ def test_robot_not_bumping_ball_when_turning(
     robot_location = tbots_cpp.Point(-1, 0)
     ball_location = robot_location + tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0)
 
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[tbots_cpp.Point(-3, 2.5), robot_location],

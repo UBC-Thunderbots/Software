@@ -171,7 +171,7 @@ def test_ball_occlusion(
     yellow_robot_positions,
     simulated_test_runner,
 ):
-    def setup(*args):
+    def setup():
         simulated_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_robot_positions,

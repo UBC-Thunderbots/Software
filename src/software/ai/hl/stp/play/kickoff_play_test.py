@@ -15,7 +15,7 @@ from software.gameplay_tests.validation.or_validation import OrValidation
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),

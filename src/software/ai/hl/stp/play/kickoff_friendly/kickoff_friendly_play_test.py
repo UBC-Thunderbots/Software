@@ -23,7 +23,7 @@ from software.gameplay_tests.util import pytest_main
 def test_kickoff_friendly_play(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    def setup(*args):
+    def setup():
         field = tbots_cpp.Field.createSSLDivisionBField()
 
         blue_bots = [
