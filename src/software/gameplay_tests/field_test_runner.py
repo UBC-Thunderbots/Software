@@ -57,62 +57,7 @@ class FieldTestRunner(TbotsTestRunner):
         self.is_yellow_friendly = is_yellow_friendly
         self.robot_communication = robot_communication
 
-        logger.info("determining robots on field")
-        # survey field for available robot ids
-        survey_start_time = time.time()
-        self.friendly_robot_ids_field = []
-        while time.time() - survey_start_time < WORLD_BUFFER_TIMEOUT:
-            try:
-                world = self.world_buffer.get(block=True, timeout=0.1)
-                self.initial_world = world
-                self.friendly_robot_ids_field = [
-                    robot.id for robot in world.friendly_team.team_robots
-                ]
-
-                if len(self.friendly_robot_ids_field) > 0:
-                    logger.info(f"friendly team ids {self.friendly_robot_ids_field}")
-                    break
-            except queue.Empty:
-                continue
-
-        if len(self.friendly_robot_ids_field) == 0:
-            raise Exception("no friendly robots found on field within timeout")
-
-    def wait_for_estop_play(self):
-        """Blocks until the estop is in the PLAY state"""
-        if self.robot_communication.estop_is_playing:
-            return
-
-        logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
-        while not self.robot_communication.estop_is_playing:
-            # We must process events if Thunderscope is running to keep it responsive
-            if self.thunderscope:
-                from pyqtgraph.Qt import QtWidgets
-
-                QtWidgets.QApplication.processEvents()
-            time.sleep(0.1)
-        logger.info(
-            "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
-        )
-
-    @override
-    def send_gamecontroller_command(
-        self,
-        gc_command: Command,
-        team: Team,
-        final_ball_placement_point=None,
-    ):
-        """Send a command to the gamecontroller
-
-        :param gc_command: The command to send
-        :param team: The team which the command as attributed to
-        :param final_ball_placement_point: The ball placement point
-        """
-        self.gamecontroller.send_gc_command(
-            gc_command=gc_command,
-            team=team,
-            final_ball_placement_point=final_ball_placement_point,
-        )
+        self._survey_field_robots()
 
     @override
     def set_world_state(self, world_state: WorldState):
@@ -143,100 +88,142 @@ class FieldTestRunner(TbotsTestRunner):
                                 remain after the timeout, the test fails.
         """
 
-        def stop_test(delay):
-            time.sleep(delay)
-            # We no longer close thunderscope here, because a test might call run_test multiple times.
-            # Thunderscope will be closed when the fixture is torn down.
+        threading.excepthook = self._excepthook
 
-        def __runner():
-            time.sleep(LAUNCH_DELAY_S)
+        run_test_thread = threading.Thread(
+            target=self._runner,
+            daemon=True,
+            args=[
+                always_validation_sequence_set,
+                eventually_validation_sequence_set,
+                test_timeout_s,
+            ],
+        )
 
-            test_end_time = time.time() + test_timeout_s
+        run_test_thread.start()
 
-            # Keep track if we started with any eventually validations
-            has_eventually_validations = any(
-                len(seq) > 0 for seq in eventually_validation_sequence_set
+        self.thunderscope.show()
+
+        run_test_thread.join()
+
+        if self.last_exception:
+            pytest.fail(str(self.last_exception))
+
+    def _wait_for_estop_play(self):
+        """Blocks until the estop is in the PLAY state"""
+        if self.robot_communication.estop_is_playing:
+            return
+
+        logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
+        while not self.robot_communication.estop_is_playing:
+            # We must process events if Thunderscope is running to keep it responsive
+            if self.thunderscope:
+                from pyqtgraph.Qt import QtWidgets
+
+                QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+        logger.info(
+            "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
+        )
+
+    def _stop_test(self, delay):
+        time.sleep(delay)
+        self.thunderscope.close()
+
+    def _runner(
+        self,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+    ):
+        time.sleep(LAUNCH_DELAY_S)
+
+        test_end_time = time.time() + test_timeout_s
+
+        # Keep track if we started with any eventually validations
+        has_eventually_validations = any(
+            len(seq) > 0 for seq in eventually_validation_sequence_set
+        )
+
+        while time.time() < test_end_time:
+            while True:
+                try:
+                    world = self.world_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT
+                    )
+                    break
+                except queue.Empty:
+                    # If we timeout, that means full_system missed the last
+                    # wrapper and robot status, lets resend it.
+                    logger.warning(
+                        f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
+                    )
+
+            # Validate
+            (
+                eventually_validation_proto_set,
+                always_validation_proto_set,
+            ) = validation.run_validation_sequence_sets(
+                world,
+                eventually_validation_sequence_set,
+                always_validation_sequence_set,
             )
 
-            while time.time() < test_end_time:
-                while True:
-                    try:
-                        world = self.world_buffer.get(
-                            block=True, timeout=WORLD_BUFFER_TIMEOUT
-                        )
-                        break
-                    except queue.Empty:
-                        # If we timeout, that means full_system missed the last
-                        # wrapper and robot status, lets resend it.
-                        logger.warning(
-                            f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
-                        )
+            if self.publish_validation_protos:
+                # Set the test name
+                eventually_validation_proto_set.test_name = self.test_name
+                always_validation_proto_set.test_name = self.test_name
 
-                # Validate
-                (
-                    eventually_validation_proto_set,
-                    always_validation_proto_set,
-                ) = validation.run_validation_sequence_sets(
-                    world,
-                    eventually_validation_sequence_set,
-                    always_validation_sequence_set,
+                # Send out the validation proto to thunderscope
+                self.blue_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, eventually_validation_proto_set
+                )
+                self.blue_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, always_validation_proto_set
                 )
 
-                if self.publish_validation_protos:
-                    # Set the test name
-                    eventually_validation_proto_set.test_name = self.test_name
-                    always_validation_proto_set.test_name = self.test_name
+            # Check that all always validations are always valid
+            validation.check_validation(always_validation_proto_set)
 
-                    # Send out the validation proto to thunderscope
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set
-                    )
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, always_validation_proto_set
-                    )
+            # Break if eventually validation passes
+            if has_eventually_validations and all(
+                len(seq) == 0 for seq in eventually_validation_sequence_set
+            ):
+                break
 
-                # Check that all always validations are always valid
-                validation.check_validation(always_validation_proto_set)
+        validation.check_validation(eventually_validation_proto_set)
 
-                # Break if eventually validation passes
-                if has_eventually_validations and all(
-                    len(seq) == 0 for seq in eventually_validation_sequence_set
-                ):
+        self._stop_test(delay=PROCESS_BUFFER_DELAY_S)
+
+    def _excepthook(self, args):
+        """This function is _critical_ for show_thunderscope to work.
+        If the test Thread will raises an exception we won't be able to close
+        the window from the main thread.
+
+        :param args: The args passed in from the hook
+        """
+        self._stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self.last_exception = args.exc_value
+        raise self.last_exception
+
+    def _survey_field_robots(self):
+        logger.info("determining robots on field")
+        # survey field for available robot ids
+        survey_start_time = time.time()
+        self.friendly_robot_ids_field = []
+        while time.time() - survey_start_time < WORLD_BUFFER_TIMEOUT:
+            try:
+                world = self.world_buffer.get(block=True, timeout=0.1)
+                self.initial_world = world
+                self.friendly_robot_ids_field = [
+                    robot.id for robot in world.friendly_team.team_robots
+                ]
+
+                if len(self.friendly_robot_ids_field) > 0:
+                    logger.info(f"friendly team ids {self.friendly_robot_ids_field}")
                     break
+            except queue.Empty:
+                continue
 
-            validation.check_validation(eventually_validation_proto_set)
-
-            stop_test(delay=PROCESS_BUFFER_DELAY_S)
-
-        def excepthook(args):
-            """This function is _critical_ for show_thunderscope to work.
-            If the test Thread will raises an exception we won't be able to close
-            the window from the main thread.
-
-            :param args: The args passed in from the hook
-            """
-            stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
-            self.last_exception = args.exc_value
-            raise self.last_exception
-
-        threading.excepthook = excepthook
-
-        # If visualization is enabled, we need to be careful.
-        # Thunderscope.show() is blocking.
-        if self.thunderscope:
-            run_test_thread = threading.Thread(target=__runner, daemon=True)
-            run_test_thread.start()
-
-            # Only call show if the window is not already open.
-            # If it IS open, it means we are ALREADY in the Qt event loop,
-            # which can only happen if we are running this run_test in a background thread.
-            if not self.thunderscope.is_open():
-                self.thunderscope.show()
-
-            run_test_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        else:
-            __runner()
+        if len(self.friendly_robot_ids_field) == 0:
+            raise Exception("no friendly robots found on field within timeout")

@@ -61,18 +61,83 @@ class SimulatedTestRunner(TbotsTestRunner):
         """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
-    def excepthook(self, args):
+    @override
+    def run_test(
+        self,
+        setup=lambda: None,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
+        tick_duration_s=0.0166,
+        ci_cmd_with_delay=[],
+        run_till_end=True,
+    ):
+        """Helper function to run a test, with thunderscope if enabled
+
+        :param always_validation_sequence_set: validation that should always be true
+        :param eventually_validation_sequence_set: validation that should eventually be true
+        :param setup: function that sets up the World state and the gamecontroller before running the test
+        :param test_timeout_s: how long the test should run before timing out
+        :param tick_duration_s: length of a simulation tick
+        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
+        :param run_till_end: If true, test runs till the end even if eventually validation passes
+                             If false, test stops once eventually validation passes and fails if time out
+        """
+        threading.excepthook = self._excepthook
+
+        self._sync_setup(setup)
+
+        # If thunderscope is enabled, run the test in a thread and show
+        # thunderscope on this thread. The excepthook is setup to catch
+        # any test failures and propagate them to the main thread
+        if self.thunderscope:
+            run_sim_thread = threading.Thread(
+                target=self._runner,
+                daemon=True,
+                args=[
+                    always_validation_sequence_set,
+                    eventually_validation_sequence_set,
+                    test_timeout_s,
+                    tick_duration_s,
+                    ci_cmd_with_delay,
+                    run_till_end,
+                ],
+            )
+            run_sim_thread.start()
+            self.thunderscope.show()
+            run_sim_thread.join()
+
+            if self.last_exception:
+                pytest.fail(str(self.last_exception))
+
+        # If thunderscope is disabled, just run the test
+        else:
+            self._runner(
+                always_validation_sequence_set,
+                eventually_validation_sequence_set,
+                test_timeout_s,
+                tick_duration_s,
+                ci_cmd_with_delay=ci_cmd_with_delay,
+                run_till_end=run_till_end,
+            )
+
+    def _excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
         If the test Thread will raises an exception we won't be able to close
         the window from the main thread.
 
         :param args: The args passed in from the hook
         """
-        self.__stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
 
-    def __stopper(self, delay=PROCESS_BUFFER_DELAY_S):
+    def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
         """Stop running the test
 
         :param delay: How long to wait before closing everything, defaults
@@ -83,7 +148,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         if self.thunderscope:
             self.thunderscope.close()
 
-    def sync_setup(self, setup):
+    def _sync_setup(self, setup):
         """Run setup until simulator has received game state
 
         :param setup: Function that sets up the world state
@@ -108,7 +173,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # Received a response from the simulator
                 break
 
-    def runner(
+    def _runner(
         self,
         always_validation_sequence_set,
         eventually_validation_sequence_set,
@@ -235,7 +300,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 try:
                     # Check that all eventually validations are eventually valid
                     validation.check_validation(eventually_validation_proto_set)
-                    self.__stopper()
+                    self._stopper()
                     return
                 except AssertionError as e:
                     eventually_validation_failure_msg = str(e)
@@ -246,69 +311,4 @@ class SimulatedTestRunner(TbotsTestRunner):
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
-        self.__stopper()
-
-    @override
-    def run_test(
-        self,
-        setup=lambda: None,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-        tick_duration_s=0.0166,
-        ci_cmd_with_delay=[],
-        run_till_end=True,
-    ):
-        """Helper function to run a test, with thunderscope if enabled
-
-        :param always_validation_sequence_set: validation that should always be true
-        :param eventually_validation_sequence_set: validation that should eventually be true
-        :param setup: function that sets up the World state and the gamecontroller before running the test
-        :param test_timeout_s: how long the test should run before timing out
-        :param tick_duration_s: length of a simulation tick
-        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
-        """
-        threading.excepthook = self.excepthook
-
-        self.sync_setup(setup)
-
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-            run_sim_thread = threading.Thread(
-                target=self.runner,
-                daemon=True,
-                args=[
-                    always_validation_sequence_set,
-                    eventually_validation_sequence_set,
-                    test_timeout_s,
-                    tick_duration_s,
-                    ci_cmd_with_delay,
-                    run_till_end,
-                ],
-            )
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            self.runner(
-                always_validation_sequence_set,
-                eventually_validation_sequence_set,
-                test_timeout_s,
-                tick_duration_s,
-                ci_cmd_with_delay=ci_cmd_with_delay,
-                run_till_end=run_till_end,
-            )
+        self._stopper()
