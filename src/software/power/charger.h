@@ -7,7 +7,7 @@
  */
 class Charger
 {
-public:
+   public:
     /**
      * Creates a Charger setting up pins and attaching interrupts.
      */
@@ -42,7 +42,7 @@ public:
      */
     bool isCapacitorCharging();
 
-private:
+   private:
     static constexpr float VOLTAGE_DIVIDER = 1003.0 / 13.0;
     static constexpr float RESOLUTION      = 4096.0;
     static constexpr float SCALE_VOLTAGE   = 3.3;

@@ -34,11 +34,11 @@ cc_library(
 py_test(
     name = "ball_placement_play_test",
     timeout = "long",
-    # Flaky: multi-robot simulated play sensitive to sim timing; passes on retry.
-    flaky = True,
     srcs = [
         "ball_placement_play_test.py",
     ],
+    # Flaky: multi-robot simulated play sensitive to sim timing; passes on retry.
+    flaky = True,
     deps = [
         "//software:conftest",
         "//software/gameplay_tests/validation:validations",
