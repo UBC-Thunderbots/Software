@@ -78,13 +78,13 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
     general_group.add_argument(
         "--blue_full_system_runtime_dir",
         type=str,
-        help="blue full_system runtime directory",
+        help="Blue full_system runtime directory",
         default=os.path.join(RUNTIME_DIR, "blue"),
     )
     general_group.add_argument(
         "--yellow_full_system_runtime_dir",
         type=str,
-        help="yellow full_system runtime directory",
+        help="Yellow full_system runtime directory",
         default=os.path.join(RUNTIME_DIR, "yellow"),
     )
     general_group.add_argument(
@@ -121,7 +121,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
     simulated_group.add_argument(
         "--simulator_runtime_dir",
         type=str,
-        help="simulator runtime directory",
+        help="Simulator runtime directory",
         default=RUNTIME_DIR,
     )
     simulated_group.add_argument(
@@ -131,7 +131,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         help="Debug the simulator",
     )
     simulated_group.add_argument(
-        "--enable_thunderscope", action="store_true", help="enable thunderscope"
+        "--enable_thunderscope", action="store_true", help="Enable thunderscope"
     )
     simulated_group.add_argument(
         "--enable_realism",
