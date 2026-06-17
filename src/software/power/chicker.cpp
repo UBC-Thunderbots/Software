@@ -4,7 +4,7 @@ hw_timer_t* Chicker::pulse_timer    = nullptr;
 hw_timer_t* Chicker::cooldown_timer = nullptr;
 volatile bool Chicker::on_cooldown  = false;
 
-Chicker::Chicker()
+Chicker::Chicker(std::shared_ptr<Charger> charger) : charger_(charger)
 {
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
@@ -20,11 +20,21 @@ Chicker::Chicker()
 void Chicker::kick(uint32_t kick_pulse_width)
 {
     oneShotPulse(kick_pulse_width, KICKER_PIN);
+    // Charging occurs on rising edge, so toggle the pin
+    delay(CHARGE_DELAY_MILLISECONDS);
+    charger_->setCapacitorPin(LOW);
+    delay(CHARGE_DELAY_MILLISECONDS);
+    charger_->setCapacitorPin(HIGH);
 }
 
 void Chicker::chip(uint32_t chip_pulse_width)
 {
     oneShotPulse(chip_pulse_width, CHIPPER_PIN);
+    // Charging occurs on rising edge, so toggle the pin
+    delay(CHARGE_DELAY_MILLISECONDS);
+    charger_->setCapacitorPin(LOW);
+    delay(CHARGE_DELAY_MILLISECONDS);
+    charger_->setCapacitorPin(HIGH);
 }
 
 void Chicker::autokick(uint32_t kick_pulse_width)

@@ -14,10 +14,10 @@ class Charger
     Charger();
     /**
      * Sets the state of the capacitors and whether we should charge them.
-     * @param should_charge Sets the charge pin to HIGH if should_charge is true to begin
-     * charging the capacitors. Otherwise, sets the charge pin to LOW.
+     * @param pin_state HIGH to begin charging the capacitors. Otherwise, sets the charge
+     * pin to LOW.
      */
-    static void chargeCapacitors(bool should_charge);
+    static void setCapacitorPin(bool pin_state);
     /**
      * Returns the voltage of the capacitors
      *

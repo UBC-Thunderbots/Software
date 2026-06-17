@@ -8,9 +8,9 @@ Charger::Charger()
     pinMode(CHRG, OUTPUT);
 }
 
-void Charger::chargeCapacitors(bool should_charge)
+void Charger::setCapacitorPin(bool pin_state)
 {
-    digitalWrite(CHRG, should_charge ? LOW : HIGH);
+    digitalWrite(CHRG, pin_state);
 }
 
 float Charger::getCapacitorVoltage()
