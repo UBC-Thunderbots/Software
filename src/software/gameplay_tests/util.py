@@ -69,9 +69,6 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         help="Runs test as a field test instead of a simulated test",
     )
     general_group.add_argument(
-        "--enable_thunderscope", action="store_true", help="enable thunderscope"
-    )
-    general_group.add_argument(
         "--test_filter",
         action="store",
         default="",
@@ -132,6 +129,9 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         action="store_true",
         default=False,
         help="Debug the simulator",
+    )
+    simulated_group.add_argument(
+        "--enable_thunderscope", action="store_true", help="enable thunderscope"
     )
     simulated_group.add_argument(
         "--enable_realism",
