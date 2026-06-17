@@ -37,14 +37,14 @@ class FieldTestRunner(TbotsTestRunner):
     """Run a field test"""
 
     def __init__(
-            self,
-            test_name,
-            thunderscope,
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
-            gamecontroller,
-            publish_validation_protos=True,
-            is_yellow_friendly=False,
+        self,
+        test_name,
+        thunderscope,
+        blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io,
+        gamecontroller,
+        publish_validation_protos=True,
+        is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
 
@@ -88,10 +88,10 @@ class FieldTestRunner(TbotsTestRunner):
 
     @override
     def send_gamecontroller_command(
-            self,
-            gc_command: proto.ssl_gc_state_pb2.Command,
-            team: proto.ssl_gc_common_pb2.Team,
-            final_ball_placement_point=None,
+        self,
+        gc_command: proto.ssl_gc_state_pb2.Command,
+        team: proto.ssl_gc_common_pb2.Team,
+        final_ball_placement_point=None,
     ):
         """Send a command to the gamecontroller
 
@@ -107,10 +107,10 @@ class FieldTestRunner(TbotsTestRunner):
 
     @override
     def run_test(
-            self,
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=3,
+        self,
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=3,
     ):
         """Run a test. In a field test this means beginning validation.
 
@@ -294,7 +294,7 @@ def load_command_line_arguments():
         action="store",
         default="",
         help="The test filter, if not specified all tests will run. "
-             + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
 
     parser.add_argument(
@@ -377,11 +377,11 @@ def field_test_runner():
 
     # Launch all binaries
     with FullSystem(
-            "software/unix_full_system",
-            full_system_runtime_dir=runtime_dir,
-            debug_full_system=debug_full_sys,
-            friendly_colour_yellow=args.run_yellow,
-            should_restart_on_crash=False,
+        "software/unix_full_system",
+        full_system_runtime_dir=runtime_dir,
+        debug_full_system=debug_full_sys,
+        friendly_colour_yellow=args.run_yellow,
+        should_restart_on_crash=False,
     ) as friendly_fs, Gamecontroller(
         # we would be using conventional port if and only if we are playing in robocup.
         suppress_logs=(not args.show_gamecontroller_logs),
