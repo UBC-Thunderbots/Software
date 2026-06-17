@@ -49,27 +49,31 @@ void PrimitiveExecutor::updateState(const RobotState& state)
 
 Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
 {
-    const auto target_v_global =
+    Vector target_v_global =
         position_controller_.step(state_.position(), *trajectory_path_,
                                   time_since_linear_trajectory_creation_, delta_time);
-    auto target_v_local = globalToLocalVelocity(target_v_global, state_.orientation());
 
-    // make sure robot doesn't go faster than max speed
-    target_v_local = target_v_local.normalize(
-        std::min(target_v_local.length(),
+    // make sure robot doesn't go faster than max speed (speed is frame-invariant)
+    target_v_global = target_v_global.normalize(
+        std::min(target_v_global.length(),
                  static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 
-    const Vector local_acceleration =
-        (target_v_local - prev_target_local_velocity_) / delta_time.toSeconds();
-
-    if (local_acceleration.length() > robot_constants_.robot_max_acceleration_m_per_s_2)
+    // The acceleration limit applies to the robot's translational (global-frame)
+    // velocity. Measuring it in the rotating body frame (i.e. after
+    // globalToLocalVelocity) would add the v*omega term from the body frame spinning,
+    // which falsely trips the limit whenever the robot translates while rotating even
+    // though its global motion is within limits. So compare the change in global
+    // velocity.
+    const Vector global_acceleration =
+        (target_v_global - prev_target_global_velocity_) / delta_time.toSeconds();
+    if (global_acceleration.length() > robot_constants_.robot_max_acceleration_m_per_s_2)
     {
-        LOG(WARNING) << "Robot trying to accelerate at " << local_acceleration.length()
+        LOG(WARNING) << "Robot trying to accelerate at " << global_acceleration.length()
                      << "m/s^2.";
     }
+    prev_target_global_velocity_ = target_v_global;
 
-    prev_target_local_velocity_ = target_v_local;
-    return target_v_local;
+    return globalToLocalVelocity(target_v_global, state_.orientation());
 }
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time)
@@ -178,7 +182,8 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
                                                  const AngularVelocity& angular_velocity)
 {
-    prev_target_local_velocity_   = local_velocity;
+    prev_target_global_velocity_ =
+        localToGlobalVelocity(local_velocity, state_.orientation());
     prev_target_angular_velocity_ = angular_velocity;
 }
 

@@ -21,7 +21,6 @@ cc_library(
     deps = [
         ":trajectory",
         "//software/geom:point",
-        "//software/geom/algorithms",
     ],
 )
 

@@ -59,13 +59,4 @@ class Trajectory
     {
         return getPosition(getTotalTime());
     }
-
-    /**
-     * Check if this trajectory is meaningfully equal to another trajectory.
-     * @param other The other trajectory to compare to
-     * @param threshold The threshold below which the trajectories are considered
-     * equal
-     * @return True if the trajectories are equal, false otherwise
-     */
-    virtual bool equals(const Trajectory<P, V, A>& other, double threshold) const = 0;
 };

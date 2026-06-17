@@ -100,7 +100,7 @@ class PrimitiveExecutor
 
     // The velocities commanded on the previous step. Used to measure the commanded
     // (tick-to-tick) acceleration
-    Vector prev_target_local_velocity_;
+    Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
 
     // Estimated delay between a vision frame to AI processing to robot executing

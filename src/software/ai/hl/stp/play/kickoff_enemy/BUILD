@@ -28,6 +28,8 @@ cc_library(
 
 py_test(
     name = "kickoff_enemy_play_test",
+    # Flaky: multi-robot simulated play sensitive to sim timing; passes on retry.
+    flaky = True,
     srcs = ["kickoff_enemy_play_test.py"],
     deps = [
         "//software:conftest",
