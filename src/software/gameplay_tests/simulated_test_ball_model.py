@@ -44,10 +44,10 @@ STOPPING_SPEED = 0.01
 def test_simulator_move_ball(
     ball_initial_position,
     ball_initial_velocity,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     # Setup Ball
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
+    gameplay_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             [],
@@ -60,13 +60,13 @@ def test_simulator_move_ball(
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+    gameplay_test_runner.blue_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+    gameplay_test_runner.yellow_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )
 
@@ -102,20 +102,20 @@ def test_simulator_move_ball(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         test_timeout_s=8,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
-def test_ball_robot_collision(simulated_test_runner):
+def test_ball_robot_collision(gameplay_test_runner):
     ball_initial_position = tbots_cpp.Field.createSSLDivisionBField().centerPoint()
     ball_initial_velocity = tbots_cpp.Vector(2.5, 0)
     robot_position = tbots_cpp.Point(2.5, 0)
 
     # Setup Robot
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
+    gameplay_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             [],
@@ -126,7 +126,7 @@ def test_ball_robot_collision(simulated_test_runner):
     )
 
     # Setup Ball
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
+    gameplay_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             [],
@@ -139,13 +139,13 @@ def test_ball_robot_collision(simulated_test_runner):
     # Setup Tactic
     params = AssignedTacticPlayControlParams()
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+    gameplay_test_runner.blue_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )
 
     # Setup no tactics on the enemy side
     params = AssignedTacticPlayControlParams()
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+    gameplay_test_runner.yellow_full_system_proto_unix_io.send_proto(
         AssignedTacticPlayControlParams, params
     )
 
@@ -180,7 +180,7 @@ def test_ball_robot_collision(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
     )

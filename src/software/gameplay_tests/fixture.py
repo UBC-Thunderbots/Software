@@ -33,8 +33,15 @@ LAUNCH_DELAY_S = 0.1
 
 
 @pytest.fixture
-def simulated_test_runner():
+def gameplay_test_runner():
     args = load_command_line_arguments()
+    if args.run_field_test:
+        yield from (args)
+    else:
+        yield from simulated_test_runner(args)
+
+
+def simulated_test_runner(args):
     tscope = None
 
     simulator_proto_unix_io = ProtoUnixIO()
@@ -118,7 +125,7 @@ def simulated_test_runner():
 
 
 @pytest.fixture
-def field_test_runner():
+def field_test_runner(args):
     """Runs a field test
 
     :return: yields the runner to the test fixture
@@ -126,7 +133,6 @@ def field_test_runner():
     simulator_proto_unix_io = ProtoUnixIO()
     yellow_full_system_proto_unix_io = ProtoUnixIO()
     blue_full_system_proto_unix_io = ProtoUnixIO()
-    args = load_command_line_arguments()
 
     # Grab the current test name to store the proto log for the test case
     current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]

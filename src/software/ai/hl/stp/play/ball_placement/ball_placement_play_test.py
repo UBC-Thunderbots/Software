@@ -31,10 +31,10 @@ from software.gameplay_tests.util import pytest_main
     ],
 )
 def test_two_ai_ball_placement(
-    simulated_test_runner, ball_start_point, ball_placement_point
+    gameplay_test_runner, ball_start_point, ball_placement_point
 ):
     run_ball_placement_scenario(
-        simulated_test_runner, ball_start_point, ball_placement_point
+        gameplay_test_runner, ball_start_point, ball_placement_point
     )
 
 
@@ -62,21 +62,21 @@ def test_two_ai_ball_placement(
     ],
 )
 def test_robocup_technical_challenge_placement(
-    simulated_test_runner, ball_start_point, ball_placement_point
+    gameplay_test_runner, ball_start_point, ball_placement_point
 ):
     run_ball_placement_scenario(
-        simulated_test_runner, ball_start_point, ball_placement_point, blue_only=True
+        gameplay_test_runner, ball_start_point, ball_placement_point, blue_only=True
     )
 
 
 def ball_placement_play_setup(
-    ball_start_point, ball_placement_point, simulated_test_runner, blue_only
+    ball_start_point, ball_placement_point, gameplay_test_runner, blue_only
 ):
     """Set up ball placement test by initializing bot positions, ball placement targets, and test settings
 
     :param ball_start_point: Initial point of the ball
     :param ball_placement_point: Target point of the ball
-    :param simulated_test_runner: Simulated test runner
+    :param gameplay_test_runner: Simulated test runner
     :param blue_only: If True, only the blue team is active; the yellow team is ignored.
     """
     # Setup blue robots
@@ -111,7 +111,7 @@ def ball_placement_play_setup(
         ]
 
     # Create world state
-    simulated_test_runner.set_world_state(
+    gameplay_test_runner.set_world_state(
         create_world_state(
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
@@ -121,28 +121,28 @@ def ball_placement_play_setup(
     )
 
     # Game Controller Setup
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
     # Pass in placement point here - not required for all play tests
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=Command.Type.BALL_PLACEMENT,
         team=Team.BLUE,
         final_ball_placement_point=ball_placement_point,
     )
 
     # Force play override here
-    simulated_test_runner.set_plays(
+    gameplay_test_runner.set_plays(
         blue_play=PlayName.BallPlacementPlay, yellow_play=PlayName.HaltPlay
     )
 
 
 def run_ball_placement_scenario(
-    simulated_test_runner, ball_start_point, ball_placement_point, blue_only=False
+    gameplay_test_runner, ball_start_point, ball_placement_point, blue_only=False
 ):
     """Runs a ball placement test scenario with the specified parameters.
 
-    :param simulated_test_runner: The test runner used to simulate robot and ball behavior.
+    :param gameplay_test_runner: The test runner used to simulate robot and ball behavior.
     :param ball_start_point: The initial position of the ball.
     :param ball_placement_point: The target position where the ball should be placed.
     :param blue_only: If True, only the blue team is active; the yellow team is ignored.
@@ -181,11 +181,11 @@ def run_ball_placement_scenario(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=lambda: ball_placement_play_setup(
             ball_start_point,
             ball_placement_point,
-            simulated_test_runner,
+            gameplay_test_runner,
             blue_only,
         ),
         always_validation_sequence_set=[[]],
@@ -193,7 +193,7 @@ def run_ball_placement_scenario(
         test_timeout_s=30,
     )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         # setup argument isn't passed to preserve world state from previous test run
         always_validation_sequence_set=drop_ball_always_validation_sequence_set,
         eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,

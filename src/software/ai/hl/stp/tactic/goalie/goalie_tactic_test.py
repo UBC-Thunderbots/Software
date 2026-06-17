@@ -110,10 +110,10 @@ def test_goalie_blocks_shot(
     ball_initial_position,
     ball_initial_velocity,
     robot_initial_position,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup():
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[robot_initial_position],
@@ -122,7 +122,7 @@ def test_goalie_blocks_shot(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: GoalieTactic(
                     max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
@@ -153,7 +153,7 @@ def test_goalie_blocks_shot(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
@@ -185,10 +185,10 @@ def test_goalie_blocks_shot(
 def test_goalie_clears_from_dead_zone(
     ball_position,
     should_clear,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup():
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[
@@ -201,7 +201,7 @@ def test_goalie_clears_from_dead_zone(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: GoalieTactic(
                     max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
@@ -234,7 +234,7 @@ def test_goalie_clears_from_dead_zone(
             ]
         ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         test_timeout_s=8,
         eventually_validation_sequence_set=eventually_validation_sequence_set,

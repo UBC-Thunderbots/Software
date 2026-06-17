@@ -8,7 +8,7 @@ from proto.ssl_gc_common_pb2 import Team
 from software.gameplay_tests.util import pytest_main
 
 
-def test_offense_play(simulated_test_runner):
+def test_offense_play(gameplay_test_runner):
     start_point = tbots_cpp.Point(-4.4, 2.9)
 
     def setup():
@@ -34,7 +34,7 @@ def test_offense_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_bots,
                 yellow_robot_locations=yellow_bots,
@@ -43,14 +43,14 @@ def test_offense_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.OffensePlay, yellow_play=PlayName.HaltPlay
         )
 
@@ -67,7 +67,7 @@ def test_offense_play(simulated_test_runner):
         [FriendlyTeamEventuallyScored()],
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,

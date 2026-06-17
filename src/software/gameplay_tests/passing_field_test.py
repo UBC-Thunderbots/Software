@@ -1,19 +1,19 @@
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.gameplay_tests.fixture import *
-from software.gameplay_tests.field_test_runner import WORLD_BUFFER_TIMEOUT
+from software.gameplay_tests.gameplay_test_runner import WORLD_BUFFER_TIMEOUT
 from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
 from software.gameplay_tests.util import pytest_main
 
 
-def test_passing(field_test_runner):
+def test_passing(gameplay_test_runner):
     passer_robot_id = 3
     receiver_robot_id = 5
     should_receive_pass = True
 
-    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    world = gameplay_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     passer_point = tbots_cpp.createPoint(world.ball.current_state.global_position)
     receiver_point = None
     for robot in world.friendly_team.team_robots:
@@ -84,15 +84,15 @@ def test_passing(field_test_runner):
         ]
     ]
 
-    field_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
-    field_test_runner.run_test(
+    gameplay_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
+    gameplay_test_runner.run_test(
         always_validation_sequence_set=always_validation_sequence_set,
         eventually_validation_sequence_set=[[]],
         test_timeout_s=5,
     )
 
     # Send a halt tactic after the test finishes
-    field_test_runner.set_tactics(
+    gameplay_test_runner.set_tactics(
         blue_tactics={
             passer_robot_id: HaltTactic(),
             receiver_robot_id: HaltTactic(),

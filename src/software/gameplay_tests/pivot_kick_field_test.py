@@ -1,7 +1,7 @@
 import math
 from proto.import_all_protos import *
 from software.gameplay_tests.fixture import *
-from software.gameplay_tests.field_test_runner import WORLD_BUFFER_TIMEOUT
+from software.gameplay_tests.gameplay_test_runner import WORLD_BUFFER_TIMEOUT
 
 from software.logger.logger import create_logger
 from software.gameplay_tests.util import pytest_main
@@ -9,10 +9,10 @@ from software.gameplay_tests.util import pytest_main
 logger = create_logger(__name__)
 
 
-def test_pivot_kick(field_test_runner):
+def test_pivot_kick(gameplay_test_runner):
     id = 5
 
-    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    world = gameplay_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     print("Here are the robots:")
     print(
         [
@@ -21,7 +21,7 @@ def test_pivot_kick(field_test_runner):
         ]
     )
 
-    field_test_runner.set_tactics(
+    gameplay_test_runner.set_tactics(
         blue_tactics={
             id: PivotKickTactic(
                 kick_origin=Point(x_meters=-1.13, y_meters=0.75),
@@ -31,14 +31,14 @@ def test_pivot_kick(field_test_runner):
         },
         yellow_tactics=None,
     )
-    field_test_runner.run_test(
+    gameplay_test_runner.run_test(
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=15,
     )
 
     # Send a halt tactic after the test finishes
-    field_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
+    gameplay_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
 
 
 if __name__ == "__main__":

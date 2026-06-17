@@ -14,11 +14,11 @@ from software.gameplay_tests.util import pytest_main
 @pytest.mark.skip(
     "Skipping test. TODO (#3233): attacker robot sometimes doesn't kick the ball towards the receiver"
 )
-def test_shoot_or_pass_play(simulated_test_runner):
+def test_shoot_or_pass_play(gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     def setup():
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     field.friendlyGoalCenter(),
@@ -41,21 +41,21 @@ def test_shoot_or_pass_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.ShootOrPassPlay, yellow_play=PlayName.HaltPlay
         )
 
     # Eventually Validation
     eventually_validations = [[FriendlyTeamEventuallyScored()]]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=15,

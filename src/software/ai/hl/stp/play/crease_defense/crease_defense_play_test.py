@@ -13,12 +13,12 @@ from software.gameplay_tests.validation.robot_enters_region import (
 from software.gameplay_tests.validation.delay_validation import DelayValidation
 
 
-def test_crease_defense_play(simulated_test_runner):
+def test_crease_defense_play(gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
     goalie_position = tbots_cpp.Point(-4.5, 0)
 
     def setup():
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     goalie_position,
@@ -41,11 +41,11 @@ def test_crease_defense_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.CreaseDefensePlay, yellow_play=PlayName.HaltPlay
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
 
@@ -68,7 +68,7 @@ def test_crease_defense_play(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,

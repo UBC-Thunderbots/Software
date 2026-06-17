@@ -10,7 +10,7 @@ from proto.import_all_protos import Command
 from software.gameplay_tests.util import pytest_main
 
 
-def test_example_play(simulated_test_runner):
+def test_example_play(gameplay_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
     def setup():
@@ -36,7 +36,7 @@ def test_example_play(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -45,17 +45,17 @@ def test_example_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.ExamplePlay, yellow_play=PlayName.HaltPlay
         )
 
@@ -70,7 +70,7 @@ def test_example_play(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,

@@ -10,7 +10,7 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
 
 
-def test_shoot_or_chip_play(simulated_test_runner):
+def test_shoot_or_chip_play(gameplay_test_runner):
     def setup():
         ball_initial_pos = tbots_cpp.Point(-1.4, 2)
         ball_initial_vel = tbots_cpp.Vector(0, 0)
@@ -46,21 +46,21 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         world_state.yellow_robots[5].CopyFrom(last_robot)
 
-        simulated_test_runner.set_world_state(world_state)
+        gameplay_test_runner.set_world_state(world_state)
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.HaltPlay
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
     # TODO (#3651): add validations
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=[[]],
         test_timeout_s=10,

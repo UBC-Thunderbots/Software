@@ -187,14 +187,14 @@ def test_receiver(
     robot_pos,
     robot_orientation,
     one_touch,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     def setup():
         ball_velocity = calculate_ball_velocity(
             passer_point, receiver_point, pass_speed
         )
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -216,7 +216,7 @@ def test_receiver(
             "disable_one_touch_shot": not one_touch,
         }
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={1: ReceiverTactic(**receiver_args)}
         )
 
@@ -232,7 +232,7 @@ def test_receiver(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         run_till_end=False,

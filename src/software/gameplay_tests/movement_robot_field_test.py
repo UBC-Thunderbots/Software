@@ -1,6 +1,6 @@
 from proto.import_all_protos import *
 from software.gameplay_tests.fixture import *
-from software.gameplay_tests.field_test_runner import WORLD_BUFFER_TIMEOUT
+from software.gameplay_tests.gameplay_test_runner import WORLD_BUFFER_TIMEOUT
 
 from software.gameplay_tests.util import pytest_main
 from software.logger.logger import create_logger
@@ -69,10 +69,10 @@ logger = create_logger(__name__)
 
 
 # this test can only be run on the field
-def test_basic_rotation(field_test_runner):
+def test_basic_rotation(gameplay_test_runner):
     test_angles = [0, 45, 90, 180, 270, 0]
 
-    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    world = gameplay_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
         raise Exception("The first world received had no robots in it!")
 
@@ -104,16 +104,16 @@ def test_basic_rotation(field_test_runner):
         move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
 
         # Setup Tactic
-        field_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={id: move_tactic}, yellow_tactics=None
         )
-        field_test_runner.run_test(
+        gameplay_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
             test_timeout_s=5,
         )
         # Send a halt tactic after the test finishes
-        field_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={id: HaltTactic()}, yellow_tactics=None
         )
 
@@ -123,8 +123,8 @@ def test_basic_rotation(field_test_runner):
         time.sleep(2)
 
 
-def test_one_robots_square(field_test_runner):
-    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+def test_one_robots_square(gameplay_test_runner):
+    world = gameplay_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
         raise Exception("The first world received had no robots in it!")
 
@@ -185,20 +185,20 @@ def test_one_robots_square(field_test_runner):
     for tactic in tactics:
         print(f"Going to {tactic.destination}")
 
-        field_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 id: tactic,
             },
             yellow_tactics=None,
         )
-        field_test_runner.run_test(
+        gameplay_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
             test_timeout_s=4,
         )
 
     # Send a halt tactic after the test finishes
-    field_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
+    gameplay_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
 
 
 if __name__ == "__main__":

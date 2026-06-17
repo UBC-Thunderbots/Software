@@ -117,11 +117,11 @@ from software.gameplay_tests.util import pytest_main
         # ),
     ],
 )
-def test_stop_play(ball_position, blue_robot_positions, simulated_test_runner):
+def test_stop_play(ball_position, blue_robot_positions, gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     def setup():
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_robot_positions,
                 yellow_robot_locations=[
@@ -137,11 +137,11 @@ def test_stop_play(ball_position, blue_robot_positions, simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.StopPlay, yellow_play=PlayName.HaltPlay
         )
 
@@ -163,7 +163,7 @@ def test_stop_play(ball_position, blue_robot_positions, simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         always_validation_sequence_set=always_stop_play_rules,
         test_timeout_s=6,

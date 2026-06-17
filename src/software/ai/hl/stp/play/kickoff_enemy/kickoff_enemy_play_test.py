@@ -16,7 +16,7 @@ from proto.ssl_gc_common_pb2 import Team
 from software.gameplay_tests.util import pytest_main
 
 
-def test_kickoff_enemy_play(simulated_test_runner):
+def test_kickoff_enemy_play(gameplay_test_runner):
     ball_initial_pos = tbots_cpp.Point(0, 0)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
@@ -39,7 +39,7 @@ def test_kickoff_enemy_play(simulated_test_runner):
             field.enemyDefenseArea().negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_bots,
                 yellow_robot_locations=yellow_bots,
@@ -48,22 +48,22 @@ def test_kickoff_enemy_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.KICKOFF, team=Team.YELLOW
         )
 
         # Let robots get ready before starting kickoff
         threading.Timer(
             4.0,
-            lambda: simulated_test_runner.send_gamecontroller_command(
+            lambda: gameplay_test_runner.send_gamecontroller_command(
                 gc_command=Command.Type.NORMAL_START, team=Team.YELLOW
             ),
         ).start()
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.KickoffEnemyPlay,
             yellow_play=PlayName.KickoffFriendlyPlay,
         )
@@ -136,7 +136,7 @@ def test_kickoff_enemy_play(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
