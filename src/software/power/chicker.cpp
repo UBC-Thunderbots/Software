@@ -3,9 +3,11 @@
 hw_timer_t* Chicker::pulse_timer    = nullptr;
 hw_timer_t* Chicker::cooldown_timer = nullptr;
 volatile bool Chicker::on_cooldown  = false;
+std::shared_ptr<Charger> Chicker::charger_ = nullptr;
 
-Chicker::Chicker(std::shared_ptr<Charger> charger) : charger_(charger)
+Chicker::Chicker(std::shared_ptr<Charger> charger)
 {
+    charger_ = charger;
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
     pinMode(BREAK_BEAM_PIN, INPUT);
