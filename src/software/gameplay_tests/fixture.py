@@ -37,14 +37,23 @@ LAUNCH_DELAY_S = 0.1
 
 @pytest.fixture
 def gameplay_test_runner():
+    """Dispatches to the field or simulated test runner based on --run_field_test.
+
+    :yields: A SimulatedTestRunner or FieldTestRunner.
+    """
     args = load_command_line_arguments()
     if args.run_field_test:
-        yield from (args)
+        yield from field_test_runner(args)
     else:
         yield from simulated_test_runner(args)
 
 
 def simulated_test_runner(args):
+    """Starts the simulator, blue/yellow full systems, and gamecontroller binaries.
+
+    :param args: Parsed command-line arguments.
+    :yields: A SimulatedTestRunner.
+    """
     tscope = None
 
     simulator_proto_unix_io = ProtoUnixIO()
@@ -123,11 +132,11 @@ def simulated_test_runner(args):
             yield runner
 
 
-@pytest.fixture
 def field_test_runner(args):
-    """Runs a field test
+    """Starts the friendly full system, gamecontroller, WiFi, and robot communication.
 
-    :return: yields the runner to the test fixture
+    :param args: Parsed command-line arguments.
+    :yields: A FieldTestRunner.
     """
     simulator_proto_unix_io = ProtoUnixIO()
     yellow_full_system_proto_unix_io = ProtoUnixIO()
