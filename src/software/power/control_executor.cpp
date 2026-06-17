@@ -15,9 +15,17 @@ void ControlExecutor::execute(const TbotsProto_PowerPulseControl& control)
     {
         case TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag:
             chicker->kick(control.chicker.chicker_command.kick_pulse_width);
+            delay(5);
+            charger->chargeCapacitors(false);
+            delay(5);
+            charger->chargeCapacitors(true);
             break;
         case TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag:
             chicker->chip(control.chicker.chicker_command.chip_pulse_width);
+            delay(5);
+            charger->chargeCapacitors(false);
+            delay(5);
+            charger->chargeCapacitors(true);
             break;
         case TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag:
             switch (
