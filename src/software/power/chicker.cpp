@@ -1,8 +1,8 @@
 #include "chicker.h"
 
-hw_timer_t* Chicker::pulse_timer    = nullptr;
-hw_timer_t* Chicker::cooldown_timer = nullptr;
-volatile bool Chicker::on_cooldown  = false;
+hw_timer_t* Chicker::pulse_timer           = nullptr;
+hw_timer_t* Chicker::cooldown_timer        = nullptr;
+volatile bool Chicker::on_cooldown         = false;
 std::shared_ptr<Charger> Chicker::charger_ = nullptr;
 
 Chicker::Chicker(std::shared_ptr<Charger> charger)
