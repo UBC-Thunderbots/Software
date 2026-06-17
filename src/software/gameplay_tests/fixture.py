@@ -1,4 +1,3 @@
-import os
 import time
 
 import pytest
@@ -11,7 +10,11 @@ from software.py_constants import (
 from proto.import_all_protos import World
 from software.gameplay_tests.field_test_runner import FieldTestRunner
 from software.gameplay_tests.simulated_test_runner import SimulatedTestRunner
-from software.gameplay_tests.util import load_command_line_arguments
+from software.gameplay_tests.util import (
+    load_command_line_arguments,
+    get_pytest_name,
+    get_pytest_path_name,
+)
 from software.logger.logger import create_logger
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
@@ -49,23 +52,19 @@ def simulated_test_runner(args):
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
     # Grab the current test name to store the proto log for the test case
-    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
-    current_test = current_test.replace("]", "")
-    current_test = current_test.replace("[", "-")
-
-    # Truncate the test name to 25 characters for UNIX path length limits
-    test_name = current_test.split("-")[0][:25]
+    test_name = get_pytest_name()
+    test_path_name = get_pytest_path_name()
 
     # Launch all binaries
     with (
         Simulator(
-            f"{args.simulator_runtime_dir}/test/{test_name}",
+            f"{args.simulator_runtime_dir}/test/{test_path_name}",
             args.debug_simulator,
             args.enable_realism,
         ) as simulator,
         FullSystem(
             "software/unix_full_system",
-            f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+            f"{args.blue_full_system_runtime_dir}/test/{test_path_name}",
             args.debug_blue_full_system,
             False,
             should_restart_on_crash=False,
@@ -73,7 +72,7 @@ def simulated_test_runner(args):
         ) as blue_fs,
         FullSystem(
             "software/unix_full_system",
-            f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+            f"{args.yellow_full_system_runtime_dir}/test/{test_path_name}",
             args.debug_yellow_full_system,
             True,
             should_restart_on_crash=False,
@@ -112,7 +111,7 @@ def simulated_test_runner(args):
             time.sleep(LAUNCH_DELAY_S)
 
             runner = SimulatedTestRunner(
-                current_test,
+                test_name,
                 tscope,
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
@@ -135,18 +134,16 @@ def field_test_runner(args):
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
     # Grab the current test name to store the proto log for the test case
-    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
-    current_test = current_test.replace("]", "")
-    current_test = current_test.replace("[", "-")
+    test_name = get_pytest_name()
+    test_path_name = get_pytest_path_name()
 
-    test_name = current_test.split("-")[0]
     debug_full_sys = args.debug_blue_full_system
-    runtime_dir = f"{args.blue_full_system_runtime_dir}/test/{test_name}"
+    runtime_dir = f"{args.blue_full_system_runtime_dir}/test/{test_path_name}"
     friendly_proto_unix_io = blue_full_system_proto_unix_io
 
     if args.run_yellow:
         debug_full_sys = args.debug_yellow_full_system
-        runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
+        runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_path_name}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
 
     estop_mode, estop_path = get_estop_config(
@@ -223,7 +220,7 @@ def field_test_runner(args):
 
         time.sleep(LAUNCH_DELAY_S)
         runner = FieldTestRunner(
-            test_name=current_test,
+            test_name=test_name,
             blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             gamecontroller=gamecontroller,

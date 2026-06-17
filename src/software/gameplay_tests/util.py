@@ -20,6 +20,32 @@ def get_runtime_dir():
     return runtime_dir
 
 
+def get_pytest_name():
+    """Gets the name of the currently running pytest test.
+
+    Sanitizes the test name by replacing square brackets with hyphens.
+
+    :return: The sanitized test name.
+    """
+    current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
+    current_test = current_test.replace("]", "")
+    current_test = current_test.replace("[", "-")
+    return current_test
+
+
+def get_pytest_path_name():
+    """Gets the base test component name, truncated for filesystem compatibility.
+
+    Extracts just the test name (before any parametrize suffix) and truncates
+    to 25 characters to adhere to UNIX path length limits.
+
+    :return: The truncated base test name.
+    """
+
+    # Truncate the test name to 25 characters for UNIX path length limits
+    return get_pytest_name().split("-")[0][:25]
+
+
 def load_command_line_arguments(allow_unrecognized: bool = False):
     """Load in command-line arguments using argparse
 
