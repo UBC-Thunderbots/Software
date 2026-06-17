@@ -234,6 +234,7 @@ def field_test_runner(args):
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             gamecontroller=gamecontroller,
             thunderscope=tscope,
+            robot_communication=rc_friendly,
             is_yellow_friendly=args.run_yellow,
         )
 
