@@ -4,8 +4,6 @@ import time
 from typing import override
 
 import pytest
-from proto.ssl_gc_common_pb2 import Team
-from proto.ssl_gc_state_pb2 import Command
 
 from proto.import_all_protos import ValidationProtoSet, WorldState
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
