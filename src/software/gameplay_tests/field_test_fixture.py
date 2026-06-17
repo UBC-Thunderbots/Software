@@ -37,15 +37,14 @@ class FieldTestRunner(TbotsTestRunner):
     """Run a field test"""
 
     def __init__(
-        self,
-        test_name,
-        thunderscope,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        gamecontroller,
-        robot_communication,
-        publish_validation_protos=True,
-        is_yellow_friendly=False,
+            self,
+            test_name,
+            thunderscope,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
+            gamecontroller,
+            publish_validation_protos=True,
+            is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
 
@@ -54,7 +53,6 @@ class FieldTestRunner(TbotsTestRunner):
         :param blue_full_system_proto_unix_io: The blue full system proto unix io to use
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
-        :param robot_communication: The robot communication instance
         :param publish_validation_protos: whether to publish validation protos
         :param: is_yellow_friendly: if yellow is the friendly team
         """
@@ -68,52 +66,32 @@ class FieldTestRunner(TbotsTestRunner):
         )
         self.publish_validation_protos = publish_validation_protos
         self.is_yellow_friendly = is_yellow_friendly
-        self.robot_communication = robot_communication
 
         logger.info("determining robots on field")
         # survey field for available robot ids
-        survey_start_time = time.time()
-        self.friendly_robot_ids_field = []
-        while time.time() - survey_start_time < WORLD_BUFFER_TIMEOUT:
-            try:
-                world = self.world_buffer.get(block=True, timeout=0.1)
-                self.initial_world = world
-                self.friendly_robot_ids_field = [
-                    robot.id for robot in world.friendly_team.team_robots
-                ]
+        try:
+            world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+            self.initial_world = world
+            self.friendly_robot_ids_field = [
+                robot.id for robot in world.friendly_team.team_robots
+            ]
 
-                if len(self.friendly_robot_ids_field) > 0:
-                    logger.info(f"friendly team ids {self.friendly_robot_ids_field}")
-                    break
-            except queue.Empty:
-                continue
+            logger.info(f"friendly team ids {self.friendly_robot_ids_field}")
 
-        if len(self.friendly_robot_ids_field) == 0:
-            raise Exception("no friendly robots found on field within timeout")
+            if len(self.friendly_robot_ids_field) == 0:
+                raise Exception("no friendly robots found on field")
 
-    def wait_for_estop_play(self):
-        """Blocks until the estop is in the PLAY state"""
-        if self.robot_communication.estop_is_playing:
-            return
-
-        logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
-        while not self.robot_communication.estop_is_playing:
-            # We must process events if Thunderscope is running to keep it responsive
-            if self.thunderscope:
-                from pyqtgraph.Qt import QtWidgets
-
-                QtWidgets.QApplication.processEvents()
-            time.sleep(0.1)
-        logger.info(
-            "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
-        )
+        except queue.Empty:
+            raise Exception(
+                f"No Worlds were received with in {WORLD_BUFFER_TIMEOUT} seconds. Please make sure atleast 1 robot and 1 ball is present on the field."
+            )
 
     @override
     def send_gamecontroller_command(
-        self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
-        final_ball_placement_point=None,
+            self,
+            gc_command: proto.ssl_gc_state_pb2.Command,
+            team: proto.ssl_gc_common_pb2.Team,
+            final_ball_placement_point=None,
     ):
         """Send a command to the gamecontroller
 
@@ -121,7 +99,7 @@ class FieldTestRunner(TbotsTestRunner):
         :param team: The team which the command as attributed to
         :param final_ball_placement_point: The ball placement point
         """
-        self.gamecontroller.send_gc_command(
+        self.gamecontroller.send_ci_input(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
@@ -129,10 +107,10 @@ class FieldTestRunner(TbotsTestRunner):
 
     @override
     def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
+            self,
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            test_timeout_s=3,
     ):
         """Run a test. In a field test this means beginning validation.
 
@@ -146,18 +124,13 @@ class FieldTestRunner(TbotsTestRunner):
 
         def stop_test(delay):
             time.sleep(delay)
-            # We no longer close thunderscope here, because a test might call run_test multiple times.
-            # Thunderscope will be closed when the fixture is torn down.
+            if self.thunderscope:
+                self.thunderscope.close()
 
         def __runner():
             time.sleep(LAUNCH_DELAY_S)
 
             test_end_time = time.time() + test_timeout_s
-
-            # Keep track if we started with any eventually validations
-            has_eventually_validations = any(
-                len(seq) > 0 for seq in eventually_validation_sequence_set
-            )
 
             while time.time() < test_end_time:
                 while True:
@@ -199,15 +172,9 @@ class FieldTestRunner(TbotsTestRunner):
                 # Check that all always validations are always valid
                 validation.check_validation(always_validation_proto_set)
 
-                # Break if eventually validation passes
-                if has_eventually_validations and all(
-                    len(seq) == 0 for seq in eventually_validation_sequence_set
-                ):
-                    break
-
+            # Check that all eventually validations are eventually valid
             validation.check_validation(eventually_validation_proto_set)
-
-            stop_test(delay=PROCESS_BUFFER_DELAY_S)
+            stop_test(TEST_END_DELAY)
 
         def excepthook(args):
             """This function is _critical_ for show_thunderscope to work.
@@ -222,22 +189,14 @@ class FieldTestRunner(TbotsTestRunner):
 
         threading.excepthook = excepthook
 
-        # If visualization is enabled, we need to be careful.
-        # Thunderscope.show() is blocking.
         if self.thunderscope:
             run_test_thread = threading.Thread(target=__runner, daemon=True)
             run_test_thread.start()
-
-            # Only call show if the window is not already open.
-            # If it IS open, it means we are ALREADY in the Qt event loop,
-            # which can only happen if we are running this run_test in a background thread.
-            if not self.thunderscope.is_open():
-                self.thunderscope.show()
-
+            self.thunderscope.show()
             run_test_thread.join()
 
             if self.last_exception:
-                pytest.fail(str(self.last_exception))
+                pytest.fail(str(ex.last_exception))
 
         else:
             __runner()
@@ -335,7 +294,7 @@ def load_command_line_arguments():
         action="store",
         default="",
         help="The test filter, if not specified all tests will run. "
-        + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
+             + "See https://docs.pytest.org/en/latest/how-to/usage.html#specifying-tests-selecting-tests",
     )
 
     parser.add_argument(
@@ -418,11 +377,11 @@ def field_test_runner():
 
     # Launch all binaries
     with FullSystem(
-        "software/unix_full_system",
-        full_system_runtime_dir=runtime_dir,
-        debug_full_system=debug_full_sys,
-        friendly_colour_yellow=args.run_yellow,
-        should_restart_on_crash=False,
+            "software/unix_full_system",
+            full_system_runtime_dir=runtime_dir,
+            debug_full_system=debug_full_sys,
+            friendly_colour_yellow=args.run_yellow,
+            should_restart_on_crash=False,
     ) as friendly_fs, Gamecontroller(
         # we would be using conventional port if and only if we are playing in robocup.
         suppress_logs=(not args.show_gamecontroller_logs),
@@ -486,7 +445,6 @@ def field_test_runner():
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             gamecontroller=gamecontroller,
             thunderscope=tscope,
-            robot_communication=rc_friendly,
             is_yellow_friendly=args.run_yellow,
         )
 

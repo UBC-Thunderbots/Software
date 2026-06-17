@@ -7,7 +7,7 @@
  */
 class Charger
 {
-   public:
+public:
     /**
      * Creates a Charger setting up pins and attaching interrupts.
      */
@@ -20,10 +20,6 @@ class Charger
      */
     static void chargeCapacitors();
     /**
-     * Sets the charge pin to LOW to stop charging the capacitors.
-     */
-    static void stopChargeCapacitors();
-    /**
      * Returns the voltage of the capacitors
      *
      * @return voltage of capacitors
@@ -35,14 +31,8 @@ class Charger
      * @return whether the flyback fault is tripped or not
      */
     bool getFlybackFault();
-    /**
-     * Returns whether the capacitors are currently charging
-     *
-     * @return whether the capacitors are charging or not
-     */
-    bool isCapacitorCharging();
 
-   private:
+private:
     static constexpr float VOLTAGE_DIVIDER = 1003.0 / 13.0;
     static constexpr float RESOLUTION      = 4096.0;
     static constexpr float SCALE_VOLTAGE   = 3.3;

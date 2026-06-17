@@ -13,11 +13,6 @@ void Charger::chargeCapacitors()
     digitalWrite(CHRG, HIGH);
 }
 
-void Charger::stopChargeCapacitors()
-{
-    digitalWrite(CHRG, LOW);
-}
-
 float Charger::getCapacitorVoltage()
 {
     return analogRead(HV_SENSE) / RESOLUTION * SCALE_VOLTAGE * VOLTAGE_DIVIDER;
@@ -26,9 +21,4 @@ float Charger::getCapacitorVoltage()
 bool Charger::getFlybackFault()
 {
     return !digitalRead(FLYBACK_FAULT);
-}
-
-bool Charger::isCapacitorCharging()
-{
-    return digitalRead(CHRG_DONE);
 }

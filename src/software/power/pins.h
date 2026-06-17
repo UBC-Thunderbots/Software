@@ -11,14 +11,14 @@ const uint8_t LEFT_DIR             = 1;
 const uint8_t RIGHT_DIR            = -1;
 
 // Chicker
-const uint8_t KICKER_PIN  = 33;
-const uint8_t CHIPPER_PIN = 32;
+const uint8_t KICKER_PIN  = 32;
+const uint8_t CHIPPER_PIN = 33;
 
 // Charger
 const uint8_t HV_SENSE      = 36;
 const uint8_t FLYBACK_FAULT = 27;
-const uint8_t CHRG_DONE     = 25;
-const uint8_t CHRG          = 26;
+const uint8_t CHRG_DONE     = 26;
+const uint8_t CHRG          = 25;
 
 // Break Beam
 const uint8_t BREAK_BEAM_PIN = 37;
