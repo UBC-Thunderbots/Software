@@ -18,6 +18,7 @@ LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
 PROCESS_BUFFER_DELAY_S = 0.01
 PAUSE_AFTER_FAIL_DELAY_S = 3
+TICK_DURATION_S = 1 / 60
 
 
 class SimulatedTestRunner(TbotsTestRunner):
@@ -68,9 +69,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        tick_duration_s=0.0166,
-        ci_cmd_with_delay=[],
-        run_till_end=True,
+        gc_cmd_with_delay=[],
     ):
         """Helper function to run a test, with thunderscope if enabled
 
@@ -78,15 +77,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param eventually_validation_sequence_set: validation that should eventually be true
         :param setup: function that sets up the World state and the gamecontroller before running the test
         :param test_timeout_s: how long the test should run before timing out
-        :param tick_duration_s: length of a simulation tick
-        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+        :param gc_cmd_with_delay: A list consisting of tuples with a duration and GC command, e.g.
                                   [
                                       (time, command, team),
                                       (time, command, team),
                                       ...
                                   ]
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
         """
         threading.excepthook = self._excepthook
 
@@ -103,9 +99,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     always_validation_sequence_set,
                     eventually_validation_sequence_set,
                     test_timeout_s,
-                    tick_duration_s,
-                    ci_cmd_with_delay,
-                    run_till_end,
+                    gc_cmd_with_delay,
                 ],
             )
             run_sim_thread.start()
@@ -121,9 +115,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
                 eventually_validation_sequence_set,
                 test_timeout_s,
-                tick_duration_s,
-                ci_cmd_with_delay=ci_cmd_with_delay,
-                run_till_end=run_till_end,
+                gc_cmd_with_delay=gc_cmd_with_delay,
             )
 
     def _excepthook(self, args):
@@ -178,9 +170,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s,
-        tick_duration_s,
-        ci_cmd_with_delay,
-        run_till_end,
+        gc_cmd_with_delay,
     ):
         """Run a test
 
@@ -190,15 +180,12 @@ class SimulatedTestRunner(TbotsTestRunner):
                                 eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
-        :param tick_duration_s: The simulation step duration
-        :param ci_cmd_with_delay: A list consisting of tuples with a duration and CI command, e.g.
+        :param gc_cmd_with_delay: A list consisting of tuples with a duration and GC command, e.g.
                                   [
                                       (time, command, team),
                                       (time, command, team),
                                       ...
                                   ]
-        :param run_till_end: If true, test runs till the end even if eventually validation passes
-                             If false, test stops once eventually validation passes and fails if time out
         """
         time_elapsed_s = 0
 
@@ -208,18 +195,18 @@ class SimulatedTestRunner(TbotsTestRunner):
             # get time before we execute the loop
             processing_start_time = time.time()
 
-            # Check for new CI commands at this time step
-            for delay, cmd, team in ci_cmd_with_delay:
+            # Check for new GC commands at this time step
+            for delay, cmd, team in gc_cmd_with_delay:
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
                     self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
                     # remove command from the list
-                    ci_cmd_with_delay.remove((delay, cmd, team))
+                    gc_cmd_with_delay.remove((delay, cmd, team))
 
-            tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
+            tick = SimulatorTick(milliseconds=TICK_DURATION_S * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-            time_elapsed_s += tick_duration_s
+            time_elapsed_s += TICK_DURATION_S
 
             while True:
                 try:
@@ -258,9 +245,9 @@ class SimulatedTestRunner(TbotsTestRunner):
             if (
                 self.thunderscope
                 and not self.ci_mode
-                and tick_duration_s > processing_time
+                and TICK_DURATION_S > processing_time
             ):
-                time.sleep(tick_duration_s - processing_time)
+                time.sleep(TICK_DURATION_S - processing_time)
 
             # Validate
             (
@@ -295,18 +282,6 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             # Check that all always validations are always valid
             validation.check_validation(always_validation_proto_set)
-
-            if not run_till_end:
-                try:
-                    # Check that all eventually validations are eventually valid
-                    validation.check_validation(eventually_validation_proto_set)
-                    self._stopper()
-                    return
-                except AssertionError as e:
-                    eventually_validation_failure_msg = str(e)
-
-        if not run_till_end:
-            raise AssertionError(eventually_validation_failure_msg)
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)

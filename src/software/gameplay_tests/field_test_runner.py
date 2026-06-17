@@ -71,10 +71,7 @@ class FieldTestRunner(TbotsTestRunner):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        # Unused parameters, here for compatibility with sim tests
-        tick_duration_s=None,
-        ci_cmd_with_delay=None,
-        run_till_end=None,
+        gc_cmd_with_delay=[],
     ):
         """Run a test. In a field test this means beginning validation.
 
@@ -84,6 +81,12 @@ class FieldTestRunner(TbotsTestRunner):
                                 eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
+        :param gc_cmd_with_delay: A list consisting of tuples with a duration and GC command, e.g.
+                                  [
+                                      (time, command, team),
+                                      (time, command, team),
+                                      ...
+                                  ]
         """
 
         threading.excepthook = self._excepthook
@@ -95,6 +98,7 @@ class FieldTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
                 eventually_validation_sequence_set,
                 test_timeout_s,
+                gc_cmd_with_delay,
             ],
         )
 
@@ -135,6 +139,7 @@ class FieldTestRunner(TbotsTestRunner):
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s,
+        gc_cmd_with_delay,  # TODO (#3744): implement this
     ):
         time.sleep(LAUNCH_DELAY_S)
 

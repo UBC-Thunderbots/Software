@@ -257,7 +257,6 @@ def test_passing_receive_speed(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        run_till_end=False,
     )
 
 
@@ -382,7 +381,6 @@ def test_passing_no_backwards_passes(
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        run_till_end=False,
     )
 
 

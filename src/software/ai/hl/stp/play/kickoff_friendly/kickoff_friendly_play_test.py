@@ -60,14 +60,6 @@ def test_kickoff_friendly_play(gameplay_test_runner):
             gc_command=Command.Type.KICKOFF, team=Team.BLUE
         )
 
-        # Let robots get ready before starting kickoff
-        threading.Timer(
-            4.0,
-            lambda: gameplay_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-            ),
-        ).start()
-
         gameplay_test_runner.set_plays(
             blue_play=PlayName.KickoffFriendlyPlay,
             yellow_play=PlayName.KickoffEnemyPlay,
@@ -141,6 +133,7 @@ def test_kickoff_friendly_play(gameplay_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=60,
+        gc_cmd_with_delay=[4, Command.Type.NORMAL_START, Team.BLUE],
     )
 
 

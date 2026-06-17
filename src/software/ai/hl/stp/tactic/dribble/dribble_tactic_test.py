@@ -179,7 +179,6 @@ def test_dribble(
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=25,
-        run_till_end=False,
     )
 
 

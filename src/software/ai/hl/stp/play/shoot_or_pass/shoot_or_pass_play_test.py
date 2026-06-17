@@ -59,7 +59,6 @@ def test_shoot_or_pass_play(gameplay_test_runner):
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=15,
-        run_till_end=False,
     )
 
 
