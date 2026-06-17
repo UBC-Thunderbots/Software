@@ -228,6 +228,7 @@ def field_test_runner(args):
             )
 
         time.sleep(LAUNCH_DELAY_S)
+
         runner = FieldTestRunner(
             test_name=test_name,
             blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,

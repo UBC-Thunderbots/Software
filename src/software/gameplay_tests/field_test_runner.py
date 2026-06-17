@@ -55,7 +55,7 @@ class FieldTestRunner(TbotsTestRunner):
         self.is_yellow_friendly = is_yellow_friendly
         self.robot_communication = robot_communication
 
-        self._survey_field_robots()
+        # self._survey_field_robots()
 
     @override
     def set_world_state(self, world_state: WorldState):
@@ -115,18 +115,20 @@ class FieldTestRunner(TbotsTestRunner):
         logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
         while not self.robot_communication.estop_is_playing:
             # We must process events if Thunderscope is running to keep it responsive
-            if self.thunderscope:
-                from pyqtgraph.Qt import QtWidgets
-
-                QtWidgets.QApplication.processEvents()
+            # if self.thunderscope:
+            #     from pyqtgraph.Qt import QtWidgets
+            #
+            #     QtWidgets.QApplication.processEvents()
             time.sleep(0.1)
         logger.info(
             "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
         )
 
-    def _stop_test(self, delay):
+    def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
         time.sleep(delay)
-        self.thunderscope.close()
+
+        if self.thunderscope:
+            self.thunderscope.close()
 
     def _runner(
         self,
@@ -135,6 +137,8 @@ class FieldTestRunner(TbotsTestRunner):
         test_timeout_s,
     ):
         time.sleep(LAUNCH_DELAY_S)
+
+        self._wait_for_estop_play()
 
         test_end_time = time.time() + test_timeout_s
 
@@ -191,7 +195,7 @@ class FieldTestRunner(TbotsTestRunner):
 
         validation.check_validation(eventually_validation_proto_set)
 
-        self._stop_test(delay=PROCESS_BUFFER_DELAY_S)
+        self._stopper()
 
     def _excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
@@ -200,7 +204,7 @@ class FieldTestRunner(TbotsTestRunner):
 
         :param args: The args passed in from the hook
         """
-        self._stop_test(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
 

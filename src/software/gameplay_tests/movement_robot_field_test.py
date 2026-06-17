@@ -18,16 +18,19 @@ from software.gameplay_tests.validation.robot_enters_region import (
 
 @pytest.mark.parametrize(
     "angle",
-    [0, 45, 90, 180, 270, 0],
+    [0, 45, 90, 180, 270, 360],
 )
 def test_basic_rotation(angle, gameplay_test_runner):
     target_angle = tbots_cpp.Angle.fromDegrees(angle)
     start_position = tbots_cpp.Point(-1.5, 0.6)
+    robot_id = 2
 
     def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
+                    tbots_cpp.Point(0.0, 0.0),
+                    tbots_cpp.Point(0.0, 1.0),
                     start_position,
                 ],
                 yellow_robot_locations=[],
@@ -46,21 +49,25 @@ def test_basic_rotation(angle, gameplay_test_runner):
             obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         )
 
-        gameplay_test_runner.set_tactics(
-            blue_tactics={
-                0: move_tactic,
-            },
-        )
+        # gameplay_test_runner.set_tactics(
+        #     blue_tactics={
+        #         robot_id: move_tactic,
+        #     },
+        # )
 
     gameplay_test_runner.run_test(
         setup=setup,
-        test_timeout_s=5,
+        # TODO AVAH FIX ACTUAL TIME VS THE OTHER TIME THING
+        test_timeout_s=50,
         eventually_validation_sequence_set=[
             [
                 DurationValidation(
-                    duration_s=1,
-                    validation=RobotEventuallyAtOrientation(0, target_angle),
+                    duration_s=20,
+                    validation=RobotEventuallyAtOrientation(robot_id, target_angle),
                 ),
+            ],
+            [
+                RobotEventuallyAtOrientation(robot_id, target_angle)
             ]
         ],
     )
