@@ -12,13 +12,13 @@ S1_PIN = 16
 DEMUX_DISABLE_PIN = 0  # Pull HIGH to disable SWD and SWCLK multiplexing
 
 # Put these in order of board 0, 1, 2, 3
-BOARD_NAMES = ["A", "B", "C", "D"]
+BOARD_NAMES = ["FL", "FR", "BL", "BR"]
 
 
 class MotorDriverFlasher:
-    def __init__(self, board_letter, drivers):
-        switch_case_num = BOARD_NAMES.index(board_letter)
-        self.board_letter = board_letter
+    def __init__(self, board_name, drivers):
+        switch_case_num = BOARD_NAMES.index(board_name)
+        self.board_name = board_name
         self.multiplex = [switch_case_num % 2, switch_case_num // 2]
 
         self.drivers = drivers
@@ -30,7 +30,7 @@ class MotorDriverFlasher:
             else:
                 self.drivers[i].off()
 
-        print(f"Preparing to flash driver on board {self.board_letter}...")
+        print(f"Preparing to flash driver on board {self.board_name}...")
 
         # Short delay to ensure lines settle
         time.sleep(0.5)
@@ -72,7 +72,7 @@ class MotorDriverFlasher:
             raise e
 
         # After flashing all, ensure all are set to High (Run)
-        print(f"Flash to board {self.board_letter} complete.")
+        print(f"Flash to board {self.board_name} complete.")
         # Let line settle rq
         time.sleep(0.5)
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     # If no arguments given,
     if not (2 <= len(sys.argv) <= 5):
         print(
-            "Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (A to D valid)"
+            "Usage: python3 flash_motor_drivers.py <flash_board_name_1> <flash_board_name_2> (FL, FR, BL, BR valid)"
         )
         sys.exit(1)
 
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     for i in range(1, len(sys.argv)):
         if sys.argv[i] not in BOARD_NAMES:
             print(
-                f"Usage: python3 flash_motor_drivers.py <flash_board_letter_1> <flash_board_letter_2> (Valid Letters: {BOARD_NAMES})"
+                f"Usage: python3 flash_motor_drivers.py <flash_board_name_1> <flash_board_name_2> (Valid Names: {BOARD_NAMES})"
             )
             sys.exit(1)
 
