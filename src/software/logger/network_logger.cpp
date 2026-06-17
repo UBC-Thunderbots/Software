@@ -14,17 +14,18 @@ NetworkLoggerSingleton::NetworkLoggerSingleton(RobotId robot_id, bool enable_log
         logWorker->addSink(std::make_unique<NetworkSink>(robot_id, enable_log_merging),
                            &NetworkSink::sendToNetwork);
 
-    // Sink for outputting logs to the terminal
-    auto colour_cout_sink_handle = logWorker->addSink(
-        std::make_unique<ColouredCoutSink>(true), &ColouredCoutSink::displayColouredLog);
+    logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
+                       &ColouredCoutSink::displayColouredLog);
 
-    auto csv_sink_handle =
-        logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH), &CSVSink::appendToFile);
+    logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH), &CSVSink::appendToFile);
 
     // Sink for PlotJuggler plotting
     auto plotjuggler_handle =
         logWorker->addSink(std::make_unique<PlotJugglerSink>(network_interface),
                            &PlotJugglerSink::sendToPlotJuggler);
+
+    g3::only_change_at_initialization::addLogLevel(CSV);
+    g3::only_change_at_initialization::addLogLevel(PLOTJUGGLER);
 
     g3::initializeLogging(logWorker.get());
 }
@@ -34,7 +35,7 @@ void NetworkLoggerSingleton::initializeLogger(RobotId robot_id, bool enable_log_
 {
     if (!instance)
     {
-        NetworkLoggerSingleton::instance = std::shared_ptr<NetworkLoggerSingleton>(
+        instance = std::shared_ptr<NetworkLoggerSingleton>(
             new NetworkLoggerSingleton(robot_id, enable_log_merging, network_interface));
     }
 }
