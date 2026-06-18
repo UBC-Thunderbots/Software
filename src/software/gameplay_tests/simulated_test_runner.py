@@ -82,9 +82,9 @@ class SimulatedTestRunner(TbotsTestRunner):
                                       ...
                                   ]
         """
-        threading.excepthook = self.excepthook
-
         self._sync_setup(setup)
+
+        threading.excepthook = self.excepthook
 
         # If thunderscope is enabled, run the test in a thread and show
         # thunderscope on this thread. The excepthook is setup to catch
@@ -148,25 +148,11 @@ class SimulatedTestRunner(TbotsTestRunner):
         test_timeout_s,
         gc_cmd_with_delay,
     ):
-        """Run a test
+        time.sleep(LAUNCH_DELAY_S)
 
-        :param always_validation_sequence_set: Validation functions that should
-                                hold on every tick
-        :param eventually_validation_sequence_set: Validation that should
-                                eventually be true, before the test ends
-        :param test_timeout_s: The timeout for the test, if any eventually_validations
-                                remain after the timeout, the test fails.
-        :param gc_cmd_with_delay: A list consisting of tuples with a duration and GC command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        """
         time_elapsed_s = 0
 
         while time_elapsed_s < test_timeout_s:
-            # get time before we execute the loop
             processing_start_time = time.time()
 
             # Check for new GC commands at this time step

@@ -132,13 +132,24 @@ class FieldTestRunner(TbotsTestRunner):
         test_timeout_s,
         gc_cmd_with_delay,  # TODO (#3744): implement this
     ):
-        time.sleep(LAUNCH_DELAY_S)
-
         self._wait_for_estop_play()
 
-        test_end_time = time.time() + test_timeout_s
+        time.sleep(LAUNCH_DELAY_S)
 
-        while time.time() < test_end_time:
+        time_elapsed_s = 0
+
+        while time_elapsed_s < test_timeout_s:
+            processing_start_time = time.time()
+
+            # Check for new GC commands at this time step
+            for delay, cmd, team in gc_cmd_with_delay:
+                # If delay matches time
+                if delay <= time_elapsed_s:
+                    # send command
+                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
+                    # remove command from the list
+                    gc_cmd_with_delay.remove((delay, cmd, team))
+
             while True:
                 try:
                     world = self.world_buffer.get(
@@ -185,6 +196,8 @@ class FieldTestRunner(TbotsTestRunner):
                     break
                 except AssertionError:
                     pass
+
+            time_elapsed_s += time.time() - processing_start_time
 
         validation.check_validation(eventually_validation_proto_set)
 
