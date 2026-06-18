@@ -45,7 +45,7 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
+        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
    private:
     /*
@@ -54,7 +54,7 @@ class PrimitiveExecutor
      *
      * @returns Vector The target linear _local_ velocity
      */
-    Vector stepTargetLinearVelocity(Duration delta_time);
+    Vector stepTargetLinearVelocity(const Duration& delta_time);
 
     /*
      * Compute the next target angular velocity the robot should have.
@@ -62,7 +62,7 @@ class PrimitiveExecutor
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity stepTargetAngularVelocity(Duration delta_time);
+    AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
 
     /**
      * Sends the position, local velocity, and local acceleration to PlotJuggler.
@@ -72,7 +72,7 @@ class PrimitiveExecutor
      * @param delta_time Used to calculate acceleration.
      */
     void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       Duration delta_time);
+                                       const Duration& delta_time) const;
 
     /**
      * Records the velocities commanded this step so the next step can measure the

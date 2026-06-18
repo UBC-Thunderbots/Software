@@ -16,7 +16,6 @@
 #include "software/embedded/services/network/network.h"
 #include "software/embedded/services/power.h"
 #include "software/embedded/toml_config/toml_config_client.h"
-#include "software/logger/logger.h"
 
 class Thunderloop
 {
@@ -177,7 +176,6 @@ class Thunderloop
 
     // Current State
     robot_constants::RobotConstants robot_constants_;
-    Angle current_orientation_;
     int robot_id_;
     int channel_id_;
     std::string network_interface_;
