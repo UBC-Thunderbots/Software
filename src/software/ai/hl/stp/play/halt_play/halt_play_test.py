@@ -52,9 +52,7 @@ def test_halt_play(gameplay_test_runner):
     gameplay_test_runner.run_test(
         setup=setup,
         always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[
-            [RobotSpeedEventuallyBelowThreshold(1e-3)]
-        ],
+        eventually_validation_sequence_set=[[RobotSpeedEventuallyBelowThreshold(1e-3)]],
         gc_cmd_with_delay=[
             (3, Command.Type.HALT, Team.BLUE),
             (3, Command.Type.HALT, Team.YELLOW),

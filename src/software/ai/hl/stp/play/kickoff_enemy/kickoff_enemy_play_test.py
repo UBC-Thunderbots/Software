@@ -1,5 +1,3 @@
-import threading
-
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
 

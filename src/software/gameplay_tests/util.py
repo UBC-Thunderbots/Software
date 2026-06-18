@@ -41,7 +41,6 @@ def get_pytest_path_name():
 
     :return: The truncated base test name.
     """
-
     # Truncate the test name to 25 characters for UNIX path length limits
     return get_pytest_name().split("-")[0][:25]
 
@@ -54,7 +53,6 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
 
     :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
     """
-
     RUNTIME_DIR = get_runtime_dir()
 
     parser = argparse.ArgumentParser(

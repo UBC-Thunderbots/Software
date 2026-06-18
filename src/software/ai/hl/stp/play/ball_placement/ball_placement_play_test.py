@@ -6,7 +6,6 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_enters_region import (
-    BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
 )
 from software.gameplay_tests.validation.robot_enters_region import (
