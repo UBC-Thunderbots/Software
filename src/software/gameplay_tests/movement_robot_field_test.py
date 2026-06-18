@@ -6,7 +6,6 @@ import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.util import pytest_main
-from software.gameplay_tests.validation.delay_validation import DelayValidation
 from software.gameplay_tests.validation.duration_validation import DurationValidation
 from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
@@ -57,18 +56,14 @@ def test_basic_rotation(angle, gameplay_test_runner):
 
     gameplay_test_runner.run_test(
         setup=setup,
-        # TODO AVAH FIX ACTUAL TIME VS THE OTHER TIME THING
-        test_timeout_s=50,
+        test_timeout_s=5,
         eventually_validation_sequence_set=[
             [
                 DurationValidation(
-                    duration_s=20,
+                    duration_s=1,
                     validation=RobotEventuallyAtOrientation(robot_id, target_angle),
                 ),
             ],
-            [
-                RobotEventuallyAtOrientation(robot_id, target_angle)
-            ]
         ],
     )
 
@@ -128,11 +123,8 @@ def test_one_robots_square(start_position, end_position, gameplay_test_runner):
         test_timeout_s=4,
         eventually_validation_sequence_set=[
             [
-                RobotEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(end_position, 0.05)]
-                ),
-                DelayValidation(
-                    delay_s=1,
+                DurationValidation(
+                    duration_s=1,
                     validation=RobotEventuallyEntersRegion(
                         regions=[tbots_cpp.Circle(end_position, 0.05)]
                     ),

@@ -1,44 +1,45 @@
-import math
+import software.python_bindings as tbots_cpp
+
 from proto.import_all_protos import *
-from software.gameplay_tests.fixture import *
-from software.gameplay_tests.gameplay_test_runner import WORLD_BUFFER_TIMEOUT
-
-from software.logger.logger import create_logger
+from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.util import pytest_main
-
-logger = create_logger(__name__)
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
+    BallEventuallyKickedInDirection,
+)
 
 
 def test_pivot_kick(gameplay_test_runner):
-    id = 5
+    robot_id = 0
 
-    world = gameplay_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    print("Here are the robots:")
-    print(
-        [
-            robot.current_state.global_position
-            for robot in world.friendly_team.team_robots
-        ]
-    )
+    ball_location = tbots_cpp.Point(-1.13, 0.75)
+    angle_to_kick_at = tbots_cpp.Angle.threeQuarter()
 
-    gameplay_test_runner.set_tactics(
-        blue_tactics={
-            id: PivotKickTactic(
-                kick_origin=Point(x_meters=-1.13, y_meters=0.75),
-                kick_direction=Angle(radians=-math.pi / 2),
-                auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
+    def setup():
+        gameplay_test_runner.set_world_state(
+            create_world_state(
+                blue_robot_locations=[tbots_cpp.Point(1, 1)],
+                yellow_robot_locations=[],
+                ball_location=ball_location,
+                ball_velocity=tbots_cpp.Vector(0, 0),
             )
-        },
-        yellow_tactics=None,
-    )
+        )
+        gameplay_test_runner.set_tactics(
+            blue_tactics={
+                robot_id: PivotKickTactic(
+                    kick_origin=tbots_cpp.createPointProto(ball_location),
+                    kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
+                    auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
+                )
+            }
+        )
+
     gameplay_test_runner.run_test(
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
+        setup=setup,
+        eventually_validation_sequence_set=[
+            [BallEventuallyKickedInDirection(angle_to_kick_at)]
+        ],
         test_timeout_s=15,
     )
-
-    # Send a halt tactic after the test finishes
-    gameplay_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
 
 
 if __name__ == "__main__":
