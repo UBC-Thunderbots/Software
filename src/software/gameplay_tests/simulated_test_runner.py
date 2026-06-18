@@ -1,9 +1,7 @@
 import queue
-import threading
 import time
 from typing import override
 
-import pytest
 from software.py_constants import MILLISECONDS_PER_SECOND
 
 from proto.import_all_protos import *
@@ -61,66 +59,10 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     @override
-    def run_test(
-        self,
-        setup=lambda: None,
-        always_validation_sequence_set=[],
-        eventually_validation_sequence_set=[],
-        test_timeout_s=3,
-        gc_cmd_with_delay=[],
-    ):
-        """Helper function to run a test, with thunderscope if enabled
-
-        :param always_validation_sequence_set: validation that should always be true
-        :param eventually_validation_sequence_set: validation that should eventually be true
-        :param setup: function that sets up the World state and the gamecontroller before running the test
-        :param test_timeout_s: how long the test should run before timing out
-        :param gc_cmd_with_delay: A list consisting of tuples with a duration and GC command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        """
-        self._sync_setup(setup)
-
-        threading.excepthook = self.excepthook
-
-        # If thunderscope is enabled, run the test in a thread and show
-        # thunderscope on this thread. The excepthook is setup to catch
-        # any test failures and propagate them to the main thread
-        if self.thunderscope:
-            run_sim_thread = threading.Thread(
-                target=self._runner,
-                daemon=True,
-                args=[
-                    always_validation_sequence_set,
-                    eventually_validation_sequence_set,
-                    test_timeout_s,
-                    gc_cmd_with_delay,
-                ],
-            )
-            run_sim_thread.start()
-            self.thunderscope.show()
-            run_sim_thread.join()
-
-            if self.last_exception:
-                pytest.fail(str(self.last_exception))
-
-        # If thunderscope is disabled, just run the test
-        else:
-            self._runner(
-                always_validation_sequence_set,
-                eventually_validation_sequence_set,
-                test_timeout_s,
-                gc_cmd_with_delay=gc_cmd_with_delay,
-            )
-
-    def _sync_setup(self, setup):
+    def _pre_run_setup(self, setup: (lambda: None)):
         """Run setup until simulator has received game state
 
         :param setup: Function that sets up the world state
-        :param param: Parameter passed into setup
         """
         world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
         self.simulator_proto_unix_io.register_observer(
@@ -141,6 +83,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # Received a response from the simulator
                 break
 
+    @override
     def _runner(
         self,
         always_validation_sequence_set,
@@ -254,4 +197,4 @@ class SimulatedTestRunner(TbotsTestRunner):
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
-        self.stopper()
+        self._stopper()

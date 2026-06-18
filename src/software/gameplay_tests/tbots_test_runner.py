@@ -1,4 +1,7 @@
+import threading
 import time
+
+import pytest
 
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -131,6 +134,27 @@ class TbotsTestRunner:
         raise NotImplementedError("abstract class method called set_world_state")
 
     @abstractmethod
+    def _runner(
+        self,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+        gc_cmd_with_delay,
+    ):
+        """Internal test loop; implemented by subclasses.
+
+        See run_test() method for param docs.
+        """
+        raise NotImplementedError("abstract class method called _runner")
+
+    def _pre_run_setup(self, setup: (lambda: None)):
+        """Hook called before the test loop starts. Override in subclasses that
+        need to synchronize setup with external systems (e.g. simulator).
+
+        :param setup: Function that sets up the world state
+        """
+        setup()
+
     def run_test(
         self,
         setup=lambda: None,
@@ -139,16 +163,39 @@ class TbotsTestRunner:
         test_timeout_s=3,
         gc_cmd_with_delay=[],
     ):
-        """Begins validating a test based on incoming world protos
+        """Begins validating a test based on incoming world protos.
+        Runs the test in a background thread if thunderscope is enabled.
 
         :param always_validation_sequence_set: validation set that must always be true
         :param eventually_validation_sequence_set: validation set that must eventually be true
         :param test_timeout_s: how long the test will run
         :param gc_cmd_with_delay: timed GC commands
         """
-        raise NotImplementedError("abstract method run_test called from base class")
+        self._pre_run_setup(setup)
 
-    def stopper(self, delay=PROCESS_BUFFER_DELAY_S):
+        threading.excepthook = self._excepthook
+
+        args = (
+            always_validation_sequence_set,
+            eventually_validation_sequence_set,
+            test_timeout_s,
+            gc_cmd_with_delay,
+        )
+
+        if self.thunderscope:
+            run_test_thread = threading.Thread(
+                target=self._runner, daemon=True, args=args
+            )
+            run_test_thread.start()
+            self.thunderscope.show()
+            run_test_thread.join()
+
+            if self.last_exception:
+                pytest.fail(str(self.last_exception))
+        else:
+            self._runner(*args)
+
+    def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
         """Stop running the test
 
         :param delay: How long to wait before closing everything, defaults
@@ -159,14 +206,14 @@ class TbotsTestRunner:
         if self.thunderscope:
             self.thunderscope.close()
 
-    def excepthook(self, args):
+    def _excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
         If the test Thread will raises an exception we won't be able to close
         the window from the main thread.
 
         :param args: The args passed in from the hook
         """
-        self.stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
 

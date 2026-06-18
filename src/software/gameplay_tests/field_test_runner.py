@@ -1,9 +1,6 @@
 import queue
-import threading
 import time
 from typing import override
-
-import pytest
 
 from proto.import_all_protos import ValidationProtoSet, WorldState
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
@@ -63,68 +60,6 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     @override
-    def run_test(
-        self,
-        setup=lambda: None,
-        always_validation_sequence_set=[],
-        eventually_validation_sequence_set=[],
-        test_timeout_s=3,
-        gc_cmd_with_delay=[],
-    ):
-        """Run a test. In a field test this means beginning validation.
-
-        :param always_validation_sequence_set: Validation functions that should
-                                hold on every tick
-        :param eventually_validation_sequence_set: Validation that should
-                                eventually be true, before the test ends
-        :param test_timeout_s: The timeout for the test, if any eventually_validations
-                                remain after the timeout, the test fails.
-        :param gc_cmd_with_delay: A list consisting of tuples with a duration and GC command, e.g.
-                                  [
-                                      (time, command, team),
-                                      (time, command, team),
-                                      ...
-                                  ]
-        """
-        threading.excepthook = self.excepthook
-
-        run_test_thread = threading.Thread(
-            target=self._runner,
-            daemon=True,
-            args=[
-                always_validation_sequence_set,
-                eventually_validation_sequence_set,
-                test_timeout_s,
-                gc_cmd_with_delay,
-            ],
-        )
-
-        run_test_thread.start()
-
-        self.thunderscope.show()
-
-        run_test_thread.join()
-
-        if self.last_exception:
-            pytest.fail(str(self.last_exception))
-
-    def _wait_for_estop_play(self):
-        """Blocks until the estop is in the PLAY state"""
-        if self.robot_communication.estop_is_playing:
-            return
-
-        logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
-        while not self.robot_communication.estop_is_playing:
-            # We must process events if Thunderscope is running to keep it responsive
-            # if self.thunderscope:
-            #     from pyqtgraph.Qt import QtWidgets
-            #
-            #     QtWidgets.QApplication.processEvents()
-            time.sleep(0.1)
-        logger.info(
-            "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
-        )
-
     def _runner(
         self,
         always_validation_sequence_set,
@@ -201,7 +136,24 @@ class FieldTestRunner(TbotsTestRunner):
 
         validation.check_validation(eventually_validation_proto_set)
 
-        self.stopper()
+        self._stopper()
+
+    def _wait_for_estop_play(self):
+        """Blocks until the estop is in the PLAY state"""
+        if self.robot_communication.estop_is_playing:
+            return
+
+        logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
+        while not self.robot_communication.estop_is_playing:
+            # We must process events if Thunderscope is running to keep it responsive
+            # if self.thunderscope:
+            #     from pyqtgraph.Qt import QtWidgets
+            #
+            #     QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+        logger.info(
+            "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
+        )
 
     def _survey_field_robots(self):
         logger.info("determining robots on field")
