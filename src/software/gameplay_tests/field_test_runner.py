@@ -13,8 +13,6 @@ from software.logger.logger import create_logger
 logger = create_logger(__name__)
 
 WORLD_BUFFER_TIMEOUT = 5.0
-PROCESS_BUFFER_DELAY_S = 0.01
-PAUSE_AFTER_FAIL_DELAY_S = 3
 LAUNCH_DELAY_S = 0.1
 
 
@@ -88,8 +86,7 @@ class FieldTestRunner(TbotsTestRunner):
                                       ...
                                   ]
         """
-
-        threading.excepthook = self._excepthook
+        threading.excepthook = self.excepthook
 
         run_test_thread = threading.Thread(
             target=self._runner,
@@ -127,12 +124,6 @@ class FieldTestRunner(TbotsTestRunner):
         logger.info(
             "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
         )
-
-    def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
-        time.sleep(delay)
-
-        if self.thunderscope:
-            self.thunderscope.close()
 
     def _runner(
         self,
@@ -200,18 +191,7 @@ class FieldTestRunner(TbotsTestRunner):
 
         validation.check_validation(eventually_validation_proto_set)
 
-        self._stopper()
-
-    def _excepthook(self, args):
-        """This function is _critical_ for show_thunderscope to work.
-        If the test Thread will raises an exception we won't be able to close
-        the window from the main thread.
-
-        :param args: The args passed in from the hook
-        """
-        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
-        self.last_exception = args.exc_value
-        raise self.last_exception
+        self.stopper()
 
     def _survey_field_robots(self):
         logger.info("determining robots on field")

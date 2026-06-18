@@ -49,11 +49,11 @@ def test_basic_rotation(angle, gameplay_test_runner):
             obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         )
 
-        # gameplay_test_runner.set_tactics(
-        #     blue_tactics={
-        #         robot_id: move_tactic,
-        #     },
-        # )
+        gameplay_test_runner.set_tactics(
+            blue_tactics={
+                robot_id: move_tactic,
+            },
+        )
 
     gameplay_test_runner.run_test(
         setup=setup,

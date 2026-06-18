@@ -16,8 +16,6 @@ logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
-PROCESS_BUFFER_DELAY_S = 0.01
-PAUSE_AFTER_FAIL_DELAY_S = 3
 TICK_DURATION_S = 1 / 60
 
 
@@ -84,7 +82,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                                       ...
                                   ]
         """
-        threading.excepthook = self._excepthook
+        threading.excepthook = self.excepthook
 
         self._sync_setup(setup)
 
@@ -117,28 +115,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                 test_timeout_s,
                 gc_cmd_with_delay=gc_cmd_with_delay,
             )
-
-    def _excepthook(self, args):
-        """This function is _critical_ for show_thunderscope to work.
-        If the test Thread will raises an exception we won't be able to close
-        the window from the main thread.
-
-        :param args: The args passed in from the hook
-        """
-        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
-        self.last_exception = args.exc_value
-        raise self.last_exception
-
-    def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
-        """Stop running the test
-
-        :param delay: How long to wait before closing everything, defaults
-                      to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
-        """
-        time.sleep(delay)
-
-        if self.thunderscope:
-            self.thunderscope.close()
 
     def _sync_setup(self, setup):
         """Run setup until simulator has received game state
@@ -188,8 +164,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                                   ]
         """
         time_elapsed_s = 0
-
-        eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
             # get time before we execute the loop
@@ -286,4 +260,4 @@ class SimulatedTestRunner(TbotsTestRunner):
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
-        self._stopper()
+        self.stopper()

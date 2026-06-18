@@ -1,7 +1,12 @@
+import time
+
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
 from typing import Any
+
+PAUSE_AFTER_FAIL_DELAY_S = 3
+PROCESS_BUFFER_DELAY_S = 0.01
 
 
 class TbotsTestRunner:
@@ -142,6 +147,28 @@ class TbotsTestRunner:
         :param gc_cmd_with_delay: timed GC commands
         """
         raise NotImplementedError("abstract method run_test called from base class")
+
+    def stopper(self, delay=PROCESS_BUFFER_DELAY_S):
+        """Stop running the test
+
+        :param delay: How long to wait before closing everything, defaults
+                      to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
+        """
+        time.sleep(delay)
+
+        if self.thunderscope:
+            self.thunderscope.close()
+
+    def excepthook(self, args):
+        """This function is _critical_ for show_thunderscope to work.
+        If the test Thread will raises an exception we won't be able to close
+        the window from the main thread.
+
+        :param args: The args passed in from the hook
+        """
+        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self.last_exception = args.exc_value
+        raise self.last_exception
 
     def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
         """Converts dict of tactics to AssignedTacticPlayControlParams message
