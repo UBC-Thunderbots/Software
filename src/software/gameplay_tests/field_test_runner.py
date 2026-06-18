@@ -24,7 +24,6 @@ class FieldTestRunner(TbotsTestRunner):
         yellow_full_system_proto_unix_io,
         gamecontroller,
         robot_communication,
-        publish_validation_protos=True,
         is_yellow_friendly=False,
     ):
         """Initialize the FieldTestRunner
@@ -35,7 +34,6 @@ class FieldTestRunner(TbotsTestRunner):
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
         :param robot_communication: The robot communication instance
-        :param publish_validation_protos: whether to publish validation protos
         :param: is_yellow_friendly: if yellow is the friendly team
         """
         super(FieldTestRunner, self).__init__(
@@ -46,7 +44,6 @@ class FieldTestRunner(TbotsTestRunner):
             gamecontroller,
             is_yellow_friendly,
         )
-        self.publish_validation_protos = publish_validation_protos
         self.is_yellow_friendly = is_yellow_friendly
         self.robot_communication = robot_communication
 
@@ -54,6 +51,7 @@ class FieldTestRunner(TbotsTestRunner):
 
     @override
     def set_world_state(self, world_state: WorldState):
+        # TODO (#3369): add visualization for setup instead of just logging warning
         logger.warning(
             "set_world_state called in field test: "
             "assuming robots are initialized according to the given parameters"
@@ -65,7 +63,7 @@ class FieldTestRunner(TbotsTestRunner):
         always_validation_sequence_set,
         eventually_validation_sequence_set,
         test_timeout_s,
-        gc_cmd_with_delay,  # TODO (#3744): implement this
+        gc_cmd_with_delay,
     ):
         self._wait_for_estop_play()
 
@@ -108,12 +106,18 @@ class FieldTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
             )
 
-            if self.publish_validation_protos:
-                # Set the test name
-                eventually_validation_proto_set.test_name = self.test_name
-                always_validation_proto_set.test_name = self.test_name
+            # Set the test name
+            eventually_validation_proto_set.test_name = self.test_name
+            always_validation_proto_set.test_name = self.test_name
 
-                # Send out the validation proto to thunderscope
+            if self.is_yellow_friendly:
+                self.yellow_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, eventually_validation_proto_set
+                )
+                self.yellow_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, always_validation_proto_set
+                )
+            else:
                 self.blue_full_system_proto_unix_io.send_proto(
                     ValidationProtoSet, eventually_validation_proto_set
                 )
@@ -134,6 +138,7 @@ class FieldTestRunner(TbotsTestRunner):
 
             time_elapsed_s += time.time() - processing_start_time
 
+        # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
         self._stopper()
