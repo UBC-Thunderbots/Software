@@ -135,7 +135,6 @@ def create_zig_zag_path_test_params(
         ],
         [],
         20,
-        False,
     )
 
 

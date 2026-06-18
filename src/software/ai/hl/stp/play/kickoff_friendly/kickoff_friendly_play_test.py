@@ -133,7 +133,7 @@ def test_kickoff_friendly_play(gameplay_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=60,
-        gc_cmd_with_delay=[4, Command.Type.NORMAL_START, Team.BLUE],
+        gc_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.BLUE)],
     )
 
 
