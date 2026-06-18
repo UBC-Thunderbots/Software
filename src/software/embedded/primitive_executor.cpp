@@ -10,9 +10,9 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
-PrimitiveExecutor::PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants) :
-    state_(), current_primitive_(),
-    robot_constants_(robot_constants)
+PrimitiveExecutor::PrimitiveExecutor(
+    const robot_constants::RobotConstants& robot_constants)
+    : state_(), current_primitive_(), robot_constants_(robot_constants)
 {
 }
 
@@ -102,9 +102,9 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
     // delta_time per tick.
     const double max_angular_velocity_delta =
         robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_time.toSeconds();
-    const double angular_velocity_delta = std::clamp(
-        (target_w - prev_target_angular_velocity_).toRadians(),
-        -max_angular_velocity_delta, max_angular_velocity_delta);
+    const double angular_velocity_delta =
+        std::clamp((target_w - prev_target_angular_velocity_).toRadians(),
+                   -max_angular_velocity_delta, max_angular_velocity_delta);
     target_w = prev_target_angular_velocity_ +
                AngularVelocity::fromRadians(angular_velocity_delta);
     prev_target_angular_velocity_ = target_w;
