@@ -81,7 +81,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
           std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
       network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
-      primitive_executor_(robot_constants, robot_id_),
+      primitive_executor_(robot_constants),
       robot_localizer_(RobotLocalizer::RobotLocalizerConfig{
           robot_constants.kalman_process_noise_variance_rad_per_s_4,
           robot_constants.kalman_vision_noise_variance_rad_2,
