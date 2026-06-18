@@ -18,6 +18,63 @@ from software.gameplay_tests.validation.ball_enters_region import (
 )
 
 
+def calculate_best_pass(
+    ball_initial_position,
+    ball_initial_velocity,
+    blue_robot_locations,
+    yellow_robot_locations,
+):
+    # construct a world object to match the one sent to the test runner
+    world = tbots_cpp.World(
+        tbots_cpp.Field.createSSLDivisionBField(),
+        tbots_cpp.Ball(
+            ball_initial_position, ball_initial_velocity, tbots_cpp.Timestamp()
+        ),
+        tbots_cpp.Team(
+            [
+                tbots_cpp.Robot(
+                    index,
+                    location,
+                    tbots_cpp.Vector(0.0, 0.0),
+                    tbots_cpp.Angle.fromRadians(0),
+                    tbots_cpp.Angle(),
+                    tbots_cpp.Timestamp(),
+                )
+                for index, location in enumerate(blue_robot_locations)
+            ]
+        ),
+        tbots_cpp.Team(
+            [
+                tbots_cpp.Robot(
+                    index,
+                    location,
+                    tbots_cpp.Vector(0.0, 0.0),
+                    tbots_cpp.Angle.fromRadians(0),
+                    tbots_cpp.Angle(),
+                    tbots_cpp.Timestamp(),
+                )
+                for index, location in enumerate(yellow_robot_locations)
+            ]
+        ),
+    )
+
+    # construct a pass generator with a max receive speed set
+    config = PassingConfig()
+    config.enemy_proximity_importance = 0.01
+    config.enemy_interception_time_multiplier = 5
+    config.max_receive_speed_m_per_s = 2.0
+    pass_generator = tbots_cpp.PassGenerator(config)
+
+    # generate the best pass on the world 100 times
+    # this improves the passes generated over time
+    robots_to_ignore = [0]  # Avoid sampling passes around the attacker robot
+    for index in range(0, 100):
+        best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
+
+    best_pass = best_pass_with_score.pass_value
+    return best_pass
+
+
 def setup_pass_and_robots(
     ball_initial_position,
     ball_initial_velocity,
@@ -54,54 +111,12 @@ def setup_pass_and_robots(
         ),
     )
 
-    # construct a world object to match the one sent to the test runner
-    world = tbots_cpp.World(
-        tbots_cpp.Field.createSSLDivisionBField(),
-        tbots_cpp.Ball(
-            ball_initial_position, ball_initial_velocity, tbots_cpp.Timestamp()
-        ),
-        tbots_cpp.Team(
-            [
-                tbots_cpp.Robot(
-                    index,
-                    location,
-                    tbots_cpp.Vector(0.0, 0.0),
-                    tbots_cpp.Angle.fromRadians(0),
-                    tbots_cpp.Angle(),
-                    tbots_cpp.Timestamp(),
-                )
-                for index, location in enumerate(blue_robot_locations)
-            ]
-        ),
-        tbots_cpp.Team(
-            [
-                tbots_cpp.Robot(
-                    index,
-                    location,
-                    tbots_cpp.Vector(0.0, 0.0),
-                    tbots_cpp.Angle.fromRadians(0),
-                    tbots_cpp.Angle(),
-                    tbots_cpp.Timestamp(),
-                )
-                for index, location in enumerate(enemy_robot_positions)
-            ]
-        ),
+    best_pass = calculate_best_pass(
+        ball_initial_position,
+        ball_initial_velocity,
+        blue_robot_locations,
+        enemy_robot_positions,
     )
-
-    # construct a pass generator with a max receive speed set
-    config = PassingConfig()
-    config.enemy_proximity_importance = 0.01
-    config.enemy_interception_time_multiplier = 5
-    config.max_receive_speed_m_per_s = 2.0
-    pass_generator = tbots_cpp.PassGenerator(config)
-
-    # generate the best pass on the world 100 times
-    # this improves the passes generated over time
-    robots_to_ignore = [0]  # Avoid sampling passes around the attacker robot
-    for index in range(0, 100):
-        best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
-
-    best_pass = best_pass_with_score.pass_value
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
@@ -340,17 +355,26 @@ def test_passing_no_backwards_passes(
     enemy_robot_positions,
     gameplay_test_runner,
 ):
-    field = tbots_cpp.Field.createSSLDivisionBField()
-    best_pass = setup_pass_and_robots(
-        ball_initial_position=ball_initial_position,
-        ball_initial_velocity=ball_initial_velocity,
-        attacker_robot_position=attacker_robot_position,
-        receiver_robot_positions=receiver_robot_positions,
-        friendly_orientations=friendly_orientations,
-        enemy_robot_positions=enemy_robot_positions,
-        receive_pass=True,
-        gameplay_test_runner=gameplay_test_runner,
+    best_pass = calculate_best_pass(
+        ball_initial_position,
+        ball_initial_velocity,
+        [attacker_robot_position, *receiver_robot_positions],
+        enemy_robot_positions,
     )
+
+    def setup():
+        setup_pass_and_robots(
+            ball_initial_position=ball_initial_position,
+            ball_initial_velocity=ball_initial_velocity,
+            attacker_robot_position=attacker_robot_position,
+            receiver_robot_positions=receiver_robot_positions,
+            friendly_orientations=friendly_orientations,
+            enemy_robot_positions=enemy_robot_positions,
+            receive_pass=True,
+            gameplay_test_runner=gameplay_test_runner,
+        )
+
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Eventually Validation
     eventually_validation_sequence_set = [
@@ -378,6 +402,7 @@ def test_passing_no_backwards_passes(
     ]
 
     gameplay_test_runner.run_test(
+        setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,

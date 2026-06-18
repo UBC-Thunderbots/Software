@@ -133,31 +133,9 @@ class TbotsTestRunner:
         """
         raise NotImplementedError("abstract class method called set_world_state")
 
-    @abstractmethod
-    def _runner(
-        self,
-        always_validation_sequence_set,
-        eventually_validation_sequence_set,
-        test_timeout_s,
-        gc_cmd_with_delay,
-    ):
-        """Internal test loop; implemented by subclasses.
-
-        See run_test() method for param docs.
-        """
-        raise NotImplementedError("abstract class method called _runner")
-
-    def _pre_run_setup(self, setup: (lambda: None)):
-        """Hook called before the test loop starts. Override in subclasses that
-        need to synchronize setup with external systems (e.g. simulator).
-
-        :param setup: Function that sets up the world state
-        """
-        setup()
-
     def run_test(
         self,
-        setup=lambda: None,
+        setup: (lambda: None),
         always_validation_sequence_set=[],
         eventually_validation_sequence_set=[],
         test_timeout_s=3,
@@ -166,6 +144,7 @@ class TbotsTestRunner:
         """Begins validating a test based on incoming world protos.
         Runs the test in a background thread if thunderscope is enabled.
 
+        :param setup: Function that sets up the world state
         :param always_validation_sequence_set: validation set that must always be true
         :param eventually_validation_sequence_set: validation set that must eventually be true
         :param test_timeout_s: how long the test will run
@@ -194,6 +173,28 @@ class TbotsTestRunner:
                 pytest.fail(str(self.last_exception))
         else:
             self._runner(*args)
+
+    @abstractmethod
+    def _runner(
+        self,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+        gc_cmd_with_delay,
+    ):
+        """Internal test loop; implemented by subclasses.
+
+        See run_test() method for param docs.
+        """
+        raise NotImplementedError("abstract class method called _runner")
+
+    def _pre_run_setup(self, setup: (lambda: None)):
+        """Hook called before the test loop starts. Override in subclasses that
+        need to synchronize setup with external systems (e.g. simulator).
+
+        :param setup: Function that sets up the world state
+        """
+        setup()
 
     def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
         """Stop running the test

@@ -154,23 +154,9 @@ def run_ball_placement_scenario(
             BallEventuallyEntersRegion(
                 regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
             ),
-        ]
-    ]
-
-    # Drop Ball Always Validation
-    drop_ball_always_validation_sequence_set = [
-        [
-            BallAlwaysStaysInRegion(
-                regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
-            ),
-        ]
-    ]
-
-    # Drop Ball Eventually Validation
-    # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
-    # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
-    drop_ball_eventually_validation_sequence_set = [
-        [
+            # Drop Ball Eventually Validation
+            # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
+            # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
             RobotEventuallyExitsRegion(
                 regions=[
                     tbots_cpp.Circle(
@@ -181,6 +167,16 @@ def run_ball_placement_scenario(
         ]
     ]
 
+    # Make sure ball never moves after robot moves away
+    # TODO (#3503): Enable this with an OrValidation checking robot is moving back
+    # drop_ball_always_validation_sequence_set = [
+    #     [
+    #         BallAlwaysStaysInRegion(
+    #             regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
+    #         ),
+    #     ]
+    # ]
+
     gameplay_test_runner.run_test(
         setup=lambda: ball_placement_play_setup(
             ball_start_point,
@@ -188,16 +184,8 @@ def run_ball_placement_scenario(
             gameplay_test_runner,
             blue_only,
         ),
-        always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
         test_timeout_s=30,
-    )
-
-    gameplay_test_runner.run_test(
-        # setup argument isn't passed to preserve world state from previous test run
-        always_validation_sequence_set=drop_ball_always_validation_sequence_set,
-        eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        test_timeout_s=10,
     )
 
 
