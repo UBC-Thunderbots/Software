@@ -15,6 +15,7 @@ class DurationValidation(Validation):
                 "Type of validation needs to be EVENTUALLY for DurationValidation"
             )
 
+        # TODO (#3786): rewrite without DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK for field tests
         self.duration_s = duration_s
         self.passing_ticks = 0
         self.duration_ticks = int(

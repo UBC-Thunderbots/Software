@@ -10,6 +10,8 @@ from software.gameplay_tests.validation.validation import (
 class DelayValidation(Validation):
     def __init__(self, delay_s, validation):
         """A validation wrapper that adds a delay to given validation before being evaluated"""
+
+        # TODO (#3786): rewrite without DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK for field tests
         self.delay_s = delay_s
         self.ticks_so_far = 0
         self.delay_ticks = int(delay_s / DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK)

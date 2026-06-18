@@ -2,7 +2,10 @@ import queue
 import time
 from typing import override
 
-from software.py_constants import MILLISECONDS_PER_SECOND
+from software.py_constants import (
+    DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK,
+    MILLISECONDS_PER_SECOND,
+)
 
 from proto.import_all_protos import *
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
@@ -14,7 +17,7 @@ logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
-TICK_DURATION_S = 1 / 60
+TICK_DURATION_S = DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 
 
 class SimulatedTestRunner(TbotsTestRunner):
