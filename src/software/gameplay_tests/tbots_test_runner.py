@@ -134,8 +134,8 @@ class TbotsTestRunner:
     def run_test(
         self,
         setup=lambda: None,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
+        always_validation_sequence_set=[],
+        eventually_validation_sequence_set=[],
         test_timeout_s=3,
         gc_cmd_with_delay=[],
     ):
@@ -166,7 +166,7 @@ class TbotsTestRunner:
 
         :param args: The args passed in from the hook
         """
-        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self.stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
         self.last_exception = args.exc_value
         raise self.last_exception
 

@@ -66,8 +66,8 @@ class FieldTestRunner(TbotsTestRunner):
     def run_test(
         self,
         setup=lambda: None,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
+        always_validation_sequence_set=[],
+        eventually_validation_sequence_set=[],
         test_timeout_s=3,
         gc_cmd_with_delay=[],
     ):
@@ -138,11 +138,6 @@ class FieldTestRunner(TbotsTestRunner):
 
         test_end_time = time.time() + test_timeout_s
 
-        # Keep track if we started with any eventually validations
-        has_eventually_validations = any(
-            len(seq) > 0 for seq in eventually_validation_sequence_set
-        )
-
         while time.time() < test_end_time:
             while True:
                 try:
@@ -180,14 +175,16 @@ class FieldTestRunner(TbotsTestRunner):
                     ValidationProtoSet, always_validation_proto_set
                 )
 
-            # Check that all always validations are always valid
-            validation.check_validation(always_validation_proto_set)
-
-            # Break if eventually validation passes
-            if has_eventually_validations and all(
-                len(seq) == 0 for seq in eventually_validation_sequence_set
-            ):
-                break
+            if len(always_validation_sequence_set) != 0:
+                # Check that all always validations are always valid
+                validation.check_validation(always_validation_proto_set)
+            else:
+                # If there are no always validations, check eventually validations to end test early
+                try:
+                    validation.check_validation(eventually_validation_proto_set)
+                    break
+                except AssertionError:
+                    pass
 
         validation.check_validation(eventually_validation_proto_set)
 

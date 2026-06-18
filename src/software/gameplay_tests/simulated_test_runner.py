@@ -64,8 +64,8 @@ class SimulatedTestRunner(TbotsTestRunner):
     def run_test(
         self,
         setup=lambda: None,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
+        always_validation_sequence_set=[],
+        eventually_validation_sequence_set=[],
         test_timeout_s=3,
         gc_cmd_with_delay=[],
     ):
@@ -254,8 +254,16 @@ class SimulatedTestRunner(TbotsTestRunner):
                     ValidationProtoSet, always_validation_proto_set
                 )
 
-            # Check that all always validations are always valid
-            validation.check_validation(always_validation_proto_set)
+            if len(always_validation_sequence_set) != 0:
+                # Check that all always validations are always valid
+                validation.check_validation(always_validation_proto_set)
+            else:
+                # If there are no always validations, check eventually validations to end test early
+                try:
+                    validation.check_validation(eventually_validation_proto_set)
+                    break
+                except AssertionError:
+                    pass
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
