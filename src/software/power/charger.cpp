@@ -5,13 +5,9 @@ uint32_t Charger::last_charge_edge_ms              = 0;
 
 Charger::Charger()
 {
-    // Old ESP32 ADC path is no longer used for capacitor voltage.
-    pinMode(HV_SENSE, INPUT);
-
     pinMode(FLYBACK_FAULT, INPUT);
 
-    // DONE is active-low/open-drain. External pull-up should exist, but INPUT_PULLUP
-    // is also safe and helps during bring-up.
+    // DONE is active-low, I think we already have a pullup but just incase
     pinMode(CHRG_DONE, INPUT_PULLUP);
 
     pinMode(CHRG, OUTPUT);
@@ -37,8 +33,8 @@ void Charger::chargeCapacitors()
     delayMicroseconds(LT3750_CHARGE_LOW_TIME_US);
     digitalWrite(CHRG, HIGH);
 
-    last_charge_edge_ms = millis();
-    has_seen_done_since_last_charge_edge = false;
+    // last_charge_edge_ms = millis();
+    // has_seen_done_since_last_charge_edge = false;
 }
 
 void Charger::maintainCharge()
@@ -59,6 +55,7 @@ void Charger::maintainCharge()
     // {
     //     chargeCapacitors();
     // }
+    
     if ((millis() - last_charge_edge_ms) > MIN_CHARGE_RETRIGGER_INTERVAL_MS )
     {
         chargeCapacitors();
@@ -142,7 +139,15 @@ float Charger::getCapacitorVoltage()
 {
     static constexpr int NUM_SAMPLES = 8;
 
-    // Discard one frame because ADS7945 data corresponds to the previous conversion.
+    // Calibration from scope measurements:
+    // diagnostic 286.0 V corresponds to actual 196.44 V.
+    // This linear fit is applied after converting the raw ADC code to a voltage which already 
+    // accounts for the hardware gain and divider
+    static constexpr float CAP_CAL_ANCHOR_DIAGNOSTIC_V = 286.0f;
+    static constexpr float CAP_CAL_ANCHOR_ACTUAL_V     = 196.44f;
+    static constexpr float CAP_CAL_SLOPE               = 0.7019289f;
+
+    // ADS7945 returns the previous conversion, so discard one frame first.
     (void)readAds7945SignedCode();
 
     long code_sum = 0;
@@ -157,15 +162,38 @@ float Charger::getCapacitorVoltage()
 
     const float v_adc_diff = adcCodeToDifferentialVoltage(avg_code);
 
-    return adcDifferentialVoltageToCapacitorVoltage(v_adc_diff);
+    // Uncalibrated diagnostic voltage.
+    const float raw_capacitor_voltage =
+        adcDifferentialVoltageToCapacitorVoltage(v_adc_diff);
+
+    // Convert diagnostic voltage to calibrated physical capacitor voltage.
+    const float calibrated_capacitor_voltage =
+        CAP_CAL_ANCHOR_ACTUAL_V +
+        CAP_CAL_SLOPE *
+            (raw_capacitor_voltage - CAP_CAL_ANCHOR_DIAGNOSTIC_V);
+
+    // Prevent a small negative reported voltage near 0 V.
+    const float physical_capacitor_voltage =
+        (calibrated_capacitor_voltage < 0.0f)
+            ? 0.0f
+            : calibrated_capacitor_voltage;
+
+    // Initialize from the first real reading so startup does not ramp from 0 V.
+    if (!capacitor_voltage_ema_initialized_)
+    {
+        capacitor_voltage_ema_             = physical_capacitor_voltage;
+        capacitor_voltage_ema_initialized_ = true;
+    }
+    else
+    {
+        capacitor_voltage_ema_ +=
+            CAP_VOLTAGE_EMA_ALPHA *
+            (physical_capacitor_voltage - capacitor_voltage_ema_);
+    }
+    return capacitor_voltage_ema_;
 }
 
 bool Charger::getFlybackFault()
 {
     return !digitalRead(FLYBACK_FAULT);
 }
-
-// float Charger::getCapacitorVoltage()
-// {
-//     return 123.45f;
-// }

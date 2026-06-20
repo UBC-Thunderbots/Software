@@ -129,9 +129,8 @@ void loop()
 
     dribbler->update();
 
-    // Minimal LT3750 maintenance. This does not change telemetry or command logic.
+    // Minimal LT3750 maintenance.
     charger->maintainCharge();
-    //charger->chargeCapacitors();
 
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
