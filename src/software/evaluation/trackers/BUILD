@@ -8,9 +8,9 @@ py_library(
         "__init__.py",
         "goalie_tracker.py",
         "kick_tracker.py",
+        "pass_log_tracker.py",
         "possession_tracker.py",
         "referee_tracker.py",
-        "tracked_event.py",
         "tracker.py",
         "tracker_builder.py",
     ],
@@ -20,6 +20,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//software/evaluation/logs",
         "//software/thunderscope:time_provider",
     ],
 )

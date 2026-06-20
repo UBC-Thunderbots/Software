@@ -1,0 +1,7 @@
+pandas
+numpy
+torch
+torch_geometric
+onnxruntime
+scikit-learn
+onnxscript

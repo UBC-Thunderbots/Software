@@ -4,7 +4,6 @@ from software.thunderscope.log.trackers.tracker_builder import TrackerBuilder
 from software.thunderscope.log.trackers.referee_tracker import RefereeTracker
 from software.thunderscope.log.trackers.goalie_tracker import GoalieTracker
 
-from software.thunderscope.log.trackers.tracked_event import EventType, TrackedEvent
 
 __all__ = [
     "PossessionTracker",
@@ -13,6 +12,5 @@ __all__ = [
     "TrackerBuilder",
     "RefereeTracker",
     "GoalieTracker",
-    "TrackedEvent",
     "EventType",
 ]
