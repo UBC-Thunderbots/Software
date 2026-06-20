@@ -47,7 +47,7 @@ class FieldTestRunner(TbotsTestRunner):
         self.is_yellow_friendly = is_yellow_friendly
         self.robot_communication = robot_communication
 
-        # self._survey_field_robots()
+        self._survey_field_robots()
 
     @override
     def set_world_state(self, world_state: WorldState):
@@ -58,6 +58,15 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     @override
+    def _pre_run_setup(self, setup: (lambda: None)):
+        """Wait for estop to be in play state before runing setup
+
+        :param setup: Function that sets up the world state
+        """
+        self._wait_for_estop_play()
+        setup()
+
+    @override
     def _runner(
         self,
         always_validation_sequence_set,
@@ -65,8 +74,6 @@ class FieldTestRunner(TbotsTestRunner):
         test_timeout_s,
         gc_cmd_with_delay,
     ):
-        self._wait_for_estop_play()
-
         time.sleep(LAUNCH_DELAY_S)
 
         time_elapsed_s = 0

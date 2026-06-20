@@ -188,9 +188,9 @@ class TbotsTestRunner:
         """
         raise NotImplementedError("abstract class method called _runner")
 
+    @abstractmethod
     def _pre_run_setup(self, setup: (lambda: None)):
-        """Hook called before the test loop starts. Override in subclasses that
-        need to synchronize setup with external systems (e.g. simulator).
+        """Hook called before the test loop starts
 
         :param setup: Function that sets up the world state
         """
