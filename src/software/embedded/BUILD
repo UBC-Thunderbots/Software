@@ -18,7 +18,7 @@ config_setting(
 
 string_flag(
     name = "motor_board",
-    build_setting_default = "TRINAMIC",
+    build_setting_default = "STSPIN",
     values = [
         "TRINAMIC",
         "STSPIN",

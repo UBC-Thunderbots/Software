@@ -275,6 +275,7 @@ void StSpinMotorController::openSpiFileDescriptor(const MotorIndex motor)
 void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
                                                 const OutgoingFrame& outgoing_frame)
 {
+#if 0 
     std::array<uint8_t, FRAME_LEN> tx{};
     std::array<uint8_t, FRAME_LEN> rx{};
 
@@ -305,6 +306,7 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
     }
 
     processRx(motor, rx);
+#endif
 }
 
 void StSpinMotorController::populateTx(const OutgoingFrame& outgoing_frame,
