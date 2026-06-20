@@ -29,8 +29,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
 
     using Update = TacticFSM<GoalieFSM>::Update;
 
-    // Distance to chip the ball when trying to yeet it, as a fraction of field
-    // length (was 2.0 m on the 9.0 m Division B field).
+    // Distance to chip the ball when trying to yeet it, as a fraction of field length
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_FRACTION = 2.0 / 9.0;
 

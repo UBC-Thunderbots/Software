@@ -31,7 +31,7 @@ class Simulator:
         :param simulator_runtime_dir: The directory to run the simulator in
         :param debug_simulator: Whether to run the simulator in debug mode
         :param enable_realism: a argument (--enable_realism) that is going to be passed to er_force_simulator_main binary
-        :param division: which field to simulate on — "div_a", "div_b", or "practice"
+        :param division: which field to simulate on: "div_a", "div_b", or "practice"
         """
         self.simulator_runtime_dir = simulator_runtime_dir
         self.generic_command = [

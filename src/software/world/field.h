@@ -50,12 +50,10 @@ class Field
     static Field createSSLDivisionAField();
 
     /**
-     * Creates a smaller practice field that fits in a constrained space.
-     * Field length and width are 2/5 of Division B; goal width is 3/5 of Division B.
-     * Goal depth and boundary buffer are kept at Division B values because they
-     * are tied to physical goal hardware and carpet margin, not field size.
+     * Creates a practice field. Goal depth and boundary buffer are kept at
+     * Division B values.
      *
-     * @return a field sized for indoor practice use
+     * @return a practice field
      */
     static Field createPracticeField();
 

@@ -5,11 +5,7 @@
 #   - shared/practice_field_dims.py                         (constants for Python)
 #   - extlibs/er_force_sim/config/simulator/practice.txt    (sim geometry)
 #
-# Ratios versus Division B (9.0 x 6.0):
-#   - 2/5 for field length/width, defense area, center circle
-#   - 3/5 for goal width
-#   - Goal depth and boundary buffer kept at Division B — tied to physical
-#     goal hardware and surrounding carpet, not field size.
+# Goal depth and boundary buffer are kept the same as Division B.
 
 PRACTICE_FIELD_DIMS = {
     "field_x_length": "3.6",

@@ -38,8 +38,7 @@ void ShootOrChipPlayFSM::updateShootOrChip(const Update& event)
      */
 
     // Figure out where the fallback chip target is.
-    // Offset is one-sixth of the field length (1.5 m on a Div B 9 m field,
-    // 2.0 m on a Div A 12 m field) so the target scales with field size.
+    // Offset is one-sixth of the field length so it scales with field size.
     double fallback_chip_target_x_offset =
         event.common.world_ptr->field().xLength() / 6.0;
 
