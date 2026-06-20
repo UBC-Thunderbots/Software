@@ -94,8 +94,4 @@ class PrimitiveExecutor
     // to avoid jittering around the destination.
     static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 
-    // If distance between current linear trajectory destination and new one is larger
-    // than this, we change trajectories.
-    static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
-    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
 };

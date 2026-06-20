@@ -15,7 +15,8 @@ MovePrimitive::MovePrimitive(
     const TbotsProto::ObstacleAvoidanceMode& obstacle_avoidance_mode,
     const TbotsProto::DribblerMode& dribbler_mode,
     const TbotsProto::BallCollisionType& ball_collision_type,
-    const AutoChipOrKick& auto_chip_or_kick, std::optional<double> cost_override)
+    const AutoChipOrKick& auto_chip_or_kick, std::optional<double> cost_override,
+    double destination_similarity_threshold)
     : robot(robot),
       destination(destination),
       final_angle(final_angle),
@@ -23,7 +24,8 @@ MovePrimitive::MovePrimitive(
       auto_chip_or_kick(auto_chip_or_kick),
       ball_collision_type(ball_collision_type),
       max_allowed_speed_mode(max_allowed_speed_mode),
-      obstacle_avoidance_mode(obstacle_avoidance_mode)
+      obstacle_avoidance_mode(obstacle_avoidance_mode),
+      destination_similarity_threshold(destination_similarity_threshold)
 {
     if (cost_override.has_value())
     {
@@ -122,7 +124,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     traj_path = planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                        constraints, obstacles, navigable_area,
-                                       prev_sub_destination, current_trajectory);
+                                       prev_sub_destination, current_trajectory,
+                                       destination_similarity_threshold);
 
     if (!traj_path.has_value())
     {

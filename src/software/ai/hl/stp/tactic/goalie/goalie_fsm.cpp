@@ -213,7 +213,8 @@ void GoalieFSM::panic(const Update& event)
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        std::nullopt, TrajectoryEvaluator::GOALIE_DESTINATION_SIMILARITY_THRESHOLD_M));
 }
 
 void GoalieFSM::updatePivotKick(
@@ -255,7 +256,8 @@ void GoalieFSM::positionToBlock(const Update& event)
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        std::nullopt, TrajectoryEvaluator::GOALIE_DESTINATION_SIMILARITY_THRESHOLD_M));
 }
 
 bool GoalieFSM::ballInInflatedDefenseArea(const Update& event)
@@ -279,7 +281,8 @@ void GoalieFSM::moveToGoalLine(const Update& event)
         Angle::zero(), max_allowed_speed_mode,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, std::nullopt,
+        TrajectoryEvaluator::GOALIE_DESTINATION_SIMILARITY_THRESHOLD_M));
 }
 
 bool GoalieFSM::retrieveDone(const Update& event)

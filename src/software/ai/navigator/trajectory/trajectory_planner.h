@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/ai/navigator/trajectory/trajectory_evaluator.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/navigator/trajectory/trajectory_path_with_cost.h"
 
@@ -29,15 +30,21 @@ class TrajectoryPlanner
      * @param current_trajectory The trajectory the robot is currently executing.
      * Used to add a consistency cost that discourages unnecessary deviation from the
      * current path. nullopt if there is no current trajectory.
-     * @return TrajectoryPath which attempts to avoid the obstacles, or nullopt if the
-     * best trajectory exceeds MAX_TRAJECTORY_COST (all options are too costly)
+     * @param destination_similarity_threshold Distance (m) below which the new
+     * trajectory's first sub-destination is considered the same as the current one,
+     * causing the old trajectory to be kept. Defaults to
+     * TrajectoryEvaluator::DESTINATION_SIMILARITY_THRESHOLD_M.
+     * @return TrajectoryPath which attempts to avoid the obstacles, or nullopt if there
+     * is an unavoidable imminent collision
      */
     std::optional<TrajectoryPath> findTrajectory(
         const Point& start, const Point& destination, const Vector& initial_velocity,
         const KinematicConstraints& constraints,
         const std::vector<ObstaclePtr>& obstacles, const Rectangle& navigable_area,
-        const std::optional<Point>& prev_sub_destination   = std::nullopt,
-        const std::optional<TrajectoryPath>& current_trajectory = std::nullopt);
+        const std::optional<Point>& prev_sub_destination        = std::nullopt,
+        const std::optional<TrajectoryPath>& current_trajectory = std::nullopt,
+        double destination_similarity_threshold =
+            TrajectoryEvaluator::DESTINATION_SIMILARITY_THRESHOLD_M);
 
    private:
     /**
@@ -49,13 +56,12 @@ class TrajectoryPlanner
      * @param initial_velocity Initial velocity of the trajectory
      * @param constraints Kinematic constraints of the trajectory
      * @param obstacles List of all obstacles
-     * @param current_trajectory The trajectory the robot is currently executing
      * @return A trajectory path with only a single trajectory + its cost
      */
     TrajectoryPathWithCost getDirectTrajectoryWithCost(
         const Point& start, const Point& destination, const Vector& initial_velocity,
-        const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles,
-        const std::optional<TrajectoryPath>& current_trajectory);
+        const KinematicConstraints& constraints,
+        const std::vector<ObstaclePtr>& obstacles);
 
     /**
      * Given a trajectory path, calculate its cost.
@@ -66,14 +72,12 @@ class TrajectoryPlanner
      * trajectory
      * @param sub_traj_duration_s Optional duration of the cached sub_traj_with_cost
      * @param max_cost Current maximum cost among calculated trajectories
-     * @param current_trajectory The trajectory the robot is currently executing
      * @return The trajectory path with its cost
      */
     TrajectoryPathWithCost getTrajectoryWithCost(
         const TrajectoryPath& trajectory, const std::vector<ObstaclePtr>& obstacles,
         const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
-        const std::optional<double> sub_traj_duration_s, double max_cost,
-        const std::optional<TrajectoryPath>& current_trajectory);
+        const std::optional<double> sub_traj_duration_s, double max_cost);
 
 
 
@@ -109,9 +113,9 @@ class TrajectoryPlanner
     static constexpr double UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S       = 0.2;
     static constexpr double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S = 0.5;
 
-    // If the best trajectory's cost exceeds this value, findTrajectory returns nullopt
-    // (causing the robot to stop) rather than executing a very poor path.
-    static constexpr double MAX_TRAJECTORY_COST = 40.0;
+    // Cost threshold for the current trajectory — above this we replan unconditionally.
+    static constexpr double CURRENT_TRAJ_REPLAN_THRESHOLD = 15.0;
+
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
 

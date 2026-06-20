@@ -33,7 +33,9 @@ class MovePrimitive : public Primitive
                   const TbotsProto::DribblerMode& dribbler_mode,
                   const TbotsProto::BallCollisionType& ball_collision_type,
                   const AutoChipOrKick& auto_chip_or_kick,
-                  std::optional<double> cost_override = std::nullopt);
+                  std::optional<double> cost_override = std::nullopt,
+                  double destination_similarity_threshold =
+                      TrajectoryEvaluator::DESTINATION_SIMILARITY_THRESHOLD_M);
 
     ~MovePrimitive() override = default;
 
@@ -89,6 +91,7 @@ class MovePrimitive : public Primitive
     TbotsProto::BallCollisionType ball_collision_type;
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
+    double destination_similarity_threshold;
 
     // List of all obstacles that the robot should avoid
     std::vector<ObstaclePtr> obstacles;

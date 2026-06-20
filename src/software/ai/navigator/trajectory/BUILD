@@ -116,6 +116,7 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_evaluator",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
+        "//software/logger",
     ],
 )
 

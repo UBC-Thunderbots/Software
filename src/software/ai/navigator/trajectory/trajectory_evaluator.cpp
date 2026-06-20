@@ -10,8 +10,7 @@ TrajectoryEvaluator::TrajectoryEvaluator(const std::vector<ObstaclePtr>& obstacl
 TrajectoryPathWithCost TrajectoryEvaluator::evaluate(
     const TrajectoryPath& trajectory,
     const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_s, const double max_cost,
-    const std::optional<TrajectoryPath>& current_trajectory)
+    const std::optional<double> sub_traj_duration_s, const double max_cost)
 {
     TrajectoryPathWithCost traj_with_cost(trajectory);
 
@@ -19,7 +18,6 @@ TrajectoryPathWithCost TrajectoryEvaluator::evaluate(
     total_cost += evaluateCollisions(trajectory, traj_with_cost, sub_traj_with_cost,
                                      sub_traj_duration_s, max_cost);
     total_cost += evaluatePath(trajectory);
-    total_cost += evaluateTrajectoryConsistency(trajectory, current_trajectory);
 
     traj_with_cost.cost = total_cost;
     return traj_with_cost;
@@ -104,29 +102,14 @@ double TrajectoryEvaluator::evaluatePath(const TrajectoryPath& trajectory)
     return 0.0;
 }
 
-double TrajectoryEvaluator::evaluateTrajectoryConsistency(
-    const TrajectoryPath& new_trajectory,
-    const std::optional<TrajectoryPath>& current_trajectory) const
+double TrajectoryEvaluator::evaluateDestinationSimilarity(
+    const TrajectoryPath& new_trajectory, const TrajectoryPath& current_trajectory)
 {
-    if (!current_trajectory.has_value())
-    {
-        return 0.0;
-    }
-
-    double total_deviation = 0.0;
-    const double check_end =
-        std::min({CONSISTENCY_CHECK_HORIZON_S, new_trajectory.getTotalTime(),
-                  current_trajectory->getTotalTime()});
-
-    for (double t = CONSISTENCY_CHECK_STEP_INTERVAL_S; t <= check_end;
-         t += CONSISTENCY_CHECK_STEP_INTERVAL_S)
-    {
-        total_deviation += (new_trajectory.getPosition(t) -
-                            current_trajectory->getPosition(t))
-                               .length();
-    }
-
-    return TRAJECTORY_CONSISTENCY_WEIGHT * total_deviation;
+    const Point new_first_dest =
+        new_trajectory.getTrajectoryPathNodes()[0].getTrajectory()->getDestination();
+    const Point cur_first_dest =
+        current_trajectory.getTrajectoryPathNodes()[0].getTrajectory()->getDestination();
+    return (new_first_dest - cur_first_dest).length();
 }
 
 double TrajectoryEvaluator::getFirstNonCollisionTime(const TrajectoryPath& traj_path,
