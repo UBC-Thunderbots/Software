@@ -46,15 +46,11 @@ void StSpinMotorController::setup()
     for (const MotorIndex motor : driveMotors())
     {
         sendAndReceiveMessage(motor,
-                              SetPidSpeedKpKiMessage{
-                                  .kp = SPEED_PID_PROPORTIONAL_GAIN,
-                                  .ki = SPEED_PID_INTEGRAL_GAIN
-                              });
+                              SetPidSpeedKpKiMessage{.kp = SPEED_PID_PROPORTIONAL_GAIN,
+                                                     .ki = SPEED_PID_INTEGRAL_GAIN});
         sendAndReceiveMessage(motor,
-                              SetPidTorqueKpKiMessage{
-                                  .kp = TORQUE_PID_PROPORTIONAL_GAIN,
-                                  .ki = TORQUE_PID_INTEGRAL_GAIN
-                              });
+                              SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
+                                                      .ki = TORQUE_PID_INTEGRAL_GAIN});
     }
 }
 
