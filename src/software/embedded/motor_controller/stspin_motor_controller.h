@@ -33,14 +33,16 @@ class StSpinMotorController : public MotorController
 
    private:
     // TODO: #3750 Use a template function instead of std::variant.
-    using OutgoingFrame =
-        std::variant<NoOpFrame, SetResponseTypeFrame, SetTargetSpeedFrame,
-                     SetTargetTorqueFrame, SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame,
-                     SetPidSpeedKpKiFrame, SetSpeedFeedForwardKaKvFrame,
-                     SetSpeedFeedForwardKsFrame>;
+    using OutgoingMessage =
+        std::variant<NoOpMessage, SetResponseTypeMessage, SetTargetSpeedMessage,
+                     SetTargetTorqueMessage, SetPidTorqueKpKiMessage,
+                     SetPidFluxKpKiMessage, SetPidSpeedKpKiMessage,
+                     SetSpeedFeedForwardKaKvMessage, SetSpeedFeedForwardKsMessage>;
 
-    // Length of frame (in number of bytes)
-    static constexpr unsigned int FRAME_LEN = 6;
+    // Length of message (in number of bytes)
+    static constexpr unsigned int MESSAGE_SIZE = 8;
+
+    static constexpr uint8_t MESSAGE_DELIMITER = 0xAA;
 
     // clang-format off
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
@@ -74,7 +76,7 @@ class StSpinMotorController : public MotorController
 
     struct MotorStatus
     {
-        unsigned int frame_count;
+        uint16_t seq_num;
         bool enabled;
         MotorFaultIndicator faults;
         uint16_t fault_flags;
@@ -100,30 +102,31 @@ class StSpinMotorController : public MotorController
     void openSpiFileDescriptor(MotorIndex motor);
 
     /**
-     * Transmits a frame to the given motor and receives a frame back over SPI.
+     * Transmits a message to the given motor and receives a message back over SPI.
      *
-     * @param motor the motor to send the frame to
-     * @param outgoing_frame the outgoing frame to send to the motor
+     * @param motor the motor to send the message to
+     * @param outgoing_message the outgoing message to send to the motor
      */
-    void sendAndReceiveFrame(MotorIndex motor, const OutgoingFrame& outgoing_frame);
+    void sendAndReceiveMessage(MotorIndex motor, const OutgoingMessage& outgoing_message);
 
     /**
-     * Populates the transmit buffer with the data from an outgoing frame.
+     * Populates the transmit buffer with the data from an outgoing message.
      *
-     * @param outgoing_frame the outgoing frame to populate the transmit buffer with
-     * @param tx the transmit buffer to populate with the outgoing frame's data
+     * @param motor the motor to send the message to
+     * @param outgoing_message the outgoing message to populate the transmit buffer with
+     * @param tx the transmit buffer to populate with the outgoing message's data
      */
-    void populateTx(const OutgoingFrame& outgoing_frame,
-                    std::array<uint8_t, FRAME_LEN>& tx);
+    void populateTx(MotorIndex motor, const OutgoingMessage& outgoing_message,
+                    std::array<uint8_t, MESSAGE_SIZE>& tx);
 
     /**
-     * Processes a frame received from the given motor, caching any motor status
-     * the frame provides.
+     * Processes a message received from the given motor, caching any motor status
+     * the message provides.
      *
-     * @param motor the motor that the received frame corresponds to
-     * @param rx the receive buffer with the received frame to process
+     * @param motor the motor that the received message corresponds to
+     * @param message the received message to process
      */
-    void processRx(MotorIndex motor, const std::array<uint8_t, FRAME_LEN>& rx);
+    void processRx(MotorIndex motor, const std::array<uint8_t, MESSAGE_SIZE>& message);
 
     /**
      * Records that the given faults were raised for a given motor.
