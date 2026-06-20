@@ -1,6 +1,7 @@
 import queue
 import time
 import os
+import glob
 import threading
 
 import pytest
@@ -385,6 +386,45 @@ def load_command_line_arguments():
     return parser.parse_args()
 
 
+def print_proto_log_replay_command(runtime_dir, friendly_colour_yellow):
+    """Print the path to the saved proto log and the command to replay it.
+
+    The full_system binary prints this on a clean shutdown, but field tests
+    don't reliably surface that message (especially when the test fails), so we
+    print it here too. This matches the behaviour of AI vs AI and simulated
+    tests, which always tell you where the proto log was saved.
+
+    :param runtime_dir: The full_system runtime directory the proto log was saved under
+    :param friendly_colour_yellow: True if the friendly team is yellow, else blue
+    """
+    # The full_system ProtoLogger saves logs to a "proto_<timestamp>" subdirectory
+    # of the runtime directory (see software/logger/proto_logger.cpp). The folder is
+    # created shortly after full_system launches, so wait briefly for it to appear in
+    # case we're called early (the up-front call before the test starts).
+    proto_log_folders = []
+    wait_until = time.time() + 3.0
+    while time.time() < wait_until:
+        proto_log_folders = sorted(glob.glob(os.path.join(runtime_dir, "proto_*")))
+        if proto_log_folders:
+            break
+        time.sleep(0.1)
+
+    if not proto_log_folders:
+        logger.warning(f"No proto log was found in {runtime_dir}")
+        return
+
+    # Folder names are timestamp-sorted, so the last one is the most recent run
+    proto_log_folder = proto_log_folders[-1]
+    team = "yellow" if friendly_colour_yellow else "blue"
+    log_flag = "--yellow_log" if friendly_colour_yellow else "--blue_log"
+    logger.info(
+        "\x1b[34m"
+        + f"\nTo watch the replay for the {team} team, go to the `src` folder and run "
+        + f"\n./tbots.py run thunderscope {log_flag} {proto_log_folder}"
+        + "\x1b[0m"
+    )
+
+
 @pytest.fixture
 def field_test_runner():
     """Runs a field test
@@ -491,4 +531,16 @@ def field_test_runner():
 
         friendly_proto_unix_io.register_observer(World, runner.world_buffer)
 
-        yield runner
+        # Print the proto log path up front, before the test's blocking Thunderscope
+        # Qt event loop starts. Field tests are usually exited with Ctrl+C while that
+        # loop is running, which bypasses pytest fixture teardown, so printing here
+        # guarantees the path is shown no matter how the test is exited.
+        print_proto_log_replay_command(runtime_dir, args.run_yellow)
+
+        try:
+            yield runner
+        finally:
+            # Also print on teardown so the path is the last thing shown on a clean
+            # exit (closing Thunderscope) or a test failure (when pytest throws the
+            # failure into the fixture at yield).
+            print_proto_log_replay_command(runtime_dir, args.run_yellow)

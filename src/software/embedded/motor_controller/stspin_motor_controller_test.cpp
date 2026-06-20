@@ -56,23 +56,23 @@ class StSpinMotorControllerTest
         {
             if (args_.torque_pid.kp && args_.torque_pid.ki)
             {
-                motor_controller->sendAndReceiveFrame(
-                    motor, SetPidTorqueKpKiFrame{.kp = args_.torque_pid.kp.value(),
-                                                 .ki = args_.torque_pid.ki.value()});
+                motor_controller->sendAndReceiveMessage(
+                    motor, SetPidTorqueKpKiMessage{.kp = args_.torque_pid.kp.value(),
+                                                   .ki = args_.torque_pid.ki.value()});
             }
 
             if (args_.flux_pid.kp && args_.flux_pid.ki)
             {
-                motor_controller->sendAndReceiveFrame(
-                    motor, SetPidFluxKpKiFrame{.kp = args_.flux_pid.kp.value(),
-                                               .ki = args_.flux_pid.ki.value()});
+                motor_controller->sendAndReceiveMessage(
+                    motor, SetPidFluxKpKiMessage{.kp = args_.flux_pid.kp.value(),
+                                                 .ki = args_.flux_pid.ki.value()});
             }
 
             if (args_.speed_pid.kp && args_.speed_pid.ki)
             {
-                motor_controller->sendAndReceiveFrame(
-                    motor, SetPidSpeedKpKiFrame{.kp = args_.speed_pid.kp.value(),
-                                                .ki = args_.speed_pid.ki.value()});
+                motor_controller->sendAndReceiveMessage(
+                    motor, SetPidSpeedKpKiMessage{.kp = args_.speed_pid.kp.value(),
+                                                  .ki = args_.speed_pid.ki.value()});
             }
         }
 
@@ -87,17 +87,17 @@ class StSpinMotorControllerTest
                 break;
             }
 
-            StSpinMotorController::OutgoingFrame command_frame;
+            StSpinMotorController::OutgoingMessage command_message;
             if (args_.mode == "speed")
             {
-                command_frame = SetTargetSpeedFrame{
+                command_message = SetTargetSpeedMessage{
                     .motor_enabled          = true,
                     .motor_target_speed_rpm = setpoint,
                 };
             }
             else if (args_.mode == "torque")
             {
-                command_frame = SetTargetTorqueFrame{
+                command_message = SetTargetTorqueMessage{
                     .motor_enabled       = true,
                     .motor_target_torque = setpoint,
                 };
@@ -105,7 +105,7 @@ class StSpinMotorControllerTest
 
             for (const MotorIndex motor : args_.enabled_motors)
             {
-                motor_controller->sendAndReceiveFrame(motor, command_frame);
+                motor_controller->sendAndReceiveMessage(motor, command_message);
             }
 
             auto start_time = std::chrono::steady_clock::now();
