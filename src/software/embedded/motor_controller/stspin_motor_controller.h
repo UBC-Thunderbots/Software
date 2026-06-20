@@ -29,8 +29,6 @@ class StSpinMotorController : public MotorController
 
     int readThenWriteVelocity(MotorIndex motor, int target_velocity) override;
 
-    void updateEuclideanVelocity(EuclideanSpace_t target_euclidean_velocity) override;
-
     void immediatelyDisable() override;
 
    private:
@@ -61,19 +59,17 @@ class StSpinMotorController : public MotorController
     };
     // clang-format on
 
-    static constexpr uint32_t SPI_SPEED_HZ     = 100000;
+    static constexpr uint32_t SPI_SPEED_HZ     = 500000;
     static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000;
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
 
     static constexpr int RESET_GPIO_PIN = 12;
 
-    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 700;
-    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 30;
-
-    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
-    static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
-    static constexpr double MINIMUM_SPEED_FOR_FEED_FORWARD  = 0.01;
+    static constexpr int SPEED_PID_PROPORTIONAL_GAIN  = 439;
+    static constexpr int SPEED_PID_INTEGRAL_GAIN      = 535;
+    static constexpr int TORQUE_PID_PROPORTIONAL_GAIN = 336;
+    static constexpr int TORQUE_PID_INTEGRAL_GAIN     = 170;
 
     robot_constants::RobotConstants robot_constants_;
 

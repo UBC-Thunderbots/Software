@@ -48,6 +48,9 @@ void StSpinMotorController::setup()
         sendAndReceiveMessage(motor,
                               SetPidSpeedKpKiMessage{.kp = SPEED_PID_PROPORTIONAL_GAIN,
                                                      .ki = SPEED_PID_INTEGRAL_GAIN});
+        sendAndReceiveMessage(motor,
+                              SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
+                                                      .ki = TORQUE_PID_INTEGRAL_GAIN});
     }
 }
 
@@ -190,59 +193,6 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
     sendAndReceiveMessage(motor, outgoing_message);
 
     return motor_status_.at(motor).speed;
-}
-
-void StSpinMotorController::updateEuclideanVelocity(
-    EuclideanSpace_t target_euclidean_velocity)
-{
-    const Vector local_velocity(target_euclidean_velocity[1],
-                                -target_euclidean_velocity[0]);
-
-    if (local_velocity.length() <= MINIMUM_SPEED_FOR_FEED_FORWARD)
-    {
-        sendAndReceiveMessage(
-            MotorIndex::FRONT_LEFT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        sendAndReceiveMessage(
-            MotorIndex::FRONT_RIGHT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        sendAndReceiveMessage(
-            MotorIndex::BACK_RIGHT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        sendAndReceiveMessage(
-            MotorIndex::BACK_LEFT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        return;
-    }
-
-    const Angle direction = local_velocity.orientation();
-
-    const Angle front_wheel_angle =
-        Angle::fromDegrees(robot_constants_.front_wheel_angle_deg);
-    const Angle back_wheel_angle =
-        Angle::fromDegrees(robot_constants_.back_wheel_angle_deg);
-
-    const int16_t front_left_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction - Angle::quarter() + front_wheel_angle).sin()));
-    const int16_t front_right_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction + Angle::quarter() - front_wheel_angle).sin()));
-    const int16_t back_right_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction + Angle::quarter() + back_wheel_angle).sin()));
-    const int16_t back_left_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction - Angle::quarter() - back_wheel_angle).sin()));
-
-    sendAndReceiveMessage(MotorIndex::FRONT_LEFT,
-                          SetSpeedFeedForwardKsMessage{.ks = front_left_ks});
-    sendAndReceiveMessage(MotorIndex::FRONT_RIGHT,
-                          SetSpeedFeedForwardKsMessage{.ks = front_right_ks});
-    sendAndReceiveMessage(MotorIndex::BACK_RIGHT,
-                          SetSpeedFeedForwardKsMessage{.ks = back_right_ks});
-    sendAndReceiveMessage(MotorIndex::BACK_LEFT,
-                          SetSpeedFeedForwardKsMessage{.ks = back_left_ks});
 }
 
 void StSpinMotorController::immediatelyDisable()

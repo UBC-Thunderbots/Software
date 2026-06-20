@@ -201,8 +201,6 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
             direct_velocity.velocity().x_component_meters(),
             direct_velocity.angular_velocity().radians_per_second()};
 
-        motor_controller_->updateEuclideanVelocity(target_euclidean_velocity);
-
         target_wheel_velocities_ =
             euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
     }
