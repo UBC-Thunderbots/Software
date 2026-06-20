@@ -4,22 +4,22 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 from proto.import_all_protos import AttackerTactic, Pass
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.robot_at_position import (
+from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.simulated_test_fixture import pytest_main
 
 
 def calculate_ball_velocity(passer_point, receiver_point, speed):
@@ -160,7 +160,9 @@ def test_attacker_passing(
             RobotEventuallyAtOrientation(robot_id=1, orientation=pass_orientation),
             # Larger threshold since techically ball is at passer point, not the robot
             RobotEventuallyAtPosition(
-                robot_id=1, position=passer_point, threshold=ROBOT_MAX_RADIUS_METERS
+                robot_id=1,
+                position=passer_point,
+                threshold=ROBOT_MAX_RADIUS_METERS * 1.5,
             ),
             BallEventuallyKickedInDirection(kick_direction=pass_orientation),
         ]

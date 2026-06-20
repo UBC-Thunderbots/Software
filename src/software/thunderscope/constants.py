@@ -264,6 +264,7 @@ class Colors:
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
+    SELECTED_ROBOT_OUTLINE = QtGui.QColor(0, 255, 255, 200)
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
@@ -331,7 +332,9 @@ class DiagnosticsConstants:
     SUPPORTED_CONTROLLERS = {
         "Microsoft Xbox One X pad",
         "Microsoft X-Box One S pad",
+        "Microsoft X-Box 360 pad",
         "Microsoft Xbox 360 pad",
+        "Generic X-Box pad",
     }
 
     BUTTON_PRESSED_THRESHOLD = 0.5

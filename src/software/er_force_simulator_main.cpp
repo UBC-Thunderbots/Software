@@ -99,7 +99,7 @@ int main(int argc, char** argv)
             field_type = TbotsProto::FieldType::DIV_B;
         }
         er_force_sim = std::make_shared<ErForceSimulator>(
-            field_type, create2021RobotConstants(), realism_config);
+            field_type, robot_constants::createRobotConstants(), realism_config);
 
         std::mutex simulator_mutex;
 

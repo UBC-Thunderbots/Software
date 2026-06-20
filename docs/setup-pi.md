@@ -10,9 +10,11 @@ The Raspberry Pi 5 is compatible with many different (primarily Linux-based) ope
 
 ### Install OS Using Raspberry Pi Imager
 
-To install the Raspberry Pi OS onto a microSD card, we use the Raspberry Pi Imager program. Install it [here](https://www.raspberrypi.com/software/). 
+To install the Raspberry Pi OS onto a microSD card, we use the Raspberry Pi Imager program. Install it [here](https://www.raspberrypi.com/software/).
 
-*Note: if using the "Download for Linux" option, you will have to right click on the installed `.AppImage` file and select `Properties` &rarr; `Permissions` &rarr; `Allow Executing File as Program` (this may appear as a checkbox)
+*Note 1: If on Linux, download the app image through `Download for Linux (x86_64)`. Using `sudo apt install rpi-imager` installs an older version of the program, which does not properly apply OS customization required in later steps. 
+
+*Note 2: if using the "Download for Linux" option, you will have to right click on the installed `.AppImage` file and select `Properties` &rarr; `Permissions` &rarr; `Allow Executing File as Program` (this may appear as a checkbox)
 
 When you open the imager, you should see something like this:
 

@@ -3,7 +3,7 @@ load("@robot_diagnostics_cli_deps//:requirements.bzl", "requirement")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-load("//:starlark/defs.bzl", "pkg_executable")
+load("//starlark:defs.bzl", "pkg_executable")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -30,8 +30,7 @@ py_binary(
         "//software/embedded/robot_diagnostics_cli:embedded_data",
         requirement("typer_shell"),
         requirement("rich"),
-        requirement("protobuf"),
-        requirement("inquirerpy"),
+        "@protobuf//:protobuf_python",
     ],
 )
 
@@ -53,7 +52,7 @@ py_library(
     name = "embedded_communication",
     srcs = [":embedded_communication.py"],
     deps = [
-        requirement("protobuf"),
+        "@protobuf//:protobuf_python",
     ],
 )
 
