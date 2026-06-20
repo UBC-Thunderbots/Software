@@ -1,6 +1,6 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
-#include "collision_evaluator.h"
+#include "software/ai/navigator/trajectory/trajectory_evaluator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
@@ -12,7 +12,6 @@ TrajectoryPlanner::TrajectoryPlanner()
 
 std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
 {
-    // A set of sub destinations positioned around a circle relative to the robot.
     std::vector<Vector> relative_sub_destinations;
     const Angle sub_angles = Angle::full() / NUM_SUB_DESTINATION_ANGLES;
     for (const double distance : SUB_DESTINATION_DISTANCES_METERS)
@@ -30,8 +29,6 @@ std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
 std::vector<Point> TrajectoryPlanner::getSubDestinations(
     const Point& start, const Point& destination, const Rectangle& navigable_area) const
 {
-    // Convert the relative sub destinations to actual sub destination points
-    // and filter out undesirable sub destinations to reduce trajectory sampling.
     std::vector<Point> sub_destinations;
     Angle direction = (destination - start).orientation();
     sub_destinations.reserve(relative_sub_destinations.size());
@@ -58,7 +55,8 @@ std::vector<Point> TrajectoryPlanner::getSubDestinations(
 std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     const Point& start, const Point& destination, const Vector& initial_velocity,
     const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles,
-    const Rectangle& navigable_area, const std::optional<Point>& prev_sub_destination)
+    const Rectangle& navigable_area, const std::optional<Point>& prev_sub_destination,
+    const std::optional<TrajectoryPath>& current_trajectory)
 {
     if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
         constraints.getMaxDeceleration() <= 0.0)
@@ -67,7 +65,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     }
 
     TrajectoryPathWithCost best_traj_with_cost = getDirectTrajectoryWithCost(
-        start, destination, initial_velocity, constraints, obstacles);
+        start, destination, initial_velocity, constraints, obstacles, current_trajectory);
 
     // Return direct trajectory to the destination if it doesn't have any collisions
     if (!best_traj_with_cost.collides())
@@ -79,13 +77,11 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     // and store the best trajectory path (min cost)
     for (const Point& sub_dest : getSubDestinations(start, destination, navigable_area))
     {
-        // Generate a direct trajectory to the sub destination
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
-            start, sub_dest, initial_velocity, constraints, obstacles);
+            start, sub_dest, initial_velocity, constraints, obstacles, current_trajectory);
 
-        // Prefer sub destinations that are closer to the previous sub destination.
-        // This is used to avoid oscillation between two sub destinations that return a
-        // trajectory with the similar cost.
+        // Prefer sub destinations that are closer to the previous sub destination to
+        // avoid oscillation between two sub destinations with similar cost.
         double cost_offset = 0.0;
         if (prev_sub_destination.has_value() &&
             distance(sub_dest, prev_sub_destination.value()) <
@@ -98,13 +94,9 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
              connection_time <= sub_trajectory.traj_path.getTotalTime();
              connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
         {
-            // Branch off of a copy of the initial trajectory at connection_time
-            // to move towards the actual destination.
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
             traj_path_to_dest.append(connection_time, destination, constraints);
 
-            // Return early for this sub destination if the trajectory can
-            // not have a lower cost than the best trajectory.
             if (traj_path_to_dest.getTotalTime() >= best_traj_with_cost.cost)
             {
                 break;
@@ -112,19 +104,14 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 
             TrajectoryPathWithCost full_traj_with_cost =
                 getTrajectoryWithCost(traj_path_to_dest, obstacles, sub_trajectory,
-                                      connection_time, best_traj_with_cost.cost);
+                                      connection_time, best_traj_with_cost.cost,
+                                      current_trajectory);
             full_traj_with_cost.cost += cost_offset;
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
                 best_traj_with_cost = full_traj_with_cost;
             }
 
-            // Later connection_times will generally result in a longer trajectory
-            // duration, thus, if this trajectory does not have a collision, then we can
-            // not get a better trajectory with a later connection_time Alternatively, if
-            // this trajectory does collide and their exists a trajectory that doesn't
-            // collide and has a shorter duration, then we're not going to find a better
-            // trajectory by increasing the connection time.
             if (!full_traj_with_cost.collides() ||
                 (!best_traj_with_cost.collides() &&
                  full_traj_with_cost.traj_path.getTotalTime() >
@@ -135,9 +122,15 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         }
     }
 
-    // In move primitive, a stop primitive is created when trajectory path is null.
-    // Check if there is an unavoidable collision, and return a null opt if such
-    // collision exist on best path
+    // If all candidate trajectories are too costly, keep the current trajectory rather
+    // than committing to a bad plan. The firmware always restarts from the robot's
+    // current position, so the robot naturally advances through the old waypoints.
+    // Falls back to nullopt (stop) only if there is no current trajectory.
+    if (best_traj_with_cost.cost > MAX_TRAJECTORY_COST)
+    {
+        return current_trajectory;
+    }
+
     double collision_velocity =
         best_traj_with_cost.traj_path
             .getVelocity(best_traj_with_cost.first_collision_time_s)
@@ -149,33 +142,30 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     {
         return std::nullopt;
     }
-    else
-    {
-        return best_traj_with_cost.traj_path;
-    }
+
+    return best_traj_with_cost.traj_path;
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const Point& start, const Point& destination, const Vector& initial_velocity,
-    const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles)
+    const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles,
+    const std::optional<TrajectoryPath>& current_trajectory)
 {
-    // Calculate full new cost regardless by passing in maximum max cost
     return getTrajectoryWithCost(
         TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
                            start, destination, initial_velocity, constraints),
                        BangBangTrajectory2D::generator),
-        obstacles, std::nullopt, std::nullopt, std::numeric_limits<double>::max());
+        obstacles, std::nullopt, std::nullopt, std::numeric_limits<double>::max(),
+        current_trajectory);
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const TrajectoryPath& trajectory, const std::vector<ObstaclePtr>& obstacles,
     const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_s, double max_cost)
+    const std::optional<double> sub_traj_duration_s, double max_cost,
+    const std::optional<TrajectoryPath>& current_trajectory)
 {
-    CollisionEvaluator evaluator(obstacles);
-    TrajectoryPathWithCost traj_with_cost(evaluator.evaluate(
-        trajectory, sub_traj_with_cost, sub_traj_duration_s, max_cost));
-
-
-    return traj_with_cost;
+    TrajectoryEvaluator evaluator(obstacles);
+    return evaluator.evaluate(trajectory, sub_traj_with_cost, sub_traj_duration_s,
+                              max_cost, current_trajectory);
 }

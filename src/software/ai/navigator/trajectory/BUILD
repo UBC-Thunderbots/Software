@@ -95,6 +95,17 @@ cc_library(
 )
 
 cc_library(
+    name = "trajectory_evaluator",
+    srcs = ["trajectory_evaluator.cpp"],
+    hdrs = ["trajectory_evaluator.h"],
+    deps = [
+        ":trajectory_path",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
+    ],
+)
+
+cc_library(
     name = "trajectory_planner",
     srcs = ["trajectory_planner.cpp"],
     hdrs = ["trajectory_planner.h"],
@@ -103,7 +114,7 @@ cc_library(
         ":trajectory_path",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/trajectory:collision_evaluator",
+        "//software/ai/navigator/trajectory:trajectory_evaluator",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
     ],
 )

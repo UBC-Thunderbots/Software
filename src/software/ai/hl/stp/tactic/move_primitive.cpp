@@ -106,11 +106,13 @@ MovePrimitive::generatePrimitiveProtoMessage(
     }
 
     std::optional<Point> prev_sub_destination;
+    std::optional<TrajectoryPath> current_trajectory;
     auto prev_trajectory_it = robot_trajectories.find(robot.id());
     if (prev_trajectory_it != robot_trajectories.end())
     {
+        current_trajectory = prev_trajectory_it->second;
         const auto& prev_trajectory_path_nodes =
-            prev_trajectory_it->second.getTrajectoryPathNodes();
+            current_trajectory->getTrajectoryPathNodes();
         if (!prev_trajectory_path_nodes.empty())
         {
             prev_sub_destination =
@@ -120,7 +122,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     traj_path = planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                        constraints, obstacles, navigable_area,
-                                       prev_sub_destination);
+                                       prev_sub_destination, current_trajectory);
 
     if (!traj_path.has_value())
     {

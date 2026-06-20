@@ -26,13 +26,18 @@ class TrajectoryPlanner
      * @param navigable_area The navigable area of the field
      * @param prev_sub_destination The previous sub destination of this robot.
      * nullopt if there is no previous sub destination
-     * @return TrajectoryPath which attempts to avoid the obstacles
+     * @param current_trajectory The trajectory the robot is currently executing.
+     * Used to add a consistency cost that discourages unnecessary deviation from the
+     * current path. nullopt if there is no current trajectory.
+     * @return TrajectoryPath which attempts to avoid the obstacles, or nullopt if the
+     * best trajectory exceeds MAX_TRAJECTORY_COST (all options are too costly)
      */
     std::optional<TrajectoryPath> findTrajectory(
         const Point& start, const Point& destination, const Vector& initial_velocity,
         const KinematicConstraints& constraints,
         const std::vector<ObstaclePtr>& obstacles, const Rectangle& navigable_area,
-        const std::optional<Point>& prev_sub_destination = std::nullopt);
+        const std::optional<Point>& prev_sub_destination   = std::nullopt,
+        const std::optional<TrajectoryPath>& current_trajectory = std::nullopt);
 
    private:
     /**
@@ -44,15 +49,16 @@ class TrajectoryPlanner
      * @param initial_velocity Initial velocity of the trajectory
      * @param constraints Kinematic constraints of the trajectory
      * @param obstacles List of all obstacles
+     * @param current_trajectory The trajectory the robot is currently executing
      * @return A trajectory path with only a single trajectory + its cost
      */
     TrajectoryPathWithCost getDirectTrajectoryWithCost(
         const Point& start, const Point& destination, const Vector& initial_velocity,
-        const KinematicConstraints& constraints,
-        const std::vector<ObstaclePtr>& obstacles);
+        const KinematicConstraints& constraints, const std::vector<ObstaclePtr>& obstacles,
+        const std::optional<TrajectoryPath>& current_trajectory);
 
     /**
-     * Given a trajectory path, calculate its cost
+     * Given a trajectory path, calculate its cost.
      *
      * @param trajectory The trajectory path to calculate the cost of
      * @param obstacles List of all obstacles
@@ -60,12 +66,14 @@ class TrajectoryPlanner
      * trajectory
      * @param sub_traj_duration_s Optional duration of the cached sub_traj_with_cost
      * @param max_cost Current maximum cost among calculated trajectories
+     * @param current_trajectory The trajectory the robot is currently executing
      * @return The trajectory path with its cost
      */
     TrajectoryPathWithCost getTrajectoryWithCost(
         const TrajectoryPath& trajectory, const std::vector<ObstaclePtr>& obstacles,
         const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
-        const std::optional<double> sub_traj_duration_s, double max_cost);
+        const std::optional<double> sub_traj_duration_s, double max_cost,
+        const std::optional<TrajectoryPath>& current_trajectory);
 
 
 
@@ -101,8 +109,11 @@ class TrajectoryPlanner
     static constexpr double UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S       = 0.2;
     static constexpr double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S = 0.5;
 
-    const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
+    // If the best trajectory's cost exceeds this value, findTrajectory returns nullopt
+    // (causing the robot to stop) rather than executing a very poor path.
+    static constexpr double MAX_TRAJECTORY_COST = 40.0;
 
+    const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
 
     const double SUB_DESTINATION_CLOSE_BONUS_THRESHOLD_METERS = 0.1;
     const double SUB_DESTINATION_CLOSE_BONUS_COST             = -0.3;
