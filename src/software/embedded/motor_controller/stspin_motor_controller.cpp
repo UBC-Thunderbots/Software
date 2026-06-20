@@ -284,7 +284,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
     populateTx(motor, outgoing_message, tx);
 
     std::vector<uint8_t> received_data;
-    while (true)
+    for (unsigned int attempt = 0; attempt < MAX_SPI_TRANSFER_ATTEMPTS; ++attempt)
     {
         spiTransfer(spi_fds_[motor], tx.data(), rx.data(), MESSAGE_SIZE, SPI_SPEED_HZ);
         received_data.insert(received_data.end(), rx.begin(), rx.end());
@@ -316,16 +316,24 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
             {
                 // The message we just sent was acknowledged, we can stop resending
                 // and waiting for a response
+                const auto now = std::chrono::steady_clock::now();
+                motor_status_.at(motor).last_message_ack_time = now;
+
                 std::array<uint8_t, MESSAGE_SIZE> message{};
                 std::copy(delimiter_pos, std::next(delimiter_pos, MESSAGE_SIZE),
                           message.begin());
                 processRx(motor, message);
+
                 return;
             }
         }
 
         received_data.erase(received_data.begin(), std::next(delimiter_pos));
     }
+
+    LOG(WARNING) << "Motor " << motor << " did not acknowledge message (seq_num "
+                 << motor_status_.at(motor).seq_num << ") after "
+                 << MAX_SPI_TRANSFER_ATTEMPTS << " SPI attempts; giving up";
 }
 
 void StSpinMotorController::populateTx(const MotorIndex motor,

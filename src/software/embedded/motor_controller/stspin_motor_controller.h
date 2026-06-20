@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
@@ -42,7 +44,13 @@ class StSpinMotorController : public MotorController
     // Length of message (in number of bytes)
     static constexpr unsigned int MESSAGE_SIZE = 8;
 
+    // Delimiter byte used to indicate start of a message
     static constexpr uint8_t MESSAGE_DELIMITER = 0xAA;
+
+    // Maximum number of SPI transfer attempts to wait for an acknowledgement
+    // before giving up. Prevents unresponsive MD (e.g. firmware crash or
+    // SPI desynced) from blocking Thunderloop indefinitely
+    static constexpr unsigned int MAX_SPI_TRANSFER_ATTEMPTS = 100;
 
     // clang-format off
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
@@ -76,7 +84,7 @@ class StSpinMotorController : public MotorController
 
     struct MotorStatus
     {
-        uint16_t seq_num;
+        uint8_t seq_num;
         bool enabled;
         MotorFaultIndicator faults;
         uint16_t fault_flags;
@@ -90,6 +98,7 @@ class StSpinMotorController : public MotorController
         int16_t vd;
         int16_t phase_current;
         int16_t phase_voltage;
+        std::chrono::steady_clock::time_point last_message_ack_time;
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
