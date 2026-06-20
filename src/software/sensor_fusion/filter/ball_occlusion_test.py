@@ -7,7 +7,7 @@ from proto.play_pb2 import PlayName
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.import_all_protos import Command
 from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 

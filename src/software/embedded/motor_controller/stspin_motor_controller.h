@@ -1,5 +1,8 @@
 #pragma once
 
+#include <chrono>
+#include <memory>
+
 #include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/embedded/motor_controller/motor_fault_indicator.h"
@@ -33,14 +36,22 @@ class StSpinMotorController : public MotorController
 
    private:
     // TODO: #3750 Use a template function instead of std::variant.
-    using OutgoingFrame =
-        std::variant<NoOpFrame, SetResponseTypeFrame, SetTargetSpeedFrame,
-                     SetTargetTorqueFrame, SetPidTorqueKpKiFrame, SetPidFluxKpKiFrame,
-                     SetPidSpeedKpKiFrame, SetSpeedFeedForwardKaKvFrame,
-                     SetSpeedFeedForwardKsFrame>;
+    using OutgoingMessage =
+        std::variant<NoOpMessage, SetResponseTypeMessage, SetTargetSpeedMessage,
+                     SetTargetTorqueMessage, SetPidTorqueKpKiMessage,
+                     SetPidFluxKpKiMessage, SetPidSpeedKpKiMessage,
+                     SetSpeedFeedForwardKaKvMessage, SetSpeedFeedForwardKsMessage>;
 
-    // Length of frame (in number of bytes)
-    static constexpr unsigned int FRAME_LEN = 6;
+    // Length of message (in number of bytes)
+    static constexpr unsigned int MESSAGE_SIZE = 8;
+
+    static constexpr uint8_t MESSAGE_DELIMITER = 0xAA;
+
+    // Maximum number of SPI transfer attempts to wait for an acknowledgement before
+    // giving up. Bounds the resync loop so an unresponsive motor (e.g. firmware not
+    // running or SPI desynced) cannot block thunderloop indefinitely. At SPI_SPEED_HZ
+    // this caps a single send/receive at roughly 32 ms.
+    static constexpr unsigned int MAX_RESYNC_ATTEMPTS = 50;
 
     // clang-format off
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
@@ -51,15 +62,18 @@ class StSpinMotorController : public MotorController
     };
     // clang-format on
 
-    static constexpr uint32_t SPI_SPEED_HZ     = 100000;
+    static constexpr uint32_t SPI_SPEED_HZ     = 500000;
     static constexpr uint32_t MAX_SPI_SPEED_HZ = 250000000;
     static constexpr uint8_t SPI_BITS          = 8;
     static constexpr uint32_t SPI_MODE         = 0;
 
     static constexpr int RESET_GPIO_PIN = 12;
 
-    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 700;
-    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 30;
+    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 439;
+    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 535;
+
+    static constexpr int TORQUE_PID_PROPORTIONAL_GAIN = 336;
+    static constexpr int TORQUE_PID_INTEGRAL_GAIN     = 170;
 
     static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
     static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
@@ -74,7 +88,7 @@ class StSpinMotorController : public MotorController
 
     struct MotorStatus
     {
-        unsigned int frame_count;
+        uint16_t seq_num;
         bool enabled;
         MotorFaultIndicator faults;
         uint16_t fault_flags;
@@ -88,6 +102,10 @@ class StSpinMotorController : public MotorController
         int16_t vd;
         int16_t phase_current;
         int16_t phase_voltage;
+        // Time the previous message to this motor was acknowledged. Used to plot the
+        // interval between completed frames. Default-constructed (epoch) until the first
+        // frame completes, and reset whenever motor_status_ is reinitialized in setup().
+        std::chrono::steady_clock::time_point last_frame_complete_time;
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
@@ -100,30 +118,31 @@ class StSpinMotorController : public MotorController
     void openSpiFileDescriptor(MotorIndex motor);
 
     /**
-     * Transmits a frame to the given motor and receives a frame back over SPI.
+     * Transmits a message to the given motor and receives a message back over SPI.
      *
-     * @param motor the motor to send the frame to
-     * @param outgoing_frame the outgoing frame to send to the motor
+     * @param motor the motor to send the message to
+     * @param outgoing_message the outgoing message to send to the motor
      */
-    void sendAndReceiveFrame(MotorIndex motor, const OutgoingFrame& outgoing_frame);
+    void sendAndReceiveMessage(MotorIndex motor, const OutgoingMessage& outgoing_message);
 
     /**
-     * Populates the transmit buffer with the data from an outgoing frame.
+     * Populates the transmit buffer with the data from an outgoing message.
      *
-     * @param outgoing_frame the outgoing frame to populate the transmit buffer with
-     * @param tx the transmit buffer to populate with the outgoing frame's data
+     * @param motor the motor to send the message to
+     * @param outgoing_message the outgoing message to populate the transmit buffer with
+     * @param tx the transmit buffer to populate with the outgoing message's data
      */
-    void populateTx(const OutgoingFrame& outgoing_frame,
-                    std::array<uint8_t, FRAME_LEN>& tx);
+    void populateTx(MotorIndex motor, const OutgoingMessage& outgoing_message,
+                    std::array<uint8_t, MESSAGE_SIZE>& tx);
 
     /**
-     * Processes a frame received from the given motor, caching any motor status
-     * the frame provides.
+     * Processes a message received from the given motor, caching any motor status
+     * the message provides.
      *
-     * @param motor the motor that the received frame corresponds to
-     * @param rx the receive buffer with the received frame to process
+     * @param motor the motor that the received message corresponds to
+     * @param message the received message to process
      */
-    void processRx(MotorIndex motor, const std::array<uint8_t, FRAME_LEN>& rx);
+    void processRx(MotorIndex motor, const std::array<uint8_t, MESSAGE_SIZE>& message);
 
     /**
      * Records that the given faults were raised for a given motor.

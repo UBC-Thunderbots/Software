@@ -117,18 +117,26 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
+#ifndef DISABLE_POWER_SERVICE
     power_service_ = std::make_unique<PowerService>(
         std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY)),
         std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY)),
         std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)));
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+#else
+    LOG(INFO) << "THUNDERLOOP: Power Service DISABLED! Next initializing Motor Service";
+#endif
 
+#ifndef DISABLE_MOTOR_SERVICE
     motor_service_  = std::make_unique<MotorService>(robot_constants);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
 
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+#else
+    LOG(INFO) << "THUNDERLOOP: Motor Service DISABLED! Next initializing IMU Service";
+#endif
 
     imu_service_ = std::make_unique<ImuService>();
     LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
@@ -225,15 +233,19 @@ void Thunderloop::runLoop()
             // Chicker: track time since the last kick/chip event
             updateChickerStatus(last_chipper_fired, last_kicker_fired);
 
+#ifndef DISABLE_MOTOR_SERVICE
             // Motor Service: execute the motor control command
             pollMotorService(poll_time, time_since_prev_iter);
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
+#endif
 
+#ifndef DISABLE_POWER_SERVICE
             // Power Service: execute the power control command
             pollPowerService(poll_time);
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
+#endif
 
             // Robot Status: aggregate poll responses and broadcast
             updateAndSendRobotStatus(primitive_.sequence_number());
@@ -285,14 +297,12 @@ inline void Thunderloop::processNetworkPolling(
         primitive_ = new_primitive;
 
         // Feed the trajectory's starting pose to the localizer as a vision update.
-        // The start angle is offset by half a turn to match the robot's convention.
         if (primitive_.has_move())
         {
             const Point position =
                 createPoint(primitive_.move().xy_traj_params().start_position());
             const Angle orientation =
-                createAngle(primitive_.move().w_traj_params().start_angle()) +
-                Angle::half();
+                createAngle(primitive_.move().w_traj_params().start_angle());
 
             robot_localizer_.update(
                 RobotLocalizer::VisionData{position, orientation, RTT_S / 2});

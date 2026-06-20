@@ -25,6 +25,15 @@
 
 #include <Arduino.h>
 
+#ifdef DEBUG_POWERLOOP
+/**
+ * This section of code is reserved for DIRECT testing on the microcontroller/debug
+ * functionality.
+ */
+void setup() {}
+void loop() {}
+#else
+
 // Used for uart communication
 std::vector<uint8_t> buffer;
 bool receiving;
@@ -44,12 +53,12 @@ void setup()
     receiving    = false;
     sequence_num = 0;
     charger      = std::make_shared<Charger>();
-    chicker      = std::make_shared<Chicker>();
+    chicker      = std::make_shared<Chicker>(charger);
     monitor      = std::make_shared<PowerMonitor>();
     geneva       = std::make_shared<Geneva>();
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     dribbler     = std::make_shared<Dribbler>();
-    charger->chargeCapacitors();
+    charger->setCapacitorPin(HIGH);
 }
 
 void loop()
@@ -109,3 +118,4 @@ void loop()
 
     delay(5);
 }
+#endif

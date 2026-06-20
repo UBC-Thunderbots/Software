@@ -54,7 +54,7 @@ if ! /usr/local/bin/python3.12 /tmp/tbots_download_cache/get-platformio.py; then
 fi
 
 # delete existing symlink and link platformio to /opt/tbotspython/bin so that bazel can find it
-rm /opt/tbotspython/bin/platformio
+rm -f /opt/tbotspython/bin/platformio
 ln -s $HOME/.platformio/penv/bin/platformio /opt/tbotspython/bin/platformio
 
 # Programmatically enable serial communication for UART

@@ -12,7 +12,7 @@
 
 PrimitiveExecutor::PrimitiveExecutor(
     const robot_constants::RobotConstants& robot_constants)
-    : current_primitive_(), robot_constants_(robot_constants)
+    : state_(), current_primitive_(), robot_constants_(robot_constants)
 {
 }
 
@@ -47,31 +47,44 @@ void PrimitiveExecutor::updateState(const RobotState& state)
     state_ = state;
 }
 
-Vector PrimitiveExecutor::stepTargetLinearVelocity(Duration delta_time)
+Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 {
-    const auto target_v_global =
+    Vector target_v_global =
         position_controller_.step(state_.position(), *trajectory_path_,
                                   time_since_linear_trajectory_creation_, delta_time);
-    auto target_v_local = globalToLocalVelocity(target_v_global, state_.orientation());
 
-    // make sure robot doesn't go faster than max speed
-    target_v_local = target_v_local.normalize(
-        std::min(target_v_local.length(),
+    // make sure robot doesn't go faster than max speed (speed is frame-invariant)
+    target_v_global = target_v_global.normalize(
+        std::min(target_v_global.length(),
                  static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 
-    const Vector local_acceleration =
-        (target_v_local - state_.localVelocity()) / delta_time.toSeconds();
-
-    if (local_acceleration.length() > robot_constants_.robot_max_acceleration_m_per_s_2)
+    // The trajectory's own velocity is acceleration-bounded, but the PID correction and
+    // per-tick trajectory regeneration are added on top, so the emitted command must be
+    // re-limited here to the robot's kinematic acceleration limit. Otherwise, the
+    // commanded velocity can step far more than robot_max_acceleration * delta_time per
+    // tick, asking the robot to accelerate well beyond what it (and the motors/SPI) can
+    // sustain.
+    //
+    // The limit applies to the robot's translational (global-frame) velocity. Measuring
+    // the change in the rotating body frame (i.e. after globalToLocalVelocity) would add
+    // the v*omega term from the body frame spinning, which falsely trips the limit
+    // whenever the robot translates while rotating even though its global motion is
+    // within limits. So clamp the change in global velocity, relative to the previous
+    // commanded (not measured) velocity.
+    const Vector velocity_delta = target_v_global - prev_target_global_velocity_;
+    const double max_velocity_delta =
+        robot_constants_.robot_max_acceleration_m_per_s_2 * delta_time.toSeconds();
+    if (velocity_delta.length() > max_velocity_delta)
     {
-        LOG(WARNING) << "Robot trying to accelerate at " << local_acceleration.length()
-                     << "m/s^2.";
+        target_v_global =
+            prev_target_global_velocity_ + velocity_delta.normalize(max_velocity_delta);
     }
+    prev_target_global_velocity_ = target_v_global;
 
-    return target_v_local;
+    return globalToLocalVelocity(target_v_global, state_.orientation());
 }
 
-AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time)
+AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& delta_time)
 {
     auto target_w =
         orientation_controller_.step(state_.orientation(), *angular_trajectory_,
@@ -82,20 +95,25 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(Duration delta_time
     const double clamped_w = std::clamp(target_w.toRadians(), -max_speed, max_speed);
     target_w               = AngularVelocity::fromRadians(clamped_w);
 
-    const auto angular_acceleration =
-        (target_w - state_.angularVelocity()) / delta_time.toSeconds();
-    if (angular_acceleration.toRadians() >
-        robot_constants_.robot_max_ang_acceleration_rad_per_s_2)
-    {
-        LOG(WARNING) << "Robot trying to angular accelerate at "
-                     << angular_acceleration.toRadians() << "rads/s^2.";
-    }
+    // Re-limit the commanded angular velocity to the robot's angular acceleration limit,
+    // for the same reason as the translational clamp above: the feedforward trajectory is
+    // acceleration-bounded, but the PID correction and per-tick regeneration are added on
+    // top, so the emitted command can step more than robot_max_ang_acceleration *
+    // delta_time per tick.
+    const double max_angular_velocity_delta =
+        robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_time.toSeconds();
+    const double angular_velocity_delta =
+        std::clamp((target_w - prev_target_angular_velocity_).toRadians(),
+                   -max_angular_velocity_delta, max_angular_velocity_delta);
+    target_w = prev_target_angular_velocity_ +
+               AngularVelocity::fromRadians(angular_velocity_delta);
+    prev_target_angular_velocity_ = target_w;
     return target_w;
 }
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time)
+    TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time)
 {
     time_since_linear_trajectory_creation_ += delta_time;
     time_since_angular_trajectory_creation_ += delta_time;
@@ -110,10 +128,24 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             status.set_running_primitive(false);
+            setPrevCommandedVelocity(Vector(), AngularVelocity());
             return output;
         }
         case TbotsProto::Primitive::kDirectControl:
         {
+            const auto& motor_control =
+                current_primitive_.direct_control().motor_control();
+            if (motor_control.has_direct_velocity_control())
+            {
+                setPrevCommandedVelocity(
+                    createVector(motor_control.direct_velocity_control().velocity()),
+                    createAngularVelocity(
+                        motor_control.direct_velocity_control().angular_velocity()));
+            }
+            else
+            {
+                setPrevCommandedVelocity(Vector(), AngularVelocity());
+            }
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 current_primitive_.direct_control());
         }
@@ -127,6 +159,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
                 LOG(INFO)
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
+                setPrevCommandedVelocity(Vector(), AngularVelocity());
                 return output;
             }
 
@@ -154,11 +187,20 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // LOG(DEBUG) << "No primitive set!";
         }
     }
+    setPrevCommandedVelocity(Vector(), AngularVelocity());
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
 }
 
+void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
+                                                 const AngularVelocity& angular_velocity)
+{
+    prev_target_global_velocity_ =
+        localToGlobalVelocity(local_velocity, state_.orientation());
+    prev_target_angular_velocity_ = angular_velocity;
+}
+
 void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                                      Duration delta_time)
+                                                      const Duration& delta_time) const
 {
     const Vector& local_acceleration =
         (target_local_velocity - state_.localVelocity()) / delta_time.toSeconds();

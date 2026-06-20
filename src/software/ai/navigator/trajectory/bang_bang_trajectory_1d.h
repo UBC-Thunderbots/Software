@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <cstddef>
 
 #include "software/ai/navigator/trajectory/trajectory.hpp"
@@ -103,19 +102,6 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * @return The number of trajectory parts
      */
     size_t getNumTrajectoryParts() const;
-
-    /**
-     * Check if this trajectory is meaningfully equal to another trajectory.
-     * @param other The other trajectory to compare to
-     * @param threshold The threshold below which the trajectories are considered
-     * equal
-     * @return True if the trajectories are equal, false otherwise
-     */
-    bool equals(const Trajectory<double, double, double>& other,
-                double threshold) const override
-    {
-        return std::abs(getDestination() - other.getDestination()) <= threshold;
-    }
 
    private:
     /**

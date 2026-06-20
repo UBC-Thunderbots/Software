@@ -1,6 +1,36 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
+
+# When enabled, compiles Thunderloop with the DISABLE_POWER_SERVICE flag, which
+# skips initializing and polling the PowerService so Thunderloop can be run on a
+# robot without a functioning powerboard.
+bool_flag(
+    name = "disable_power_service",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "disable_power_service_enabled",
+    flag_values = {
+        ":disable_power_service": "True",
+    },
+)
+
+# When enabled, compiles Thunderloop with the DISABLE_MOTOR_SERVICE flag, which
+# skips initializing and polling the MotorService so Thunderloop can be run on a
+# robot without a functioning motorboard.
+bool_flag(
+    name = "disable_motor_service",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "disable_motor_service_enabled",
+    flag_values = {
+        ":disable_motor_service": "True",
+    },
+)
 
 config_setting(
     name = "build_trinamic",
@@ -57,6 +87,13 @@ cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     hdrs = ["thunderloop.h"],
+    local_defines = select({
+        ":disable_power_service_enabled": ["DISABLE_POWER_SERVICE"],
+        "//conditions:default": [],
+    }) + select({
+        ":disable_motor_service_enabled": ["DISABLE_MOTOR_SERVICE"],
+        "//conditions:default": [],
+    }),
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
@@ -126,5 +163,16 @@ cc_library(
         "//software/sensor_fusion/filter:kalman_filter",
         "//software/util/scoped_timespec_timer",
         "@eigen",
+    ],
+)
+
+cc_test(
+    name = "robot_localizer_test",
+    srcs = ["robot_localizer_test.cpp"],
+    deps = [
+        ":robot_localizer",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/physics:velocity_conversion_util",
     ],
 )
