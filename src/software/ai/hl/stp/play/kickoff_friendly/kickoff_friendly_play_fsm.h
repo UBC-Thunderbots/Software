@@ -22,8 +22,12 @@
  */
 struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
 {
-    static constexpr double ENEMY_X_PADDING_M          = 2.0;
-    static constexpr double SIDELINE_PADDING_M         = 0.3;
+    // How far short of the enemy goal line the chip target region stops, as a
+    // fraction of field length (was 2.0 m on the 9.0 m Division B field).
+    static constexpr double ENEMY_X_PADDING_FRACTION = 2.0 / 9.0;
+    // Padding in from each sideline for the chip region, as a fraction of field
+    // width (was 0.3 m on the 6.0 m Division B field).
+    static constexpr double SIDELINE_PADDING_FRACTION  = 0.3 / 6.0;
     static constexpr double FALLBACK_TARGET_X_FRACTION = 1.0 / 6.0;
 
     class SetupState;

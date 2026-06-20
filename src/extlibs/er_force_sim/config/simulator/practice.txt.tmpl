@@ -1,20 +1,20 @@
 geometry {
 	line_width: 0.01
-	field_width: 2.4
-	field_height: 3.6
-	boundary_width: 0.3
-	goal_width: 0.6
-	goal_depth: 0.18
+	field_width: @FIELD_Y_LENGTH@
+	field_height: @FIELD_X_LENGTH@
+	boundary_width: @BOUNDARY_BUFFER_SIZE@
+	goal_width: @GOAL_Y_LENGTH@
+	goal_depth: @GOAL_X_LENGTH@
 	goal_wall_width: 0.02
-	center_circle_radius: 0.2
-	defense_radius: 0.4
-	defense_stretch: 0.8
+	center_circle_radius: @CENTER_CIRCLE_RADIUS@
+	defense_radius: @DEFENSE_X_LENGTH@
+	defense_stretch: @DEFENSE_Y_LENGTH@
 	free_kick_from_defense_dist: 0.08
 	penalty_spot_from_field_line_dist: 0.72
 	penalty_line_from_spot_dist: 0.16
 	goal_height: 0.155
-	defense_width: 0.8
-	defense_height: 0.4
+	defense_width: @DEFENSE_Y_LENGTH@
+	defense_height: @DEFENSE_X_LENGTH@
 	type: TYPE_2018
 }
 camera_setup {

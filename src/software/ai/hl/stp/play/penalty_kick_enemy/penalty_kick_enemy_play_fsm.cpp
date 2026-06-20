@@ -26,7 +26,8 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update& event)
         double y_offset = 8 * ((double)i - ((double)move_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         move_tactics.at(i)->updateControlParams(
-            Point(event.common.world_ptr->field().enemyPenaltyMark().x() + 1.75,
+            Point(event.common.world_ptr->field().enemyPenaltyMark().x() +
+                      event.common.world_ptr->field().xLength() / 6.0,
                   y_offset),
             event.common.world_ptr->field().enemyGoalCenter().toVector().orientation());
     }

@@ -1,6 +1,7 @@
 #include "software/world/field.h"
 
 #include "shared/constants.h"
+#include "shared/practice_field_dims.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
@@ -22,11 +23,12 @@ Field Field::createSSLDivisionAField()
 
 Field Field::createPracticeField()
 {
-    // 2/5 of Division B in field length, width, defense area, and center circle;
-    // 3/5 of Division B goal width. Goal depth (0.18) and boundary buffer (0.3)
-    // are kept at Division B values — they are tied to physical goal hardware
-    // and surrounding carpet, not field size.
-    Field field = Field(3.6, 2.4, 0.4, 0.8, 0.18, 0.6, 0.3, 0.2);
+    // Dimensions sourced from shared/practice_field_dims.bzl.
+    Field field =
+        Field(practice_field::FIELD_X_LENGTH, practice_field::FIELD_Y_LENGTH,
+              practice_field::DEFENSE_X_LENGTH, practice_field::DEFENSE_Y_LENGTH,
+              practice_field::GOAL_X_LENGTH, practice_field::GOAL_Y_LENGTH,
+              practice_field::BOUNDARY_BUFFER_SIZE, practice_field::CENTER_CIRCLE_RADIUS);
     return field;
 }
 

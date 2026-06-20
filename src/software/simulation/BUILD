@@ -7,7 +7,7 @@ cc_library(
     data = [
         "//extlibs/er_force_sim/config/simulator:2020.txt",
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
-        "//extlibs/er_force_sim/config/simulator:practice.txt",
+        "//extlibs/er_force_sim/config/simulator:practice_txt",
     ],
     deps = [
         "//extlibs/er_force_sim/src/amun/simulator",

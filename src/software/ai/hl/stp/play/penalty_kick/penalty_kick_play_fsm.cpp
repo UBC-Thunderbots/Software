@@ -49,7 +49,8 @@ void PenaltyKickPlayFSM::setupPosition(const Update& event)
                           ((double)i - ((double)penalty_setup_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         penalty_setup_tactics.at(i)->updateControlParams(
-            Point(ball_position_x - 1.25, y_offset),
+            Point(ball_position_x - event.common.world_ptr->field().xLength() / 6.0,
+                  y_offset),
             event.common.world_ptr->field().enemyGoalCenter().toVector().orientation());
     }
 

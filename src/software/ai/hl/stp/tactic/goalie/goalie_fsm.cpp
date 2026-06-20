@@ -213,7 +213,9 @@ void GoalieFSM::panic(const Update& event)
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        AutoChipOrKick{
+            AutoChipOrKickMode::AUTOCHIP,
+            event.common.world_ptr->field().xLength() * YEET_CHIP_DISTANCE_FRACTION}));
 }
 
 void GoalieFSM::updatePivotKick(
@@ -255,7 +257,9 @@ void GoalieFSM::positionToBlock(const Update& event)
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        AutoChipOrKick{
+            AutoChipOrKickMode::AUTOCHIP,
+            event.common.world_ptr->field().xLength() * YEET_CHIP_DISTANCE_FRACTION}));
 }
 
 bool GoalieFSM::ballInInflatedDefenseArea(const Update& event)

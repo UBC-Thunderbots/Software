@@ -52,6 +52,7 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:constants",
+        "//shared:practice_field_dims",
         "//software/geom:circle",
         "//software/geom:rectangle",
         "//software/geom/algorithms",

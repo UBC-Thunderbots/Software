@@ -33,6 +33,7 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from shared.practice_field_dims import PRACTICE_FIELD_DIMS
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 protobuf_impl_type = api_implementation.Type()
@@ -398,11 +399,13 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            # Mirrors the dimensions in software/world/field.cpp createField factories
             division_field_dims = {
                 "div_a": (12.0, 9.0),
                 "div_b": (9.0, 6.0),
-                "practice": (3.6, 2.4),
+                "practice": (
+                    PRACTICE_FIELD_DIMS["field_x_length"],
+                    PRACTICE_FIELD_DIMS["field_y_length"],
+                ),
             }
             field_x_length, field_y_length = division_field_dims[args.division]
             sync_simulation(
