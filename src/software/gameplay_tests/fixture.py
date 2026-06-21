@@ -239,6 +239,4 @@ def field_test_runner(args):
             is_yellow_friendly=args.run_yellow,
         )
 
-        friendly_proto_unix_io.register_observer(World, runner.world_buffer)
-
         yield runner
