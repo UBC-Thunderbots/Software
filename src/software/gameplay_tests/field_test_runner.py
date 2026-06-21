@@ -94,12 +94,11 @@ class FieldTestRunner(TbotsTestRunner):
             # something went wrong with either FullSystem or SSL Vision
             try:
                 world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-                break
             except queue.Empty:
                 logger.warning(
                     f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
                 )
-                self._stopper()
+                break
 
             # Validate
             (
