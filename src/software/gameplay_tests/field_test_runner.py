@@ -90,18 +90,16 @@ class FieldTestRunner(TbotsTestRunner):
                     # remove command from the list
                     gc_cmd_with_delay.remove((delay, cmd, team))
 
-            while True:
-                try:
-                    world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT
-                    )
-                    break
-                except queue.Empty:
-                    # If we timeout, that means full_system missed the last
-                    # wrapper and robot status, lets resend it.
-                    logger.warning(
-                        f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
-                    )
+            # Try to get the world; if can't receive for timeout,
+            # something went wrong with either FullSystem or SSL Vision
+            try:
+                world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+                break
+            except queue.Empty:
+                logger.warning(
+                    f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
+                )
+                self._stopper()
 
             # Validate
             (
