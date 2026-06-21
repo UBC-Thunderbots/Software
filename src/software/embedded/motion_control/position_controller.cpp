@@ -14,15 +14,15 @@ Vector PositionController::step(const Point& position,
     double distance_to_destination =
         distance(position, target_trajectory.getDestination());
 
-    Vector local_velocity =
+    Vector global_velocity =
         target_trajectory.getVelocity(elapsed_time.toSeconds()) + control_effort;
 
     // Dampen velocity as we get closer to the destination to reduce jittering
     if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
     {
-        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
+        global_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
     }
-    return local_velocity;
+    return global_velocity;
 }
 
 void PositionController::reset()

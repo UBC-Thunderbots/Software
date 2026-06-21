@@ -342,16 +342,6 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 
     const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
     const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"target_pos_x", target_position.x()},
-        {"target_pos_y", target_position.y()},
-        {"target_vel_x", target_velocity.x()},
-        {"target_vel_y", target_velocity.y()},
-        {"actual_pos_x", state_.position().x()},
-        {"actual_pos_y", state_.position().y()},
-        {"actual_vel_x", state_.velocity().x()},
-        {"actual_vel_y", state_.velocity().y()},
-    });
 
     Vector target_v_global = position_controller_.step(
         state_.position(), *trajectory_path_, Duration::fromSeconds(sample_time_sec),
@@ -399,15 +389,38 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     // whenever the robot translates while rotating even though its global motion is
     // within limits. So clamp the change in global velocity, relative to the previous
     // commanded (not measured) velocity.
+    //
+    // We use the robot's physical acceleration/deceleration limits here (not the
+    // possibly-slower limits used to generate the trajectory): the trajectory is planned
+    // conservatively to leave headroom, but the PID is allowed to use the full physical
+    // capability to correct lag. Whether we're speeding up or slowing down selects the
+    // acceleration or deceleration limit respectively.
     const Vector velocity_delta = target_v_global - prev_target_global_velocity_;
-    const double max_velocity_delta =
-        robot_constants_.robot_max_acceleration_m_per_s_2 * delta_time.toSeconds();
+    const bool is_decelerating =
+        target_v_global.length() < prev_target_global_velocity_.length();
+    const double max_accel_m_per_s_2 =
+        is_decelerating ? robot_constants_.robot_max_deceleration_m_per_s_2
+                        : robot_constants_.robot_max_acceleration_m_per_s_2;
+    const double max_velocity_delta = max_accel_m_per_s_2 * delta_time.toSeconds();
     if (velocity_delta.length() > max_velocity_delta)
     {
         target_v_global =
             prev_target_global_velocity_ + velocity_delta.normalize(max_velocity_delta);
     }
     prev_target_global_velocity_ = target_v_global;
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"target_pos_x", target_position.x()},
+        {"target_pos_y", target_position.y()},
+        {"target_vel_x", target_v_global.x()},
+        {"target_vel_y", target_v_global.y()},
+        {"actual_pos_x", state_.position().x()},
+        {"actual_pos_y", state_.position().y()},
+        {"actual_vel_x", state_.velocity().x()},
+        {"actual_vel_y", state_.velocity().y()},
+        {"compensating_x_vel", target_v_global.x() - target_velocity.x()},
+        {"compensating_y_vel", target_v_global.y() - target_velocity.y()},
+    });
 
     return globalToLocalVelocity(target_v_global, state_.orientation());
 }
