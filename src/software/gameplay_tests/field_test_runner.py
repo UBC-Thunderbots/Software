@@ -154,11 +154,6 @@ class FieldTestRunner(TbotsTestRunner):
 
         logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
         while not self.robot_communication.estop_is_playing:
-            # We must process events if Thunderscope is running to keep it responsive
-            # if self.thunderscope:
-            #     from pyqtgraph.Qt import QtWidgets
-            #
-            #     QtWidgets.QApplication.processEvents()
             time.sleep(0.1)
         logger.info(
             "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
