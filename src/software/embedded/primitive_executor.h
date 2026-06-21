@@ -168,10 +168,6 @@ class PrimitiveExecutor
     Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
 
-    // The distance away from the destination at which we start dampening the velocity
-    // to avoid jittering around the destination.
-    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
-
     // How far ahead (in trajectory time) of the point nearest the robot we sample the
     // trajectory. This keeps the target leading the robot so it makes forward progress
     // along the path (without it, starting from rest the planned velocity at the nearest
@@ -181,7 +177,7 @@ class PrimitiveExecutor
     // If the Hausdorff distance between the path of the trajectory we're following and
     // the path of a newly received trajectory exceeds this, the paths have deviated
     // enough that we switch to following the new trajectory.
-    static constexpr double LINEAR_HAUSDORFF_THRESHOLD_M = 0.01;
+    static constexpr double LINEAR_HAUSDORFF_THRESHOLD_M = 0.3;
 
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.

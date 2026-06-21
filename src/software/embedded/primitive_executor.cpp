@@ -245,7 +245,7 @@ bool PrimitiveExecutor::shouldFollowNewLinearTrajectory(
     }
 
     // Compare current and new trajectory using Hausdorff distance;
-    // if path deviation is significant, siwtch to the new trajectory
+    // if path deviation is significant, switch to the new trajectory
     const double nearest_time_sec =
         findNearestTimeOnTrajectory(*trajectory_path_, state_.position());
     const double hausdorff_dist = trajectoryPathHausdorffDistance(
