@@ -208,22 +208,11 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         return;
     }
 
-    // The AI re-sends a Move Primitive at vision frame rate, each one recomputed from
-    // the robot's latest estimated position. Blindly adopting every received trajectory
-    // would constantly restart our progress and stop the controllers from ever
-    // correcting the robot back onto the planned path. Instead, we keep following the
-    // trajectory we're already on and only switch to the newly received one when its
-    // path meaningfully deviates from what we're following (see shouldFollowNew*
-    // Trajectory). We don't need to regenerate when we're "behind" or "ahead" because we
-    // follow the trajectory by position (nearest point), not by a wall clock - see
-    // stepTargetLinearVelocity. When we do switch, the velocity setpoint is blended
-    // across the switch so it doesn't change abruptly.
-
-    const auto new_trajectory_path =
+    const std::optional<TrajectoryPath> new_trajectory_path =
         createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
                                        state_.velocity(), robot_constants_);
 
-    const auto new_angular_trajectory =
+    const BangBangTrajectory1DAngular new_angular_trajectory =
         createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
                                           state_.angularVelocity(), robot_constants_);
 
@@ -249,24 +238,14 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 bool PrimitiveExecutor::shouldFollowNewLinearTrajectory(
     const TrajectoryPath& new_trajectory) const
 {
-    // We aren't following any trajectory yet, so we must start following the new one.
+    // If we aren't following any trajectory yet, we must start following the new one
     if (!trajectory_path_.has_value())
     {
         return true;
     }
 
-    // Path deviation: compare the remaining portion of the trajectory we're following
-    // (from the point nearest the robot until the trajectory's end) against the newly
-    // received trajectory. If their paths differ meaningfully - the destination moved, or
-    // the path was replanned around an obstacle - the Hausdorff distance will be large
-    // and we switch to the new path. Otherwise the two paths describe essentially the
-    // same route, so we keep following the current one and let the controllers steer the
-    // robot back onto it.
-    //
-    // We intentionally do not switch just because we're behind/ahead of the trajectory:
-    // because we follow the trajectory by position (nearest point) rather than by a wall
-    // clock, lagging the planned timing is fine - we simply keep commanding the planned
-    // velocity for wherever we actually are on the path.
+    // Compare current and new trajectory using Hausdorff distance;
+    // if path deviation is significant, siwtch to the new trajectory
     const double nearest_time_sec =
         findNearestTimeOnTrajectory(*trajectory_path_, state_.position());
     const double hausdorff_dist = trajectoryPathHausdorffDistance(
@@ -282,16 +261,13 @@ bool PrimitiveExecutor::shouldFollowNewLinearTrajectory(
 bool PrimitiveExecutor::shouldFollowNewAngularTrajectory(
     const BangBangTrajectory1DAngular& new_trajectory) const
 {
-    // We aren't following any trajectory yet, so we must start following the new one.
+    // If we aren't following any trajectory yet, we must start following the new one
     if (!angular_trajectory_.has_value())
     {
         return true;
     }
 
-    // Destination deviation: if the new trajectory aims for a meaningfully different
-    // final orientation, switch to it. As with the linear case, we don't switch just
-    // because we're behind/ahead - we follow the angular trajectory by orientation
-    // (nearest point), not by a wall clock.
+    // Switch to new trajectory if destination has meaningfully changed
     const Angle current_final_orientation =
         angular_trajectory_->getPosition(angular_trajectory_->getTotalTime());
     const Angle new_final_orientation =
@@ -361,22 +337,9 @@ double PrimitiveExecutor::nearestAngularTrajectorySampleTime(
 
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 {
-    // Follow the trajectory by geometry rather than by a wall clock: find the point on
-    // the trajectory nearest to where the robot actually is, and command the velocity
-    // the trajectory planned for (just ahead of) that point. Because the target is
-    // anchored to the robot's real position, it can never "run away" if the robot can't
-    // keep up - we just keep commanding the planned velocity for wherever we are on the
-    // path - so the robot still converges onto and follows the trajectory without having
-    // to match the original timing/acceleration exactly. The small look-ahead keeps the
-    // target a step ahead of the robot so it actually makes forward progress (otherwise,
-    // starting from rest at the nearest point, the planned velocity there is ~0 and the
-    // robot would never get moving).
     const double sample_time_sec =
         nearestTrajectorySampleTime(*trajectory_path_, state_.position());
 
-    // Log the trajectory's target position/velocity (where we should be) against the
-    // robot localizer's actual position/velocity (where we are), all in the global
-    // frame, so we can plot how well we're following the trajectory.
     const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
     const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
@@ -451,15 +414,9 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& delta_time)
 {
-    // Follow the angular trajectory by the orientation nearest the robot's actual
-    // orientation (plus a small look-ahead), for the same reasons as the linear case in
-    // stepTargetLinearVelocity.
     const double sample_time_sec =
         nearestAngularTrajectorySampleTime(*angular_trajectory_, state_.orientation());
 
-    // Log the angular trajectory's target orientation/angular velocity (where we should
-    // be) against the robot localizer's actual orientation/angular velocity (where we
-    // are) so we can plot how well we're following the angular trajectory.
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
         {"target_orientation_rad",
          angular_trajectory_->getPosition(sample_time_sec).toRadians()},
@@ -570,9 +527,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             Vector local_velocity            = stepTargetLinearVelocity(delta_time);
             AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
 
-            // For debugging:
-            // sendLinearMotionToPlotJuggler(local_velocity, delta_time);
-
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
                 convertDribblerModeToDribblerSpeed(
@@ -601,17 +555,4 @@ void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
     prev_target_global_velocity_ =
         localToGlobalVelocity(local_velocity, state_.orientation());
     prev_target_angular_velocity_ = angular_velocity;
-}
-
-void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                                      const Duration& delta_time) const
-{
-    const Vector& local_acceleration =
-        (target_local_velocity - state_.localVelocity()) / delta_time.toSeconds();
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"x", state_.position().x()},
-                                                 {"y", state_.position().y()},
-                                                 {"v_x", target_local_velocity.x()},
-                                                 {"v_y", target_local_velocity.y()},
-                                                 {"a_x", local_acceleration.x()},
-                                                 {"a_y", local_acceleration.y()}});
 }

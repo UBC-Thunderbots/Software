@@ -133,16 +133,6 @@ class PrimitiveExecutor
         const BangBangTrajectory1DAngular& trajectory, const Angle& orientation) const;
 
     /**
-     * Sends the position, local velocity, and local acceleration to PlotJuggler.
-     *
-     * @param target_local_velocity The local velocity being sent to the next direct
-     * control primitive
-     * @param delta_time Used to calculate acceleration.
-     */
-    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       const Duration& delta_time) const;
-
-    /**
      * Records the velocities commanded this step so the next step can measure the
      * commanded (tick-to-tick) acceleration. Call on every code path that commands a
      * velocity without going through stepTargetLinearVelocity/stepTargetAngularVelocity.
