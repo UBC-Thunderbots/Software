@@ -20,3 +20,15 @@ bazel run //software/embedded/ansible:requirements.update
 bazel run //software/gameplay_tests:requirements.update
 bazel run //software/embedded/robot_diagnostics_cli:requirements.update
 bazel run //starlark/nanopb:requirements.update
+
+# Restore any lock file a failed update left empty so we don't commit a deleted lock file,
+# then exit non-zero so we know to re-run the failed script
+exit_code=0
+for lock in $(git ls-files '*requirements_lock*.txt'); do
+    if [ ! -s "$lock" ]; then
+        git restore "$lock"
+        echo "Restored $lock: its requirements.update target failed, please re-run"
+        exit_code=1
+    fi
+done
+exit $exit_code
