@@ -194,7 +194,7 @@ class TbotsTestRunner:
 
         :param setup: Function that sets up the world state
         """
-        setup()
+        raise NotImplementedError("abstract class method called _pre_run_setup")
 
     def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
         """Stop running the test
