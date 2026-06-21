@@ -7,7 +7,6 @@ from software.py_constants import (
     getRobotMulticastChannel,
 )
 
-from proto.import_all_protos import World
 from software.gameplay_tests.field_test_runner import FieldTestRunner
 from software.gameplay_tests.simulated_test_runner import SimulatedTestRunner
 from software.gameplay_tests.util import (
