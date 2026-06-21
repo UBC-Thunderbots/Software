@@ -188,7 +188,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     """
     if config.test_suite and config.action == ActionArgument.test:
         target = """-- //...                              \\
-                      -//software/field_tests/...         \\
+                      -//software/gameplay_tests/...      \\
                       -//toolchains/cc/...                \\
                       -//software:unix_full_system_tar_gen"""
     else:

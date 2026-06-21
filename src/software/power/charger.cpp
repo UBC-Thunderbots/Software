@@ -33,7 +33,7 @@ void Charger::chargeCapacitors()
     delayMicroseconds(LT3750_CHARGE_LOW_TIME_US);
     digitalWrite(CHRG, HIGH);
 
-    // last_charge_edge_ms = millis();
+    last_charge_edge_ms = millis();
     // has_seen_done_since_last_charge_edge = false;
 }
 
@@ -55,12 +55,12 @@ void Charger::maintainCharge()
     // {
     //     chargeCapacitors();
     // }
-    
+
     if ((millis() - last_charge_edge_ms) > MIN_CHARGE_RETRIGGER_INTERVAL_MS )
     {
         chargeCapacitors();
     }
-    
+
 }
 
 bool Charger::getChargeDone()
@@ -141,7 +141,7 @@ float Charger::getCapacitorVoltage()
 
     // Calibration from scope measurements:
     // diagnostic 286.0 V corresponds to actual 196.44 V.
-    // This linear fit is applied after converting the raw ADC code to a voltage which already 
+    // This linear fit is applied after converting the raw ADC code to a voltage which already
     // accounts for the hardware gain and divider
     static constexpr float CAP_CAL_ANCHOR_DIAGNOSTIC_V = 286.0f;
     static constexpr float CAP_CAL_ANCHOR_ACTUAL_V     = 196.44f;

@@ -119,11 +119,11 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    // motor_service_  = std::make_unique<MotorService>(robot_constants);
-    // g_motor_service = motor_service_.get();
-    // motor_service_->setup();
+    motor_service_  = std::make_unique<MotorService>(robot_constants);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
 
-    // LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
 
     imu_service_ = std::make_unique<ImuService>();
     LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
@@ -292,9 +292,9 @@ void Thunderloop::runLoop()
                 getMilliseconds(poll_time));
 
             // Motor Service: execute the motor control command
-            // pollMotorService(poll_time, time_since_prev_iter);
-            // thunderloop_status_.set_motor_service_poll_time_ms(
-            //     getMilliseconds(poll_time));
+            pollMotorService(poll_time, time_since_prev_iter);
+            thunderloop_status_.set_motor_service_poll_time_ms(
+                getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
             pollPowerService(poll_time);

@@ -50,12 +50,12 @@ pip.parse(
 )
 use_repo(pip, "ansible_deps")
 pip.parse(
-    hub_name = "simulated_tests_deps",
+    hub_name = "gameplay_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
-    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+    requirements_lock = "//software/gameplay_tests:requirements_lock.txt",
 )
-use_repo(pip, "simulated_tests_deps")
+use_repo(pip, "gameplay_tests_deps")
 pip.parse(
     hub_name = "robot_diagnostics_cli_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -219,7 +219,7 @@ git_repository(
     name = "mdv6_firmware",
     build_file = "@//extlibs:mdv6_firmware.bzl",
     # Pinning to the exact commit guarantees Bazel will rebuild when this commit SHA is updated
-    commit = "97e06b9ce8db1940a033b536cd55b4059943d601",  # latest commit on master branch
+    commit = "7657fb1c63bccd506196c42ff1720928314977c7",  # latest commit on master branch
     remote = "https://github.com/UBC-Thunderbots/MDv6_Firmware.git",
 )
 

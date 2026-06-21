@@ -78,12 +78,12 @@ void setup()
     receiving    = false;
     sequence_num = 0;
     charger      = std::make_shared<Charger>();
-    chicker      = std::make_shared<Chicker>();
+    chicker      = std::make_shared<Chicker>(charger);
     monitor      = std::make_shared<PowerMonitor>();
     geneva       = std::make_shared<Geneva>();
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     dribbler     = std::make_shared<Dribbler>();
-    //charger->chargeCapacitors();
+    charger->chargeCapacitors();
 }
 
 void loop()
