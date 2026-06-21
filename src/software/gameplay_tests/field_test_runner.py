@@ -129,7 +129,7 @@ class FieldTestRunner(TbotsTestRunner):
                     ValidationProtoSet, always_validation_proto_set
                 )
 
-            if len(always_validation_sequence_set) != 0:
+            if any(len(seq) > 0 for seq in always_validation_sequence_set):
                 # Check that all always validations are always valid
                 validation.check_validation(always_validation_proto_set)
             else:
