@@ -85,8 +85,9 @@ class Charger
     static bool has_seen_done_since_last_charge_edge;
     static uint32_t last_charge_edge_ms;
 
-    static constexpr float CAP_VOLTAGE_EMA_ALPHA = 0.02f; //smaller is smoother but slower to respond
+    static constexpr float CAP_VOLTAGE_EMA_ALPHA =
+        0.02f;  // smaller is smoother but slower to respond
 
-    float capacitor_voltage_ema_ = 0.0f;
+    float capacitor_voltage_ema_            = 0.0f;
     bool capacitor_voltage_ema_initialized_ = false;
 };

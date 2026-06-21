@@ -102,7 +102,7 @@ void PowerService::poll(const TbotsProto::DirectControlPrimitive& primitive,
         primitive.power_control(), kick_coefficient_, kick_constant_, chip_constant_);
 
     *(robot_status.mutable_power_status()) = *createTbotsPowerStatus(power_status_);
-    
+
     const uint32_t dribbler_rpm =
         std::abs(primitive.motor_control().dribbler_speed_rpm());
     dribbler_command_ = createNanoPbDribblerControl(dribbler_rpm);

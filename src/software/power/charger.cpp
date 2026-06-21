@@ -7,7 +7,7 @@ Charger::Charger()
 {
     pinMode(FLYBACK_FAULT, INPUT);
 
-    // DONE is active-low, I think we already have a pullup but just incase
+    // DONE is active-low, I think we already have a pullup but just in case
     pinMode(CHRG_DONE, INPUT_PULLUP);
 
     pinMode(CHRG, OUTPUT);
@@ -56,11 +56,10 @@ void Charger::maintainCharge()
     //     chargeCapacitors();
     // }
 
-    if ((millis() - last_charge_edge_ms) > MIN_CHARGE_RETRIGGER_INTERVAL_MS )
+    if ((millis() - last_charge_edge_ms) > MIN_CHARGE_RETRIGGER_INTERVAL_MS)
     {
         chargeCapacitors();
     }
-
 }
 
 bool Charger::getChargeDone()
@@ -141,8 +140,8 @@ float Charger::getCapacitorVoltage()
 
     // Calibration from scope measurements:
     // diagnostic 286.0 V corresponds to actual 196.44 V.
-    // This linear fit is applied after converting the raw ADC code to a voltage which already
-    // accounts for the hardware gain and divider
+    // This linear fit is applied after converting the raw ADC code to a voltage which
+    // already accounts for the hardware gain and divider
     static constexpr float CAP_CAL_ANCHOR_DIAGNOSTIC_V = 286.0f;
     static constexpr float CAP_CAL_ANCHOR_ACTUAL_V     = 196.44f;
     static constexpr float CAP_CAL_SLOPE               = 0.7019289f;
@@ -157,8 +156,7 @@ float Charger::getCapacitorVoltage()
         code_sum += readAds7945SignedCode();
     }
 
-    const float avg_code =
-        static_cast<float>(code_sum) / static_cast<float>(NUM_SAMPLES);
+    const float avg_code = static_cast<float>(code_sum) / static_cast<float>(NUM_SAMPLES);
 
     const float v_adc_diff = adcCodeToDifferentialVoltage(avg_code);
 
@@ -169,14 +167,11 @@ float Charger::getCapacitorVoltage()
     // Convert diagnostic voltage to calibrated physical capacitor voltage.
     const float calibrated_capacitor_voltage =
         CAP_CAL_ANCHOR_ACTUAL_V +
-        CAP_CAL_SLOPE *
-            (raw_capacitor_voltage - CAP_CAL_ANCHOR_DIAGNOSTIC_V);
+        CAP_CAL_SLOPE * (raw_capacitor_voltage - CAP_CAL_ANCHOR_DIAGNOSTIC_V);
 
     // Prevent a small negative reported voltage near 0 V.
     const float physical_capacitor_voltage =
-        (calibrated_capacitor_voltage < 0.0f)
-            ? 0.0f
-            : calibrated_capacitor_voltage;
+        (calibrated_capacitor_voltage < 0.0f) ? 0.0f : calibrated_capacitor_voltage;
 
     // Initialize from the first real reading so startup does not ramp from 0 V.
     if (!capacitor_voltage_ema_initialized_)
@@ -187,8 +182,7 @@ float Charger::getCapacitorVoltage()
     else
     {
         capacitor_voltage_ema_ +=
-            CAP_VOLTAGE_EMA_ALPHA *
-            (physical_capacitor_voltage - capacitor_voltage_ema_);
+            CAP_VOLTAGE_EMA_ALPHA * (physical_capacitor_voltage - capacitor_voltage_ema_);
     }
     return capacitor_voltage_ema_;
 }
