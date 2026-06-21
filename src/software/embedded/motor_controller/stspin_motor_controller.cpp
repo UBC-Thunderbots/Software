@@ -190,65 +190,6 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
     return motor_status_.at(motor).speed;
 }
 
-void StSpinMotorController::updateEuclideanVelocity(
-    EuclideanSpace_t target_euclidean_velocity)
-{
-#if 0
-    const Vector local_velocity(target_euclidean_velocity[1],
-                                target_euclidean_velocity[0]);
-
-    if (local_velocity.length() <= MINIMUM_SPEED_FOR_FEED_FORWARD)
-    {
-        sendAndReceiveMessage(
-            MotorIndex::FRONT_LEFT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        sendAndReceiveMessage(
-            MotorIndex::FRONT_RIGHT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        sendAndReceiveMessage(
-            MotorIndex::BACK_RIGHT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        sendAndReceiveMessage(
-            MotorIndex::BACK_LEFT,
-            SetSpeedFeedForwardKsMessage{.ks = MIN_SPEED_FEED_FORWARD_STATIC_GAIN});
-        return;
-    }
-
-    const Angle direction = local_velocity.orientation();
-
-    const Angle front_wheel_angle =
-        Angle::fromDegrees(robot_constants_.front_wheel_angle_deg);
-    const Angle back_wheel_angle =
-        Angle::fromDegrees(robot_constants_.back_wheel_angle_deg);
-
-    const int16_t front_left_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction - Angle::quarter() + front_wheel_angle).sin()));
-    const int16_t front_right_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction + Angle::quarter() - front_wheel_angle).sin()));
-    const int16_t back_right_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction + Angle::quarter() + back_wheel_angle).sin()));
-    const int16_t back_left_ks = static_cast<int16_t>(
-        MAX_SPEED_FEED_FORWARD_STATIC_GAIN *
-        std::abs((direction - Angle::quarter() - back_wheel_angle).sin()));
-
-    sendAndReceiveMessage(MotorIndex::FRONT_LEFT,
-                          SetSpeedFeedForwardKsMessage{.ks = front_left_ks});
-    sendAndReceiveMessage(MotorIndex::FRONT_RIGHT,
-                          SetSpeedFeedForwardKsMessage{.ks = front_right_ks});
-    sendAndReceiveMessage(MotorIndex::BACK_RIGHT,
-                          SetSpeedFeedForwardKsMessage{.ks = back_right_ks});
-    sendAndReceiveMessage(MotorIndex::BACK_LEFT,
-                          SetSpeedFeedForwardKsMessage{.ks = back_left_ks});
-#endif
-    sendMotorStatusToPlotJuggler(MotorIndex::FRONT_LEFT);
-    sendMotorStatusToPlotJuggler(MotorIndex::FRONT_RIGHT);
-    sendMotorStatusToPlotJuggler(MotorIndex::BACK_LEFT);
-    sendMotorStatusToPlotJuggler(MotorIndex::BACK_RIGHT);
-}
-
 void StSpinMotorController::immediatelyDisable()
 {
     for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
@@ -288,7 +229,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
     populateTx(motor, outgoing_message, tx);
 
     std::vector<uint8_t> received_data;
-    for (unsigned int attempt = 0; attempt < MAX_RESYNC_ATTEMPTS; ++attempt)
+    for (unsigned int attempt = 0; attempt < MAX_SPI_TRANSFER_ATTEMPTS; ++attempt)
     {
         spiTransfer(spi_fds_[motor], tx.data(), rx.data(), MESSAGE_SIZE, SPI_SPEED_HZ);
         received_data.insert(received_data.end(), rx.begin(), rx.end());
@@ -315,34 +256,19 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
         const uint8_t actual_crc = Crc8Autosar::calc(&(*delimiter_pos), MESSAGE_SIZE - 1);
         if (expected_crc == actual_crc)
         {
-            // Only the low byte of seq_num is transmitted in tx[1], so compare against
-            // the low byte here too. Comparing the full uint16_t would never match once
-            // seq_num wraps past 255 and would spin the loop forever.
             const uint8_t ack_seq_num = *std::next(delimiter_pos);
-            if (ack_seq_num == static_cast<uint8_t>(motor_status_.at(motor).seq_num))
+            if (ack_seq_num == motor_status_.at(motor).seq_num)
             {
                 // The message we just sent was acknowledged, we can stop resending
-                // and waiting for a response. Plot the time waited since the previous
-                // completed frame so we can spot SPI stalls / resync delays.
-                MotorStatus& motor_status = motor_status_.at(motor);
-                const auto now            = std::chrono::steady_clock::now();
-                if (motor_status.last_frame_complete_time !=
-                    std::chrono::steady_clock::time_point{})
-                {
-                    const double frame_wait_ms =
-                        std::chrono::duration<double, std::milli>(
-                            now - motor_status.last_frame_complete_time)
-                            .count();
-                    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                        {"frame_wait_ms_" + motor, frame_wait_ms},
-                    });
-                }
-                motor_status.last_frame_complete_time = now;
+                // and waiting for a response
+                const auto now = std::chrono::steady_clock::now();
+                motor_status_.at(motor).last_message_ack_time = now;
 
                 std::array<uint8_t, MESSAGE_SIZE> message{};
                 std::copy(delimiter_pos, std::next(delimiter_pos, MESSAGE_SIZE),
                           message.begin());
                 processRx(motor, message);
+
                 return;
             }
         }
@@ -350,11 +276,9 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
         received_data.erase(received_data.begin(), std::next(delimiter_pos));
     }
 
-    // Resync did not complete within the attempt budget. Degrade gracefully by giving
-    // up on this message rather than blocking the caller (e.g. setup() during init).
     LOG(WARNING) << "Motor " << motor << " did not acknowledge message (seq_num "
-                 << motor_status_.at(motor).seq_num << ") after " << MAX_RESYNC_ATTEMPTS
-                 << " SPI attempts; giving up";
+                 << motor_status_.at(motor).seq_num << ") after "
+                 << MAX_SPI_TRANSFER_ATTEMPTS << " SPI attempts; giving up";
 }
 
 void StSpinMotorController::populateTx(const MotorIndex motor,

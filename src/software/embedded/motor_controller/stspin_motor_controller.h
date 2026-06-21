@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <memory>
 
 #include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
@@ -30,8 +29,6 @@ class StSpinMotorController : public MotorController
 
     int readThenWriteVelocity(MotorIndex motor, int target_velocity) override;
 
-    void updateEuclideanVelocity(EuclideanSpace_t target_euclidean_velocity) override;
-
     void immediatelyDisable() override;
 
    private:
@@ -45,13 +42,13 @@ class StSpinMotorController : public MotorController
     // Length of message (in number of bytes)
     static constexpr unsigned int MESSAGE_SIZE = 8;
 
+    // Delimiter byte used to indicate start of a message
     static constexpr uint8_t MESSAGE_DELIMITER = 0xAA;
 
-    // Maximum number of SPI transfer attempts to wait for an acknowledgement before
-    // giving up. Bounds the resync loop so an unresponsive motor (e.g. firmware not
-    // running or SPI desynced) cannot block thunderloop indefinitely. At SPI_SPEED_HZ
-    // this caps a single send/receive at roughly 32 ms.
-    static constexpr unsigned int MAX_RESYNC_ATTEMPTS = 50;
+    // Maximum number of SPI transfer attempts to wait for an acknowledgement
+    // before giving up. Prevents unresponsive MD (e.g. firmware crash or
+    // SPI desynced) from blocking Thunderloop indefinitely
+    static constexpr unsigned int MAX_SPI_TRANSFER_ATTEMPTS = 100;
 
     // clang-format off
     static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
@@ -69,15 +66,10 @@ class StSpinMotorController : public MotorController
 
     static constexpr int RESET_GPIO_PIN = 12;
 
-    static constexpr int SPEED_PID_PROPORTIONAL_GAIN = 439;
-    static constexpr int SPEED_PID_INTEGRAL_GAIN     = 535;
-
+    static constexpr int SPEED_PID_PROPORTIONAL_GAIN  = 439;
+    static constexpr int SPEED_PID_INTEGRAL_GAIN      = 535;
     static constexpr int TORQUE_PID_PROPORTIONAL_GAIN = 336;
     static constexpr int TORQUE_PID_INTEGRAL_GAIN     = 170;
-
-    static constexpr int MAX_SPEED_FEED_FORWARD_STATIC_GAIN = 750;
-    static constexpr int MIN_SPEED_FEED_FORWARD_STATIC_GAIN = 300;
-    static constexpr double MINIMUM_SPEED_FOR_FEED_FORWARD  = 0.01;
 
     robot_constants::RobotConstants robot_constants_;
 
@@ -88,7 +80,7 @@ class StSpinMotorController : public MotorController
 
     struct MotorStatus
     {
-        uint16_t seq_num;
+        uint8_t seq_num;
         bool enabled;
         MotorFaultIndicator faults;
         uint16_t fault_flags;
@@ -102,10 +94,7 @@ class StSpinMotorController : public MotorController
         int16_t vd;
         int16_t phase_current;
         int16_t phase_voltage;
-        // Time the previous message to this motor was acknowledged. Used to plot the
-        // interval between completed frames. Default-constructed (epoch) until the first
-        // frame completes, and reset whenever motor_status_ is reinitialized in setup().
-        std::chrono::steady_clock::time_point last_frame_complete_time;
+        std::chrono::steady_clock::time_point last_message_ack_time;
     };
 
     std::unordered_map<MotorIndex, MotorStatus> motor_status_;
