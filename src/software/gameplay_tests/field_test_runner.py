@@ -59,7 +59,7 @@ class FieldTestRunner(TbotsTestRunner):
 
     @override
     def _pre_run_setup(self, setup: (lambda: None)):
-        """Wait for estop to be in play state before runing setup
+        """Wait for estop to be in play state before running setup
 
         :param setup: Function that sets up the world state
         """
