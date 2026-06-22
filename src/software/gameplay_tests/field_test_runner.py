@@ -25,6 +25,7 @@ class FieldTestRunner(TbotsTestRunner):
         gamecontroller,
         robot_communication,
         is_yellow_friendly=False,
+        owns_thunderscope=True,
     ):
         """Initialize the FieldTestRunner
 
@@ -35,6 +36,8 @@ class FieldTestRunner(TbotsTestRunner):
         :param gamecontroller: The gamecontroller context managed instance
         :param robot_communication: The robot communication instance
         :param: is_yellow_friendly: if yellow is the friendly team
+        :param owns_thunderscope: Whether this runner controls the Thunderscope
+            lifecycle (False when binding to an open Thunderscope in test mode)
         """
         super(FieldTestRunner, self).__init__(
             test_name,
@@ -43,6 +46,7 @@ class FieldTestRunner(TbotsTestRunner):
             yellow_full_system_proto_unix_io,
             gamecontroller,
             is_yellow_friendly,
+            owns_thunderscope=owns_thunderscope,
         )
         self.is_yellow_friendly = is_yellow_friendly
         self.robot_communication = robot_communication

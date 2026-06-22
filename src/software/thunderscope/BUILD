@@ -19,6 +19,8 @@ py_binary(
         ":estop_helpers",
         ":thunderscope",
         ":util",
+        "//software/gameplay_tests:test_mode",
+        "//software/gameplay_tests/validation:validations",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:runtime_manager",
@@ -59,6 +61,14 @@ py_library(
 py_library(
     name = "time_provider",
     srcs = ["time_provider.py"],
+)
+
+py_library(
+    name = "test_runner_widget",
+    srcs = ["test_runner_widget.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
 )
 
 py_library(

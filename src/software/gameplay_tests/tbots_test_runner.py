@@ -23,6 +23,7 @@ class TbotsTestRunner:
         yellow_full_system_proto_unix_io,
         gamecontroller,
         is_yellow_friendly=False,
+        owns_thunderscope=True,
     ):
         """Initialize the TestRunner.
 
@@ -32,6 +33,10 @@ class TbotsTestRunner:
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
         :param: is_yellow_friendly: if yellow is the friendly team
+        :param owns_thunderscope: Whether this runner controls the Thunderscope
+            lifecycle. True (default) when the runner launched its own
+            Thunderscope; False when binding to an already-open Thunderscope
+            (test mode), in which case the runner must not show or close it.
         """
         self.test_name = test_name
         self.thunderscope = thunderscope
@@ -39,6 +44,7 @@ class TbotsTestRunner:
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
         self.is_yellow_friendly = is_yellow_friendly
+        self.owns_thunderscope = owns_thunderscope
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=PrimitiveSet
@@ -52,27 +58,58 @@ class TbotsTestRunner:
             buffer_size=1, protobuf_type=RobotStatus
         )
 
-        self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
+        # Track every (proto_unix_io, proto_class, buffer) we register so that
+        # cleanup() can deregister them. This keeps long-lived ProtoUnixIOs
+        # (test mode) from accumulating dead buffers across runs.
+        self._registered_observers = []
+
+        self._register_observer(
+            self.blue_full_system_proto_unix_io,
+            SSL_WrapperPacket,
+            self.ssl_wrapper_buffer,
         )
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
+        self._register_observer(
+            self.blue_full_system_proto_unix_io, RobotStatus, self.robot_status_buffer
         )
         if self.is_yellow_friendly:
-            self.yellow_full_system_proto_unix_io.register_observer(
-                World, self.world_buffer
+            self._register_observer(
+                self.yellow_full_system_proto_unix_io, World, self.world_buffer
             )
-            self.yellow_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_set_buffer
+            self._register_observer(
+                self.yellow_full_system_proto_unix_io,
+                PrimitiveSet,
+                self.primitive_set_buffer,
             )
         # Only validate on the blue worlds
         else:
-            self.blue_full_system_proto_unix_io.register_observer(
-                World, self.world_buffer
+            self._register_observer(
+                self.blue_full_system_proto_unix_io, World, self.world_buffer
             )
-            self.blue_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_set_buffer
+            self._register_observer(
+                self.blue_full_system_proto_unix_io,
+                PrimitiveSet,
+                self.primitive_set_buffer,
             )
+
+    def _register_observer(self, proto_unix_io, proto_class, buffer):
+        """Register an observer buffer and remember it for cleanup().
+
+        :param proto_unix_io: The ProtoUnixIO to register the buffer on
+        :param proto_class: Class of protobuf to consume
+        :param buffer: buffer to register
+        """
+        proto_unix_io.register_observer(proto_class, buffer)
+        self._registered_observers.append((proto_unix_io, proto_class, buffer))
+
+    def cleanup(self):
+        """Deregister all observers this runner placed on the shared ProtoUnixIOs.
+
+        Must be called when binding to long-lived ProtoUnixIOs (test mode) so
+        that buffers from finished runs do not accumulate across runs.
+        """
+        for proto_unix_io, proto_class, buffer in self._registered_observers:
+            proto_unix_io.deregister_observer(proto_class, buffer)
+        self._registered_observers = []
 
     def send_gamecontroller_command(
         self,
@@ -152,8 +189,6 @@ class TbotsTestRunner:
         """
         self._pre_run_setup(setup)
 
-        threading.excepthook = self._excepthook
-
         args = (
             always_validation_sequence_set,
             eventually_validation_sequence_set,
@@ -161,7 +196,14 @@ class TbotsTestRunner:
             gc_cmd_with_delay,
         )
 
-        if self.thunderscope:
+        # When bound to an already-open Thunderscope (test mode), we are already
+        # running on a background thread while the Qt event loop runs on the main
+        # thread, so run the test loop inline and let exceptions propagate to
+        # pytest. Otherwise, run the loop in a background thread and block the
+        # main thread on the Thunderscope we own.
+        if self.thunderscope and self.owns_thunderscope:
+            threading.excepthook = self._excepthook
+
             run_test_thread = threading.Thread(
                 target=self._runner, daemon=True, args=args
             )
@@ -204,7 +246,9 @@ class TbotsTestRunner:
         """
         time.sleep(delay)
 
-        if self.thunderscope:
+        # Only close a Thunderscope that this runner owns. In test mode the
+        # Thunderscope outlives the test, so it must be left open.
+        if self.thunderscope and self.owns_thunderscope:
             self.thunderscope.close()
 
     def _excepthook(self, args):

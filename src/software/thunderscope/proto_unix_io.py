@@ -96,6 +96,22 @@ class ProtoUnixIO:
         else:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
 
+    def deregister_observer(
+        self, proto_class: Type[Message], buffer: ThreadSafeBuffer
+    ) -> None:
+        """Remove a previously registered observer buffer for a protobuf class.
+
+        Used to tear down observers between runs (e.g. test mode) so that
+        buffers do not accumulate on a long-lived ProtoUnixIO. Does nothing
+        if the buffer was never registered.
+
+        :param proto_class: Class of protobuf the buffer was registered for
+        :param buffer: buffer to deregister
+        """
+        observers = self.proto_observers.get(proto_class.DESCRIPTOR.full_name)
+        if observers and buffer in observers:
+            observers.remove(buffer)
+
     def register_to_observe_everything(self, buffer: ThreadSafeBuffer) -> None:
         """Register a buffer to observe all incoming protobufs
 
