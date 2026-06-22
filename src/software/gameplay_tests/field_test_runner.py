@@ -95,10 +95,9 @@ class FieldTestRunner(TbotsTestRunner):
             try:
                 world = self.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
             except queue.Empty:
-                logger.warning(
+                raise Exception(
                     f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
                 )
-                break
 
             # Validate
             (
