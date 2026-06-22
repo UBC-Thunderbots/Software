@@ -77,12 +77,6 @@ int TmcMotorController::readThenWriteVelocity(const MotorIndex motor,
     }
 }
 
-void TmcMotorController::updateEuclideanVelocity(
-    EuclideanSpace_t target_euclidean_velocity)
-{
-}
-
-
 void TmcMotorController::writeToDriverOrDieTrying(const uint8_t motor,
                                                   const uint8_t address,
                                                   const int32_t value)
