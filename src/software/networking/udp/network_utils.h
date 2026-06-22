@@ -6,6 +6,13 @@
 #include <string>
 
 /**
+ * Get the name of the loopback network interface for the current platform.
+ *
+ * @return the loopback interface name for the current platform
+ */
+std::string getLoopbackInterfaceName();
+
+/**
  * Given an interface, get the IP address associated with that interface
  *
  * @param interface The interface to get the IP address from
