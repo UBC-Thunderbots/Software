@@ -2,6 +2,7 @@
 
 #include <linux/spi/spidev.h>
 
+#include <algorithm>
 #include <chrono>
 #include <iomanip>
 #include <thread>
@@ -240,18 +241,19 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
         received_data.insert(received_data.end(), rx.begin(), rx.end());
 
         auto delimiter_pos =
-            std::find(received_data.begin(), received_data.end(), MESSAGE_DELIMITER);
+            std::search(received_data.begin(), received_data.end(),
+                        MESSAGE_DELIMITER.begin(), MESSAGE_DELIMITER.end());
 
         if (delimiter_pos == received_data.end())
         {
-            // No delimiter byte found, discard everything
+            // No delimiter sequence found, discard everything
             received_data.clear();
             continue;
         }
 
         if (std::distance(delimiter_pos, received_data.end()) < MESSAGE_SIZE)
         {
-            // Not enough bytes after delimiter byte for a full message,
+            // Not enough bytes after delimiter sequence for a full message,
             // wait for more bytes
             continue;
         }
@@ -261,11 +263,17 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
         const uint8_t actual_crc = Crc8Autosar::calc(&(*delimiter_pos), MESSAGE_SIZE - 1);
         if (expected_crc == actual_crc)
         {
-            const uint8_t ack_seq_num = *std::next(delimiter_pos);
-            if (ack_seq_num == motor_status_.at(motor).seq_num)
+            const uint8_t ack_seq_num =
+                *std::next(delimiter_pos, MESSAGE_DELIMITER.size());
+
+            const uint8_t current_seq = motor_status_.at(motor).seq_num;
+            const uint8_t prev_seq    = current_seq - 1;
+
+            // Accept responses where the sequence number is either the current
+            // sequence number (ACK for the message we just sent) or the
+            // previous sequence number
+            if (ack_seq_num == current_seq || ack_seq_num == prev_seq)
             {
-                // The message we just sent was acknowledged, we can stop resending
-                // and waiting for a response
                 const auto now = std::chrono::steady_clock::now();
                 motor_status_.at(motor).last_message_ack_time = now;
 
@@ -278,7 +286,9 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
             }
         }
 
-        received_data.erase(received_data.begin(), std::next(delimiter_pos));
+        // Erase everything up to the start of the delimiter to look for the next
+        // potential message
+        received_data.erase(received_data.begin(), delimiter_pos);
     }
 
     LOG(WARNING) << "Motor " << motor << " did not acknowledge message (seq_num "
@@ -290,8 +300,12 @@ void StSpinMotorController::populateTx(const MotorIndex motor,
                                        const OutgoingMessage& outgoing_message,
                                        std::array<uint8_t, MESSAGE_SIZE>& tx)
 {
-    tx[0] = MESSAGE_DELIMITER;
-    tx[1] = motor_status_.at(motor).seq_num;
+    std::copy(MESSAGE_DELIMITER.begin(), MESSAGE_DELIMITER.end(), tx.begin());
+
+    constexpr size_t seq_index    = MESSAGE_DELIMITER.size();
+    constexpr size_t opcode_index = seq_index + 1;
+
+    tx[seq_index] = motor_status_.at(motor).seq_num;
 
     std::visit(
         [&]<typename TMessage>(TMessage&& message)
@@ -299,132 +313,155 @@ void StSpinMotorController::populateTx(const MotorIndex motor,
             using T = std::decay_t<TMessage>;
             if constexpr (std::is_same_v<T, NoOpMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::NO_OP);
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::NO_OP);
             }
             else if constexpr (std::is_same_v<T, SetTargetSpeedMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_SPEED);
-                tx[3] = static_cast<uint8_t>(message.motor_enabled);
-                tx[4] =
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_SPEED);
+                tx[opcode_index + 1] = static_cast<uint8_t>(message.motor_enabled);
+                tx[opcode_index + 2] =
                     static_cast<uint8_t>(0xFF & (message.motor_target_speed_rpm >> 8));
-                tx[5] = static_cast<uint8_t>(0xFF & message.motor_target_speed_rpm);
+                tx[opcode_index + 3] =
+                    static_cast<uint8_t>(0xFF & message.motor_target_speed_rpm);
             }
             else if constexpr (std::is_same_v<T, SetTargetTorqueMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_TORQUE);
-                tx[3] = static_cast<uint8_t>(message.motor_enabled);
-                tx[4] = static_cast<uint8_t>(0xFF & (message.motor_target_torque >> 8));
-                tx[5] = static_cast<uint8_t>(0xFF & message.motor_target_torque);
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_TORQUE);
+                tx[opcode_index + 1] = static_cast<uint8_t>(message.motor_enabled);
+                tx[opcode_index + 2] =
+                    static_cast<uint8_t>(0xFF & (message.motor_target_torque >> 8));
+                tx[opcode_index + 3] =
+                    static_cast<uint8_t>(0xFF & message.motor_target_torque);
             }
             else if constexpr (std::is_same_v<T, SetResponseTypeMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_RESPONSE_TYPE);
-                tx[3] = static_cast<uint8_t>(message.response_type);
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_RESPONSE_TYPE);
+                tx[opcode_index + 1] = static_cast<uint8_t>(message.response_type);
             }
             else if constexpr (std::is_same_v<T, SetPidTorqueKpKiMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_PID_TORQUE_KP_KI);
-                tx[3] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
-                tx[4] = static_cast<uint8_t>(0xFF & message.kp);
-                tx[5] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
-                tx[6] = static_cast<uint8_t>(0xFF & message.ki);
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_PID_TORQUE_KP_KI);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.kp);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.ki);
             }
             else if constexpr (std::is_same_v<T, SetPidFluxKpKiMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_PID_FLUX_KP_KI);
-                tx[3] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
-                tx[4] = static_cast<uint8_t>(0xFF & message.kp);
-                tx[5] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
-                tx[6] = static_cast<uint8_t>(0xFF & message.ki);
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_PID_FLUX_KP_KI);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.kp);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.ki);
             }
             else if constexpr (std::is_same_v<T, SetPidSpeedKpKiMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_PID_SPEED_KP_KI);
-                tx[3] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
-                tx[4] = static_cast<uint8_t>(0xFF & message.kp);
-                tx[5] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
-                tx[6] = static_cast<uint8_t>(0xFF & message.ki);
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_PID_SPEED_KP_KI);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.kp);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.ki);
             }
             else if constexpr (std::is_same_v<T, SetSpeedFeedForwardKaKvMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KA_KV);
-                tx[3] = static_cast<uint8_t>(0xFF & (message.ka >> 8));
-                tx[4] = static_cast<uint8_t>(0xFF & message.ka);
-                tx[5] = static_cast<uint8_t>(0xFF & (message.kv >> 8));
-                tx[6] = static_cast<uint8_t>(0xFF & message.kv);
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KA_KV);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.ka >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.ka);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.kv >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.kv);
             }
             else if constexpr (std::is_same_v<T, SetSpeedFeedForwardKsMessage>)
             {
-                tx[2] = static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KS);
-                tx[3] = static_cast<uint8_t>(0xFF & (message.ks >> 8));
-                tx[4] = static_cast<uint8_t>(0xFF & message.ks);
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KS);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.ks >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.ks);
             }
         },
         outgoing_message);
 
-    tx[7] = Crc8Autosar::calc(tx.data(), MESSAGE_SIZE - 1);
+    tx[MESSAGE_SIZE - 1] = Crc8Autosar::calc(tx.data(), MESSAGE_SIZE - 1);
 }
 
 void StSpinMotorController::processRx(const MotorIndex motor,
                                       const std::array<uint8_t, MESSAGE_SIZE>& rx)
 {
-    switch (static_cast<StSpinResponseType>(rx[2]))
+    const size_t opcode_index = MESSAGE_DELIMITER.size() + 1;
+
+    switch (static_cast<StSpinResponseType>(rx[opcode_index]))
     {
         case StSpinResponseType::SPEED_AND_FAULTS:
         {
             motor_status_[motor].speed =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             const uint16_t fault_flags =
-                static_cast<uint16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<uint16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                      rx[opcode_index + 4]);
             updateFaults(motor, fault_flags);
             break;
         }
         case StSpinResponseType::IQ_AND_ID:
         {
             motor_status_[motor].iq =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             motor_status_[motor].id =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
             break;
         }
         case StSpinResponseType::VQ_AND_VD:
         {
             motor_status_[motor].vq =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             motor_status_[motor].vd =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
             break;
         }
         case StSpinResponseType::PHASE_CURRENT_AND_VOLTAGE:
         {
             motor_status_[motor].phase_current =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             motor_status_[motor].phase_voltage =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
             break;
         }
         case StSpinResponseType::IQ_AND_IQ_REF:
         {
             motor_status_[motor].iq =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             motor_status_[motor].iq_ref =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
             break;
         }
         case StSpinResponseType::ID_AND_ID_REF:
         {
             motor_status_[motor].id =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             motor_status_[motor].id_ref =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
             break;
         }
         case StSpinResponseType::SPEED_AND_SPEED_REF:
         {
             motor_status_[motor].speed =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[3]) << 8) | rx[4]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
             motor_status_[motor].speed_ref =
-                static_cast<int16_t>((static_cast<uint16_t>(rx[5]) << 8) | rx[6]);
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
             break;
         }
     }
