@@ -169,4 +169,8 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("AUTO_CHIP_DISTANCE_DEFAULT_M")     = AUTO_CHIP_DISTANCE_DEFAULT_M;
     m.attr("AUTO_KICK_SPEED_DEFAULT_M_PER_S")  = AUTO_KICK_SPEED_DEFAULT_M_PER_S;
     m.attr("WHEEL_ROTATION_MAX_SPEED_M_PER_S") = WHEEL_ROTATION_MAX_SPEED_M_PER_S;
+
+    // Estop Arduino USB identifiers
+    m.attr("ARDUINO_VENDOR_ID")  = std::string(ARDUINO_VENDOR_ID);
+    m.attr("ARDUINO_PRODUCT_ID") = std::string(ARDUINO_PRODUCT_ID);
 }

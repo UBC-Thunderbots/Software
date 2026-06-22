@@ -190,7 +190,9 @@ py_library(
 py_library(
     name = "estop_helpers",
     srcs = ["estop_helpers.py"],
+    data = ["//software:py_constants.so"],
     deps = [
         "//software/thunderscope:constants",
+        requirement("pyserial"),
     ],
 )
