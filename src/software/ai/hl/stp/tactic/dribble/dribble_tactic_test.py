@@ -460,7 +460,7 @@ def test_robot_not_bumping_ball_when_turning(
             )
         )
 
-        dribble_params = DribbleTactic()
+        dribble_params = DribbleTactic(allow_excessive_dribbling=False)
         simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     eventually_validations = [
