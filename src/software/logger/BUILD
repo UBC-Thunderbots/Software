@@ -146,6 +146,7 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//shared:constants",
+        "//software/networking/udp:network_utils",
         "//software/networking/udp:threaded_udp_sender",
         "@g3log",
         "@protobuf//:json_util",

@@ -2,6 +2,15 @@
 
 #include <arpa/inet.h>
 
+std::string getLoopbackInterfaceName()
+{
+#ifdef __APPLE__
+    return "lo0";
+#else
+    return "lo";
+#endif
+}
+
 std::optional<std::string> getLocalIp(const std::string& interface, bool ipv4)
 {
     struct ifaddrs* ifAddrStruct = nullptr;
