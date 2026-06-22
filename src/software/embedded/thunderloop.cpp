@@ -139,7 +139,6 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
 #endif
 
     imu_service_ = std::make_unique<ImuService>();
-    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -160,14 +159,12 @@ Thunderloop::~Thunderloop() {}
  */
 void Thunderloop::runLoop()
 {
-    // Timing
+    // Timing local to the loop. Cross-iteration timing state lives in members
+    // (last_primitive_received_time_, last_chipper_fired_, last_kicker_fired_) so the
+    // stage helpers can read and update it without threading it through their signatures.
     struct timespec next_shot;
-    struct timespec poll_time;
     struct timespec iteration_time;
-    struct timespec last_primitive_received_time;
     struct timespec current_time;
-    struct timespec last_chipper_fired;
-    struct timespec last_kicker_fired;
     struct timespec prev_iter_start_time;
 
     // Loop interval
@@ -178,9 +175,9 @@ void Thunderloop::runLoop()
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
     // CLOCK_REALTIME can jump backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
-    clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
-    clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
-    clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
+    clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time_);
+    clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired_);
+    clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired_);
     clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
     // Initial version setup
@@ -220,35 +217,37 @@ void Thunderloop::runLoop()
 
             // Network Service: receive newest primitives and send out the last
             // robot status
-            processNetworkPolling(poll_time, last_primitive_received_time);
+            const NetworkPollResult network_result = pollNetwork();
 
             // Robot Localizer: fuse sensor measurements into a robot state estimate
             // and hand it to the primitive executor
-            processLocalizationUpdates();
+            updateLocalization();
 
-            // Primitive Executor: run the last primitive if we have not timed out
-            processPrimitiveExecution(poll_time, last_primitive_received_time,
-                                      delta_time);
+            // Primitive Executor: run the last primitive if we have not timed out,
+            // producing the control command for this iteration
+            const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time);
 
             // Chicker: track time since the last kick/chip event
-            updateChickerStatus(last_chipper_fired, last_kicker_fired);
+            const TbotsProto::ChipperKickerStatus chicker_status =
+                trackChicker(primitive_result.direct_control);
+
+            std::optional<double> motor_poll_time_ms;
+            std::optional<double> power_poll_time_ms;
 
 #ifndef DISABLE_MOTOR_SERVICE
             // Motor Service: execute the motor control command
-            pollMotorService(poll_time, time_since_prev_iter);
-            thunderloop_status_.set_motor_service_poll_time_ms(
-                getMilliseconds(poll_time));
+            motor_poll_time_ms = pollMotorService(primitive_result.direct_control,
+                                                  time_since_prev_iter);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
             // Power Service: execute the power control command
-            pollPowerService(poll_time);
-            thunderloop_status_.set_power_service_poll_time_ms(
-                getMilliseconds(poll_time));
+            power_poll_time_ms = pollPowerService(primitive_result.direct_control);
 #endif
 
-            // Robot Status: aggregate poll responses and broadcast
-            updateAndSendRobotStatus(primitive_.sequence_number());
+            // Robot Status: compose the per-stage results into the outgoing status
+            assembleRobotStatus(network_result, primitive_result, chicker_status,
+                                motor_poll_time_ms, power_poll_time_ms);
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -263,9 +262,10 @@ void Thunderloop::runLoop()
     }
 }
 
-inline void Thunderloop::processNetworkPolling(
-    struct timespec& poll_time, struct timespec& last_primitive_received_time)
+inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
 {
+    NetworkPollResult result;
+    struct timespec poll_time;
     struct timespec current_time;
     TbotsProto::Primitive new_primitive;
 
@@ -278,14 +278,14 @@ inline void Thunderloop::processNetworkPolling(
         new_primitive = network_service_->poll(robot_status_);
     }
 
-    thunderloop_status_.set_network_service_poll_time_ms(getMilliseconds(poll_time));
+    result.poll_time_ms = getMilliseconds(poll_time);
 
     // Update the time elapsed since the last received primitive
     struct timespec time_since_last_primitive_received;
     clock_gettime(CLOCK_MONOTONIC, &current_time);
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time,
+    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time_,
                                       &time_since_last_primitive_received);
-    network_status_.set_ms_since_last_primitive_received(
+    result.network_status.set_ms_since_last_primitive_received(
         getMilliseconds(time_since_last_primitive_received));
 
     // If the primitive msg is new, update the internal buffer and start the new
@@ -308,20 +308,22 @@ inline void Thunderloop::processNetworkPolling(
                 RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
         }
 
-        clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
+        clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time_);
 
         // Start new primitive
+        struct timespec start_time;
         {
-            ScopedTimespecTimer timer(&poll_time);
+            ScopedTimespecTimer timer(&start_time);
             primitive_executor_.updatePrimitive(primitive_);
         }
 
-        thunderloop_status_.set_primitive_executor_start_time_ms(
-            getMilliseconds(poll_time));
+        result.primitive_start_time_ms = getMilliseconds(start_time);
     }
+
+    return result;
 }
 
-inline void Thunderloop::processLocalizationUpdates()
+inline RobotState Thunderloop::updateLocalization()
 {
     const std::optional<ImuData> imu_poll = imu_service_->poll();
 
@@ -346,29 +348,33 @@ inline void Thunderloop::processLocalizationUpdates()
 
     // Step the localizer forward using the measured linear acceleration
     Vector linear_acceleration;
+
+#ifdef ENABLE_IMU_ACCEL
     if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
     {
         const auto accel    = imu_poll->linear_acceleration.value();
         linear_acceleration = Vector(accel[0], accel[1]);
     }
+#endif
 
     robot_localizer_.step(linear_acceleration);
 
     // Hand the fused state estimate to the primitive executor
-    primitive_executor_.updateState(RobotState(
+    return RobotState(
         robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
-        robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity()));
+        robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity());
 }
 
-inline void Thunderloop::processPrimitiveExecution(
-    struct timespec& poll_time, struct timespec& last_primitive_received_time,
+inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
     const Duration& delta_time)
 {
+    PrimitiveStepResult result;
+    struct timespec poll_time;
     struct timespec current_time;
     struct timespec time_since_last_primitive_received;
 
     clock_gettime(CLOCK_MONOTONIC, &current_time);
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time,
+    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time_,
                                       &time_since_last_primitive_received);
 
     {
@@ -385,61 +391,89 @@ inline void Thunderloop::processPrimitiveExecution(
             primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
         }
 
-        direct_control_ =
-            *primitive_executor_.stepPrimitive(primitive_executor_status_, delta_time);
+        result.direct_control =
+            *primitive_executor_.stepPrimitive(result.executor_status, delta_time);
     }
 
-    thunderloop_status_.set_primitive_executor_step_time_ms(getMilliseconds(poll_time));
+    result.step_time_ms = getMilliseconds(poll_time);
+
+    return result;
 }
 
-inline void Thunderloop::updateChickerStatus(struct timespec& last_chipper_fired,
-                                             struct timespec& last_kicker_fired)
+inline TbotsProto::ChipperKickerStatus Thunderloop::trackChicker(
+    const TbotsProto::DirectControlPrimitive& direct_control)
 {
+    TbotsProto::ChipperKickerStatus chicker_status;
     struct timespec current_time;
     struct timespec time_diff;
 
     clock_gettime(CLOCK_MONOTONIC, &current_time);
 
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired, &time_diff);
-    chipper_kicker_status_.set_ms_since_kicker_fired(getMilliseconds(time_diff));
+    ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired_, &time_diff);
+    chicker_status.set_ms_since_kicker_fired(getMilliseconds(time_diff));
 
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired, &time_diff);
-    chipper_kicker_status_.set_ms_since_chipper_fired(getMilliseconds(time_diff));
+    ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired_, &time_diff);
+    chicker_status.set_ms_since_chipper_fired(getMilliseconds(time_diff));
 
     // if a kick proto is sent or if autokick is on
-    if (direct_control_.power_control().chicker().has_kick_speed_m_per_s() ||
-        direct_control_.power_control()
+    if (direct_control.power_control().chicker().has_kick_speed_m_per_s() ||
+        direct_control.power_control()
             .chicker()
             .auto_chip_or_kick()
             .has_autokick_speed_m_per_s())
     {
-        clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
+        clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired_);
     }
     // if a chip proto is sent or if autochip is on
-    else if (direct_control_.power_control().chicker().has_chip_distance_meters() ||
-             direct_control_.power_control()
+    else if (direct_control.power_control().chicker().has_chip_distance_meters() ||
+             direct_control.power_control()
                  .chicker()
                  .auto_chip_or_kick()
                  .has_autochip_distance_meters())
     {
-        clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
+        clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired_);
     }
+
+    return chicker_status;
 }
 
-inline void Thunderloop::updateAndSendRobotStatus(uint64_t last_handled_primitive_set)
+inline void Thunderloop::assembleRobotStatus(
+    const NetworkPollResult& network, const PrimitiveStepResult& primitive,
+    const TbotsProto::ChipperKickerStatus& chicker_status,
+    std::optional<double> motor_poll_time_ms, std::optional<double> power_poll_time_ms)
 {
+    // Fold the per-stage timing into the sticky telemetry. Fields whose stage did not run
+    // this iteration (a new primitive start, a disabled service) keep their last value.
+    thunderloop_status_.set_network_service_poll_time_ms(network.poll_time_ms);
+    if (network.primitive_start_time_ms.has_value())
+    {
+        thunderloop_status_.set_primitive_executor_start_time_ms(
+            network.primitive_start_time_ms.value());
+    }
+    thunderloop_status_.set_primitive_executor_step_time_ms(primitive.step_time_ms);
+    if (motor_poll_time_ms.has_value())
+    {
+        thunderloop_status_.set_motor_service_poll_time_ms(motor_poll_time_ms.value());
+    }
+    if (power_poll_time_ms.has_value())
+    {
+        thunderloop_status_.set_power_service_poll_time_ms(power_poll_time_ms.value());
+    }
+
     struct timespec current_time;
     clock_gettime(CLOCK_MONOTONIC, &current_time);
-    time_sent_.set_epoch_timestamp_seconds(static_cast<double>(current_time.tv_sec));
+    TbotsProto::Timestamp time_sent;
+    time_sent.set_epoch_timestamp_seconds(static_cast<double>(current_time.tv_sec));
 
-    // Update Robot Status with poll responses
+    // Compose the outgoing status. Note: motor_status and power_status are written into
+    // robot_status_ directly by the motor/power services during their poll.
     robot_status_.set_robot_id(robot_id_);
-    robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
-    *(robot_status_.mutable_time_sent())                 = time_sent_;
+    robot_status_.set_last_handled_primitive_set(primitive_.sequence_number());
+    *(robot_status_.mutable_time_sent())                 = time_sent;
     *(robot_status_.mutable_thunderloop_status())        = thunderloop_status_;
-    *(robot_status_.mutable_network_status())            = network_status_;
-    *(robot_status_.mutable_chipper_kicker_status())     = chipper_kicker_status_;
-    *(robot_status_.mutable_primitive_executor_status()) = primitive_executor_status_;
+    *(robot_status_.mutable_network_status())            = network.network_status;
+    *(robot_status_.mutable_chipper_kicker_status())     = chicker_status;
+    *(robot_status_.mutable_primitive_executor_status()) = primitive.executor_status;
 
     updateErrorCodes();
 }
@@ -487,26 +521,38 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
-void Thunderloop::pollMotorService(struct timespec& poll_time,
-                                   const struct timespec& time_since_prev_iteration)
+double Thunderloop::pollMotorService(
+    const TbotsProto::DirectControlPrimitive& direct_control,
+    const struct timespec& time_since_prev_iteration)
 {
-    ScopedTimespecTimer timer(&poll_time);
+    struct timespec poll_time;
+    {
+        ScopedTimespecTimer timer(&poll_time);
 
-    ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
+        ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
 
-    double time_since_prev_iteration_s =
-        getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
+        double time_since_prev_iteration_s =
+            getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
 
-    motor_service_->poll(direct_control_, robot_status_, time_since_prev_iteration_s);
+        motor_service_->poll(direct_control, robot_status_, time_since_prev_iteration_s);
+    }
+
+    return getMilliseconds(poll_time);
 }
 
-void Thunderloop::pollPowerService(struct timespec& poll_time)
+double Thunderloop::pollPowerService(
+    const TbotsProto::DirectControlPrimitive& direct_control)
 {
-    ScopedTimespecTimer timer(&poll_time);
+    struct timespec poll_time;
+    {
+        ScopedTimespecTimer timer(&poll_time);
 
-    ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
+        ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
 
-    power_service_->poll(direct_control_, robot_status_);
+        power_service_->poll(direct_control, robot_status_);
+    }
+
+    return getMilliseconds(poll_time);
 }
 
 bool isPowerStable(std::ifstream& log_file)
