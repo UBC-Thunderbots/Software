@@ -1,0 +1,7 @@
+#!/bin/bash --norc
+
+# The prebuilt messense aarch64-unknown-linux-gnu toolchain ships only the BFD
+# linker (ld/ld.bfd) — no ld.gold. The shared cc_toolchain config adds
+# -fuse-ld=gold, so append -fuse-ld=bfd (last one wins) to use the linker that
+# actually exists. Ignored for non-link (compile) invocations.
+exec /opt/homebrew/Cellar/aarch64-unknown-linux-gnu/15.2.0/toolchain/bin/aarch64-unknown-linux-gnu-gcc "$@" -fuse-ld=bfd
