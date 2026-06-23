@@ -144,10 +144,6 @@ def bound_runner(session):
 def simulated_session(args, runtime_subpath):
     """Launches the simulator, blue/yellow full systems, and gamecontroller.
 
-    Sets up their ProtoUnixIOs and keeps the binaries alive for the duration of
-    the context. Used both per-test (simulated_test_runner) and once for the
-    whole session (test mode).
-
     :param args: Parsed command-line arguments.
     :param runtime_subpath: Subdirectory (under each runtime dir) for this session.
     :yields: A SessionContext with the live ProtoUnixIOs and gamecontroller.
@@ -211,10 +207,6 @@ def simulated_session(args, runtime_subpath):
 @contextlib.contextmanager
 def field_session(args, runtime_subpath):
     """Launches the friendly full system, gamecontroller, WiFi, and robot comms.
-
-    Sets up their ProtoUnixIOs, puts all robots under AI control, and keeps the
-    binaries alive for the duration of the context. Used both per-test
-    (field_test_runner) and once for the whole session (test mode).
 
     :param args: Parsed command-line arguments.
     :param runtime_subpath: Subdirectory (under each runtime dir) for this session.
@@ -297,9 +289,6 @@ def field_session(args, runtime_subpath):
 def wire_field_keyboard_estop(thunderscope, robot_communication, estop_mode):
     """Connects Thunderscope's keyboard estop shortcut to robot communication.
 
-    Only does anything in keyboard estop mode; enables the estop immediately so
-    a field test can start moving robots as soon as it runs.
-
     :param thunderscope: The Thunderscope instance.
     :param robot_communication: The RobotCommunication instance.
     :param estop_mode: The EstopMode in use.
@@ -340,8 +329,6 @@ def build_field_test_thunderscope(
     session, yellow_is_friendly, layout_path, extra_widgets=[]
 ):
     """Builds a Thunderscope with the field-test view bound to a session.
-
-    Also wires up the keyboard estop for the session's robot communication.
 
     :param session: the SessionContext whose ProtoUnixIOs to visualize.
     :param yellow_is_friendly: whether the friendly team is yellow.

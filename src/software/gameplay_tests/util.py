@@ -205,9 +205,7 @@ def pytest_main(file):
 def _file_has_gameplay_test(path: str) -> bool:
     """Returns whether a Python file defines a test using gameplay_test_runner.
 
-    Parses the file and looks for a test function (named test*) that requests the
-    gameplay_test_runner fixture as a parameter. Using the AST instead of a text
-    search avoids false positives and does not require importing the module.
+    Parses the file and looks for a test function with gameplay_test_runner as a parameter.
 
     :param path: absolute path to the Python file to inspect.
     :return: True if the file contains a gameplay_test_runner test.
@@ -235,10 +233,7 @@ def _file_has_gameplay_test(path: str) -> bool:
 def discover_tests() -> list[tuple[str, str]]:
     """Discovers gameplay tests from the workspace source tree.
 
-    Returns every test file containing a test that uses the gameplay_test_runner
-    fixture. Such tests run as both simulated and field tests, so the same list
-    is offered in either mode; the _field_test.py naming is only a convention
-    (typically simpler, fewer-robot tests) and is not used to filter.
+    Returns every test file containing a test that uses the gameplay_test_runner fixture.
 
     :return: list of (display_name, absolute_path) tuples, sorted by name.
     """

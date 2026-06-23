@@ -45,8 +45,6 @@ class TbotsTestRunner:
         self.gamecontroller = gamecontroller
         self.is_yellow_friendly = is_yellow_friendly
         self.owns_thunderscope = owns_thunderscope
-        # Optional Event used to stop the test loop early (set in test mode when
-        # the user selects another test to run). None when not bound.
         self.cancel_event = None
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
@@ -61,9 +59,6 @@ class TbotsTestRunner:
             buffer_size=1, protobuf_type=RobotStatus
         )
 
-        # Track every (proto_unix_io, proto_class, buffer) we register so that
-        # cleanup() can deregister them. This keeps long-lived ProtoUnixIOs
-        # (test mode) from accumulating dead buffers across runs.
         self._registered_observers = []
 
         self._register_observer(
@@ -196,6 +191,8 @@ class TbotsTestRunner:
         """
         self._pre_run_setup(setup)
 
+        threading.excepthook = self._excepthook
+
         args = (
             always_validation_sequence_set,
             eventually_validation_sequence_set,
@@ -203,13 +200,7 @@ class TbotsTestRunner:
             gc_cmd_with_delay,
         )
 
-        # When we own the Thunderscope, run the test loop on a background thread
-        # and block the main thread on the Qt event loop. When bound to an
-        # already-open Thunderscope (test mode), we are already off the main
-        # thread, so run the loop inline.
         if self.thunderscope and self.owns_thunderscope:
-            threading.excepthook = self._excepthook
-
             run_test_thread = threading.Thread(
                 target=self._runner, daemon=True, args=args
             )
