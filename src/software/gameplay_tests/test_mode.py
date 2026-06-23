@@ -1,4 +1,5 @@
 import argparse
+import ast
 import os
 from dataclasses import dataclass
 
@@ -125,14 +126,44 @@ def run_selected_test(session: TestModeSession, test_path: str) -> str:
     return collector.summary(exit_code)
 
 
-def discover_tests(run_field_test: bool) -> list[tuple[str, str]]:
-    """Discovers runnable gameplay tests from the workspace source tree.
+def _file_has_gameplay_test(path: str) -> bool:
+    """Returns whether a Python file defines a test using gameplay_test_runner.
 
-    Scans for test files that use the gameplay_test_runner fixture, returning
-    field tests (files ending in _field_test.py) in field mode and simulated
-    tests (other _test.py files) otherwise.
+    Parses the file and looks for a test function (named test*) that requests the
+    gameplay_test_runner fixture as a parameter. Using the AST instead of a text
+    search avoids false positives and does not require importing the module.
 
-    :param run_field_test: whether to list field tests instead of simulated tests.
+    :param path: absolute path to the Python file to inspect.
+    :return: True if the file contains a gameplay_test_runner test.
+    """
+    try:
+        with open(path) as test_file:
+            tree = ast.parse(test_file.read(), filename=path)
+    except (OSError, SyntaxError):
+        return False
+
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if not node.name.startswith("test"):
+            continue
+        arg_names = {
+            arg.arg
+            for arg in node.args.posonlyargs + node.args.args + node.args.kwonlyargs
+        }
+        if "gameplay_test_runner" in arg_names:
+            return True
+    return False
+
+
+def discover_tests() -> list[tuple[str, str]]:
+    """Discovers gameplay tests from the workspace source tree.
+
+    Returns every test file containing a test that uses the gameplay_test_runner
+    fixture. Such tests run as both simulated and field tests, so the same list
+    is offered in either mode; the _field_test.py naming is only a convention
+    (typically simpler, fewer-robot tests) and is not used to filter.
+
     :return: list of (display_name, absolute_path) tuples, sorted by name.
     """
     workspace = os.environ.get("BUILD_WORKSPACE_DIRECTORY")
@@ -146,18 +177,10 @@ def discover_tests(run_field_test: bool) -> list[tuple[str, str]]:
         for name in files:
             if not name.endswith("_test.py"):
                 continue
-            if name.endswith("_field_test.py") != run_field_test:
-                continue
 
             path = os.path.join(root, name)
-            try:
-                with open(path) as test_file:
-                    if "gameplay_test_runner" not in test_file.read():
-                        continue
-            except OSError:
-                continue
-
-            tests.append((os.path.relpath(path, software_dir), path))
+            if _file_has_gameplay_test(path):
+                tests.append((os.path.relpath(path, software_dir), path))
 
     return sorted(tests)
 
@@ -202,7 +225,7 @@ def launch_test_mode(main_args) -> None:
     :param main_args: parsed thunderscope_main command-line arguments.
     """
     args = _build_test_args(main_args)
-    tests = discover_tests(args.run_field_test)
+    tests = discover_tests()
 
     session_cm = (
         fixture.field_session(args, TEST_MODE_RUNTIME_SUBPATH)
