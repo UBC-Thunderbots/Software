@@ -45,6 +45,9 @@ class TbotsTestRunner:
         self.gamecontroller = gamecontroller
         self.is_yellow_friendly = is_yellow_friendly
         self.owns_thunderscope = owns_thunderscope
+        # Optional Event used to stop the test loop early (set in test mode when
+        # the user selects another test to run). None when not bound.
+        self.cancel_event = None
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=PrimitiveSet
@@ -110,6 +113,10 @@ class TbotsTestRunner:
         for proto_unix_io, proto_class, buffer in self._registered_observers:
             proto_unix_io.deregister_observer(proto_class, buffer)
         self._registered_observers = []
+
+    def _is_cancelled(self):
+        """Returns whether this test run has been asked to stop early."""
+        return self.cancel_event is not None and self.cancel_event.is_set()
 
     def send_gamecontroller_command(
         self,

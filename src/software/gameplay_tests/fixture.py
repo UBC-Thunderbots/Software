@@ -132,6 +132,8 @@ def bound_runner(session):
             owns_thunderscope=False,
         )
 
+    runner.cancel_event = session.cancel_event
+
     try:
         yield runner
     finally:

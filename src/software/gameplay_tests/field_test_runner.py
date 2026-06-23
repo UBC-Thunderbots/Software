@@ -82,7 +82,7 @@ class FieldTestRunner(TbotsTestRunner):
 
         time_elapsed_s = 0
 
-        while time_elapsed_s < test_timeout_s:
+        while time_elapsed_s < test_timeout_s and not self._is_cancelled():
             processing_start_time = time.time()
 
             # Check for new GC commands at this time step

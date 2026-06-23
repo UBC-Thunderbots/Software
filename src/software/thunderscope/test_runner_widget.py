@@ -15,33 +15,31 @@ from pyqtgraph.Qt.QtWidgets import (
 class TestRunnerWidget(QWidget):
     """A widget for selecting and running a gameplay test from within Thunderscope.
 
-    Displays a searchable list of discovered tests and a button to run the
-    selected one. The test is run on a background thread (so the Qt event loop
-    keeps running) via the ``run_callback`` provided at construction; the
-    callback's returned status string is reported back to the UI.
+    Displays a searchable list of discovered tests and a button to run the selected one.
     """
 
     __run_finished_signal = pyqtSignal(str)
-    """Emitted with the run's status string when a background run finishes.
-
-    Used to marshal the result back onto the main (Qt) thread.
-    """
+    """Carries a finished run's status string onto the main (Qt) thread."""
 
     def __init__(
         self,
         tests: list[tuple[str, str]],
         run_callback: Callable[[str], str],
+        cancel_callback: Callable[[], None],
     ) -> None:
         """Create the test runner widget.
 
         :param tests: list of (display_name, test_path) tuples to choose from
         :param run_callback: called on a background thread with the selected
             test's path; should run the test and return a status string to show
+        :param cancel_callback: called to signal an in-progress test to stop
         """
         super().__init__()
 
         self.tests = dict(tests)
         self.run_callback = run_callback
+        self.cancel_callback = cancel_callback
+        self.__run_thread = None
 
         self.search_query = QLineEdit()
         self.search_query.setPlaceholderText("Search tests")
@@ -62,7 +60,7 @@ class TestRunnerWidget(QWidget):
         layout.addWidget(self.status_label)
         self.setLayout(layout)
 
-        self.__run_finished_signal.connect(self.__handle_run_finished)
+        self.__run_finished_signal.connect(self.status_label.setText)
         self.__populate_test_list(search_term=None)
 
     def __populate_test_list(self, search_term: str | None) -> None:
@@ -83,28 +81,26 @@ class TestRunnerWidget(QWidget):
         self.__populate_test_list(search_term)
 
     def __run_selected_test(self) -> None:
-        """Run the currently selected test on a background thread.
-
-        Does nothing if no test is selected or a run is already in progress.
-        """
+        """Run the selected test, cancelling any test already in progress."""
         selected = self.test_list.currentItem()
-        if selected is None or not self.run_button.isEnabled():
+        if selected is None:
             return
 
         test_path = self.tests[selected.text()]
-        self.run_button.setEnabled(False)
         self.status_label.setText(f"Running {selected.text()}...")
 
+        # Signal any in-progress run to stop; the new run waits for it to finish.
+        self.cancel_callback()
+        previous_thread = self.__run_thread
+
         def run() -> None:
+            if previous_thread is not None:
+                previous_thread.join()
             status = self.run_callback(test_path)
-            self.__run_finished_signal.emit(status)
+            # Only report status if this is still the latest requested run, so a
+            # cancelled run does not overwrite the new run's status.
+            if threading.current_thread() is self.__run_thread:
+                self.__run_finished_signal.emit(status)
 
-        threading.Thread(target=run, daemon=True).start()
-
-    def __handle_run_finished(self, status: str) -> None:
-        """Report a finished run's status and re-enable the run button.
-
-        :param status: the status string returned by the run callback
-        """
-        self.status_label.setText(status)
-        self.run_button.setEnabled(True)
+        self.__run_thread = threading.Thread(target=run, daemon=True)
+        self.__run_thread.start()

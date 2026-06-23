@@ -1,5 +1,6 @@
 import argparse
-from dataclasses import dataclass
+import threading
+from dataclasses import dataclass, field
 
 import pytest
 
@@ -31,13 +32,27 @@ class TestModeSession:
     run_field_test: bool
     is_yellow_friendly: bool
     ci_mode: bool
+    cancel_event: threading.Event = field(default_factory=threading.Event)
+    """Set to ask the in-progress test to stop early so another can run"""
 
 
 class _ResultCollector:
     """A pytest plugin that records the pass/fail outcome of a run's tests."""
 
-    def __init__(self) -> None:
+    def __init__(self, cancel_event) -> None:
+        self.cancel_event = cancel_event
         self.outcomes = []
+
+    def pytest_runtest_setup(self, item) -> None:
+        """Abort the whole run (skipping remaining tests) once it is cancelled.
+
+        A single run executes every test in the file, so this stops the next
+        test from starting after the user has selected a different test to run.
+
+        :param item: the pytest test item about to be set up
+        """
+        if self.cancel_event.is_set():
+            pytest.exit("Test run cancelled", returncode=pytest.ExitCode.INTERRUPTED)
 
     def pytest_runtest_logreport(self, report) -> None:
         """Record the outcome of each test's call phase (and any setup failures).
@@ -100,7 +115,10 @@ def run_selected_test(session: TestModeSession, test_path: str) -> str:
     :return: a human-readable status string describing the outcome.
     """
     fixture.ACTIVE_SESSION = session
-    collector = _ResultCollector()
+    # Clear once per run (not per test in the file) so a cancel set during the
+    # run stops every remaining test, not just the current one.
+    session.cancel_event.clear()
+    collector = _ResultCollector(session.cancel_event)
     try:
         # Pass the fixture module as a plugin so gameplay_test_runner is available
         # regardless of where pytest resolves conftest.py for the source-tree test.
@@ -182,9 +200,14 @@ def launch_test_mode(main_args) -> None:
         def run_callback(test_path: str) -> str:
             return run_selected_test(session_holder["session"], test_path)
 
+        def cancel_callback() -> None:
+            session = session_holder.get("session")
+            if session is not None:
+                session.cancel_event.set()
+
         test_runner_widget = TScopeWidget(
             name="Test Runner",
-            widget=TestRunnerWidget(tests, run_callback),
+            widget=TestRunnerWidget(tests, run_callback, cancel_callback),
             anchor="Logs",
             position=WidgetPosition.ABOVE,
             has_refresh_func=False,
