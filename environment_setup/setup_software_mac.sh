@@ -76,6 +76,10 @@ print_status_msg "Setting up cross compiler for robot software"
 install_cross_compiler $sys
 print_status_msg "Done setting up cross compiler for robot software"
 
+print_status_msg "Setting up STM32 cross-compiler for motor board firmware"
+install_stm32_cross_compiler $sys
+print_status_msg "Done setting up STM32 cross-compiler"
+
 print_status_msg "Setting Up Python Development Headers"
 install_python_toolchain_headers
 print_status_msg "Done Setting Up Python Development Headers"
