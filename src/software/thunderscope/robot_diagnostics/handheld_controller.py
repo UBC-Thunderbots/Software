@@ -1,91 +1,94 @@
-import numpy
+import os
 
-# TODO: remove the try-catch when we rewrite this with macOS-compatible lib
-try:
-    from evdev import InputDevice, ecodes
-except ImportError:
-    pass
+# Suppress the pygame "Hello from the pygame community" banner on import
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
-from threading import Thread
+from pygame._sdl2 import controller
 
 
 class HandheldController:
-    """Represents a handheld game controller or input device that can be used
-    to manually control our robots.
+    """Represents a handheld game controller (e.g. an Xbox gamepad) that can be
+    used to manually control our robots.
+
+    Backed by SDL's game-controller API (via pygame), which recognizes
+    controllers through its controller database and exposes a standardized
+    button/axis layout. This means a recognized controller works the same way
+    across platforms (Linux, macOS), and callers can read inputs by their
+    semantic SDL constant (e.g. pygame.CONTROLLER_AXIS_LEFTX,
+    pygame.CONTROLLER_BUTTON_A).
     """
 
-    def __init__(self, path: str):
-        """Initialize a HandheldController that reads input events from
-        the specified device path.
+    # Raw SDL axis values span the signed 16-bit range; used to normalize the
+    # stick/trigger readings to [-1, 1] / [0, 1].
+    _AXIS_MAX_VALUE = 32767
 
-        :param path: the device input path
+    def __init__(self, controller_index: int):
+        """Open the game controller at the given SDL device index.
+
+        :param controller_index: the SDL device index of the controller
         """
-        self.input_device = InputDevice(path)
-        self.input_values: dict[int, float] = {}
+        self.controller = controller.Controller(controller_index)
 
-        capabilities = self.input_device.capabilities()
-        self.supported_keys = set(capabilities[ecodes.EV_KEY])
-        self.abs_info = dict(capabilities[ecodes.EV_ABS])
+    @classmethod
+    def detect(cls) -> "HandheldController | None":
+        """Scan the currently connected devices for a supported game controller.
 
-        self.thread = Thread(target=self.__read_input, daemon=True)
-        self.thread.start()
+        :return: a HandheldController for the first recognized controller, or
+            None if none is connected
+        """
+        controller.init()
+        # Poll mode: refresh state via update() instead of the SDL event queue,
+        # so no display / event subsystem is required (Thunderscope drives this
+        # widget by polling, and pygame's event pump needs a video system).
+        controller.set_eventstate(False)
+        controller.update()
+
+        for index in range(controller.get_count()):
+            if controller.is_controller(index):
+                return cls(index)
+
+        return None
 
     def name(self) -> str:
         """Get the device name of the controller.
 
         :return: the device name
         """
-        return self.input_device.name
+        return self.controller.name
 
     def connected(self) -> bool:
         """Check whether the controller is currently connected.
 
         :return: true if the controller is connected, false otherwise
         """
-        return self.input_device is not None
+        return self.controller.attached()
 
-    def key_down(self, key_code: int) -> bool:
-        """Check whether the given key on the controller is currently pressed down.
+    def update(self) -> None:
+        """Refresh the controller's input state.
 
-        :param key_code: the EV_KEY code of the key to check
-        :return: true if the key is currently pressed down, false otherwise
+        Must be called before reading input values, since we run SDL in poll
+        mode rather than consuming its event queue.
         """
-        if key_code not in self.supported_keys:
-            return False
+        controller.update()
 
-        return bool(self.input_values.get(key_code, 0))
+    def key_down(self, button: int) -> bool:
+        """Check whether the given button on the controller is currently pressed.
 
-    def abs_value(self, abs_code: int) -> float:
-        """Get the current value of an absolute axis input on the controller,
-        normalized to a range of [-1, 1].
-
-        :param abs_code: the EV_ABS code of the axis to check
-        :return: the value of the axis input, normalized to [-1, 1]
+        :param button: the pygame.CONTROLLER_BUTTON_* code of the button to check
+        :return: true if the button is currently pressed down, false otherwise
         """
-        if abs_code not in self.abs_info:
-            return 0
+        return bool(self.controller.get_button(button))
 
-        value_min = self.abs_info[abs_code].min
-        value_max = self.abs_info[abs_code].max
-        value = self.input_values.get(abs_code, 0)
+    def abs_value(self, axis: int) -> float:
+        """Get the current value of an axis input on the controller, normalized
+        to a range of [-1, 1] for sticks and [0, 1] for triggers.
 
-        if value >= 0:
-            return numpy.interp(value, (0, value_max), (0, 1))
-        else:
-            return numpy.interp(value, (value_min, 0), (-1, 0))
+        :param axis: the pygame.CONTROLLER_AXIS_* code of the axis to read
+        :return: the normalized value of the axis input
+        """
+        raw_value = self.controller.get_axis(axis)
+        return max(-1.0, min(1.0, raw_value / HandheldController._AXIS_MAX_VALUE))
 
     def close(self) -> None:
         """Close the connection to the controller."""
-        if self.input_device is not None:
-            self.input_values.clear()
-            self.input_device.close()
-            self.input_device = None
-
-    def __read_input(self) -> None:
-        """Endless loop that reads input events from the controller."""
-        try:
-            for event in self.input_device.read_loop():
-                if event.type == ecodes.EV_KEY or event.type == ecodes.EV_ABS:
-                    self.input_values[event.code] = event.value
-        except:
-            self.close()
+        self.controller.quit()
