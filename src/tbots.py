@@ -18,6 +18,7 @@ from cli.cli_params import (
     INTERACTIVE_STYLE,
     LAUNCH_MODE_CHOICES,
     PLAYBOOK_CHOICES,
+    TEST_TYPE_CHOICES,
     THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
     ActionArgument,
     AnsiblePlaybook,
@@ -30,10 +31,12 @@ from cli.cli_params import (
     NoOptimizedBuildOption,
     PrintCommandOption,
     RobotName,
+    RunFieldTestOption,
     RunsOption,
     SelectDebugBinariesOption,
     SSHPasswordOption,
     StopAIOnStartOption,
+    TestModeOption,
     TestSuiteOption,
     TracyOption,
 )
@@ -56,6 +59,8 @@ class BuildConfig:
     test_suite: bool = False
     enable_thunderscope: bool = False
     stop_ai_on_start: bool = False
+    test_mode: bool = False
+    run_field_test: bool = False
     jobs_option: str | None = None
     runs: int | None = None
     robot_name: str | None = None
@@ -94,6 +99,8 @@ def main(
     test_suite: TestSuiteOption = False,
     enable_thunderscope: EnableThunderscopeOption = False,
     stop_ai_on_start: StopAIOnStartOption = False,
+    test_mode: TestModeOption = False,
+    run_field_test: RunFieldTestOption = False,
     jobs_option: JobsOption = None,
     runs: RunsOption = None,
     robot_name: RobotName = None,
@@ -120,6 +127,8 @@ def main(
     :param test_suite: run the entire test suite instead of a single target
     :param enable_thunderscope: launch with Thunderscope enabled
     :param stop_ai_on_start: start the binary with the AI paused
+    :param test_mode: launch Thunderscope with a widget to select and run gameplay tests
+    :param run_field_test: in test mode, run field tests instead of simulated tests
     :param jobs_option: value passed to Bazel's --jobs flag
     :param runs: value passed to Bazel's --runs_per_test flag
     :param robot_name: hostname of the robot targeted by an Ansible playbook
@@ -142,6 +151,8 @@ def main(
         test_suite=test_suite,
         enable_thunderscope=enable_thunderscope,
         stop_ai_on_start=stop_ai_on_start,
+        test_mode=test_mode,
+        run_field_test=run_field_test,
         jobs_option=jobs_option,
         runs=runs,
         robot_name=robot_name,
@@ -240,6 +251,10 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         runtime_args.append("--stop_ai_on_start")
     if config.enable_thunderscope:
         runtime_args.append("--enable_thunderscope")
+    if config.test_mode:
+        runtime_args.append("--test_mode")
+    if config.run_field_test:
+        runtime_args.append("--run_field_test")
 
     if config.ansible_playbook:
         runtime_args += [
@@ -336,11 +351,23 @@ def start_interactive_cli():
                             style=INTERACTIVE_STYLE,
                         ).ask()
                         extra_args.extend([time])
-            else:
+            elif launch == "Diagnostics":
                 iface = questionary.text(
                     "Network interface?", style=INTERACTIVE_STYLE
                 ).ask()
                 extra_args.extend(["--run_diagnostics", "--interface", iface])
+            elif launch == "Tests":
+                extra_args.append("--test_mode")
+                test_type = questionary.select(
+                    "Test type?",
+                    choices=TEST_TYPE_CHOICES,
+                    style=INTERACTIVE_STYLE,
+                ).ask()
+                if test_type == "Field tests":
+                    iface = questionary.text(
+                        "Network interface?", style=INTERACTIVE_STYLE
+                    ).ask()
+                    extra_args.extend(["--run_field_test", "--interface", iface])
 
         case "Test":
             config.action = ActionArgument.test
