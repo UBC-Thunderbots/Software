@@ -80,31 +80,41 @@ class TbotsProtobufTest : public ::testing::Test
         ASSERT_NEAR(traj_path_nodes_1[0].getTrajectoryEndTime(),
                     traj_path_nodes_2[0].getTrajectoryEndTime(), 0.000001);
 
+        // The proto round-trip stores some params (sub-trajectory connection times,
+        // points) as floats, so the regenerated trajectory differs from the reference by
+        // float round-trip error - more visible at higher accelerations. Compare within a
+        // small tolerance rather than exactly (the end-time check above does the same for
+        // the same reason).
+        constexpr double TOLERANCE = 1e-4;
         for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
-            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getPosition(0.0),
-                      traj_path_nodes_2[i].getTrajectory()->getPosition(0.0))
+            EXPECT_TRUE(TestUtil::equalWithinTolerance(
+                traj_path_nodes_1[i].getTrajectory()->getPosition(0.0),
+                traj_path_nodes_2[i].getTrajectory()->getPosition(0.0), TOLERANCE))
                 << " Position at index " << i << " is not equal";
         }
 
         for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
-            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getVelocity(0.0),
-                      traj_path_nodes_2[i].getTrajectory()->getVelocity(0.0))
+            EXPECT_TRUE(TestUtil::equalWithinTolerance(
+                traj_path_nodes_1[i].getTrajectory()->getVelocity(0.0),
+                traj_path_nodes_2[i].getTrajectory()->getVelocity(0.0), TOLERANCE))
                 << " Velocity at index " << i << " is not equal";
         }
 
         for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
-            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getAcceleration(0.0),
-                      traj_path_nodes_2[i].getTrajectory()->getAcceleration(0.0))
+            EXPECT_TRUE(TestUtil::equalWithinTolerance(
+                traj_path_nodes_1[i].getTrajectory()->getAcceleration(0.0),
+                traj_path_nodes_2[i].getTrajectory()->getAcceleration(0.0), TOLERANCE))
                 << " Acceleration at index " << i << " is not equal";
         }
 
         for (std::size_t i = 0; i < traj_path_nodes_1.size(); i++)
         {
-            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getDestination(),
-                      traj_path_nodes_2[i].getTrajectory()->getDestination())
+            EXPECT_TRUE(TestUtil::equalWithinTolerance(
+                traj_path_nodes_1[i].getTrajectory()->getDestination(),
+                traj_path_nodes_2[i].getTrajectory()->getDestination(), TOLERANCE))
                 << " Destination at index " << i << " is not equal";
         }
     }
@@ -166,9 +176,12 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
                                                                    robot_constants);
-    KinematicConstraints constraints(max_speed,
-                                     robot_constants.robot_max_acceleration_m_per_s_2,
-                                     robot_constants.robot_max_deceleration_m_per_s_2);
+    // Must match the constraints createTrajectoryPathFromParams() uses (the trajectory
+    // planner limits, which are intentionally lower than the physical limits to leave
+    // headroom for the PID), otherwise the reference and converted trajectories differ.
+    KinematicConstraints constraints(
+        max_speed, robot_constants.robot_trajectory_max_acceleration_m_per_s_2,
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
 
     Point initial_destination = destination;
     if (!sub_destinations.empty())

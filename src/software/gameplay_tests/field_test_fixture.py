@@ -389,18 +389,9 @@ def load_command_line_arguments():
 def print_proto_log_replay_command(runtime_dir, friendly_colour_yellow):
     """Print the path to the saved proto log and the command to replay it.
 
-    The full_system binary prints this on a clean shutdown, but field tests
-    don't reliably surface that message (especially when the test fails), so we
-    print it here too. This matches the behaviour of AI vs AI and simulated
-    tests, which always tell you where the proto log was saved.
-
     :param runtime_dir: The full_system runtime directory the proto log was saved under
     :param friendly_colour_yellow: True if the friendly team is yellow, else blue
     """
-    # The full_system ProtoLogger saves logs to a "proto_<timestamp>" subdirectory
-    # of the runtime directory (see software/logger/proto_logger.cpp). The folder is
-    # created shortly after full_system launches, so wait briefly for it to appear in
-    # case we're called early (the up-front call before the test starts).
     proto_log_folders = []
     wait_until = time.time() + 3.0
     while time.time() < wait_until:
@@ -532,15 +523,6 @@ def field_test_runner():
         friendly_proto_unix_io.register_observer(World, runner.world_buffer)
 
         # Print the proto log path up front, before the test's blocking Thunderscope
-        # Qt event loop starts. Field tests are usually exited with Ctrl+C while that
-        # loop is running, which bypasses pytest fixture teardown, so printing here
-        # guarantees the path is shown no matter how the test is exited.
+        # Qt event loop starts.
         print_proto_log_replay_command(runtime_dir, args.run_yellow)
-
-        try:
-            yield runner
-        finally:
-            # Also print on teardown so the path is the last thing shown on a clean
-            # exit (closing Thunderscope) or a test failure (when pytest throws the
-            # failure into the fixture at yield).
-            print_proto_log_replay_command(runtime_dir, args.run_yellow)
+        yield runner

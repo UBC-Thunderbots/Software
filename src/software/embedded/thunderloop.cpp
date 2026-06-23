@@ -221,7 +221,7 @@ void Thunderloop::runLoop()
 
             // Robot Localizer: fuse sensor measurements into a robot state estimate
             // and hand it to the primitive executor
-            updateLocalization();
+            primitive_executor_.updateState(updateLocalization());
 
             // Primitive Executor: run the last primitive if we have not timed out,
             // producing the control command for this iteration
@@ -236,8 +236,8 @@ void Thunderloop::runLoop()
 
 #ifndef DISABLE_MOTOR_SERVICE
             // Motor Service: execute the motor control command
-            motor_poll_time_ms = pollMotorService(primitive_result.direct_control,
-                                                  time_since_prev_iter);
+            motor_poll_time_ms =
+                pollMotorService(primitive_result.direct_control, time_since_prev_iter);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
@@ -360,9 +360,9 @@ inline RobotState Thunderloop::updateLocalization()
     robot_localizer_.step(linear_acceleration);
 
     // Hand the fused state estimate to the primitive executor
-    return RobotState(
-        robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
-        robot_localizer_.getOrientation(), robot_localizer_.getAngularVelocity());
+    return RobotState(robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
+                      robot_localizer_.getOrientation(),
+                      robot_localizer_.getAngularVelocity());
 }
 
 inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(

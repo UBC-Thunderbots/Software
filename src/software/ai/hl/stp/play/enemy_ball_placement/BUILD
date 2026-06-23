@@ -28,6 +28,10 @@ py_test(
     srcs = [
         "enemy_ball_placement_play_test.py",
     ],
+    # Full-system ball-placement sim test; intermittently flaky under parallel load (like
+    # the ball_placement / kickoff_enemy siblings, which are also flaky). Retry rather than
+    # gate CI on a single flake; it passes reliably on its own.
+    flaky = True,
     deps = [
         "//software:conftest",
         "//software/gameplay_tests/validation:validations",

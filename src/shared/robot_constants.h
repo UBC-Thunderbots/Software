@@ -92,13 +92,10 @@ struct RobotConstants
     // move at, while still leaving headroom for the PID to apply correction on lag. [m/s]
     float robot_trajectory_max_speed_m_per_s;
 
-    // The maximum acceleration physically achievable by our robots [m/s^2]. Used to
-    // clamp the velocity we command (trajectory velocity + PID correction) so we never
-    // ask for more than the robot can physically do.
+    // The maximum acceleration physically achievable by our robots [m/s^2].
     float robot_max_acceleration_m_per_s_2;
 
-    // The maximum deceleration (brake) physically achievable by our robots [m/s^2]. Used
-    // to clamp the velocity we command (trajectory velocity + PID correction).
+    // The maximum deceleration (brake) physically achievable by our robots [m/s^2].
     float robot_max_deceleration_m_per_s_2;
 
     // The maximum acceleration the trajectory planner is allowed to use when generating
@@ -167,18 +164,18 @@ constexpr RobotConstants createRobotConstants()
         .indefinite_dribbler_speed_rpm = -10000,
         .max_force_dribbler_speed_rpm  = -12000,
 
-        // Motor constant// Motor constant
-        .motor_max_acceleration_m_per_s_2 = 32.0f,
+        // Motor constant
+        .motor_max_acceleration_m_per_s_2 = 2.0f,
 
         // Robot's linear movement constants
-        .robot_max_speed_m_per_s                     = 10.0f,
-        .robot_trajectory_max_speed_m_per_s          = 6.0f,
+        .robot_max_speed_m_per_s            = 3.0f,
+        .robot_trajectory_max_speed_m_per_s = 2.5f,
 
-        .robot_max_acceleration_m_per_s_2            = 16.0f,
-        .robot_max_deceleration_m_per_s_2            = 16.0f,
+        .robot_max_acceleration_m_per_s_2 = 4.5f,
+        .robot_max_deceleration_m_per_s_2 = 3.0f,
 
-        .robot_trajectory_max_acceleration_m_per_s_2 = 10.0f,
-        .robot_trajectory_max_deceleration_m_per_s_2 = 6.0f,
+        .robot_trajectory_max_acceleration_m_per_s_2 = 3.0f,
+        .robot_trajectory_max_deceleration_m_per_s_2 = 2.0f,
 
         // Robot's angular movement constants
         .robot_max_ang_speed_rad_per_s            = 10.0f,

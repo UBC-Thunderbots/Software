@@ -68,9 +68,6 @@ class Thunderloop
     std::unique_ptr<TomlConfigClient> toml_config_client_;
 
    private:
-    // Each loop stage returns its contribution to the outgoing RobotStatus instead of
-    // mutating shared member buffers. assembleRobotStatus() is the single place that
-    // composes these into robot_status_, so every output proto has one obvious producer.
     struct NetworkPollResult
     {
         TbotsProto::NetworkStatus network_status;
@@ -156,7 +153,8 @@ class Thunderloop
     inline NetworkPollResult pollNetwork();
 
     /**
-     * Fuses sensor measurements (IMU, motors) into a robot state estimate and returns current Robot State.
+     * Fuses sensor measurements (IMU, motors) into a robot state estimate and returns
+     * current Robot State.
      * @return The kinematic state of the robot in the world
      */
     inline RobotState updateLocalization();
@@ -198,17 +196,12 @@ class Thunderloop
                                     std::optional<double> power_poll_time_ms);
 
 
-    // The current primitive being executed. Persists across iterations; only replaced
-    // when a newer primitive arrives over the network.
+    // The current primitive being executed.
     TbotsProto::Primitive primitive_;
 
-    // The outgoing robot status. Persists across iterations because the network service
-    // sends the copy assembled on the previous iteration. The motor and power services
-    // write their status into it directly; assembleRobotStatus() fills in the rest.
+    // The outgoing robot status.
     TbotsProto::RobotStatus robot_status_;
 
-    // Sticky timing telemetry. Written only by assembleRobotStatus() (poll times) and the
-    // end of runLoop() (iteration time); fields retain their last value between updates.
     TbotsProto::ThunderloopStatus thunderloop_status_;
 
     // Current State
