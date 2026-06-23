@@ -1,11 +1,10 @@
-import numpy
+import os
 
-# TODO: remove the try-catch when we rewrite this with macOS-compatible lib
-try:
-    import evdev
-    from evdev import ecodes
-except ImportError:
-    pass
+# Suppress the pygame "Hello from the pygame community" banner on import
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
+import numpy
+import pygame
 
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtWidgets import *
@@ -58,18 +57,11 @@ class HandheldControllerWidget(QWidget):
         self.detect_controller()
 
     def detect_controller(self) -> None:
-        """Scan through the list of currently connected devices for a supported
-        handheld controller and, if one is found, set it as the device to accept
+        """Scan the currently connected devices for a supported handheld
+        controller and, if one is found, set it as the device to accept
         controller inputs from.
         """
-        self.handheld_controller = None
-
-        for path in evdev.list_devices():
-            device = evdev.InputDevice(path)
-            if device.name in DiagnosticsConstants.SUPPORTED_CONTROLLERS:
-                self.handheld_controller = HandheldController(path)
-                break
-
+        self.handheld_controller = HandheldController.detect()
         self.__update_controller_status()
 
     def controller_input_enabled(self) -> bool:
@@ -83,7 +75,12 @@ class HandheldControllerWidget(QWidget):
         if self.handheld_controller is None:
             return
 
+        # Refresh the controller's input state before reading from it or
+        # checking whether it is still connected
+        self.handheld_controller.update()
+
         if not self.handheld_controller.connected():
+            self.handheld_controller.close()
             self.handheld_controller = None
             self.__update_controller_status()
             return
@@ -134,11 +131,19 @@ class HandheldControllerWidget(QWidget):
                 else 0
             )
 
-        move_axis_x = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_Y))
-        move_axis_y = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_X))
-        move_axis_rot = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_RX))
+        move_axis_x = with_deadzone(
+            self.handheld_controller.abs_value(pygame.CONTROLLER_AXIS_LEFTY)
+        )
+        move_axis_y = with_deadzone(
+            self.handheld_controller.abs_value(pygame.CONTROLLER_AXIS_LEFTX)
+        )
+        move_axis_rot = with_deadzone(
+            self.handheld_controller.abs_value(pygame.CONTROLLER_AXIS_RIGHTX)
+        )
 
-        left_trigger_value = self.handheld_controller.abs_value(ecodes.ABS_Z)
+        left_trigger_value = self.handheld_controller.abs_value(
+            pygame.CONTROLLER_AXIS_TRIGGERLEFT
+        )
         speed_factor = (
             DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR
             if left_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
@@ -155,8 +160,14 @@ class HandheldControllerWidget(QWidget):
             -move_axis_rot * self.constants.robot_max_ang_speed_rad_per_s * speed_factor
         )
 
-        d_pad_axis_x = self.handheld_controller.abs_value(ecodes.ABS_HAT0X)
-        d_pad_axis_y = self.handheld_controller.abs_value(ecodes.ABS_HAT0Y)
+        # SDL exposes the D-pad as four buttons; synthesize hat axis values
+        # (right/down = +1, left/up = -1) to match the previous behaviour.
+        d_pad_axis_x = self.handheld_controller.key_down(
+            pygame.CONTROLLER_BUTTON_DPAD_RIGHT
+        ) - self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_DPAD_LEFT)
+        d_pad_axis_y = self.handheld_controller.key_down(
+            pygame.CONTROLLER_BUTTON_DPAD_DOWN
+        ) - self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_DPAD_UP)
 
         if d_pad_axis_x != self.last_d_pad_axis_x_value:
             self.last_d_pad_axis_x_value = d_pad_axis_x
@@ -184,15 +195,17 @@ class HandheldControllerWidget(QWidget):
                 )
             )
 
-        right_trigger_value = self.handheld_controller.abs_value(ecodes.ABS_RZ)
+        right_trigger_value = self.handheld_controller.abs_value(
+            pygame.CONTROLLER_AXIS_TRIGGERRIGHT
+        )
         self.motor_control.dribbler_speed_rpm = (
             self.dribbler_speed
             if right_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
             else 0
         )
 
-        btn_a = self.handheld_controller.key_down(ecodes.BTN_A)
-        btn_b = self.handheld_controller.key_down(ecodes.BTN_B)
+        btn_a = self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_A)
+        btn_b = self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_B)
 
         if btn_a != self.last_btn_a_value:
             self.last_btn_a_value = btn_a
