@@ -111,8 +111,7 @@ cc_test(
 cc_test(
     name = "last_in_first_out_threaded_observer_test",
     srcs = ["last_in_first_out_threaded_observer_test.cpp"],
-    # Flaky: the received-value-ordering assertions depend on thread scheduling, so a
-    # race can occasionally swap adjacent values. Retry rather than fail CI.
+    # Run the test up to 3 times if it fails
     flaky = True,
     deps = [
         ":threaded_observer",

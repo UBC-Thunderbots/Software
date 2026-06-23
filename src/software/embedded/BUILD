@@ -2,9 +2,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
-# When enabled, compiles Thunderloop with the DISABLE_POWER_SERVICE flag, which
-# skips initializing and polling the PowerService so Thunderloop can be run on a
-# robot without a functioning powerboard.
 bool_flag(
     name = "disable_power_service",
     build_setting_default = False,
@@ -17,9 +14,6 @@ config_setting(
     },
 )
 
-# When enabled, compiles Thunderloop with the DISABLE_MOTOR_SERVICE flag, which
-# skips initializing and polling the MotorService so Thunderloop can be run on a
-# robot without a functioning motorboard.
 bool_flag(
     name = "disable_motor_service",
     build_setting_default = False,

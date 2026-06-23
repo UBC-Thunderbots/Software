@@ -374,19 +374,13 @@ def start_interactive_cli():
                 choices=PLAYBOOK_CHOICES,
                 style=INTERACTIVE_STYLE,
             ).ask()
-            # The DEBUG_POWERLOOP entry reuses the deploy_powerboard playbook but
-            # compiles powerloop_main with the DEBUG_POWERLOOP flag, swapping in
-            # the bare setup()/loop() stubs so arbitrary code can be flashed onto
-            # the powerboard microcontroller for debugging.
+
             if playbook_choice == DEBUG_POWERLOOP_PLAYBOOK:
                 config.ansible_playbook = "deploy_powerboard.yml"
                 config.debug_powerloop = True
             else:
                 config.ansible_playbook = playbook_choice
-            # The deploy_robot_software playbook can compile Thunderloop with
-            # services disabled so it can run on a robot missing a powerboard or
-            # motorboard. Each selected option maps to a Bazel flag that defines
-            # the matching preprocessor macro in thunderloop.cpp.
+
             if config.ansible_playbook == "deploy_robot_software.yml":
                 selected = (
                     questionary.checkbox(

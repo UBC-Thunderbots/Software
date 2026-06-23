@@ -522,7 +522,6 @@ def field_test_runner():
 
         friendly_proto_unix_io.register_observer(World, runner.world_buffer)
 
-        # Print the proto log path up front, before the test's blocking Thunderscope
-        # Qt event loop starts.
+        # Print the proto log path up front, before the test's blocking Thunderscope Qt event loop starts.
         print_proto_log_replay_command(runtime_dir, args.run_yellow)
         yield runner

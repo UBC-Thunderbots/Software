@@ -58,19 +58,6 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
         std::min(target_v_global.length(),
                  static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 
-    // The trajectory's own velocity is acceleration-bounded, but the PID correction and
-    // per-tick trajectory regeneration are added on top, so the emitted command must be
-    // re-limited here to the robot's kinematic acceleration limit. Otherwise, the
-    // commanded velocity can step far more than robot_max_acceleration * delta_time per
-    // tick, asking the robot to accelerate well beyond what it (and the motors/SPI) can
-    // sustain.
-    //
-    // The limit applies to the robot's translational (global-frame) velocity. Measuring
-    // the change in the rotating body frame (i.e. after globalToLocalVelocity) would add
-    // the v*omega term from the body frame spinning, which falsely trips the limit
-    // whenever the robot translates while rotating even though its global motion is
-    // within limits. So clamp the change in global velocity, relative to the previous
-    // commanded (not measured) velocity.
     const Vector velocity_delta = target_v_global - prev_target_global_velocity_;
     const double max_velocity_delta =
         robot_constants_.robot_max_acceleration_m_per_s_2 * delta_time.toSeconds();
@@ -95,11 +82,6 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
     const double clamped_w = std::clamp(target_w.toRadians(), -max_speed, max_speed);
     target_w               = AngularVelocity::fromRadians(clamped_w);
 
-    // Re-limit the commanded angular velocity to the robot's angular acceleration limit,
-    // for the same reason as the translational clamp above: the feedforward trajectory is
-    // acceleration-bounded, but the PID correction and per-tick regeneration are added on
-    // top, so the emitted command can step more than robot_max_ang_acceleration *
-    // delta_time per tick.
     const double max_angular_velocity_delta =
         robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_time.toSeconds();
     const double angular_velocity_delta =
