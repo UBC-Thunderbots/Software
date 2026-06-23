@@ -33,10 +33,9 @@ class TestModeSession:
     is_yellow_friendly: bool
     ci_mode: bool
     cancel_event: threading.Event = field(default_factory=threading.Event)
-    """Set to ask the in-progress test to stop early so another can run"""
 
 
-class _ResultCollector:
+class ResultCollector:
     """A pytest plugin that records the pass/fail outcome of a run's tests."""
 
     def __init__(self, cancel_event) -> None:
@@ -79,36 +78,8 @@ class _ResultCollector:
         return f"{status}: {passed}/{total} passed"
 
 
-def _reset_session_state(session: TestModeSession) -> None:
-    """Halts the AI and clears tactic overrides between runs.
-
-    Keeps each run hermetic and, for field tests, stops the robots once a test
-    finishes.
-
-    :param session: the active TestModeSession.
-    """
-    context = session.context
-    try:
-        context.gamecontroller.send_gc_command(
-            gc_command=Command.Type.HALT, team=Team.UNKNOWN
-        )
-        empty_tactics = AssignedTacticPlayControlParams()
-        context.blue_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, empty_tactics
-        )
-        context.yellow_full_system_proto_unix_io.send_proto(
-            AssignedTacticPlayControlParams, empty_tactics
-        )
-    except Exception as exception:
-        logger.warning(f"Failed to reset state after test: {exception}")
-
-
 def run_selected_test(session: TestModeSession, test_path: str) -> str:
     """Runs a single gameplay test bound to the given session.
-
-    Sets fixture.ACTIVE_SESSION so the gameplay_test_runner fixture binds the
-    test to the open Thunderscope, runs the test in-process with pytest, then
-    clears the session and resets state.
 
     :param session: the active TestModeSession.
     :param test_path: absolute path to the test file to run.
@@ -118,7 +89,7 @@ def run_selected_test(session: TestModeSession, test_path: str) -> str:
     # Clear once per run (not per test in the file) so a cancel set during the
     # run stops every remaining test, not just the current one.
     session.cancel_event.clear()
-    collector = _ResultCollector(session.cancel_event)
+    collector = ResultCollector(session.cancel_event)
     try:
         # Pass the fixture module as a plugin so gameplay_test_runner is available
         # regardless of where pytest resolves conftest.py for the source-tree test.
@@ -135,7 +106,6 @@ def run_selected_test(session: TestModeSession, test_path: str) -> str:
         )
     finally:
         fixture.ACTIVE_SESSION = None
-        _reset_session_state(session)
     return collector.summary(exit_code)
 
 
@@ -172,10 +142,6 @@ def _build_test_args(main_args) -> argparse.Namespace:
 def launch_test_mode(main_args) -> None:
     """Launches Thunderscope in test mode and runs the Qt event loop.
 
-    Starts the gameplay-test binaries once, builds a Thunderscope view with the
-    Test Runner widget, and keeps everything alive so that tests selected in the
-    widget run against the already-open Thunderscope.
-
     :param main_args: parsed thunderscope_main command-line arguments.
     """
     args = _build_test_args(main_args)
@@ -188,22 +154,16 @@ def launch_test_mode(main_args) -> None:
     )
 
     with session_cm as context:
-        # Must construct the QApplication before any QWidget (the Test Runner
-        # widget) is created. configure_*_view calls this again, but it is
-        # idempotent.
+        # Must construct the QApplication before any QWidget
         initialize_application()
 
-        # Holds the session so the run callback can reach it; the session is only
-        # created after the Thunderscope (which needs the widget) exists.
-        session_holder = {}
+        session = None
 
         def run_callback(test_path: str) -> str:
-            return run_selected_test(session_holder["session"], test_path)
+            return run_selected_test(session, test_path)
 
         def cancel_callback() -> None:
-            session = session_holder.get("session")
-            if session is not None:
-                session.cancel_event.set()
+            session.cancel_event.set()
 
         test_runner_widget = TScopeWidget(
             name="Test Runner",
@@ -225,7 +185,7 @@ def launch_test_mode(main_args) -> None:
                 context, main_args.layout, extra_widgets=[test_runner_widget]
             )
 
-        session_holder["session"] = TestModeSession(
+        session = TestModeSession(
             context=context,
             thunderscope=thunderscope,
             run_field_test=args.run_field_test,
