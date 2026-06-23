@@ -105,7 +105,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         help="Debug yellow full_system",
     )
     general_group.add_argument(
-        "--show_gamecontroller_logs",
+        "--verbose",
         action="store_true",
         default=False,
         help="Show gamecontroller logs",

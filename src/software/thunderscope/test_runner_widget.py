@@ -19,7 +19,6 @@ class TestRunnerWidget(QWidget):
     """
 
     __run_finished_signal = pyqtSignal(str)
-    """Carries a finished run's status string onto the main (Qt) thread."""
 
     def __init__(
         self,

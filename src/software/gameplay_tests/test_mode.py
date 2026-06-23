@@ -1,4 +1,4 @@
-import argparse
+import copy
 import threading
 from dataclasses import dataclass, field
 
@@ -16,7 +16,6 @@ from software.thunderscope.thunderscope_types import TScopeWidget, WidgetPositio
 logger = create_logger(__name__)
 
 TEST_MODE_RUNTIME_SUBPATH = "test_mode"
-"""Fixed runtime subdirectory used for the long-lived test-mode binaries"""
 
 
 @dataclass
@@ -109,42 +108,14 @@ def run_selected_test(session: TestModeSession, test_path: str) -> str:
     return collector.summary(exit_code)
 
 
-def _build_test_args(main_args) -> argparse.Namespace:
-    """Builds a gameplay-test args namespace from thunderscope_main's arguments.
-
-    Maps the subset of test-mode-relevant flags onto the namespace expected by
-    the session context managers and runners.
-
-    :param main_args: parsed thunderscope_main command-line arguments.
-    :return: a Namespace compatible with the session context managers.
-    """
-    return argparse.Namespace(
-        run_field_test=main_args.run_field_test,
-        simulator_runtime_dir=main_args.simulator_runtime_dir,
-        blue_full_system_runtime_dir=main_args.blue_full_system_runtime_dir,
-        yellow_full_system_runtime_dir=main_args.yellow_full_system_runtime_dir,
-        debug_simulator=main_args.debug_simulator,
-        debug_blue_full_system=main_args.debug_blue_full_system,
-        debug_yellow_full_system=main_args.debug_yellow_full_system,
-        enable_realism=main_args.enable_realism,
-        enable_thunderscope=True,
-        ci_mode=main_args.ci_mode,
-        show_gamecontroller_logs=main_args.verbose,
-        run_yellow=main_args.run_yellow,
-        channel=main_args.channel,
-        interface=main_args.interface,
-        keyboard_estop=main_args.keyboard_estop,
-        disable_communication=main_args.disable_communication,
-        layout=main_args.layout,
-    )
-
-
 def launch_test_mode(main_args) -> None:
     """Launches Thunderscope in test mode and runs the Qt event loop.
 
     :param main_args: parsed thunderscope_main command-line arguments.
     """
-    args = _build_test_args(main_args)
+    args = copy.copy(main_args)
+    args.enable_thunderscope = True
+
     tests = discover_tests()
 
     session_cm = (

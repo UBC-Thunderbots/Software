@@ -36,13 +36,8 @@ logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 
+# The test-mode session bound to the currently running test
 ACTIVE_SESSION = None
-"""The test-mode session bound to the currently running test, or None.
-
-Set by the test-mode launcher (software.gameplay_tests.test_mode) while a
-selected test runs, so that gameplay_test_runner binds the test to the open
-Thunderscope instead of launching new binaries.
-"""
 
 
 @dataclass
@@ -56,17 +51,12 @@ class SessionContext:
     blue_full_system_proto_unix_io: ProtoUnixIO
     yellow_full_system_proto_unix_io: ProtoUnixIO
     simulator_proto_unix_io: ProtoUnixIO
-    gamecontroller: Any
-    robot_communication: Optional[Any] = None
-    """The RobotCommunication instance, only set for field tests"""
-    estop_mode: Optional[Any] = None
-    """The EstopMode, only set for field tests"""
-    simulator: Optional[Any] = None
-    """The Simulator context manager, only set for simulated tests"""
-    blue_full_system: Optional[Any] = None
-    """The blue FullSystem context manager, only set for simulated tests"""
-    yellow_full_system: Optional[Any] = None
-    """The yellow FullSystem context manager, only set for simulated tests"""
+    gamecontroller: Gamecontroller
+    robot_communication: Optional[RobotCommunication] = None
+    estop_mode: Optional[EstopMode] = None
+    simulator: Optional[Simulator] = None
+    blue_full_system: Optional[FullSystem] = None
+    yellow_full_system: Optional[FullSystem] = None
 
 
 @pytest.fixture
@@ -174,9 +164,7 @@ def simulated_session(args, runtime_subpath):
             should_restart_on_crash=False,
             running_in_realtime=args.enable_thunderscope and not args.ci_mode,
         ) as yellow_fs,
-        Gamecontroller(
-            suppress_logs=(not args.show_gamecontroller_logs)
-        ) as gamecontroller,
+        Gamecontroller(suppress_logs=(not args.verbose)) as gamecontroller,
     ):
         blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
         yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
@@ -189,6 +177,7 @@ def simulated_session(args, runtime_subpath):
         gamecontroller.setup_proto_unix_io(
             blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+            simulator_proto_unix_io=None,  # None so that gamecontroller doesn't set robot limit
         )
 
         time.sleep(LAUNCH_DELAY_S)
@@ -240,7 +229,7 @@ def field_session(args, runtime_subpath):
         ) as friendly_fs,
         Gamecontroller(
             # we would be using conventional port if and only if we are playing in robocup.
-            suppress_logs=(not args.show_gamecontroller_logs),
+            suppress_logs=(not args.verbose),
             use_conventional_port=False,
         ) as gamecontroller,
         WifiCommunicationManager(
