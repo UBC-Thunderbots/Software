@@ -101,10 +101,6 @@ class ProtoUnixIO:
     ) -> None:
         """Remove a previously registered observer buffer for a protobuf class.
 
-        Used to tear down observers between runs (e.g. test mode) so that
-        buffers do not accumulate on a long-lived ProtoUnixIO. Does nothing
-        if the buffer was never registered.
-
         :param proto_class: Class of protobuf the buffer was registered for
         :param buffer: buffer to deregister
         """
