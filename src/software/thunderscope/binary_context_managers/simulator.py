@@ -64,6 +64,9 @@ class Simulator:
         if self.enable_realism:
             simulator_command += " --enable_realism"
 
+        # Stored so the process can be relaunched via restart()
+        self.simulator_command = simulator_command
+
         if self.debug_simulator:
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb
@@ -106,6 +109,11 @@ gdb --args bazel-bin/{simulator_command}
         if self.er_force_simulator_proc:
             self.er_force_simulator_proc.kill()
             self.er_force_simulator_proc.wait()
+
+    def restart(self) -> None:
+        """Kill and relaunch the simulator process at the same runtime dir."""
+        kill_cmd_if_running(self.generic_command)
+        self.er_force_simulator_proc = Popen(self.simulator_command.split(" "))
 
     def setup_proto_unix_io(
         self,

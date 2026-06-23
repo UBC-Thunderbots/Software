@@ -207,6 +207,11 @@ gdb --args bazel-bin/{self.full_system}
             except TimeoutExpired:
                 self.full_system_proc.kill()
 
+    def restart(self) -> None:
+        """Kill and relaunch the full_system process at the same runtime dir."""
+        kill_cmd_if_running(self.generic_command)
+        self.full_system_proc = Popen(self.full_system.split(" "))
+
     def setup_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
         """Helper to run full system and attach the appropriate unix senders/listeners
 

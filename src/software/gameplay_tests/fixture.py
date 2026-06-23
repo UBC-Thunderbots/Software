@@ -61,6 +61,12 @@ class SessionContext:
     """The RobotCommunication instance, only set for field tests"""
     estop_mode: Optional[Any] = None
     """The EstopMode, only set for field tests"""
+    simulator: Optional[Any] = None
+    """The Simulator context manager, only set for simulated tests"""
+    blue_full_system: Optional[Any] = None
+    """The blue FullSystem context manager, only set for simulated tests"""
+    yellow_full_system: Optional[Any] = None
+    """The yellow FullSystem context manager, only set for simulated tests"""
 
 
 @pytest.fixture
@@ -108,6 +114,13 @@ def bound_runner(session):
             owns_thunderscope=False,
         )
     else:
+        # Relaunch the simulator and full systems so each test starts from clean state.
+        # The ProtoUnixIOs reconnect automatically.
+        context.simulator.restart()
+        context.blue_full_system.restart()
+        context.yellow_full_system.restart()
+        time.sleep(LAUNCH_DELAY_S)
+
         runner = SimulatedTestRunner(
             test_name,
             session.thunderscope,
@@ -178,7 +191,6 @@ def simulated_session(args, runtime_subpath):
         gamecontroller.setup_proto_unix_io(
             blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-            simulator_proto_unix_io=simulator_proto_unix_io,
         )
 
         time.sleep(LAUNCH_DELAY_S)
@@ -188,6 +200,9 @@ def simulated_session(args, runtime_subpath):
             yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
             simulator_proto_unix_io=simulator_proto_unix_io,
             gamecontroller=gamecontroller,
+            simulator=simulator,
+            blue_full_system=blue_fs,
+            yellow_full_system=yellow_fs,
         )
 
 
