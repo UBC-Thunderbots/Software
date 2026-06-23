@@ -1,20 +1,15 @@
 import argparse
-import ast
-import os
 from dataclasses import dataclass
 
 import pytest
 
 from proto.import_all_protos import *
 from software.gameplay_tests import fixture
+from software.gameplay_tests.util import discover_tests
 from software.logger.logger import create_logger
 from software.thunderscope.test_runner_widget import TestRunnerWidget
 from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.thunderscope_config import (
-    configure_field_test_view,
-    configure_simulated_test_view,
-    initialize_application,
-)
+from software.thunderscope.thunderscope_config import initialize_application
 from software.thunderscope.thunderscope_types import TScopeWidget, WidgetPosition
 
 logger = create_logger(__name__)
@@ -126,65 +121,6 @@ def run_selected_test(session: TestModeSession, test_path: str) -> str:
     return collector.summary(exit_code)
 
 
-def _file_has_gameplay_test(path: str) -> bool:
-    """Returns whether a Python file defines a test using gameplay_test_runner.
-
-    Parses the file and looks for a test function (named test*) that requests the
-    gameplay_test_runner fixture as a parameter. Using the AST instead of a text
-    search avoids false positives and does not require importing the module.
-
-    :param path: absolute path to the Python file to inspect.
-    :return: True if the file contains a gameplay_test_runner test.
-    """
-    try:
-        with open(path) as test_file:
-            tree = ast.parse(test_file.read(), filename=path)
-    except (OSError, SyntaxError):
-        return False
-
-    for node in ast.walk(tree):
-        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            continue
-        if not node.name.startswith("test"):
-            continue
-        arg_names = {
-            arg.arg
-            for arg in node.args.posonlyargs + node.args.args + node.args.kwonlyargs
-        }
-        if "gameplay_test_runner" in arg_names:
-            return True
-    return False
-
-
-def discover_tests() -> list[tuple[str, str]]:
-    """Discovers gameplay tests from the workspace source tree.
-
-    Returns every test file containing a test that uses the gameplay_test_runner
-    fixture. Such tests run as both simulated and field tests, so the same list
-    is offered in either mode; the _field_test.py naming is only a convention
-    (typically simpler, fewer-robot tests) and is not used to filter.
-
-    :return: list of (display_name, absolute_path) tuples, sorted by name.
-    """
-    workspace = os.environ.get("BUILD_WORKSPACE_DIRECTORY")
-    if not workspace:
-        logger.warning("BUILD_WORKSPACE_DIRECTORY is not set; cannot discover tests")
-        return []
-
-    software_dir = os.path.join(workspace, "software")
-    tests = []
-    for root, _, files in os.walk(software_dir):
-        for name in files:
-            if not name.endswith("_test.py"):
-                continue
-
-            path = os.path.join(root, name)
-            if _file_has_gameplay_test(path):
-                tests.append((os.path.relpath(path, software_dir), path))
-
-    return sorted(tests)
-
-
 def _build_test_args(main_args) -> argparse.Namespace:
     """Builds a gameplay-test args namespace from thunderscope_main's arguments.
 
@@ -255,28 +191,15 @@ def launch_test_mode(main_args) -> None:
         )
 
         if args.run_field_test:
-            thunderscope = Thunderscope(
-                configure_field_test_view(
-                    simulator_proto_unix_io=context.simulator_proto_unix_io,
-                    blue_full_system_proto_unix_io=context.blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=context.yellow_full_system_proto_unix_io,
-                    yellow_is_friendly=args.run_yellow,
-                    extra_widgets=[test_runner_widget],
-                ),
-                layout_path=main_args.layout,
-            )
-            fixture.wire_field_keyboard_estop(
-                thunderscope, context.robot_communication, context.estop_mode
+            thunderscope = fixture.build_field_test_thunderscope(
+                context,
+                args.run_yellow,
+                main_args.layout,
+                extra_widgets=[test_runner_widget],
             )
         else:
-            thunderscope = Thunderscope(
-                configure_simulated_test_view(
-                    blue_full_system_proto_unix_io=context.blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=context.yellow_full_system_proto_unix_io,
-                    simulator_proto_unix_io=context.simulator_proto_unix_io,
-                    extra_widgets=[test_runner_widget],
-                ),
-                layout_path=main_args.layout,
+            thunderscope = fixture.build_simulated_test_thunderscope(
+                context, main_args.layout, extra_widgets=[test_runner_widget]
             )
 
         session_holder["session"] = TestModeSession(

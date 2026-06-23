@@ -103,6 +103,7 @@ py_library(
     ],
     deps = [
         ":fixture",
+        ":util",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/thunderscope",

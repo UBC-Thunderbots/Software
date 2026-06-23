@@ -1,4 +1,6 @@
 import argparse
+import ast
+import logging
 import os
 import sys
 
@@ -198,3 +200,62 @@ def pytest_main(file):
             ["-svv", "-W ignore::DeprecationWarning", "-k", args.test_filter, file]
         )
     )
+
+
+def _file_has_gameplay_test(path: str) -> bool:
+    """Returns whether a Python file defines a test using gameplay_test_runner.
+
+    Parses the file and looks for a test function (named test*) that requests the
+    gameplay_test_runner fixture as a parameter. Using the AST instead of a text
+    search avoids false positives and does not require importing the module.
+
+    :param path: absolute path to the Python file to inspect.
+    :return: True if the file contains a gameplay_test_runner test.
+    """
+    try:
+        with open(path) as test_file:
+            tree = ast.parse(test_file.read(), filename=path)
+    except (OSError, SyntaxError):
+        return False
+
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if not node.name.startswith("test"):
+            continue
+        arg_names = {
+            arg.arg
+            for arg in node.args.posonlyargs + node.args.args + node.args.kwonlyargs
+        }
+        if "gameplay_test_runner" in arg_names:
+            return True
+    return False
+
+
+def discover_tests() -> list[tuple[str, str]]:
+    """Discovers gameplay tests from the workspace source tree.
+
+    Returns every test file containing a test that uses the gameplay_test_runner
+    fixture. Such tests run as both simulated and field tests, so the same list
+    is offered in either mode; the _field_test.py naming is only a convention
+    (typically simpler, fewer-robot tests) and is not used to filter.
+
+    :return: list of (display_name, absolute_path) tuples, sorted by name.
+    """
+    workspace = os.environ.get("BUILD_WORKSPACE_DIRECTORY")
+    if not workspace:
+        logging.warning("BUILD_WORKSPACE_DIRECTORY is not set; cannot discover tests")
+        return []
+
+    software_dir = os.path.join(workspace, "software")
+    tests = []
+    for root, _, files in os.walk(software_dir):
+        for name in files:
+            if not name.endswith("_test.py"):
+                continue
+
+            path = os.path.join(root, name)
+            if _file_has_gameplay_test(path):
+                tests.append((os.path.relpath(path, software_dir), path))
+
+    return sorted(tests)

@@ -196,11 +196,10 @@ class TbotsTestRunner:
             gc_cmd_with_delay,
         )
 
-        # When bound to an already-open Thunderscope (test mode), we are already
-        # running on a background thread while the Qt event loop runs on the main
-        # thread, so run the test loop inline and let exceptions propagate to
-        # pytest. Otherwise, run the loop in a background thread and block the
-        # main thread on the Thunderscope we own.
+        # When we own the Thunderscope, run the test loop on a background thread
+        # and block the main thread on the Qt event loop. When bound to an
+        # already-open Thunderscope (test mode), we are already off the main
+        # thread, so run the loop inline.
         if self.thunderscope and self.owns_thunderscope:
             threading.excepthook = self._excepthook
 

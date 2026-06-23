@@ -315,6 +315,54 @@ def wire_field_keyboard_estop(thunderscope, robot_communication, estop_mode):
         )
 
 
+def build_simulated_test_thunderscope(session, layout_path, extra_widgets=[]):
+    """Builds a Thunderscope with the simulated-test view bound to a session.
+
+    :param session: the SessionContext whose ProtoUnixIOs to visualize.
+    :param layout_path: the Thunderscope layout to load, or None.
+    :param extra_widgets: additional widget data to add to the view.
+    :return: the Thunderscope instance.
+    """
+    return Thunderscope(
+        configure_simulated_test_view(
+            blue_full_system_proto_unix_io=session.blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io=session.yellow_full_system_proto_unix_io,
+            simulator_proto_unix_io=session.simulator_proto_unix_io,
+            extra_widgets=extra_widgets,
+        ),
+        layout_path=layout_path,
+    )
+
+
+def build_field_test_thunderscope(
+    session, yellow_is_friendly, layout_path, extra_widgets=[]
+):
+    """Builds a Thunderscope with the field-test view bound to a session.
+
+    Also wires up the keyboard estop for the session's robot communication.
+
+    :param session: the SessionContext whose ProtoUnixIOs to visualize.
+    :param yellow_is_friendly: whether the friendly team is yellow.
+    :param layout_path: the Thunderscope layout to load, or None.
+    :param extra_widgets: additional widget data to add to the view.
+    :return: the Thunderscope instance.
+    """
+    thunderscope = Thunderscope(
+        configure_field_test_view(
+            simulator_proto_unix_io=session.simulator_proto_unix_io,
+            blue_full_system_proto_unix_io=session.blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io=session.yellow_full_system_proto_unix_io,
+            yellow_is_friendly=yellow_is_friendly,
+            extra_widgets=extra_widgets,
+        ),
+        layout_path=layout_path,
+    )
+    wire_field_keyboard_estop(
+        thunderscope, session.robot_communication, session.estop_mode
+    )
+    return thunderscope
+
+
 def simulated_test_runner(args):
     """Starts the simulated-test binaries and yields a SimulatedTestRunner.
 
@@ -327,14 +375,7 @@ def simulated_test_runner(args):
     with simulated_session(args, f"test/{test_path_name}") as session:
         tscope = None
         if args.enable_thunderscope:
-            tscope = Thunderscope(
-                configure_simulated_test_view(
-                    blue_full_system_proto_unix_io=session.blue_full_system_proto_unix_io,
-                    yellow_full_system_proto_unix_io=session.yellow_full_system_proto_unix_io,
-                    simulator_proto_unix_io=session.simulator_proto_unix_io,
-                ),
-                layout_path=args.layout,
-            )
+            tscope = build_simulated_test_thunderscope(session, args.layout)
 
         runner = SimulatedTestRunner(
             test_name,
@@ -359,18 +400,8 @@ def field_test_runner(args):
     test_path_name = get_pytest_path_name()
 
     with field_session(args, f"test/{test_path_name}") as session:
-        tscope = Thunderscope(
-            configure_field_test_view(
-                simulator_proto_unix_io=session.simulator_proto_unix_io,
-                blue_full_system_proto_unix_io=session.blue_full_system_proto_unix_io,
-                yellow_full_system_proto_unix_io=session.yellow_full_system_proto_unix_io,
-                yellow_is_friendly=args.run_yellow,
-            ),
-            layout_path=None,
-        )
-
-        wire_field_keyboard_estop(
-            tscope, session.robot_communication, session.estop_mode
+        tscope = build_field_test_thunderscope(
+            session, args.run_yellow, layout_path=None
         )
 
         runner = FieldTestRunner(
