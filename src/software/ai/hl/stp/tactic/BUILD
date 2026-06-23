@@ -116,6 +116,7 @@ cc_library(
         ":vis_proto_deduper",
         "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/trajectory:jerk_limited_trajectory_2d",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/geom/algorithms:end_in_obstacle_sample",
     ],

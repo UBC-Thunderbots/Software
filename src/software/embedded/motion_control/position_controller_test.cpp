@@ -4,13 +4,15 @@
 
 #include <memory>
 
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
+
 // TODO(#3743): write proper tests after pid constants have been tuned
 
 TEST(PositionControllerTest, BasicTest)
 {
     PositionController controller;
-    std::shared_ptr trajectory_ptr = std::make_shared<BangBangTrajectory2D>();
-    TrajectoryPath trajectory{trajectory_ptr, BangBangTrajectory2D::generator};
+    std::shared_ptr trajectory_ptr = std::make_shared<JerkLimitedTrajectory2D>();
+    TrajectoryPath trajectory{trajectory_ptr, JerkLimitedTrajectory2D::generator};
     controller.step(Point{}, trajectory, Duration::fromSeconds(1.0),
                     Duration::fromSeconds(0.01));
     controller.reset();

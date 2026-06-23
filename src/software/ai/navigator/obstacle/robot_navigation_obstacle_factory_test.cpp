@@ -7,6 +7,7 @@
 #include "software/ai/navigator/obstacle/const_velocity_obstacle.hpp"
 #include "software/ai/navigator/obstacle/geom_obstacle.hpp"
 #include "software/ai/navigator/obstacle/trajectory_obstacle.hpp"
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
@@ -220,9 +221,10 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_robot_obstacle)
     Robot robot =
         Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
 
-    TrajectoryPath trajectory(std::make_shared<BangBangTrajectory2D>(
-                                  origin, end, velocity, KinematicConstraints(1, 1, 1)),
-                              BangBangTrajectory2D::generator);
+    TrajectoryPath trajectory(
+        std::make_shared<JerkLimitedTrajectory2D>(origin, end, velocity, Vector(),
+                                                  KinematicConstraints(1, 1, 1, 1)),
+        JerkLimitedTrajectory2D::generator);
 
     ObstaclePtr obstacle =
         robot_navigation_obstacle_factory.createFromMovingRobot(robot, trajectory);
@@ -285,9 +287,10 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_obstacle)
     Point destination(4.0, 1.0);
     Vector velocity(1.0, 0.0);
 
-    auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        origin, destination, velocity, KinematicConstraints(1.0, 1.0, 1.0));
-    TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
+    auto trajectory = std::make_shared<JerkLimitedTrajectory2D>(
+        origin, destination, velocity, Vector(),
+        KinematicConstraints(1.0, 1.0, 1.0, 1.0));
+    TrajectoryPath trajectory_path(trajectory, JerkLimitedTrajectory2D::generator);
 
     Robot robot =
         Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);

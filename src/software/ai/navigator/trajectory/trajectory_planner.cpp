@@ -1,6 +1,7 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 #include "collision_evaluator.h"
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
@@ -61,7 +62,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     const Rectangle& navigable_area, const std::optional<Point>& prev_sub_destination)
 {
     if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
-        constraints.getMaxDeceleration() <= 0.0)
+        constraints.getMaxDeceleration() <= 0.0 || constraints.getMaxJerk() <= 0.0)
     {
         return std::nullopt;
     }
@@ -161,9 +162,9 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
 {
     // Calculate full new cost regardless by passing in maximum max cost
     return getTrajectoryWithCost(
-        TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
-                           start, destination, initial_velocity, constraints),
-                       BangBangTrajectory2D::generator),
+        TrajectoryPath(std::make_shared<JerkLimitedTrajectory2D>(
+                           start, destination, initial_velocity, Vector(), constraints),
+                       JerkLimitedTrajectory2D::generator),
         obstacles, std::nullopt, std::nullopt, std::numeric_limits<double>::max());
 }
 

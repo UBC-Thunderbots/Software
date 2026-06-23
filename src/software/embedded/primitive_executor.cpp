@@ -126,8 +126,9 @@ double findNearestTimeOnTrajectory(const TrajectoryPath& trajectory,
     {
         for (int i = 0; i <= num_samples; ++i)
         {
-            const double t = start_t + (end_t - start_t) * (static_cast<double>(i) /
-                                                            static_cast<double>(num_samples));
+            const double t =
+                start_t + (end_t - start_t) *
+                              (static_cast<double>(i) / static_cast<double>(num_samples));
             const double dist_sq = (trajectory.getPosition(t) - position).lengthSquared();
             if (dist_sq < best_dist_sq)
             {
@@ -143,8 +144,9 @@ double findNearestTimeOnTrajectory(const TrajectoryPath& trajectory,
 
     // Refine within one coarse step on either side of the best coarse sample.
     const double coarse_step = total_time / NUM_NEAREST_POINT_COARSE_SAMPLES;
-    search(std::max(0.0, best_t - coarse_step), std::min(total_time, best_t + coarse_step),
-           NUM_NEAREST_POINT_FINE_SAMPLES, best_t, best_dist_sq);
+    search(std::max(0.0, best_t - coarse_step),
+           std::min(total_time, best_t + coarse_step), NUM_NEAREST_POINT_FINE_SAMPLES,
+           best_t, best_dist_sq);
     return best_t;
 }
 
@@ -170,8 +172,9 @@ double findNearestTimeOnAngularTrajectory(const BangBangTrajectory1DAngular& tra
     {
         for (int i = 0; i <= num_samples; ++i)
         {
-            const double t = start_t + (end_t - start_t) * (static_cast<double>(i) /
-                                                            static_cast<double>(num_samples));
+            const double t =
+                start_t + (end_t - start_t) *
+                              (static_cast<double>(i) / static_cast<double>(num_samples));
             const double diff_rad =
                 trajectory.getPosition(t).minDiff(orientation).toRadians();
             if (diff_rad < best_diff_rad)
@@ -187,8 +190,9 @@ double findNearestTimeOnAngularTrajectory(const BangBangTrajectory1DAngular& tra
     search(0.0, total_time, NUM_NEAREST_POINT_COARSE_SAMPLES, best_t, best_diff_rad);
 
     const double coarse_step = total_time / NUM_NEAREST_POINT_COARSE_SAMPLES;
-    search(std::max(0.0, best_t - coarse_step), std::min(total_time, best_t + coarse_step),
-           NUM_NEAREST_POINT_FINE_SAMPLES, best_t, best_diff_rad);
+    search(std::max(0.0, best_t - coarse_step),
+           std::min(total_time, best_t + coarse_step), NUM_NEAREST_POINT_FINE_SAMPLES,
+           best_t, best_diff_rad);
     return best_t;
 }
 }  // namespace
@@ -322,9 +326,9 @@ double PrimitiveExecutor::nearestTrajectorySampleTime(const TrajectoryPath& traj
     // Sample a small look-ahead past the nearest point so the target always leads the
     // robot and it keeps making forward progress along the path. Clamped to the end of
     // the trajectory so we don't sample past the destination.
-    return std::min(findNearestTimeOnTrajectory(trajectory, position) +
-                        TRAJECTORY_LOOKAHEAD_TIME_S,
-                    trajectory.getTotalTime());
+    return std::min(
+        findNearestTimeOnTrajectory(trajectory, position) + TRAJECTORY_LOOKAHEAD_TIME_S,
+        trajectory.getTotalTime());
 }
 
 double PrimitiveExecutor::nearestAngularTrajectorySampleTime(
@@ -343,9 +347,9 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
     const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
 
-    Vector target_v_global = position_controller_.step(
-        state_.position(), *trajectory_path_, Duration::fromSeconds(sample_time_sec),
-        delta_time);
+    Vector target_v_global =
+        position_controller_.step(state_.position(), *trajectory_path_,
+                                  Duration::fromSeconds(sample_time_sec), delta_time);
 
     // Smoothly blend the velocity setpoint from the trajectory we just switched away
     // from into the new one over a short window, so it doesn't jump on the switch. The
@@ -439,13 +443,14 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
         {"actual_angular_vel_rad_per_s", state_.angularVelocity().toRadians()},
     });
 
-    auto target_w = orientation_controller_.step(
-        state_.orientation(), *angular_trajectory_, Duration::fromSeconds(sample_time_sec),
-        delta_time);
+    auto target_w =
+        orientation_controller_.step(state_.orientation(), *angular_trajectory_,
+                                     Duration::fromSeconds(sample_time_sec), delta_time);
 
     // Smoothly blend the angular velocity setpoint from the trajectory we just switched
     // away from into the new one over a short window, so it doesn't jump on the switch.
-    if (angular_blend_remaining_.toSeconds() > 0.0 && prev_angular_trajectory_.has_value())
+    if (angular_blend_remaining_.toSeconds() > 0.0 &&
+        prev_angular_trajectory_.has_value())
     {
         const double prev_sample_time_sec = nearestAngularTrajectorySampleTime(
             *prev_angular_trajectory_, state_.orientation());

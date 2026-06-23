@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/vis_proto_deduper.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
-#include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 #include "software/world/world.h"
 
@@ -95,7 +95,7 @@ class MovePrimitive : public Primitive
     // List of only the motion constraint obstacles that the robot should avoid
     std::vector<ObstaclePtr> field_obstacles;
 
-    BangBangTrajectory2D trajectory;
+    JerkLimitedTrajectory2D trajectory;
     std::optional<TrajectoryPath> traj_path;
     BangBangTrajectory1DAngular angular_trajectory;
     TrajectoryPlanner planner;

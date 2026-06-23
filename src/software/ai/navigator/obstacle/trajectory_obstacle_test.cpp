@@ -2,14 +2,17 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
+
 
 class TrajectoryObstacleTest : public testing::Test
 {
    public:
     TrajectoryObstacleTest()
-        : obstacle_traj(std::make_shared<BangBangTrajectory2D>(
-                            start, end, initial_vel, KinematicConstraints(1, 1, 1)),
-                        BangBangTrajectory2D::generator),
+        : obstacle_traj(
+              std::make_shared<JerkLimitedTrajectory2D>(start, end, initial_vel, Vector(),
+                                                        KinematicConstraints(1, 1, 1, 1)),
+              JerkLimitedTrajectory2D::generator),
           obstacle(std::make_shared<TrajectoryObstacle<Circle>>(circle, obstacle_traj))
     {
     }

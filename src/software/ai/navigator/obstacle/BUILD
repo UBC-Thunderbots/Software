@@ -90,6 +90,7 @@ cc_test(
     deps = [
         ":trajectory_obstacle",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/trajectory:jerk_limited_trajectory_2d",
     ],
 )
 
@@ -99,6 +100,7 @@ cc_test(
     deps = [
         ":robot_navigation_obstacle_factory",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/trajectory:jerk_limited_trajectory_2d",
         "//software/geom:point",
         "//software/geom:rectangle",
         "//software/test_util",

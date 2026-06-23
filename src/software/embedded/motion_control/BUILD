@@ -69,6 +69,7 @@ cc_test(
     deps = [
         ":position_controller",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/trajectory:jerk_limited_trajectory_2d",
     ],
 )
 

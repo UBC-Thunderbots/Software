@@ -1,6 +1,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
 #include "software/logger/logger.h"
 
 
@@ -438,7 +439,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 
     KinematicConstraints constraints(
         max_speed, robot_constants.robot_trajectory_max_acceleration_m_per_s_2,
-        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2,
+        robot_constants.robot_trajectory_max_jerk_m_per_s_3);
 
     Point initial_destination = createPoint(params.destination());
     if (!params.sub_destinations().empty())
@@ -448,11 +450,11 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
         initial_destination = createPoint(params.sub_destinations(0).sub_destination());
     }
 
-    auto trajectory = std::make_shared<BangBangTrajectory2D>(
+    auto trajectory = std::make_shared<JerkLimitedTrajectory2D>(
         createPoint(params.start_position()), initial_destination, initial_velocity,
-        constraints);
+        Vector(), constraints);
 
-    TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
+    TrajectoryPath trajectory_path(trajectory, JerkLimitedTrajectory2D::generator);
 
     // Append the rest of the sub-trajectories
     for (int i = 1; i < params.sub_destinations_size(); ++i)
