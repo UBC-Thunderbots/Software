@@ -32,6 +32,7 @@ host_software_packages=(
     node@20
     go@1.24
     clang-format@20
+    sshpass # used to remotely ssh into robots via Ansible
 )
 
 for pkg in "${host_software_packages[@]}"; do

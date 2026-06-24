@@ -1,7 +1,26 @@
 #!/bin/bash --norc
 
-# The prebuilt messense aarch64-unknown-linux-gnu toolchain ships only the BFD
-# linker (ld/ld.bfd) — no ld.gold. The shared cc_toolchain config adds
-# -fuse-ld=gold, so append -fuse-ld=bfd (last one wins) to use the linker that
-# actually exists. Ignored for non-link (compile) invocations.
-exec /opt/homebrew/Cellar/aarch64-unknown-linux-gnu/15.2.0/toolchain/bin/aarch64-unknown-linux-gnu-gcc "$@" -fuse-ld=bfd
+# Wrapper around the prebuilt messense aarch64-unknown-linux-gnu GCC 15.2.0,
+# applying two robot-deployment fix-ups (both no-ops for compile-only calls):
+#
+#  * Static C++ runtime: this toolchain is GCC 15, newer than the robot's system
+#    libstdc++, so a dynamic libstdc++ dependency requires GLIBCXX/CXXABI symbol
+#    versions the robot doesn't have. Bazel passes an explicit `-lstdc++`, which
+#    `-static-libstdc++` does NOT intercept, so rewrite it to the static archive
+#    (`-l:libstdc++.a`). `-static-libgcc` covers libgcc.
+#
+#  * `-fuse-ld=bfd`: messense ships only the BFD linker (no ld.gold), but the
+#    shared cc_toolchain config adds `-fuse-ld=gold`; appending bfd wins.
+
+TC=/opt/homebrew/Cellar/aarch64-unknown-linux-gnu/15.2.0/toolchain
+
+args=()
+for a in "$@"; do
+    if [ "$a" = "-lstdc++" ]; then
+        args+=("-l:libstdc++.a")
+    else
+        args+=("$a")
+    fi
+done
+
+exec "$TC/bin/aarch64-unknown-linux-gnu-gcc" "${args[@]}" -fuse-ld=bfd -static-libgcc
