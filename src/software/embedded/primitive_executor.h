@@ -68,12 +68,10 @@ class PrimitiveExecutor
      * Decide whether we should stop following the linear trajectory we're currently
      * following and start following the newly received one instead.
      *
-     * We prefer to keep following the existing trajectory (so the controllers can
-     * correct the robot back onto the planned path) and only switch when the new
-     * trajectory's path deviates meaningfully from the one we're following (measured by
-     * the Hausdorff distance between the two paths). We don't switch just because we're
-     * behind/ahead, since we follow the trajectory by position (nearest point) rather
-     * than by a wall clock.
+     * We switch to the new trajectory if the destinations or subdestinations have
+     * changed significantly. Otherwise, if we are already tracking the current
+     * trajectory well (low position and velocity error), we keep following it to
+     * avoid unnecessary controller resets.
      *
      * @param new_trajectory The newly received linear trajectory
      * @return true if we should start following new_trajectory
@@ -174,10 +172,19 @@ class PrimitiveExecutor
     // point is ~0 and the robot would never start moving).
     static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.05;
 
-    // If the Hausdorff distance between the path of the trajectory we're following and
-    // the path of a newly received trajectory exceeds this, the paths have deviated
-    // enough that we switch to following the new trajectory.
-    static constexpr double LINEAR_HAUSDORFF_THRESHOLD_M = 0.3;
+    // If the final destination or any subdestination of the new trajectory differs from
+    // the current one by more than this distance, we switch to the new trajectory.
+    static constexpr double DESTINATION_THRESHOLD_M = 0.1;
+
+    // Maximum position error (distance between the robot's actual position and the
+    // nearest point on the current trajectory) below which the robot is considered to
+    // be tracking the current trajectory well.
+    static constexpr double POSITION_TRACKING_THRESHOLD_M = 0.1;
+
+    // Maximum velocity error (magnitude of difference between the robot's actual
+    // velocity and the trajectory velocity at the nearest point) below which the robot
+    // is considered to be tracking the current trajectory well.
+    static constexpr double VELOCITY_TRACKING_THRESHOLD_M_PER_S = 0.2;
 
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.

@@ -16,84 +16,56 @@
 
 namespace
 {
-// Number of points sampled along each trajectory when computing the Hausdorff distance
-// between two trajectory paths.
-constexpr size_t NUM_HAUSDORFF_SAMPLES = 12;
-
 /**
- * Sample positions uniformly in time along a trajectory path, between start_t_sec and
- * the end of the trajectory.
+ * Check whether the destinations and subdestinations of two trajectory paths have
+ * changed significantly enough to warrant switching to the new trajectory.
  *
- * @param trajectory The trajectory path to sample
- * @param start_t_sec Time (since the trajectory's creation) to start sampling from
- * @param num_samples Number of points to sample
- * @return The sampled positions
+ * Compares the final destination (end of the last trajectory node) and the end position
+ * of each intermediate trajectory path node (subdestination). If any corresponding
+ * destination differs by more than threshold_m, or the number of subdestinations differs,
+ * the paths are considered to have diverged.
+ *
+ * @param current The trajectory path currently being followed
+ * @param new_trajectory The newly received trajectory path
+ * @param threshold_m Maximum allowed difference in metres
+ * @return true if destinations or subdestinations differ by more than threshold_m
  */
-std::vector<Point> sampleTrajectoryPath(const TrajectoryPath& trajectory,
-                                        double start_t_sec, size_t num_samples)
+bool destinationsChangedSignificantly(const TrajectoryPath& current,
+                                      const TrajectoryPath& new_trajectory,
+                                      double threshold_m)
 {
-    std::vector<Point> samples;
-    samples.reserve(num_samples);
+    // Compare final destinations
+    const Point current_dest = current.getPosition(current.getTotalTime());
+    const Point new_dest     = new_trajectory.getPosition(new_trajectory.getTotalTime());
 
-    const double end_t_sec = trajectory.getTotalTime();
-    // The trajectory has already been fully traversed (or there's only one sample to
-    // take); the only relevant point is where it ends.
-    if (end_t_sec <= start_t_sec || num_samples <= 1)
+    if ((current_dest - new_dest).length() > threshold_m)
     {
-        samples.push_back(trajectory.getPosition(std::max(start_t_sec, end_t_sec)));
-        return samples;
+        return true;
     }
 
-    for (size_t i = 0; i < num_samples; ++i)
-    {
-        const double t = start_t_sec + (end_t_sec - start_t_sec) *
-                                           (static_cast<double>(i) /
-                                            static_cast<double>(num_samples - 1));
-        samples.push_back(trajectory.getPosition(t));
-    }
-    return samples;
-}
+    // Compare subdestinations (end positions of each trajectory path node)
+    const auto& current_nodes = current.getTrajectoryPathNodes();
+    const auto& new_nodes     = new_trajectory.getTrajectoryPathNodes();
 
-/**
- * Compute the directed Hausdorff distance from point set `from` to point set `to`: the
- * largest distance between any point in `from` and its nearest neighbour in `to`.
- */
-double directedHausdorffDistance(const std::vector<Point>& from,
-                                 const std::vector<Point>& to)
-{
-    double max_min_dist = 0.0;
-    for (const Point& a : from)
+    if (current_nodes.size() != new_nodes.size())
     {
-        double min_dist = std::numeric_limits<double>::max();
-        for (const Point& b : to)
+        return true;
+    }
+
+    for (size_t i = 0; i < current_nodes.size(); ++i)
+    {
+        const Point current_subdest = current_nodes[i].getTrajectory()->getPosition(
+            current_nodes[i].getTrajectoryEndTime());
+        const Point new_subdest = new_nodes[i].getTrajectory()->getPosition(
+            new_nodes[i].getTrajectoryEndTime());
+
+        if ((current_subdest - new_subdest).length() > threshold_m)
         {
-            min_dist = std::min(min_dist, (a - b).length());
+            return true;
         }
-        max_min_dist = std::max(max_min_dist, min_dist);
     }
-    return max_min_dist;
-}
 
-/**
- * Compute the (symmetric) Hausdorff distance between two trajectory paths, each sampled
- * from a given start time to its end. The Hausdorff distance captures how far apart the
- * two paths are geometrically: it is small when the paths describe essentially the same
- * route and grows when they diverge (e.g. the destination moved or the path was
- * replanned around an obstacle).
- *
- * @param a, b The two trajectory paths
- * @param a_start_t_sec, b_start_t_sec Times to start sampling each trajectory from
- * @return The Hausdorff distance between the two sampled paths
- */
-double trajectoryPathHausdorffDistance(const TrajectoryPath& a, double a_start_t_sec,
-                                       const TrajectoryPath& b, double b_start_t_sec)
-{
-    const std::vector<Point> a_samples =
-        sampleTrajectoryPath(a, a_start_t_sec, NUM_HAUSDORFF_SAMPLES);
-    const std::vector<Point> b_samples =
-        sampleTrajectoryPath(b, b_start_t_sec, NUM_HAUSDORFF_SAMPLES);
-    return std::max(directedHausdorffDistance(a_samples, b_samples),
-                    directedHausdorffDistance(b_samples, a_samples));
+    return false;
 }
 
 // Number of samples used in the coarse (whole-trajectory) and fine (refinement) passes
@@ -248,18 +220,33 @@ bool PrimitiveExecutor::shouldFollowNewLinearTrajectory(
         return true;
     }
 
-    // Compare current and new trajectory using Hausdorff distance;
-    // if path deviation is significant, switch to the new trajectory
-    const double nearest_time_sec =
-        findNearestTimeOnTrajectory(*trajectory_path_, state_.position());
-    const double hausdorff_dist = trajectoryPathHausdorffDistance(
-        *trajectory_path_, nearest_time_sec, new_trajectory, 0.0);
-    if (hausdorff_dist > LINEAR_HAUSDORFF_THRESHOLD_M)
+    // Compare subdestinations and destinations of current and new trajectory.
+    // If they've changed significantly, switch to the new trajectory.
+    if (destinationsChangedSignificantly(*trajectory_path_, new_trajectory,
+                                         DESTINATION_THRESHOLD_M))
     {
         return true;
     }
 
-    return false;
+    // Find the point on the current trajectory nearest to the robot's actual position.
+    // We use this to measure tracking error.
+    const double nearest_time_sec =
+        findNearestTimeOnTrajectory(*trajectory_path_, state_.position());
+
+    // If we are already tracking the current trajectory well (position and velocity
+    // errors are small), keep following it to avoid unnecessary controller resets.
+    const double position_error =
+        (state_.position() - trajectory_path_->getPosition(nearest_time_sec)).length();
+    const double velocity_error =
+        (state_.velocity() - trajectory_path_->getVelocity(nearest_time_sec)).length();
+
+    if (position_error < POSITION_TRACKING_THRESHOLD_M &&
+        velocity_error < VELOCITY_TRACKING_THRESHOLD_M_PER_S)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool PrimitiveExecutor::shouldFollowNewAngularTrajectory(
