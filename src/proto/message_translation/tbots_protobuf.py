@@ -76,17 +76,30 @@ def create_world_state(
     return world_state
 
 
-def create_default_world_state(num_robots: int) -> WorldState:
+def create_default_world_state(
+    num_robots: int,
+    field_x_length: float = 9.0,
+    field_y_length: float = 6.0,
+) -> WorldState:
     """Create a WorldState proto with num_robots yellow and blue robots evenly spaced in two parallel lines on the field.
 
+    Robots are placed at one third of the field length from center on each side, and
+    spread across two thirds of the field width, so the layout scales with field size.
+
     :param num_robots: Number of robots for the yellow and blue teams
+    :param field_x_length: Field length along the x-axis in meters; defaults to SSL Division B
+    :param field_y_length: Field width along the y-axis in meters; defaults to SSL Division B
     """
+    x_offset = field_x_length / 3.0
+    y_spread = field_y_length / 3.0
     return create_world_state(
         blue_robot_locations=[
-            tbots_cpp.Point(-3, y) for y in numpy.linspace(-2, 2, num_robots)
+            tbots_cpp.Point(-x_offset, y)
+            for y in numpy.linspace(-y_spread, y_spread, num_robots)
         ],
         yellow_robot_locations=[
-            tbots_cpp.Point(3, y) for y in numpy.linspace(-2, 2, num_robots)
+            tbots_cpp.Point(x_offset, y)
+            for y in numpy.linspace(-y_spread, y_spread, num_robots)
         ],
         ball_location=tbots_cpp.Point(0, 0),
         ball_velocity=tbots_cpp.Vector(0, 0),

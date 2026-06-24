@@ -50,10 +50,19 @@ class Field
     static Field createSSLDivisionAField();
 
     /**
-     * Creates a field with the standard SSL Division A or B dimensions
+     * Creates a practice field. Goal depth and boundary buffer are kept at
+     * Division B values.
+     *
+     * @return a practice field
+     */
+    static Field createPracticeField();
+
+    /**
+     * Creates a field with the standard SSL Division A or B dimensions,
+     * or the practice field dimensions.
      *
      * @param field_type The field type
-     * @return a field with the standard SSL Division A or B dimensions
+     * @return a field matching the given type
      */
     static Field createField(TbotsProto::FieldType field_type);
 

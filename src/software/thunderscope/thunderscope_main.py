@@ -33,6 +33,7 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from shared.practice_field_dims import PRACTICE_FIELD_DIMS
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 protobuf_impl_type = api_implementation.Type()
@@ -173,6 +174,14 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="set realism flag to use realistic config",
+    )
+    parser.add_argument(
+        "--division",
+        action="store",
+        type=str,
+        default="div_b",
+        choices=["div_a", "div_b", "practice"],
+        help="Which field the simulator runs on: div_a, div_b, or practice",
     )
     parser.add_argument(
         "--estop_baudrate",
@@ -390,9 +399,20 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
+            division_field_dims = {
+                "div_a": (12.0, 9.0),
+                "div_b": (9.0, 6.0),
+                "practice": (
+                    PRACTICE_FIELD_DIMS["field_x_length"],
+                    PRACTICE_FIELD_DIMS["field_y_length"],
+                ),
+            }
+            field_x_length, field_y_length = division_field_dims[args.division]
             sync_simulation(
                 tscope,
                 0 if args.empty else DIV_B_NUM_ROBOTS,
+                field_x_length=field_x_length,
+                field_y_length=field_y_length,
             )
 
             if args.ci_mode:
@@ -413,7 +433,10 @@ if __name__ == "__main__":
 
         # Launch all binaries
         with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+            args.simulator_runtime_dir,
+            args.debug_simulator,
+            args.enable_realism,
+            args.division,
         ) as simulator, FullSystem(
             path_to_binary=runtime_config.get_blue_runtime_path(),
             full_system_runtime_dir=args.blue_full_system_runtime_dir,

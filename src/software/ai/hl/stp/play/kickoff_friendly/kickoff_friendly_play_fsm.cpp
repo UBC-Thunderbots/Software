@@ -101,9 +101,12 @@ void KickoffFriendlyPlayFSM::chipBall(const Update& event)
     PriorityTacticVector tactics_to_run = {{}};
 
     const double min_chip_x = ball_position.x();
-    const double max_chip_x = field.enemyGoalCenter().x() - ENEMY_X_PADDING_M;
-    const double min_chip_y = field.enemyCornerNeg().y() + SIDELINE_PADDING_M;
-    const double max_chip_y = field.enemyCornerPos().y() - SIDELINE_PADDING_M;
+    const double max_chip_x =
+        field.enemyGoalCenter().x() - field.xLength() * ENEMY_X_PADDING_FRACTION;
+    const double min_chip_y =
+        field.enemyCornerNeg().y() + field.yLength() * SIDELINE_PADDING_FRACTION;
+    const double max_chip_y =
+        field.enemyCornerPos().y() - field.yLength() * SIDELINE_PADDING_FRACTION;
 
     const Rectangle chip_target_region(Point(min_chip_x, min_chip_y),
                                        Point(max_chip_x, max_chip_y));

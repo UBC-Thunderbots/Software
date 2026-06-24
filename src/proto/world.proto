@@ -35,8 +35,9 @@ message World
 
 enum FieldType
 {
-    DIV_A = 0;
-    DIV_B = 1;
+    DIV_A    = 0;
+    DIV_B    = 1;
+    PRACTICE = 2;
 }
 
 message WorldState

@@ -37,9 +37,10 @@ void ShootOrChipPlayFSM::updateShootOrChip(const Update& event)
      *   robot, it will chip to right in front of the robot in the largest open free area
      */
 
-    // Figure out where the fallback chip target is
-    // Experimentally determined to be a reasonable value
-    double fallback_chip_target_x_offset = 1.5;
+    // Figure out where the fallback chip target is.
+    // Offset is one-sixth of the field length so it scales with field size.
+    double fallback_chip_target_x_offset =
+        event.common.world_ptr->field().xLength() / 6.0;
 
     Point fallback_chip_target = event.common.world_ptr->field().enemyGoalCenter() -
                                  Vector(fallback_chip_target_x_offset, 0);

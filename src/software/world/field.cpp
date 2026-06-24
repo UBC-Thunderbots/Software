@@ -1,6 +1,7 @@
 #include "software/world/field.h"
 
 #include "shared/constants.h"
+#include "shared/practice_field_dims.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
@@ -20,15 +21,29 @@ Field Field::createSSLDivisionAField()
     return field;
 }
 
+Field Field::createPracticeField()
+{
+    // Dimensions sourced from shared/practice_field_dims.bzl.
+    Field field =
+        Field(practice_field::FIELD_X_LENGTH, practice_field::FIELD_Y_LENGTH,
+              practice_field::DEFENSE_X_LENGTH, practice_field::DEFENSE_Y_LENGTH,
+              practice_field::GOAL_X_LENGTH, practice_field::GOAL_Y_LENGTH,
+              practice_field::BOUNDARY_BUFFER_SIZE, practice_field::CENTER_CIRCLE_RADIUS);
+    return field;
+}
+
 Field Field::createField(TbotsProto::FieldType field_type)
 {
-    if (field_type == TbotsProto::FieldType::DIV_A)
+    switch (field_type)
     {
-        return createSSLDivisionAField();
-    }
-    else
-    {
-        return createSSLDivisionBField();
+        case TbotsProto::FieldType::DIV_A:
+            return createSSLDivisionAField();
+        case TbotsProto::FieldType::DIV_B:
+            return createSSLDivisionBField();
+        case TbotsProto::FieldType::PRACTICE:
+            return createPracticeField();
+        default:
+            throw std::invalid_argument("Unknown FieldType passed to createField");
     }
 }
 
@@ -63,7 +78,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
         boundary_buffer_size_ < 0 || center_circle_radius_ <= 0)
     {
         throw std::invalid_argument(
-            "At least one field dimension is non-positive - Field is invalid");
+            "At least one field dimension is non-positive, Field is invalid");
     }
 }
 
