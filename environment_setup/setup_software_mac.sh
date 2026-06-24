@@ -59,6 +59,8 @@ sudo pip install -r macos_requirements.txt
 
 print_status_msg "Done Setting Up Python Environment"
 
+sudo ln -s /opt/tbotspython/bin/platformio /usr/local/bin/platformio
+
 print_status_msg "Fetching game controller"
 install_gamecontroller $sys
 
