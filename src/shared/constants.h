@@ -22,6 +22,13 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
+// the name of the loopback network interface, which differs across platforms
+#ifdef __APPLE__
+static const std::string LOOPBACK_INTERFACE = "lo0";
+#else
+static const std::string LOOPBACK_INTERFACE = "lo";
+#endif
+
 // PlotJuggler's default host and port
 static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
