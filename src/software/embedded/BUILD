@@ -1,6 +1,30 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
+
+bool_flag(
+    name = "disable_power_service",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "disable_power_service_enabled",
+    flag_values = {
+        ":disable_power_service": "True",
+    },
+)
+
+bool_flag(
+    name = "disable_motor_service",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "disable_motor_service_enabled",
+    flag_values = {
+        ":disable_motor_service": "True",
+    },
+)
 
 config_setting(
     name = "build_trinamic",
@@ -57,15 +81,24 @@ cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     hdrs = ["thunderloop.h"],
+    local_defines = select({
+        ":disable_power_service_enabled": ["DISABLE_POWER_SERVICE"],
+        "//conditions:default": [],
+    }) + select({
+        ":disable_motor_service_enabled": ["DISABLE_MOTOR_SERVICE"],
+        "//conditions:default": [],
+    }),
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/embedded:robot_localizer",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
         "//software/embedded/toml_config",
         "//software/logger:network_logger",
+        "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
         "@tracy",
@@ -106,5 +139,34 @@ cc_test(
     deps = [
         ":thunderloop",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
+    name = "robot_localizer",
+    srcs = ["robot_localizer.cpp"],
+    hdrs = ["robot_localizer.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software:constants",
+        "//software/embedded/services:imu",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/sensor_fusion/filter:kalman_filter",
+        "//software/util/scoped_timespec_timer",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "robot_localizer_test",
+    srcs = ["robot_localizer_test.cpp"],
+    deps = [
+        ":robot_localizer",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/physics:velocity_conversion_util",
     ],
 )
