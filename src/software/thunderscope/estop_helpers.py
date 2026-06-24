@@ -1,7 +1,7 @@
 import os
 from serial.tools import list_ports
 
-from software.py_constants import ARDUINO_VENDOR_ID, ARDUINO_PRODUCT_ID
+from software.py_constants import ESTOP_USB_DEVICE_IDS
 from software.thunderscope.constants import EstopMode, ESTOP_PATH_1, ESTOP_PATH_2
 
 
@@ -13,13 +13,13 @@ def get_estop_path() -> str | None:
 
     :return: the estop's serial port path, or None if no estop was found
     """
+    estop_usb_ids = {
+        (vendor.lower(), product.lower()) for vendor, product in ESTOP_USB_DEVICE_IDS
+    }
     for port in list_ports.comports():
         if port.vid is None or port.pid is None:
             continue
-        if (
-            f"{port.vid:04x}".lower() == ARDUINO_VENDOR_ID.lower()
-            and f"{port.pid:04x}".lower() == ARDUINO_PRODUCT_ID.lower()
-        ):
+        if (f"{port.vid:04x}".lower(), f"{port.pid:04x}".lower()) in estop_usb_ids:
             return port.device
 
     # Fall back to linux device paths
