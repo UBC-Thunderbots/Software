@@ -17,10 +17,9 @@ TEST(ThreadedProtoUdpListenerTest, error_finding_local_ip_address)
 TEST(ThreadedProtoUdpListenerTest, error_creating_socket)
 {
     // This will always fail because it requires root privileges to open this port
-    EXPECT_THROW(
-        ThreadedProtoUdpListener<google::protobuf::Empty>(
-            "224.5.23.1", 1023, LOOPBACK_INTERFACE, [](const auto&) {}, true),
-        TbotsNetworkException);
+    EXPECT_THROW(ThreadedProtoUdpListener<google::protobuf::Empty>(
+                     "224.5.23.1", 1023, LOOPBACK_INTERFACE, [](const auto&) {}, true),
+                 TbotsNetworkException);
 }
 
 TEST(ThreadedProtoUdpListenerTest, no_error_creating_socket)
