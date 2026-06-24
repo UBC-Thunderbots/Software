@@ -288,7 +288,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
 
         // Erase everything up to the start of the delimiter to look for the next
         // potential message
-        received_data.erase(received_data.begin(), delimiter_pos);
+        received_data.erase(received_data.begin(), std::next(delimiter_pos));
     }
 
     LOG(WARNING) << "Motor " << motor << " did not acknowledge message (seq_num "
