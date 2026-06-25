@@ -47,6 +47,18 @@ class PrimitiveExecutor
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
         TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
+    // When true, the robot is constrained to only translate along its local x-axis
+    // (forwards/backwards) and rotate -- it never strafes sideways (local y). While
+    // moving, the robot faces its direction of travel along the planned path; once it is
+    // within FORWARD_ONLY_FINAL_ROTATION_DISTANCE_M of the destination it rotates to the
+    // primitive's requested final orientation. This models the robot as a non-holonomic
+    // (unicycle) vehicle, which is useful when sideways motion is unreliable.
+    //
+    // The 2D position path itself is still planned holonomically by the AI; this flag
+    // only changes how that path is executed on the robot. Flip to false to restore the
+    // default holonomic (free-strafing) behavior.
+    static constexpr bool ENABLE_FORWARD_ONLY_MOTION = true;
+
    private:
     /*
      * Compute the next target linear _local_ velocity the robot should have.
@@ -63,6 +75,21 @@ class PrimitiveExecutor
      * @returns AngularVelocity The target angular velocity
      */
     AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
+
+    /*
+     * Compute the target angular velocity used in forward-only motion mode.
+     *
+     * While the robot is travelling, it rotates to face a pure-pursuit look-ahead point
+     * on the planned path (so it steers along the path and back onto it, only ever
+     * needing to drive forwards/backwards). Once it is near the destination, it rotates
+     * to the primitive's requested final orientation instead. The returned angular
+     * velocity comes from a saturated proportional controller toward that target
+     * orientation, which settles without overshoot/oscillation. The value is unclamped;
+     * stepTargetAngularVelocity applies the shared max-speed/max-acceleration limits.
+     *
+     * @returns AngularVelocity The (unclamped) target angular velocity
+     */
+    AngularVelocity stepForwardOnlyTargetAngularVelocity();
 
     /**
      * Sends the position, local velocity, and local acceleration to PlotJuggler.
@@ -102,6 +129,42 @@ class PrimitiveExecutor
     // (tick-to-tick) acceleration
     Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
+
+    // Forward-only mode: whether the robot is currently driving in reverse (facing the
+    // opposite way to its travel direction). Persisted across steps to add hysteresis to
+    // the forwards-vs-backwards decision so it doesn't chatter near perpendicular.
+    bool forward_only_reversing_ = false;
+
+    // Forward-only mode: once the robot is within this distance of its destination, it
+    // stops slaving its heading to the travel direction and instead rotates to the
+    // requested final orientation. [m]
+    static constexpr double FORWARD_ONLY_FINAL_ROTATION_DISTANCE_M = 0.1;
+
+    // Forward-only mode: pure-pursuit look-ahead time. The heading is aimed at the point
+    // the planned path reaches this far in the future. Larger values are more damped (the
+    // robot converges onto the path more gently, less weaving) but cut corners more;
+    // smaller values track more tightly but can weave. [s]
+    static constexpr double FORWARD_ONLY_LOOKAHEAD_TIME_S = 0.3;
+
+    // Forward-only mode: the robot may drive in reverse when that needs a smaller turn.
+    // To avoid chattering between facing forwards and backwards when the travel direction
+    // is roughly perpendicular to the robot, only switch driving direction once the
+    // alternative saves at least this much rotation. [rad]
+    static constexpr double FORWARD_ONLY_REVERSE_HYSTERESIS_RAD = 0.35;  // ~20 deg
+
+    // Forward-only mode: proportional gain [1/s] for the controller that rotates the
+    // robot toward its target orientation (its pure-pursuit heading while moving, or the
+    // requested final orientation near the destination). Higher gain reduces heading lag
+    // on curves and corrects errors faster. The pure-pursuit look-ahead provides the
+    // damping, so this is the knob for responsiveness: raise it for snappier turns, but
+    // if the robot weaves across the path, increase FORWARD_ONLY_LOOKAHEAD_TIME_S or
+    // lower this gain.
+    static constexpr double FORWARD_ONLY_HEADING_KP = 8.0;
+
+    // Forward-only mode: if the robot is within this angle of its target orientation,
+    // stop commanding angular velocity so it settles instead of jittering on sensor
+    // noise. [rad]
+    static constexpr double FORWARD_ONLY_HEADING_DEADBAND_RAD = 0.017;  // ~1 deg
 
     // Estimated delay between a vision frame to AI processing to robot executing
     static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;

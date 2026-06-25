@@ -68,6 +68,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "primitive_executor_test",
+    srcs = ["primitive_executor_test.cpp"],
+    deps = [
+        ":primitive_executor",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_geometry",
+        "//shared:robot_constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/physics:velocity_conversion_util",
+        "//software/world:robot_state",
+    ],
+)
+
 cc_library(
     name = "spi_utils",
     srcs = ["spi_utils.cpp"],
