@@ -60,7 +60,7 @@ class FullSystem:
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
         self.log_level = log_level
-        self.thread = threading.Thread(target=self.__restart__, daemon=True)
+        self.thread = threading.Thread(target=self._restart_on_crash_loop, daemon=True)
 
     def discover_supported_flags(self, path_to_binary: str) -> set[str]:
         """Discover what binary flags are supported by provided binary
@@ -176,8 +176,8 @@ gdb --args bazel-bin/{self.full_system}
 
         return self
 
-    def __restart__(self) -> None:
-        """Restarts full system."""
+    def _restart_on_crash_loop(self) -> None:
+        """Background loop that relaunches full_system if it crashes."""
         while self.should_restart_on_crash:
             if not is_cmd_running(self.generic_command):
                 self.full_system_proc = Popen(self.full_system.split(" "))
@@ -206,6 +206,11 @@ gdb --args bazel-bin/{self.full_system}
                 )
             except TimeoutExpired:
                 self.full_system_proc.kill()
+
+    def restart(self) -> None:
+        """Kill and relaunch the full_system process at the same runtime dir."""
+        kill_cmd_if_running(self.generic_command)
+        self.full_system_proc = Popen(self.full_system.split(" "))
 
     def setup_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
         """Helper to run full system and attach the appropriate unix senders/listeners

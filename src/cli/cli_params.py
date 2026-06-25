@@ -90,6 +90,21 @@ TestSuiteOption = Annotated[
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
 StopAIOnStartOption = Annotated[bool, Option("-s", "--stop_ai_on_start")]
 
+TestModeOption = Annotated[
+    bool,
+    Option(
+        "--test_mode",
+        help="Launch Thunderscope with a widget to select and run gameplay tests",
+    ),
+]
+RunFieldTestOption = Annotated[
+    bool,
+    Option(
+        "--run_field_test",
+        help="In test mode, run field tests instead of simulated tests",
+    ),
+]
+
 JobsOption = Annotated[str, Option("-j", "--jobs")]
 RunsOption = Annotated[
     int,
@@ -165,6 +180,22 @@ LAUNCH_MODE_CHOICES = [
     questionary.Choice(
         title="Diagnostics",
         description="Run Thunderscope in diagnostics mode against real robots",
+    ),
+    questionary.Choice(
+        title="Tests",
+        description="Launch with a widget to select and run gameplay tests",
+    ),
+]
+
+# Thunderscope test mode "Test type?" menu.
+TEST_TYPE_CHOICES = [
+    questionary.Choice(
+        title="Simulated tests",
+        description="Run gameplay tests against the simulator",
+    ),
+    questionary.Choice(
+        title="Field tests",
+        description="Run gameplay tests against real robots (requires an interface)",
     ),
 ]
 
