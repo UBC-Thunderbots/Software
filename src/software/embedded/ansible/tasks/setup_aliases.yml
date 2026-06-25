@@ -1,0 +1,41 @@
+---
+- name: Set up shell aliases and welcome message
+  tags:
+    - configure_pi
+    - setup_aliases
+  block:
+    - name: Add thunderloop aliases to ~/.bash_aliases
+      ansible.builtin.blockinfile:
+        path: ~/.bash_aliases
+        create: true
+        mode: "0644"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - thunderloop aliases"
+        block: |
+          alias start='sudo systemctl start thunderloop'
+          alias stop='sudo systemctl stop thunderloop'
+          alias restart='sudo systemctl restart thunderloop'
+          alias status='sudo systemctl status thunderloop'
+          alias journal='sudo journalctl -n 100 -fu thunderloop'
+          alias j='sudo journalctl -n 100 -fu thunderloop'
+
+    - name: Add welcome message to ~/.bashrc
+      ansible.builtin.blockinfile:
+        path: ~/.bashrc
+        create: true
+        mode: "0644"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - thunderbots welcome message"
+        block: |
+          # Only run for interactive shells
+          case $- in
+            *i*)
+              echo "================================================================"
+              echo "            Welcome to the Thunderbots Raspberry Pi!            "
+              echo "================================================================"
+              echo "        start    -> sudo systemctl start thunderloop            "
+              echo "        stop     -> sudo systemctl stop thunderloop             "
+              echo "        restart  -> sudo systemctl restart thunderloop          "
+              echo "        status   -> sudo systemctl status thunderloop           "
+              echo "        journal  -> sudo journalctl -n 100 -fu thunderloop      "
+              echo "        j        -> sudo journalctl -n 100 -fu thunderloop      "
+              echo "================================================================"
+          esac

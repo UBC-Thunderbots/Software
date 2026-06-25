@@ -23,6 +23,12 @@
       ansible.builtin.import_tasks:
         file: ../tasks/enable_password_less_sudo_for_rsync.yml
 
+    - name: Set up shell aliases and welcome message
+      tags:
+        - configure_pi
+      ansible.builtin.import_tasks:
+        file: ../tasks/setup_aliases.yml
+
     - name: Setup Robot Software dependencies
       tags:
         - dependencies
