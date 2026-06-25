@@ -286,6 +286,8 @@ void PrimitiveExecutor::startFollowingNewLinearTrajectory(
 
     trajectory_path_ = new_trajectory;
     position_controller_.reset();
+    velocity_x_pid_.reset();
+    velocity_y_pid_.reset();
 }
 
 void PrimitiveExecutor::startFollowingNewAngularTrajectory(
@@ -337,6 +339,15 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     Vector target_v_global =
         position_controller_.step(state_.position(), *trajectory_path_,
                                   Duration::fromSeconds(sample_time_sec), delta_time);
+
+    // Add a velocity-tracking PID correction on top of the position-based target.
+    // This helps the robot match the trajectory's feedforward velocity, reducing
+    // lag that the position PID alone may not correct quickly enough.
+    const Vector velocity_error = trajectory_path_->getVelocity(sample_time_sec) -
+                                  state_.velocity();
+    target_v_global += Vector(
+        velocity_x_pid_.step(velocity_error.x(), delta_time.toSeconds()),
+        velocity_y_pid_.step(velocity_error.y(), delta_time.toSeconds()));
 
     // Smoothly blend the velocity setpoint from the trajectory we just switched away
     // from into the new one over a short window, so it doesn't jump on the switch. The
@@ -402,11 +413,17 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     // If the trajectory is in its acceleration phase (speed is increasing, not
     // decelerating towards the destination), floor the commanded velocity magnitude
     // to a minimum so we don't command an impractically small speed that the robot
-    // cannot physically achieve.
+    // cannot physically achieve. Skip the floor when we are close to the destination,
+    // so the robot can still make small velocity adjustments for fine positioning.
     const Vector traj_accel = trajectory_path_->getAcceleration(sample_time_sec);
     const bool is_accelerating =
         target_velocity.length() < 1e-6 || traj_accel.dot(target_velocity) >= 0;
-    if (is_accelerating && target_v_global.length() < MIN_COMMAND_SPEED_M_PER_S)
+    const double distance_to_destination =
+        (trajectory_path_->getPosition(trajectory_path_->getTotalTime()) -
+         state_.position())
+            .length();
+    if (is_accelerating && target_v_global.length() < MIN_COMMAND_SPEED_M_PER_S &&
+        distance_to_destination > DESTINATION_PROXIMITY_THRESHOLD_M)
     {
         target_v_global = target_v_global.normalize(MIN_COMMAND_SPEED_M_PER_S);
     }

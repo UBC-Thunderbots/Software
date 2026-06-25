@@ -5,6 +5,7 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/embedded/motion_control/orientation_controller.h"
+#include "software/embedded/motion_control/pid_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
@@ -161,6 +162,12 @@ class PrimitiveExecutor
     PositionController position_controller_;
     OrientationController orientation_controller_;
 
+    // Velocity PID controllers that correct for error between the robot's actual
+    // velocity and the trajectory's feedforward velocity. Separate x/y controllers
+    // follow the same pattern as PositionController.
+    PidController<double> velocity_x_pid_{1.0, 0.02, 0.0, 2.0};
+    PidController<double> velocity_y_pid_{1.0, 0.02, 0.0, 2.0};
+
     // The velocities commanded on the previous step. Used to measure the commanded
     // (tick-to-tick) acceleration
     Vector prev_target_global_velocity_;
@@ -191,6 +198,11 @@ class PrimitiveExecutor
     // velocity is raised to this minimum. This prevents commanding very small velocities
     // that the robot cannot physically achieve.
     static constexpr double MIN_COMMAND_SPEED_M_PER_S = 0.3;
+
+    // Distance from the final destination below which we do not enforce the minimum
+    // command speed, so the robot can make small velocity adjustments for fine
+    // positioning when it is close to the goal.
+    static constexpr double DESTINATION_PROXIMITY_THRESHOLD_M = 0.15;
 
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.
