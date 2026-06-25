@@ -281,21 +281,26 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 
-# NOTE: the Cellar path is version-pinned; a repository rule should derive it
-# (e.g. from `brew --prefix`) once this is productionized.
-MACOS_ROBOT_TC = "/opt/homebrew/Cellar/aarch64-unknown-linux-gnu/15.2.0/toolchain"
+# Execution paths resolve through Homebrew's version-independent `opt` symlink
+# (`brew --prefix aarch64-unknown-linux-gnu`), re-pointed on every `brew upgrade`,
+# so nothing here is pinned to a Cellar version.
+MACOS_ROBOT_TC = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain"
+
+# Invoking gcc through the `opt` symlink makes it report system-header absolute
+# paths two different ways: the sysroot auto-includes (e.g. stdc-predef.h) are
+# realpath'd to the resolved Cellar dir, while the C++ stdlib headers are reported
+# through the symlink. Whitelist both version-independent install roots so Bazel's
+# absolute-path-inclusion check passes for either form and for any `brew`-installed
+# version (builtin_include_directories are matched as path prefixes).
+MACOS_ROBOT_TC_HEADER_ROOTS = [
+    "/opt/homebrew/opt/aarch64-unknown-linux-gnu",  # symlink-reported (libstdc++ headers)
+    "/opt/homebrew/Cellar/aarch64-unknown-linux-gnu",  # realpath-reported (sysroot headers)
+]
 
 cc_toolchain_config_k8_aarch64_linux(
     name = "gcc_macos_robot",
-    builtin_include_directories = [
-        MACOS_ROBOT_TC + "/aarch64-unknown-linux-gnu/include/c++/15.2.0",
-        MACOS_ROBOT_TC + "/aarch64-unknown-linux-gnu/include/c++/15.2.0/aarch64-unknown-linux-gnu",
-        MACOS_ROBOT_TC + "/aarch64-unknown-linux-gnu/include/c++/15.2.0/backward",
-        MACOS_ROBOT_TC + "/lib/gcc/aarch64-unknown-linux-gnu/15.2.0/include",
-        MACOS_ROBOT_TC + "/lib/gcc/aarch64-unknown-linux-gnu/15.2.0/include-fixed",
-        MACOS_ROBOT_TC + "/aarch64-unknown-linux-gnu/include",
-        MACOS_ROBOT_TC + "/aarch64-unknown-linux-gnu/sysroot/usr/include",
-    ] + make_builtin_include_directories(),
+    builtin_include_directories =
+        MACOS_ROBOT_TC_HEADER_ROOTS + make_builtin_include_directories(),
     tool_paths = {
         "ar": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ar",
         "cpp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-cpp",

@@ -1,6 +1,6 @@
 #!/bin/bash --norc
 
-# Wrapper around the prebuilt messense aarch64-unknown-linux-gnu GCC 15.2.0,
+# Wrapper around the prebuilt messense aarch64-unknown-linux-gnu GCC 15.x,
 # applying two robot-deployment fix-ups (both no-ops for compile-only calls):
 #
 #  * Static C++ runtime: this toolchain is GCC 15, newer than the robot's system
@@ -12,7 +12,9 @@
 #  * `-fuse-ld=bfd`: messense ships only the BFD linker (no ld.gold), but the
 #    shared cc_toolchain config adds `-fuse-ld=gold`; appending bfd wins.
 
-TC=/opt/homebrew/Cellar/aarch64-unknown-linux-gnu/15.2.0/toolchain
+# Homebrew's version-independent symlink (kept in sync with MACOS_ROBOT_TC in
+# //toolchains/cc:BUILD), so this survives `brew upgrade` of the toolchain.
+TC=/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain
 
 args=()
 for a in "$@"; do
