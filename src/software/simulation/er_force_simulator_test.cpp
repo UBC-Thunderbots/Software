@@ -338,9 +338,9 @@ class ErForceSimulatorRampingTest : public ::testing::Test
     void SetUp() override
     {
         auto realism_config = ErForceSimulator::createDefaultRealismConfig();
-        simulator           = std::make_shared<ErForceSimulator>(
-            TbotsProto::FieldType::DIV_B, robot_constants, realism_config,
-            /*ramping=*/true);
+        simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
+                                                       robot_constants, realism_config,
+                                                       /*ramping=*/true);
     }
 
     // Forwarding wrapper so TEST_F bodies (which derive from this fixture) can reach the
@@ -430,8 +430,8 @@ TEST_F(ErForceSimulatorRampingTest, ramps_in_motor_service_frame_when_clipping)
     ASSERT_LT(expected[0], target_velocity.x());
 
     auto target_primitive = makeTargetPrimitive(target_velocity, target_angular);
-    auto ramped = rampVelocityPrimitive(current_velocity, current_angular,
-                                        target_primitive, time_to_ramp);
+    auto ramped           = rampVelocityPrimitive(current_velocity, current_angular,
+                                                  target_primitive, time_to_ramp);
 
     const auto& velocity = ramped->motor_control().direct_velocity_control().velocity();
     EXPECT_NEAR(velocity.x_component_meters(), expected[0], 1e-9);

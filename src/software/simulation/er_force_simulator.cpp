@@ -409,11 +409,11 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // Persist the ramped command as the setpoint to ramp from next tick.
             const auto& ramped =
                 direct_control->motor_control().direct_velocity_control();
-            prev_it->second = LocalVelocity{
-                Vector(ramped.velocity().x_component_meters(),
-                       ramped.velocity().y_component_meters()),
-                AngularVelocity::fromRadians(
-                    ramped.angular_velocity().radians_per_second())};
+            prev_it->second =
+                LocalVelocity{Vector(ramped.velocity().x_component_meters(),
+                                     ramped.velocity().y_component_meters()),
+                              AngularVelocity::fromRadians(
+                                  ramped.angular_velocity().radians_per_second())};
         }
         else
         {
