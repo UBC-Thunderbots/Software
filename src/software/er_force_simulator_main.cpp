@@ -144,8 +144,7 @@ int main(int argc, char** argv)
 
                 auto world_state_received_trigger_msg =
                     *createWorldStateReceivedTrigger();
-                world_state_received_trigger.sendProto(
-                    world_state_received_trigger_msg);
+                world_state_received_trigger.sendProto(world_state_received_trigger_msg);
             });
 
         // World Input: Buffer vision until we have primitives to tick
