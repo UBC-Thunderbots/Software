@@ -409,8 +409,8 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
         {"actual_pos_y", state_.position().y()},
         {"actual_vel_x", state_.velocity().x()},
         {"actual_vel_y", state_.velocity().y()},
-        {"compensating_x_vel", target_v_global.x() - target_velocity.x()},
-        {"compensating_y_vel", target_v_global.y() - target_velocity.y()},
+        {"traj_vel_x", target_velocity.x()},
+        {"traj_vel_y", target_velocity.y()}
     });
 
     return globalToLocalVelocity(target_v_global, state_.orientation());

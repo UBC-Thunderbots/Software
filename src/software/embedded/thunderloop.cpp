@@ -346,11 +346,11 @@ inline void Thunderloop::processLocalizationUpdates()
 
     // Step the localizer forward using the measured linear acceleration
     Vector linear_acceleration;
-    if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
-    {
-        const auto accel    = imu_poll->linear_acceleration.value();
-        linear_acceleration = Vector(accel[0], accel[1]);
-    }
+    // if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
+    // {
+    //     const auto accel    = imu_poll->linear_acceleration.value();
+    //     linear_acceleration = Vector(accel[0], accel[1]);
+    // }
 
     robot_localizer_.step(linear_acceleration);
 

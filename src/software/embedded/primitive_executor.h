@@ -170,7 +170,7 @@ class PrimitiveExecutor
     // trajectory. This keeps the target leading the robot so it makes forward progress
     // along the path (without it, starting from rest the planned velocity at the nearest
     // point is ~0 and the robot would never start moving).
-    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.05;
+    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.8;
 
     // If the final destination or any subdestination of the new trajectory differs from
     // the current one by more than this distance, we switch to the new trajectory.
@@ -179,12 +179,12 @@ class PrimitiveExecutor
     // Maximum position error (distance between the robot's actual position and the
     // nearest point on the current trajectory) below which the robot is considered to
     // be tracking the current trajectory well.
-    static constexpr double POSITION_TRACKING_THRESHOLD_M = 0.1;
+    static constexpr double POSITION_TRACKING_THRESHOLD_M = 0.3;
 
     // Maximum velocity error (magnitude of difference between the robot's actual
     // velocity and the trajectory velocity at the nearest point) below which the robot
     // is considered to be tracking the current trajectory well.
-    static constexpr double VELOCITY_TRACKING_THRESHOLD_M_PER_S = 0.2;
+    static constexpr double VELOCITY_TRACKING_THRESHOLD_M_PER_S = 0.4;
 
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.
