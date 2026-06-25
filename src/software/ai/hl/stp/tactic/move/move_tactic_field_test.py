@@ -21,14 +21,15 @@ from software.gameplay_tests.validation.robot_enters_region import (
 )
 def test_basic_rotation(angle, gameplay_test_runner):
     target_angle = tbots_cpp.Angle.fromDegrees(angle)
-    start_position = tbots_cpp.Point(-1.5, 0.6)
-    robot_id = 0
+    start_position_1 = tbots_cpp.Point(-1.5, 0.6)
+    start_position_2 = tbots_cpp.Point(1.5, 0.6)
 
     def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
-                    start_position,
+                    start_position_1,
+                    start_position_2,
                 ],
                 yellow_robot_locations=[],
                 ball_location=tbots_cpp.Point(0, 0),
@@ -36,8 +37,18 @@ def test_basic_rotation(angle, gameplay_test_runner):
             ),
         )
 
-        move_tactic = MoveTactic(
-            destination=tbots_cpp.createPointProto(start_position),
+        move_tactic_1 = MoveTactic(
+            destination=tbots_cpp.createPointProto(start_position_1),
+            dribbler_mode=DribblerMode.OFF,
+            final_orientation=tbots_cpp.createAngleProto(target_angle),
+            ball_collision_type=BallCollisionType.AVOID,
+            auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+            max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+            obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        )
+
+        move_tactic_2 = MoveTactic(
+            destination=tbots_cpp.createPointProto(start_position_2),
             dribbler_mode=DribblerMode.OFF,
             final_orientation=tbots_cpp.createAngleProto(target_angle),
             ball_collision_type=BallCollisionType.AVOID,
@@ -48,7 +59,8 @@ def test_basic_rotation(angle, gameplay_test_runner):
 
         gameplay_test_runner.set_tactics(
             blue_tactics={
-                robot_id: move_tactic,
+                0: move_tactic_1,
+                1: move_tactic_2,
             },
         )
 
@@ -59,7 +71,13 @@ def test_basic_rotation(angle, gameplay_test_runner):
             [
                 DurationValidation(
                     duration_s=1,
-                    validation=RobotEventuallyAtOrientation(robot_id, target_angle),
+                    validation=RobotEventuallyAtOrientation(0, target_angle),
+                ),
+            ],
+            [
+                DurationValidation(
+                    duration_s=1,
+                    validation=RobotEventuallyAtOrientation(1, target_angle),
                 ),
             ],
         ],
