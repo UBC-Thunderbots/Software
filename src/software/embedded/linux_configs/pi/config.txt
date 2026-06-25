@@ -49,3 +49,15 @@ otg_mode=1
 dtparam=pciex1
 dtoverlay=spi0-5cs
 dtoverlay=uart0-pi5
+
+# Fan config
+dtparam=cooling_fan=on
+dtparam=fan_temp0=45000
+dtparam=fan_temp0_hyst=2500
+dtparam=fan_temp0_speed=66
+dtparam=fan_temp1=50000
+dtparam=fan_temp1_speed=132
+dtparam=fan_temp2=55000
+dtparam=fan_temp2_speed=198
+dtparam=fan_temp3=60000
+dtparam=fan_temp3_speed=255
