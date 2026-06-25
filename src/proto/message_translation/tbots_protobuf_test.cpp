@@ -166,9 +166,9 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
                                                                    robot_constants);
-    KinematicConstraints constraints(max_speed,
-                                     robot_constants.robot_max_acceleration_m_per_s_2,
-                                     robot_constants.robot_max_deceleration_m_per_s_2);
+    KinematicConstraints constraints(
+        max_speed, robot_constants.robot_trajectory_max_acceleration_m_per_s_2,
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
 
     Point initial_destination = destination;
     if (!sub_destinations.empty())

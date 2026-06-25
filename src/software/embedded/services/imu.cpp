@@ -240,8 +240,8 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
         return std::nullopt;
     }
 
-    int16_t raw_x = opt_x.value();
-    int16_t raw_y = opt_y.value();
+    int16_t raw_x = -opt_y.value();
+    int16_t raw_y = opt_x.value();
 
     double a_x = (static_cast<double>(raw_x) / SHRT_MAX) * ACCELEROMETER_FULL_SCALE_G *
                  ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
