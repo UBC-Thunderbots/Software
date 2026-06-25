@@ -33,6 +33,7 @@ host_software_packages=(
     go@1.24
     clang-format@20
     sshpass # used to remotely ssh into robots via Ansible
+    messense/macos-cross-toolchains/aarch64-unknown-linux-gnu # raspberry pi cross compiler
 )
 
 for pkg in "${host_software_packages[@]}"; do
@@ -72,10 +73,6 @@ print_status_msg "Finished setting up AutoRef"
 print_status_msg "Install clang-format"
 install_clang_format $sys
 print_status_msg "Done installing clang-format"
-
-print_status_msg "Setting up cross compiler for robot software"
-install_cross_compiler $sys
-print_status_msg "Done setting up cross compiler for robot software"
 
 print_status_msg "Setting Up PlatformIO"
 sudo ln -s /opt/tbotspython/bin/platformio /usr/local/bin/platformio

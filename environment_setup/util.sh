@@ -37,19 +37,15 @@ install_clang_format() {
 }
 
 install_cross_compiler() {
-    if is_darwin $1; then
-        brew install messense/macos-cross-toolchains/aarch64-unknown-linux-gnu
-    else
-        file_name=aarch64-tbots-linux-gnu-for-aarch64
-        if is_x86 $1; then
-            file_name=aarch64-tbots-linux-gnu-for-x86
-        fi
-        full_file_name=$file_name.tar.xz
-        wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
-        tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
-        sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
-        rm /tmp/tbots_download_cache/$full_file_name
+    file_name=aarch64-tbots-linux-gnu-for-aarch64
+    if is_x86 $1; then
+        file_name=aarch64-tbots-linux-gnu-for-x86
     fi
+    full_file_name=$file_name.tar.xz
+    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
+    tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
+    sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
+    rm /tmp/tbots_download_cache/$full_file_name
 }
 
 install_gamecontroller () {
