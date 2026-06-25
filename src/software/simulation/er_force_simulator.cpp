@@ -383,10 +383,37 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         {
             auto direct_control_no_ramp =
                 primitive_executor->stepPrimitive(status, primitive_executor_time_step);
-            const auto& robot_state = robot_map.at(robot_id);
-            direct_control          = getRampedVelocityPrimitive(
-                         robot_state.localVelocity(), robot_state.angularVelocity(),
-                         *direct_control_no_ramp, primitive_executor_time_step);
+
+            auto* prev_ramp_velocities = &yellow_prev_ramp_velocities;
+            if (side == gameController::Team::BLUE)
+            {
+                prev_ramp_velocities = &blue_prev_ramp_velocities;
+            }
+            auto prev_it = prev_ramp_velocities->find(robot_id);
+            if (prev_it == prev_ramp_velocities->end())
+            {
+                LocalVelocity seed{Vector(0, 0), AngularVelocity::zero()};
+                auto robot_state_it = robot_map.find(robot_id);
+                if (robot_state_it != robot_map.end())
+                {
+                    seed = LocalVelocity{robot_state_it->second.localVelocity(),
+                                         robot_state_it->second.angularVelocity()};
+                }
+                prev_it = prev_ramp_velocities->insert({robot_id, seed}).first;
+            }
+
+            direct_control = getRampedVelocityPrimitive(
+                prev_it->second.linear, prev_it->second.angular, *direct_control_no_ramp,
+                primitive_executor_time_step);
+
+            // Persist the ramped command as the setpoint to ramp from next tick.
+            const auto& ramped =
+                direct_control->motor_control().direct_velocity_control();
+            prev_it->second = LocalVelocity{
+                Vector(ramped.velocity().x_component_meters(),
+                       ramped.velocity().y_component_meters()),
+                AngularVelocity::fromRadians(
+                    ramped.angular_velocity().radians_per_second())};
         }
         else
         {
@@ -410,10 +437,15 @@ ErForceSimulator::getRampedVelocityPrimitive(
     TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
         target_velocity_primitive.motor_control().direct_velocity_control();
 
+    // The Euclidean velocity fed to the wheel conversion must use the same robot-local
+    // frame as the real motor service (see MotorService::poll). Both the primitive's
+    // velocity and RobotState::localVelocity() are expressed as +x forward, +y left,
+    // which is exactly the frame EuclideanToWheel expects, so no rotation is applied.
+
     // getting the target wheel velocity
     EuclideanSpace_t target_euclidean_velocity = {
-        -direct_velocity.velocity().y_component_meters(),
         direct_velocity.velocity().x_component_meters(),
+        direct_velocity.velocity().y_component_meters(),
         direct_velocity.angular_velocity().radians_per_second()};
 
     WheelSpace_t target_wheel_velocity =
@@ -421,7 +453,7 @@ ErForceSimulator::getRampedVelocityPrimitive(
 
     // getting the current wheel velocity
     EuclideanSpace_t current_euclidean_velocity = {
-        -current_local_velocity.y(), current_local_velocity.x(),
+        current_local_velocity.x(), current_local_velocity.y(),
         current_local_angular_velocity.toRadians()};
 
     WheelSpace_t current_wheel_velocity =
@@ -436,7 +468,7 @@ ErForceSimulator::getRampedVelocityPrimitive(
     auto mutable_direct_velocity = target_velocity_primitive.mutable_motor_control()
                                        ->mutable_direct_velocity_control();
     *(mutable_direct_velocity->mutable_velocity()) =
-        *createVectorProto({ramped_euclidean[1], -ramped_euclidean[0]});
+        *createVectorProto({ramped_euclidean[0], ramped_euclidean[1]});
     *(mutable_direct_velocity->mutable_angular_velocity()) =
         *createAngularVelocityProto(AngularVelocity::fromRadians(ramped_euclidean[2]));
 
