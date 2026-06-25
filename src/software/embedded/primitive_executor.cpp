@@ -398,20 +398,31 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
         target_v_global =
             prev_target_global_velocity_ + velocity_delta.normalize(max_velocity_delta);
     }
+
+    // If the trajectory is in its acceleration phase (speed is increasing, not
+    // decelerating towards the destination), floor the commanded velocity magnitude
+    // to a minimum so we don't command an impractically small speed that the robot
+    // cannot physically achieve.
+    const Vector traj_accel = trajectory_path_->getAcceleration(sample_time_sec);
+    const bool is_accelerating =
+        target_velocity.length() < 1e-6 || traj_accel.dot(target_velocity) >= 0;
+    if (is_accelerating && target_v_global.length() < MIN_COMMAND_SPEED_M_PER_S)
+    {
+        target_v_global = target_v_global.normalize(MIN_COMMAND_SPEED_M_PER_S);
+    }
+
     prev_target_global_velocity_ = target_v_global;
 
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"target_pos_x", target_position.x()},
-        {"target_pos_y", target_position.y()},
-        {"target_vel_x", target_v_global.x()},
-        {"target_vel_y", target_v_global.y()},
-        {"actual_pos_x", state_.position().x()},
-        {"actual_pos_y", state_.position().y()},
-        {"actual_vel_x", state_.velocity().x()},
-        {"actual_vel_y", state_.velocity().y()},
-        {"traj_vel_x", target_velocity.x()},
-        {"traj_vel_y", target_velocity.y()}
-    });
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"target_pos_x", target_position.x()},
+                                                 {"target_pos_y", target_position.y()},
+                                                 {"target_vel_x", target_v_global.x()},
+                                                 {"target_vel_y", target_v_global.y()},
+                                                 {"actual_pos_x", state_.position().x()},
+                                                 {"actual_pos_y", state_.position().y()},
+                                                 {"actual_vel_x", state_.velocity().x()},
+                                                 {"actual_vel_y", state_.velocity().y()},
+                                                 {"traj_vel_x", target_velocity.x()},
+                                                 {"traj_vel_y", target_velocity.y()}});
 
     return globalToLocalVelocity(target_v_global, state_.orientation());
 }

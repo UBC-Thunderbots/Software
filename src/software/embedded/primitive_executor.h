@@ -186,6 +186,12 @@ class PrimitiveExecutor
     // is considered to be tracking the current trajectory well.
     static constexpr double VELOCITY_TRACKING_THRESHOLD_M_PER_S = 0.4;
 
+    // If the robot is in the acceleration phase of the trajectory (speed is increasing)
+    // and the commanded velocity magnitude is below this threshold, the commanded
+    // velocity is raised to this minimum. This prevents commanding very small velocities
+    // that the robot cannot physically achieve.
+    static constexpr double MIN_COMMAND_SPEED_M_PER_S = 0.3;
+
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
