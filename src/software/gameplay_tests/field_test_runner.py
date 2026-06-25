@@ -11,6 +11,7 @@ from proto.import_all_protos import (
     MoveTactic,
     ObstacleAvoidanceMode,
     ValidationProtoSet,
+    World,
     WorldState,
 )
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
@@ -136,6 +137,10 @@ class FieldTestRunner(TbotsTestRunner):
                     f"No World was received for {WORLD_BUFFER_TIMEOUT} seconds. Ending test early."
                 )
 
+            # The world reports robots by their field id, but validations are
+            # written against simulated ids. Relabel so validations match.
+            world = self._relabel_world_to_sim_ids(world)
+
             # Validate
             (
                 eventually_validation_proto_set,
@@ -228,6 +233,11 @@ class FieldTestRunner(TbotsTestRunner):
             sim_id: field_id
             for sim_id, field_id in enumerate(sorted(self.friendly_robot_ids_field))
         }
+        # Inverse mapping, used to relabel the world's field ids back to the
+        # simulated ids that validations are written against.
+        self.field_to_sim_robot_id = {
+            field_id: sim_id for sim_id, field_id in self.sim_to_field_robot_id.items()
+        }
         logger.info(f"simulated id to field id mapping {self.sim_to_field_robot_id}")
 
     def _create_move_tactics(self, robot_states):
@@ -271,6 +281,26 @@ class FieldTestRunner(TbotsTestRunner):
             mapped_tactics[self.sim_to_field_robot_id[sim_id]] = tactic
 
         return mapped_tactics
+
+    def _relabel_world_to_sim_ids(self, world: World) -> World:
+        """Return a copy of the world with friendly robot ids translated from
+        field ids back to the simulated ids the test uses.
+
+        Validations match robots by the contiguous simulated ids (0, 1, 2, ...),
+        but the world reports the robots' actual field ids. Relabeling the world
+        here lets every id-based validation find the correct robot without each
+        validation needing to know about the mapping. Friendly robots with no
+        mapping (e.g. extras not part of the test) keep their field id.
+
+        :param world: The World proto reported by the field full system
+        :return: a copy of the world with friendly robot ids in simulated-id space
+        """
+        relabeled_world = World()
+        relabeled_world.CopyFrom(world)
+        for robot in relabeled_world.friendly_team.team_robots:
+            if robot.id in self.field_to_sim_robot_id:
+                robot.id = self.field_to_sim_robot_id[robot.id]
+        return relabeled_world
 
     def _wait_for_robots_at_world_state(self, world_state: WorldState):
         """Block until every robot in the world state is within
