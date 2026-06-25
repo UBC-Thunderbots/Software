@@ -60,8 +60,6 @@ sudo pip install -r macos_requirements.txt
 
 print_status_msg "Done Setting Up Python Environment"
 
-sudo ln -s /opt/tbotspython/bin/platformio /usr/local/bin/platformio
-
 print_status_msg "Fetching game controller"
 install_gamecontroller $sys
 
@@ -78,6 +76,10 @@ print_status_msg "Done installing clang-format"
 print_status_msg "Setting up cross compiler for robot software"
 install_cross_compiler $sys
 print_status_msg "Done setting up cross compiler for robot software"
+
+print_status_msg "Setting Up PlatformIO"
+sudo ln -s /opt/tbotspython/bin/platformio /usr/local/bin/platformio
+print_status_msg "Done PlatformIO Setup"
 
 print_status_msg "Setting up STM32 cross-compiler for motor board firmware"
 install_stm32_cross_compiler $sys
