@@ -281,32 +281,19 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 
-# Execution paths resolve through Homebrew's version-independent `opt` symlink
-# (`brew --prefix aarch64-unknown-linux-gnu`), re-pointed on every `brew upgrade`,
-# so nothing here is pinned to a Cellar version.
 MACOS_ROBOT_TC = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain"
-
-# Invoking gcc through the `opt` symlink makes it report system-header absolute
-# paths two different ways: the sysroot auto-includes (e.g. stdc-predef.h) are
-# realpath'd to the resolved Cellar dir, while the C++ stdlib headers are reported
-# through the symlink. Whitelist both version-independent install roots so Bazel's
-# absolute-path-inclusion check passes for either form and for any `brew`-installed
-# version (builtin_include_directories are matched as path prefixes).
-MACOS_ROBOT_TC_HEADER_ROOTS = [
-    "/opt/homebrew/opt/aarch64-unknown-linux-gnu",  # symlink-reported (libstdc++ headers)
-    "/opt/homebrew/Cellar/aarch64-unknown-linux-gnu",  # realpath-reported (sysroot headers)
-]
 
 cc_toolchain_config_k8_aarch64_linux(
     name = "gcc_macos_robot",
-    builtin_include_directories =
-        MACOS_ROBOT_TC_HEADER_ROOTS + make_builtin_include_directories(),
+    builtin_include_directories = [
+        "/opt/homebrew/opt/aarch64-unknown-linux-gnu",  # symlink-reported (libstdc++ headers)
+        "/opt/homebrew/Cellar/aarch64-unknown-linux-gnu",  # realpath-reported (sysroot headers)
+    ] + make_builtin_include_directories(),
     tool_paths = {
         "ar": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ar",
         "cpp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-cpp",
         # messense ships no dwp; point at gcc (unused without fission).
         "dwp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-gcc",
-        # wrapper forces -fuse-ld=bfd (messense has no gold linker).
         "gcc": "wrapper/macos_robot_gcc",
         "gcov": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-gcov",
         "ld": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ld",

@@ -221,10 +221,6 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         if condition:
             command += list(flag.value)
 
-    # `test --suite` resolves to //..., and `bazel test` would also try to BUILD
-    # every non-test target in that pattern — including robot firmware that only
-    # compiles with the cross toolchain (e.g. thunderloop pulls in linux/* headers
-    # that don't exist on the host). Restrict to test targets and their deps.
     if config.test_suite and config.action == ActionArgument.test:
         command += ["--build_tests_only"]
 
