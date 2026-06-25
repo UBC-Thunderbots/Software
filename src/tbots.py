@@ -15,6 +15,7 @@ from typer import Argument, Context, Typer
 from cli.cli_params import (
     CATEGORY_CHOICES,
     DEBUG_POWERLOOP_PLAYBOOK,
+    DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
     INTERACTIVE_STYLE,
     LAUNCH_MODE_CHOICES,
     PLAYBOOK_CHOICES,
@@ -61,6 +62,8 @@ class BuildConfig:
     robot_name: str | None = None
     ansible_playbook: str | None = None
     debug_powerloop: bool = False
+    disable_power_service: bool = False
+    disable_motor_service: bool = False
 
 
 class BazelFlag(tuple, Enum):
@@ -71,6 +74,8 @@ class BazelFlag(tuple, Enum):
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)
     DEBUG_POWERLOOP = ("--//software/power:debug_powerloop",)
+    DISABLE_POWER_SERVICE = ("--//software/embedded:disable_power_service",)
+    DISABLE_MOTOR_SERVICE = ("--//software/embedded:disable_motor_service",)
 
 
 app = Typer()
@@ -209,6 +214,8 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
         BazelFlag.DEBUG_POWERLOOP: config.debug_powerloop,
+        BazelFlag.DISABLE_POWER_SERVICE: config.disable_power_service,
+        BazelFlag.DISABLE_MOTOR_SERVICE: config.disable_motor_service,
     }
     for flag, condition in flag_conditions.items():
         if condition:
@@ -367,15 +374,24 @@ def start_interactive_cli():
                 choices=PLAYBOOK_CHOICES,
                 style=INTERACTIVE_STYLE,
             ).ask()
-            # The DEBUG_POWERLOOP entry reuses the deploy_powerboard playbook but
-            # compiles powerloop_main with the DEBUG_POWERLOOP flag, swapping in
-            # the bare setup()/loop() stubs so arbitrary code can be flashed onto
-            # the powerboard microcontroller for debugging.
+
             if playbook_choice == DEBUG_POWERLOOP_PLAYBOOK:
                 config.ansible_playbook = "deploy_powerboard.yml"
                 config.debug_powerloop = True
             else:
                 config.ansible_playbook = playbook_choice
+
+            if config.ansible_playbook == "deploy_robot_software.yml":
+                selected = (
+                    questionary.checkbox(
+                        "Options:",
+                        choices=DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
+                        style=INTERACTIVE_STYLE,
+                    ).ask()
+                    or []
+                )
+                config.disable_power_service = "DISABLE_POWER_SERVICE" in selected
+                config.disable_motor_service = "DISABLE_MOTOR_SERVICE" in selected
             config.robot_name = questionary.text(
                 "Robot name?", style=INTERACTIVE_STYLE
             ).ask()
