@@ -26,6 +26,9 @@ LAUNCH_DELAY_S = 0.1
 # How close (in metres) a robot must be to its target position before the test
 # is allowed to start
 ROBOT_SETUP_TOLERANCE_M = 0.1
+# How close (in radians) a robot must be to its target orientation before the
+# test is allowed to start
+ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD = 0.1
 # How long to wait for robots to drive to their target positions before giving up
 ROBOT_SETUP_TIMEOUT_S = 30.0
 
@@ -343,12 +346,12 @@ class FieldTestRunner(TbotsTestRunner):
             except queue.Empty:
                 continue
 
-            friendly_positions = {
-                robot.id: robot.current_state.global_position
+            friendly_states = {
+                robot.id: robot.current_state
                 for robot in world.friendly_team.team_robots
             }
 
-            if self._all_robots_at_targets(friendly_targets, friendly_positions):
+            if self._all_robots_at_targets(friendly_targets, friendly_states):
                 logger.info("all robots reached their target positions")
                 return
 
@@ -358,25 +361,43 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     @staticmethod
-    def _all_robots_at_targets(targets, positions):
+    def _all_robots_at_targets(targets, states):
         """Check that every targeted robot is within ROBOT_SETUP_TOLERANCE_M of
-        its target position.
+        its target position and ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD of its
+        target orientation.
 
-        :param targets: map of robot_id -> RobotState with the desired positions
-        :param positions: dict of robot_id -> current global_position Point
+        :param targets: map of robot_id -> RobotState with the desired state
+        :param states: dict of robot_id -> current RobotState
         :return: True if every targeted robot is present and within tolerance
         """
-        for robot_id, robot_state in targets.items():
-            if robot_id not in positions:
+        for robot_id, target in targets.items():
+            if robot_id not in states:
                 return False
 
-            target = robot_state.global_position
-            current = positions[robot_id]
+            current = states[robot_id]
             distance = math.hypot(
-                current.x_meters - target.x_meters,
-                current.y_meters - target.y_meters,
+                current.global_position.x_meters - target.global_position.x_meters,
+                current.global_position.y_meters - target.global_position.y_meters,
             )
             if distance > ROBOT_SETUP_TOLERANCE_M:
                 return False
 
+            orientation_diff = FieldTestRunner._smallest_angle_diff(
+                current.global_orientation.radians, target.global_orientation.radians
+            )
+            if orientation_diff > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD:
+                return False
+
         return True
+
+    @staticmethod
+    def _smallest_angle_diff(angle_a_rad, angle_b_rad):
+        """Return the smallest absolute difference between two angles in radians,
+        accounting for wraparound (result is in [0, pi]).
+
+        :param angle_a_rad: the first angle, in radians
+        :param angle_b_rad: the second angle, in radians
+        :return: the smallest absolute difference between the angles, in radians
+        """
+        diff = angle_a_rad - angle_b_rad
+        return abs(math.atan2(math.sin(diff), math.cos(diff)))
