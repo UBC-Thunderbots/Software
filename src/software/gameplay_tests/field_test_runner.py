@@ -83,6 +83,18 @@ class FieldTestRunner(TbotsTestRunner):
         self._wait_for_robots_at_world_state(world_state)
 
     @override
+    def set_tactics(self, blue_tactics={}, yellow_tactics={}):
+        """Override AI tactics, remapping the friendly team's simulated robot ids
+        to the robot ids that are actually available on the field.
+        """
+        if self.is_yellow_friendly:
+            yellow_tactics = self._map_tactics_to_field_ids(yellow_tactics)
+        else:
+            blue_tactics = self._map_tactics_to_field_ids(blue_tactics)
+
+        super().set_tactics(blue_tactics=blue_tactics, yellow_tactics=yellow_tactics)
+
+    @override
     def _pre_run_setup(self, setup: (lambda: None)):
         """Wait for estop to be in play state before running setup
 
@@ -205,6 +217,19 @@ class FieldTestRunner(TbotsTestRunner):
         if len(self.friendly_robot_ids_field) == 0:
             raise Exception("no friendly robots found on field within timeout")
 
+        # Simulated tests create robots with contiguous ids (0, 1, 2, ...), but
+        # the robots physically on the field may have arbitrary ids and there may
+        # be fewer of them. Map each simulated id to an available field id, in
+        # ascending order, so tactics written against simulated ids are sent to
+        # the robots that are actually present. e.g. field robots [4, 5] map
+        # simulated id 0 -> 4 and 1 -> 5; field robots [0, 1, 5] map 0 -> 0,
+        # 1 -> 1 and 2 -> 5.
+        self.sim_to_field_robot_id = {
+            sim_id: field_id
+            for sim_id, field_id in enumerate(sorted(self.friendly_robot_ids_field))
+        }
+        logger.info(f"simulated id to field id mapping {self.sim_to_field_robot_id}")
+
     def _create_move_tactics(self, robot_states):
         """Create a MoveTactic for each robot to drive it to its world state.
 
@@ -224,6 +249,29 @@ class FieldTestRunner(TbotsTestRunner):
             for robot_id, robot_state in robot_states.items()
         }
 
+    def _map_tactics_to_field_ids(self, tactics):
+        """Remap a tactics dict keyed by simulated robot ids to the robot ids
+        available on the field. Tactics for simulated ids with no available
+        field robot are dropped with a warning.
+
+        :param tactics: None or dict of simulated_robot_id -> tactic
+        :return: None if tactics is None, else dict of field_robot_id -> tactic
+        """
+        if tactics is None:
+            return None
+
+        mapped_tactics = {}
+        for sim_id, tactic in tactics.items():
+            if sim_id not in self.sim_to_field_robot_id:
+                logger.warning(
+                    f"no field robot available for simulated robot id {sim_id}; "
+                    "skipping its tactic"
+                )
+                continue
+            mapped_tactics[self.sim_to_field_robot_id[sim_id]] = tactic
+
+        return mapped_tactics
+
     def _wait_for_robots_at_world_state(self, world_state: WorldState):
         """Block until every robot in the world state is within
         ROBOT_SETUP_TOLERANCE_M of its target position.
@@ -231,7 +279,8 @@ class FieldTestRunner(TbotsTestRunner):
         Robot positions are read from the friendly full system's World in the
         same fashion as _survey_field_robots. The friendly team maps to the
         friendly-coloured robots in the world state, and the enemy team to the
-        other colour.
+        other colour. The friendly targets are remapped from simulated ids to
+        the field ids they were assigned to in set_tactics.
 
         :param world_state: The WorldState proto with the desired robot states
         :raises Exception: if the robots do not reach their targets within
@@ -243,6 +292,14 @@ class FieldTestRunner(TbotsTestRunner):
         else:
             friendly_targets = world_state.blue_robots
             enemy_targets = world_state.yellow_robots
+
+        # Remap the friendly targets onto the field ids they were commanded to,
+        # dropping any simulated id that has no available field robot
+        friendly_targets = {
+            self.sim_to_field_robot_id[sim_id]: robot_state
+            for sim_id, robot_state in friendly_targets.items()
+            if sim_id in self.sim_to_field_robot_id
+        }
 
         logger.info("waiting for robots to reach their target positions")
         wait_start_time = time.time()
