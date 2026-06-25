@@ -26,8 +26,7 @@ std::optional<std::string> ArduinoUtil::getArduinoPort()
                 if (hwInfo.value().vendor == id.vendor_id &&
                     hwInfo.value().product == id.product_id)
                 {
-                    std::string device_path =
-                        (boost::format("/dev/%1%") % device).str();
+                    std::string device_path = (boost::format("/dev/%1%") % device).str();
                     return device_path;
                 }
             }
