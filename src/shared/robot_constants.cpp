@@ -40,8 +40,8 @@ RobotConstants createRobotConstants()
         .robot_trajectory_max_acceleration_m_per_s_2 = 3.5f,
         .robot_trajectory_max_deceleration_m_per_s_2 = 3.5f,
 
-        .robot_max_jerk_m_per_s_3            = 0.3f,
-        .robot_trajectory_max_jerk_m_per_s_3 = 0.3f,
+        .robot_max_jerk_m_per_s_3            = 0.1f,
+        .robot_trajectory_max_jerk_m_per_s_3 = 0.1f,
 
         // Robot's angular movement constants
         .robot_max_ang_speed_rad_per_s            = 10.0f,

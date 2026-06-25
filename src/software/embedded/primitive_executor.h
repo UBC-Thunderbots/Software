@@ -165,8 +165,8 @@ class PrimitiveExecutor
     // Velocity PID controllers that correct for error between the robot's actual
     // velocity and the trajectory's feedforward velocity. Separate x/y controllers
     // follow the same pattern as PositionController.
-    PidController<double> velocity_x_pid_{1.0, 0.02, 0.0, 2.0};
-    PidController<double> velocity_y_pid_{1.0, 0.02, 0.0, 2.0};
+    PidController<double> velocity_x_pid_{0, 0.8, 0.0, 4.0};
+    PidController<double> velocity_y_pid_{0, 0.8, 0.0, 4.0};
 
     // The velocities commanded on the previous step. Used to measure the commanded
     // (tick-to-tick) acceleration
@@ -177,7 +177,7 @@ class PrimitiveExecutor
     // trajectory. This keeps the target leading the robot so it makes forward progress
     // along the path (without it, starting from rest the planned velocity at the nearest
     // point is ~0 and the robot would never start moving).
-    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.8;
+    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.2;
 
     // If the final destination or any subdestination of the new trajectory differs from
     // the current one by more than this distance, we switch to the new trajectory.
@@ -197,7 +197,7 @@ class PrimitiveExecutor
     // and the commanded velocity magnitude is below this threshold, the commanded
     // velocity is raised to this minimum. This prevents commanding very small velocities
     // that the robot cannot physically achieve.
-    static constexpr double MIN_COMMAND_SPEED_M_PER_S = 0.3;
+    static constexpr double MIN_COMMAND_SPEED_M_PER_S = 0.05;
 
     // Distance from the final destination below which we do not enforce the minimum
     // command speed, so the robot can make small velocity adjustments for fine
