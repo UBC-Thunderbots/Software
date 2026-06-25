@@ -437,11 +437,6 @@ ErForceSimulator::getRampedVelocityPrimitive(
     TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
         target_velocity_primitive.motor_control().direct_velocity_control();
 
-    // The Euclidean velocity fed to the wheel conversion must use the same robot-local
-    // frame as the real motor service (see MotorService::poll). Both the primitive's
-    // velocity and RobotState::localVelocity() are expressed as +x forward, +y left,
-    // which is exactly the frame EuclideanToWheel expects, so no rotation is applied.
-
     // getting the target wheel velocity
     EuclideanSpace_t target_euclidean_velocity = {
         direct_velocity.velocity().x_component_meters(),
