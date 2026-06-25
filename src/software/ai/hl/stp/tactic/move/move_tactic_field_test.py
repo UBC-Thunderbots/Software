@@ -22,14 +22,12 @@ from software.gameplay_tests.validation.robot_enters_region import (
 def test_basic_rotation(angle, gameplay_test_runner):
     target_angle = tbots_cpp.Angle.fromDegrees(angle)
     start_position = tbots_cpp.Point(-1.5, 0.6)
-    robot_id = 2
+    robot_id = 0
 
     def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
-                    tbots_cpp.Point(0.0, 0.0),
-                    tbots_cpp.Point(0.0, 1.0),
                     start_position,
                 ],
                 yellow_robot_locations=[],

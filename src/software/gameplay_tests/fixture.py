@@ -209,11 +209,13 @@ def field_session(args, runtime_subpath):
     debug_full_sys = args.debug_blue_full_system
     runtime_dir = f"{args.blue_full_system_runtime_dir}/{runtime_subpath}"
     friendly_proto_unix_io = blue_full_system_proto_unix_io
+    enemy_proto_unix_io = yellow_full_system_proto_unix_io
 
     if args.run_yellow:
         debug_full_sys = args.debug_yellow_full_system
         runtime_dir = f"{args.yellow_full_system_runtime_dir}/{runtime_subpath}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
+        enemy_proto_unix_io = blue_full_system_proto_unix_io
 
     estop_mode, estop_path = get_estop_config(
         args.keyboard_estop, args.disable_communication
@@ -227,6 +229,13 @@ def field_session(args, runtime_subpath):
             friendly_colour_yellow=args.run_yellow,
             should_restart_on_crash=False,
         ) as friendly_fs,
+        FullSystem(
+            "software/unix_full_system",
+            full_system_runtime_dir=runtime_dir,
+            debug_full_system=debug_full_sys,
+            friendly_colour_yellow=not args.run_yellow,
+            should_restart_on_crash=False,
+        ) as enemy_fs,
         Gamecontroller(
             # we would be using conventional port if and only if we are playing in robocup.
             suppress_logs=(not args.verbose),
@@ -249,6 +258,7 @@ def field_session(args, runtime_subpath):
         ) as rc_friendly,
     ):
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
+        enemy_fs.setup_proto_unix_io(enemy_proto_unix_io)
 
         gamecontroller.setup_proto_unix_io(
             blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
