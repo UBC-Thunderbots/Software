@@ -1,7 +1,7 @@
 import contextlib
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 import pytest
 from software.py_constants import (
