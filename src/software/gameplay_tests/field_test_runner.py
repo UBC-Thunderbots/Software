@@ -68,7 +68,6 @@ class FieldTestRunner(TbotsTestRunner):
             is_yellow_friendly,
             owns_thunderscope=owns_thunderscope,
         )
-        self.is_yellow_friendly = is_yellow_friendly
         self.robot_communication = robot_communication
 
         self._survey_field_robots()
@@ -226,7 +225,6 @@ class FieldTestRunner(TbotsTestRunner):
                 world = self.world_buffer.get(
                     block=True, timeout=0.1, return_cached=False
                 )
-                self.initial_world = world
                 self.friendly_robot_ids_field = [
                     robot.id for robot in world.friendly_team.team_robots
                 ]
@@ -350,7 +348,7 @@ class FieldTestRunner(TbotsTestRunner):
 
         logger.info("waiting for robots to reach their target positions")
         wait_start_time = time.time()
-        friendly_states = {}
+        not_at_targets = ["no world received from the field"]
         while time.time() - wait_start_time < ROBOT_SETUP_TIMEOUT_S:
             if self._is_cancelled():
                 return
@@ -366,16 +364,15 @@ class FieldTestRunner(TbotsTestRunner):
                 robot.id: robot.current_state
                 for robot in world.friendly_team.team_robots
             }
-
-            if self._all_robots_at_targets(friendly_targets, friendly_states):
+            not_at_targets = self._describe_robots_not_at_targets(
+                friendly_targets, friendly_states
+            )
+            if not not_at_targets:
                 logger.info("all robots reached their target positions")
                 return
 
         # Timed out: report which robots are not yet at their targets, and why,
         # so the operator knows what to fix
-        not_at_targets = self._describe_robots_not_at_targets(
-            friendly_targets, friendly_states
-        )
         for description in not_at_targets:
             logger.error(description)
         raise Exception(
@@ -384,34 +381,10 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     @staticmethod
-    def _all_robots_at_targets(targets, states):
-        """Check that every targeted robot is within ROBOT_SETUP_TOLERANCE_M of
-        its target position and ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD of its
-        target orientation.
-
-        :param targets: map of robot_id -> RobotState with the desired state
-        :param states: dict of robot_id -> current RobotState
-        :return: True if every targeted robot is present and within tolerance
-        """
-        for robot_id, target in targets.items():
-            if robot_id not in states:
-                return False
-
-            distance, orientation_diff = FieldTestRunner._target_error(
-                target, states[robot_id]
-            )
-            if (
-                distance > ROBOT_SETUP_TOLERANCE_M
-                or orientation_diff > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD
-            ):
-                return False
-
-        return True
-
-    @staticmethod
     def _describe_robots_not_at_targets(targets, states):
-        """Describe each targeted robot that has not reached its target, used to
-        report what went wrong when setup times out.
+        """Describe each targeted robot that is not within ROBOT_SETUP_TOLERANCE_M
+        of its target position and ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD of its
+        target orientation. An empty result means every robot is in place.
 
         :param targets: map of field_robot_id -> RobotState with the desired state
         :param states: dict of field_robot_id -> current RobotState
@@ -423,47 +396,27 @@ class FieldTestRunner(TbotsTestRunner):
                 descriptions.append(f"robot {robot_id}: not visible on field")
                 continue
 
-            distance, orientation_diff = FieldTestRunner._target_error(
-                target, states[robot_id]
+            current = states[robot_id]
+            distance = math.hypot(
+                current.global_position.x_meters - target.global_position.x_meters,
+                current.global_position.y_meters - target.global_position.y_meters,
             )
+            # Smallest absolute orientation error, accounting for wraparound
+            orientation_error = (
+                target.global_orientation.radians - current.global_orientation.radians
+            )
+            orientation_error = abs(
+                math.atan2(math.sin(orientation_error), math.cos(orientation_error))
+            )
+
             if (
                 distance > ROBOT_SETUP_TOLERANCE_M
-                or orientation_diff > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD
+                or orientation_error > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD
             ):
                 descriptions.append(
                     f"robot {robot_id}: {distance:.2f}m from target position "
-                    f"(tolerance {ROBOT_SETUP_TOLERANCE_M}m), {orientation_diff:.2f}rad "
+                    f"(tolerance {ROBOT_SETUP_TOLERANCE_M}m), {orientation_error:.2f}rad "
                     f"from target orientation "
                     f"(tolerance {ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD}rad)"
                 )
         return descriptions
-
-    @staticmethod
-    def _target_error(target, current):
-        """Return the position and orientation error between a robot's current
-        state and its target state.
-
-        :param target: the desired RobotState
-        :param current: the current RobotState
-        :return: (position_error_m, orientation_error_rad)
-        """
-        distance = math.hypot(
-            current.global_position.x_meters - target.global_position.x_meters,
-            current.global_position.y_meters - target.global_position.y_meters,
-        )
-        orientation_diff = FieldTestRunner._smallest_angle_diff(
-            current.global_orientation.radians, target.global_orientation.radians
-        )
-        return distance, orientation_diff
-
-    @staticmethod
-    def _smallest_angle_diff(angle_a_rad, angle_b_rad):
-        """Return the smallest absolute difference between two angles in radians,
-        accounting for wraparound (result is in [0, pi]).
-
-        :param angle_a_rad: the first angle, in radians
-        :param angle_b_rad: the second angle, in radians
-        :return: the smallest absolute difference between the angles, in radians
-        """
-        diff = angle_a_rad - angle_b_rad
-        return abs(math.atan2(math.sin(diff), math.cos(diff)))
