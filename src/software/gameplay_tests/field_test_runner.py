@@ -112,6 +112,8 @@ class FieldTestRunner(TbotsTestRunner):
         :param setup: Function that sets up the world state
         """
         self._wait_for_estop_play()
+        if self._is_cancelled():
+            return
         setup()
 
     @override
@@ -199,13 +201,17 @@ class FieldTestRunner(TbotsTestRunner):
         self._stopper()
 
     def _wait_for_estop_play(self):
-        """Blocks until the estop is in the PLAY state"""
+        """Blocks until the estop is in the PLAY state, or the run is cancelled."""
         if self.robot_communication.estop_is_playing:
             return
 
         logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
-        while not self.robot_communication.estop_is_playing:
+        while not self.robot_communication.estop_is_playing and not self._is_cancelled():
             time.sleep(0.1)
+
+        if self._is_cancelled():
+            return
+
         logger.info(
             "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
         )
@@ -217,7 +223,9 @@ class FieldTestRunner(TbotsTestRunner):
         self.friendly_robot_ids_field = []
         while time.time() - survey_start_time < WORLD_BUFFER_TIMEOUT:
             try:
-                world = self.world_buffer.get(block=True, timeout=0.1)
+                world = self.world_buffer.get(
+                    block=True, timeout=0.1, return_cached=False
+                )
                 self.initial_world = world
                 self.friendly_robot_ids_field = [
                     robot.id for robot in world.friendly_team.team_robots
@@ -314,7 +322,9 @@ class FieldTestRunner(TbotsTestRunner):
 
     def _wait_for_robots_at_world_state(self, world_state: WorldState):
         """Block until every robot in the world state is within
-        ROBOT_SETUP_TOLERANCE_M of its target position.
+        ROBOT_SETUP_TOLERANCE_M of its target position and
+        ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD of its target orientation. Returns
+        early if the run is cancelled.
 
         Robot positions are read from the friendly full system's World in the
         same fashion as _survey_field_robots. The friendly targets are remapped
@@ -340,9 +350,15 @@ class FieldTestRunner(TbotsTestRunner):
 
         logger.info("waiting for robots to reach their target positions")
         wait_start_time = time.time()
+        friendly_states = {}
         while time.time() - wait_start_time < ROBOT_SETUP_TIMEOUT_S:
+            if self._is_cancelled():
+                return
+
             try:
-                world = self.world_buffer.get(block=True, timeout=0.1)
+                world = self.world_buffer.get(
+                    block=True, timeout=0.1, return_cached=False
+                )
             except queue.Empty:
                 continue
 
@@ -355,9 +371,16 @@ class FieldTestRunner(TbotsTestRunner):
                 logger.info("all robots reached their target positions")
                 return
 
+        # Timed out: report which robots are not yet at their targets, and why,
+        # so the operator knows what to fix
+        not_at_targets = self._describe_robots_not_at_targets(
+            friendly_targets, friendly_states
+        )
+        for description in not_at_targets:
+            logger.error(description)
         raise Exception(
             f"robots did not reach their target positions within "
-            f"{ROBOT_SETUP_TIMEOUT_S} seconds"
+            f"{ROBOT_SETUP_TIMEOUT_S} seconds: {'; '.join(not_at_targets)}"
         )
 
     @staticmethod
@@ -374,21 +397,64 @@ class FieldTestRunner(TbotsTestRunner):
             if robot_id not in states:
                 return False
 
-            current = states[robot_id]
-            distance = math.hypot(
-                current.global_position.x_meters - target.global_position.x_meters,
-                current.global_position.y_meters - target.global_position.y_meters,
+            distance, orientation_diff = FieldTestRunner._target_error(
+                target, states[robot_id]
             )
-            if distance > ROBOT_SETUP_TOLERANCE_M:
-                return False
-
-            orientation_diff = FieldTestRunner._smallest_angle_diff(
-                current.global_orientation.radians, target.global_orientation.radians
-            )
-            if orientation_diff > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD:
+            if (
+                distance > ROBOT_SETUP_TOLERANCE_M
+                or orientation_diff > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD
+            ):
                 return False
 
         return True
+
+    @staticmethod
+    def _describe_robots_not_at_targets(targets, states):
+        """Describe each targeted robot that has not reached its target, used to
+        report what went wrong when setup times out.
+
+        :param targets: map of field_robot_id -> RobotState with the desired state
+        :param states: dict of field_robot_id -> current RobotState
+        :return: list of human-readable strings, one per robot not at its target
+        """
+        descriptions = []
+        for robot_id, target in targets.items():
+            if robot_id not in states:
+                descriptions.append(f"robot {robot_id}: not visible on field")
+                continue
+
+            distance, orientation_diff = FieldTestRunner._target_error(
+                target, states[robot_id]
+            )
+            if (
+                distance > ROBOT_SETUP_TOLERANCE_M
+                or orientation_diff > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD
+            ):
+                descriptions.append(
+                    f"robot {robot_id}: {distance:.2f}m from target position "
+                    f"(tolerance {ROBOT_SETUP_TOLERANCE_M}m), {orientation_diff:.2f}rad "
+                    f"from target orientation "
+                    f"(tolerance {ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD}rad)"
+                )
+        return descriptions
+
+    @staticmethod
+    def _target_error(target, current):
+        """Return the position and orientation error between a robot's current
+        state and its target state.
+
+        :param target: the desired RobotState
+        :param current: the current RobotState
+        :return: (position_error_m, orientation_error_rad)
+        """
+        distance = math.hypot(
+            current.global_position.x_meters - target.global_position.x_meters,
+            current.global_position.y_meters - target.global_position.y_meters,
+        )
+        orientation_diff = FieldTestRunner._smallest_angle_diff(
+            current.global_orientation.radians, target.global_orientation.radians
+        )
+        return distance, orientation_diff
 
     @staticmethod
     def _smallest_angle_diff(angle_a_rad, angle_b_rad):
