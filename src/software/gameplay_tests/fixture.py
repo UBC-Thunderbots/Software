@@ -207,13 +207,15 @@ def field_session(args, runtime_subpath):
     blue_full_system_proto_unix_io = ProtoUnixIO()
 
     debug_full_sys = args.debug_blue_full_system
-    runtime_dir = f"{args.blue_full_system_runtime_dir}/{runtime_subpath}"
+    friendly_runtime_dir = f"{args.blue_full_system_runtime_dir}/{runtime_subpath}"
+    enemy_runtime_dir = f"{args.yellow_full_system_runtime_dir}/{runtime_subpath}"
     friendly_proto_unix_io = blue_full_system_proto_unix_io
     enemy_proto_unix_io = yellow_full_system_proto_unix_io
 
     if args.run_yellow:
         debug_full_sys = args.debug_yellow_full_system
-        runtime_dir = f"{args.yellow_full_system_runtime_dir}/{runtime_subpath}"
+        friendly_runtime_dir = f"{args.yellow_full_system_runtime_dir}/{runtime_subpath}"
+        enemy_runtime_dir = f"{args.blue_full_system_runtime_dir}/{runtime_subpath}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
         enemy_proto_unix_io = blue_full_system_proto_unix_io
 
@@ -224,14 +226,14 @@ def field_session(args, runtime_subpath):
     with (
         FullSystem(
             "software/unix_full_system",
-            full_system_runtime_dir=runtime_dir,
+            full_system_runtime_dir=friendly_runtime_dir,
             debug_full_system=debug_full_sys,
             friendly_colour_yellow=args.run_yellow,
             should_restart_on_crash=False,
         ) as friendly_fs,
         FullSystem(
             "software/unix_full_system",
-            full_system_runtime_dir=runtime_dir,
+            full_system_runtime_dir=enemy_runtime_dir,
             debug_full_system=debug_full_sys,
             friendly_colour_yellow=not args.run_yellow,
             should_restart_on_crash=False,
