@@ -370,6 +370,7 @@ def test_attacker_shoot_goal(
                     chip_target=tbots_cpp.createPointProto(
                         tbots_cpp.Point(0, field.fieldLines().yMin())
                     ),
+                    pass_committed=False,
                 )
             }
         )

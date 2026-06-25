@@ -92,10 +92,6 @@ from software.gameplay_tests.simulated_test_fixture import (
         ),
     ],
 )
-# TODO: #3503
-@pytest.mark.skip(
-    "Disabling this test because OrValidation is passed both an always validation and eventually validation"
-)
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
@@ -120,15 +116,15 @@ def test_enemy_free_kick_play(
             blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
         )
 
-    # Always Validation
+    # Validation RoboCup SSL rules: can't be within 0.5m of ball before its kicked
     always_validation_sequence_set = [
         [
             OrValidation(
                 [
                     RobotNeverEntersRegion(
-                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]
                     ),
-                    BallEventuallyExitsRegion(
+                    BallNeverEntersRegion(
                         regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
                     ),
                 ]

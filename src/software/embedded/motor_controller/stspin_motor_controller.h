@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <chrono>
 
 #include "software/embedded/gpio/gpio.h"
@@ -40,10 +41,10 @@ class StSpinMotorController : public MotorController
                      SetSpeedFeedForwardKaKvMessage, SetSpeedFeedForwardKsMessage>;
 
     // Length of message (in number of bytes)
-    static constexpr unsigned int MESSAGE_SIZE = 8;
+    static constexpr unsigned int MESSAGE_SIZE = 10;
 
-    // Delimiter byte used to indicate start of a message
-    static constexpr uint8_t MESSAGE_DELIMITER = 0xAA;
+    // Delimiter sequence used to indicate start of a message
+    static constexpr std::array<uint8_t, 3> MESSAGE_DELIMITER = {0xAA, 0xBB, 0xCC};
 
     // Maximum number of SPI transfer attempts to wait for an acknowledgement
     // before giving up. Prevents unresponsive MD (e.g. firmware crash or
