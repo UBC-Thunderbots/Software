@@ -41,10 +41,6 @@ class RobotCommunication:
         """
         self.sequence_number = 0
         self.current_proto_unix_io = current_proto_unix_io
-        self.estop_mode = estop_mode
-
-        self.estop_path = estop_path
-        self.estop_baudrate = estop_baudrate
 
         self.communication_manager = communication_manager
 
