@@ -1,7 +1,6 @@
 #include "software/embedded/primitive_executor.h"
 
 #include <algorithm>
-#include <limits>
 #include <vector>
 
 #include "proto/message_translation/tbots_geometry.h"
@@ -67,106 +66,6 @@ bool destinationsChangedSignificantly(const TrajectoryPath& current,
 
     return false;
 }
-
-// Number of samples used in the coarse (whole-trajectory) and fine (refinement) passes
-// of the nearest-point search.
-constexpr int NUM_NEAREST_POINT_COARSE_SAMPLES = 30;
-constexpr int NUM_NEAREST_POINT_FINE_SAMPLES   = 10;
-
-/**
- * Find the time on the trajectory whose position is closest to the given query position.
- * A coarse pass scans the whole trajectory; a fine pass refines around the best coarse
- * sample. This is what anchors trajectory-following to the robot's actual progress: we
- * follow the trajectory by geometry (where we are on the path) rather than by a wall
- * clock (how much time has elapsed).
- *
- * @param trajectory The trajectory to search
- * @param position The query position (the robot's actual position)
- * @return The time, in seconds since the trajectory's start, of the closest point
- */
-double findNearestTimeOnTrajectory(const TrajectoryPath& trajectory,
-                                   const Point& position)
-{
-    const double total_time = trajectory.getTotalTime();
-    if (total_time <= 0.0)
-    {
-        return 0.0;
-    }
-
-    const auto search = [&](double start_t, double end_t, int num_samples, double& best_t,
-                            double& best_dist_sq)
-    {
-        for (int i = 0; i <= num_samples; ++i)
-        {
-            const double t =
-                start_t + (end_t - start_t) *
-                              (static_cast<double>(i) / static_cast<double>(num_samples));
-            const double dist_sq = (trajectory.getPosition(t) - position).lengthSquared();
-            if (dist_sq < best_dist_sq)
-            {
-                best_dist_sq = dist_sq;
-                best_t       = t;
-            }
-        }
-    };
-
-    double best_t       = 0.0;
-    double best_dist_sq = std::numeric_limits<double>::max();
-    search(0.0, total_time, NUM_NEAREST_POINT_COARSE_SAMPLES, best_t, best_dist_sq);
-
-    // Refine within one coarse step on either side of the best coarse sample.
-    const double coarse_step = total_time / NUM_NEAREST_POINT_COARSE_SAMPLES;
-    search(std::max(0.0, best_t - coarse_step),
-           std::min(total_time, best_t + coarse_step), NUM_NEAREST_POINT_FINE_SAMPLES,
-           best_t, best_dist_sq);
-    return best_t;
-}
-
-/**
- * Angular analogue of findNearestTimeOnTrajectory: find the time on the angular
- * trajectory whose orientation is closest to the given orientation.
- *
- * @param trajectory The angular trajectory to search
- * @param orientation The query orientation (the robot's actual orientation)
- * @return The time, in seconds since the trajectory's start, of the closest point
- */
-double findNearestTimeOnAngularTrajectory(const BangBangTrajectory1DAngular& trajectory,
-                                          const Angle& orientation)
-{
-    const double total_time = trajectory.getTotalTime();
-    if (total_time <= 0.0)
-    {
-        return 0.0;
-    }
-
-    const auto search = [&](double start_t, double end_t, int num_samples, double& best_t,
-                            double& best_diff_rad)
-    {
-        for (int i = 0; i <= num_samples; ++i)
-        {
-            const double t =
-                start_t + (end_t - start_t) *
-                              (static_cast<double>(i) / static_cast<double>(num_samples));
-            const double diff_rad =
-                trajectory.getPosition(t).minDiff(orientation).toRadians();
-            if (diff_rad < best_diff_rad)
-            {
-                best_diff_rad = diff_rad;
-                best_t        = t;
-            }
-        }
-    };
-
-    double best_t        = 0.0;
-    double best_diff_rad = std::numeric_limits<double>::max();
-    search(0.0, total_time, NUM_NEAREST_POINT_COARSE_SAMPLES, best_t, best_diff_rad);
-
-    const double coarse_step = total_time / NUM_NEAREST_POINT_COARSE_SAMPLES;
-    search(std::max(0.0, best_t - coarse_step),
-           std::min(total_time, best_t + coarse_step), NUM_NEAREST_POINT_FINE_SAMPLES,
-           best_t, best_diff_rad);
-    return best_t;
-}
 }  // namespace
 
 PrimitiveExecutor::PrimitiveExecutor(
@@ -228,17 +127,15 @@ bool PrimitiveExecutor::shouldFollowNewLinearTrajectory(
         return true;
     }
 
-    // Find the point on the current trajectory nearest to the robot's actual position.
-    // We use this to measure tracking error.
-    const double nearest_time_sec =
-        findNearestTimeOnTrajectory(*trajectory_path_, state_.position());
-
-    // If we are already tracking the current trajectory well (position and velocity
-    // errors are small), keep following it to avoid unnecessary controller resets.
+    // Measure how well we're tracking the current trajectory by comparing the robot's
+    // actual state against where the trajectory expects it to be at the current elapsed
+    // time. If we are already tracking it well (position and velocity errors are small),
+    // keep following it to avoid unnecessary controller resets.
+    const double elapsed_time_sec = trajectory_elapsed_time_.toSeconds();
     const double position_error =
-        (state_.position() - trajectory_path_->getPosition(nearest_time_sec)).length();
+        (state_.position() - trajectory_path_->getPosition(elapsed_time_sec)).length();
     const double velocity_error =
-        (state_.velocity() - trajectory_path_->getVelocity(nearest_time_sec)).length();
+        (state_.velocity() - trajectory_path_->getVelocity(elapsed_time_sec)).length();
 
     if (position_error < POSITION_TRACKING_THRESHOLD_M &&
         velocity_error < VELOCITY_TRACKING_THRESHOLD_M_PER_S)
@@ -280,11 +177,13 @@ void PrimitiveExecutor::startFollowingNewLinearTrajectory(
     // abrupt change in commanded velocity.
     if (trajectory_path_.has_value())
     {
-        prev_trajectory_path_   = trajectory_path_;
+        prev_trajectory_path_         = trajectory_path_;
+        prev_trajectory_elapsed_time_ = trajectory_elapsed_time_;
         linear_blend_remaining_ = Duration::fromSeconds(TRAJECTORY_BLEND_DURATION_S);
     }
 
-    trajectory_path_ = new_trajectory;
+    trajectory_path_         = new_trajectory;
+    trajectory_elapsed_time_ = Duration::fromSeconds(0);
     position_controller_.reset();
     velocity_x_pid_.reset();
     velocity_y_pid_.reset();
@@ -296,11 +195,13 @@ void PrimitiveExecutor::startFollowingNewAngularTrajectory(
     // See startFollowingNewLinearTrajectory for the blend rationale.
     if (angular_trajectory_.has_value())
     {
-        prev_angular_trajectory_ = angular_trajectory_;
+        prev_angular_trajectory_              = angular_trajectory_;
+        prev_angular_trajectory_elapsed_time_ = angular_trajectory_elapsed_time_;
         angular_blend_remaining_ = Duration::fromSeconds(TRAJECTORY_BLEND_DURATION_S);
     }
 
-    angular_trajectory_ = new_trajectory;
+    angular_trajectory_              = new_trajectory;
+    angular_trajectory_elapsed_time_ = Duration::fromSeconds(0);
     orientation_controller_.reset();
 }
 
@@ -309,29 +210,15 @@ void PrimitiveExecutor::updateState(const RobotState& state)
     state_ = state;
 }
 
-double PrimitiveExecutor::nearestTrajectorySampleTime(const TrajectoryPath& trajectory,
-                                                      const Point& position) const
-{
-    // Sample a small look-ahead past the nearest point so the target always leads the
-    // robot and it keeps making forward progress along the path. Clamped to the end of
-    // the trajectory so we don't sample past the destination.
-    return std::min(
-        findNearestTimeOnTrajectory(trajectory, position) + TRAJECTORY_LOOKAHEAD_TIME_S,
-        trajectory.getTotalTime());
-}
-
-double PrimitiveExecutor::nearestAngularTrajectorySampleTime(
-    const BangBangTrajectory1DAngular& trajectory, const Angle& orientation) const
-{
-    return std::min(findNearestTimeOnAngularTrajectory(trajectory, orientation) +
-                        TRAJECTORY_LOOKAHEAD_TIME_S,
-                    trajectory.getTotalTime());
-}
-
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 {
-    const double sample_time_sec =
-        nearestTrajectorySampleTime(*trajectory_path_, state_.position());
+    // Progress the trajectory purely by time: advance the elapsed time by this step's
+    // delta and sample the trajectory's expected state at that time (clamped to the end
+    // of the trajectory).
+    trajectory_elapsed_time_ =
+        std::min(trajectory_elapsed_time_ + delta_time,
+                 Duration::fromSeconds(trajectory_path_->getTotalTime()));
+    const double sample_time_sec = trajectory_elapsed_time_.toSeconds();
 
     const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
     const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
@@ -343,21 +230,23 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     // Add a velocity-tracking PID correction on top of the position-based target.
     // This helps the robot match the trajectory's feedforward velocity, reducing
     // lag that the position PID alone may not correct quickly enough.
-    const Vector velocity_error = trajectory_path_->getVelocity(sample_time_sec) -
-                                  state_.velocity();
-    target_v_global += Vector(
-        velocity_x_pid_.step(velocity_error.x(), delta_time.toSeconds()),
-        velocity_y_pid_.step(velocity_error.y(), delta_time.toSeconds()));
+    const Vector velocity_error =
+        trajectory_path_->getVelocity(sample_time_sec) - state_.velocity();
+    target_v_global +=
+        Vector(velocity_x_pid_.step(velocity_error.x(), delta_time.toSeconds()),
+               velocity_y_pid_.step(velocity_error.y(), delta_time.toSeconds()));
 
     // Smoothly blend the velocity setpoint from the trajectory we just switched away
     // from into the new one over a short window, so it doesn't jump on the switch. The
-    // previous trajectory's velocity is sampled at its own nearest point to the robot.
+    // previous trajectory's velocity is sampled at its own elapsed time, which keeps
+    // advancing during the blend.
     if (linear_blend_remaining_.toSeconds() > 0.0 && prev_trajectory_path_.has_value())
     {
-        const double prev_sample_time_sec =
-            nearestTrajectorySampleTime(*prev_trajectory_path_, state_.position());
+        prev_trajectory_elapsed_time_ =
+            std::min(prev_trajectory_elapsed_time_ + delta_time,
+                     Duration::fromSeconds(prev_trajectory_path_->getTotalTime()));
         const Vector prev_traj_velocity =
-            prev_trajectory_path_->getVelocity(prev_sample_time_sec);
+            prev_trajectory_path_->getVelocity(prev_trajectory_elapsed_time_.toSeconds());
 
         // alpha ramps from 0 (just switched: follow the old trajectory) to 1 (blend
         // finished: fully follow the new trajectory).
@@ -410,24 +299,6 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
             prev_target_global_velocity_ + velocity_delta.normalize(max_velocity_delta);
     }
 
-    // If the trajectory is in its acceleration phase (speed is increasing, not
-    // decelerating towards the destination), floor the commanded velocity magnitude
-    // to a minimum so we don't command an impractically small speed that the robot
-    // cannot physically achieve. Skip the floor when we are close to the destination,
-    // so the robot can still make small velocity adjustments for fine positioning.
-    const Vector traj_accel = trajectory_path_->getAcceleration(sample_time_sec);
-    const bool is_accelerating =
-        target_velocity.length() < 1e-6 || traj_accel.dot(target_velocity) >= 0;
-    const double distance_to_destination =
-        (trajectory_path_->getPosition(trajectory_path_->getTotalTime()) -
-         state_.position())
-            .length();
-    if (is_accelerating && target_v_global.length() < MIN_COMMAND_SPEED_M_PER_S &&
-        distance_to_destination > DESTINATION_PROXIMITY_THRESHOLD_M)
-    {
-        target_v_global = target_v_global.normalize(MIN_COMMAND_SPEED_M_PER_S);
-    }
-
     prev_target_global_velocity_ = target_v_global;
 
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"target_pos_x", target_position.x()},
@@ -446,8 +317,11 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& delta_time)
 {
-    const double sample_time_sec =
-        nearestAngularTrajectorySampleTime(*angular_trajectory_, state_.orientation());
+    // Progress the angular trajectory purely by time, mirroring stepTargetLinearVelocity.
+    angular_trajectory_elapsed_time_ =
+        std::min(angular_trajectory_elapsed_time_ + delta_time,
+                 Duration::fromSeconds(angular_trajectory_->getTotalTime()));
+    const double sample_time_sec = angular_trajectory_elapsed_time_.toSeconds();
 
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
         {"target_orientation_rad",
@@ -467,10 +341,11 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
     if (angular_blend_remaining_.toSeconds() > 0.0 &&
         prev_angular_trajectory_.has_value())
     {
-        const double prev_sample_time_sec = nearestAngularTrajectorySampleTime(
-            *prev_angular_trajectory_, state_.orientation());
-        const AngularVelocity prev_traj_w =
-            prev_angular_trajectory_->getVelocity(prev_sample_time_sec);
+        prev_angular_trajectory_elapsed_time_ =
+            std::min(prev_angular_trajectory_elapsed_time_ + delta_time,
+                     Duration::fromSeconds(prev_angular_trajectory_->getTotalTime()));
+        const AngularVelocity prev_traj_w = prev_angular_trajectory_->getVelocity(
+            prev_angular_trajectory_elapsed_time_.toSeconds());
 
         // alpha ramps from 0 (just switched: follow the old trajectory) to 1 (blend
         // finished: fully follow the new trajectory).

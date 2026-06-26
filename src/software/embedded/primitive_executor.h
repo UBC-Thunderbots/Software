@@ -109,29 +109,6 @@ class PrimitiveExecutor
         const BangBangTrajectory1DAngular& new_trajectory);
 
     /**
-     * Find the time at which to sample the trajectory this step: the time of the point on
-     * the trajectory nearest to the given position, plus a small look-ahead (clamped to
-     * the trajectory's end). Sampling by nearest point anchors trajectory-following to
-     * the robot's actual progress rather than to a wall clock.
-     *
-     * @param trajectory The trajectory being followed
-     * @param position The robot's actual position
-     * @return The time, in seconds, at which to sample the trajectory
-     */
-    double nearestTrajectorySampleTime(const TrajectoryPath& trajectory,
-                                       const Point& position) const;
-
-    /**
-     * Orientation-space analogue of nearestTrajectorySampleTime.
-     *
-     * @param trajectory The angular trajectory being followed
-     * @param orientation The robot's actual orientation
-     * @return The time, in seconds, at which to sample the angular trajectory
-     */
-    double nearestAngularTrajectorySampleTime(
-        const BangBangTrajectory1DAngular& trajectory, const Angle& orientation) const;
-
-    /**
      * Records the velocities commanded this step so the next step can measure the
      * commanded (tick-to-tick) acceleration. Call on every code path that commands a
      * velocity without going through stepTargetLinearVelocity/stepTargetAngularVelocity.
@@ -149,11 +126,22 @@ class PrimitiveExecutor
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
+    // Elapsed time along the trajectory we're currently following. Advanced by delta_time
+    // on every step and used to sample the trajectory's expected state. Reset to zero
+    // when we start following a new trajectory.
+    Duration trajectory_elapsed_time_;
+    Duration angular_trajectory_elapsed_time_;
+
     // The trajectory we just switched away from, retained only for the duration of the
     // blend window so we can crossfade its velocity setpoint into the new trajectory's.
     // Reset (cleared) once the blend completes.
     std::optional<TrajectoryPath> prev_trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> prev_angular_trajectory_;
+
+    // Elapsed time along the trajectory we just switched away from, advanced during the
+    // blend window so its velocity setpoint is sampled at the matching point.
+    Duration prev_trajectory_elapsed_time_;
+    Duration prev_angular_trajectory_elapsed_time_;
 
     // Time remaining in the old->new trajectory blend. Zero when not blending.
     Duration linear_blend_remaining_;
@@ -165,44 +153,27 @@ class PrimitiveExecutor
     // Velocity PID controllers that correct for error between the robot's actual
     // velocity and the trajectory's feedforward velocity. Separate x/y controllers
     // follow the same pattern as PositionController.
-    PidController<double> velocity_x_pid_{1.0, 0.1, 0.0, 4.0};
-    PidController<double> velocity_y_pid_{1.0, 0.1, 0.0, 4.0};
+    PidController<double> velocity_x_pid_{0, 0.1, 2.0, 4.0};
+    PidController<double> velocity_y_pid_{0, 0.1, 2.0, 4.0};
 
     // The velocities commanded on the previous step. Used to measure the commanded
     // (tick-to-tick) acceleration
     Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
 
-    // How far ahead (in trajectory time) of the point nearest the robot we sample the
-    // trajectory. This keeps the target leading the robot so it makes forward progress
-    // along the path (without it, starting from rest the planned velocity at the nearest
-    // point is ~0 and the robot would never start moving).
-    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.7;
-
     // If the final destination or any subdestination of the new trajectory differs from
     // the current one by more than this distance, we switch to the new trajectory.
     static constexpr double DESTINATION_THRESHOLD_M = 0.1;
 
     // Maximum position error (distance between the robot's actual position and the
-    // nearest point on the current trajectory) below which the robot is considered to
-    // be tracking the current trajectory well.
+    // trajectory's expected position at the current elapsed time) below which the robot
+    // is considered to be tracking the current trajectory well.
     static constexpr double POSITION_TRACKING_THRESHOLD_M = 0.3;
 
-    // Maximum velocity error (magnitude of difference between the robot's actual
-    // velocity and the trajectory velocity at the nearest point) below which the robot
-    // is considered to be tracking the current trajectory well.
+    // Maximum velocity error (magnitude of difference between the robot's actual velocity
+    // and the trajectory's expected velocity at the current elapsed time) below which the
+    // robot is considered to be tracking the current trajectory well.
     static constexpr double VELOCITY_TRACKING_THRESHOLD_M_PER_S = 0.4;
-
-    // If the robot is in the acceleration phase of the trajectory (speed is increasing)
-    // and the commanded velocity magnitude is below this threshold, the commanded
-    // velocity is raised to this minimum. This prevents commanding very small velocities
-    // that the robot cannot physically achieve.
-    static constexpr double MIN_COMMAND_SPEED_M_PER_S = 0.0;
-
-    // Distance from the final destination below which we do not enforce the minimum
-    // command speed, so the robot can make small velocity adjustments for fine
-    // positioning when it is close to the goal.
-    static constexpr double DESTINATION_PROXIMITY_THRESHOLD_M = 0.15;
 
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.
