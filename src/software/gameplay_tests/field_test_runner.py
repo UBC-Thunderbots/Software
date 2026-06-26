@@ -106,8 +106,6 @@ class FieldTestRunner(TbotsTestRunner):
         :param setup: Function that sets up the world state
         """
         self._wait_for_estop_play()
-        if self._is_cancelled():
-            return
         setup()
 
     @override
@@ -122,7 +120,11 @@ class FieldTestRunner(TbotsTestRunner):
 
         time_elapsed_s = 0
 
-        while time_elapsed_s < test_timeout_s and not self._is_cancelled():
+        while time_elapsed_s < test_timeout_s:
+            if self._is_cancelled():
+                self._stopper()
+                return
+
             processing_start_time = time.time()
 
             # Check for new GC commands at this time step
@@ -200,13 +202,10 @@ class FieldTestRunner(TbotsTestRunner):
             return
 
         logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
-        while (
-            not self.robot_communication.estop_is_playing and not self._is_cancelled()
-        ):
+        while not self.robot_communication.estop_is_playing:
+            if self._is_cancelled():
+                return
             time.sleep(0.1)
-
-        if self._is_cancelled():
-            return
 
         logger.info(
             "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
@@ -218,28 +217,30 @@ class FieldTestRunner(TbotsTestRunner):
         Simulated tests create robots with contiguous ids (0, 1, 2, ...), but
         field robots may have arbitrary ids. Maps each simulated id to an available
         field id, in ascending order, so set tactics and validations are sent to
-        available field robots. e.g. field robots [2, 5] map to simuated [0, 1].
+        available field robots. e.g. field robots [2, 5] map to simulated [0, 1].
         """
         survey_start_time = time.time()
-        self.friendly_robot_ids_field = []
+        friendly_robot_ids_field = []
         while time.time() - survey_start_time < WORLD_BUFFER_TIMEOUT:
+            if self._is_cancelled():
+                return
             try:
                 world = self.world_buffer.get(
                     block=True, timeout=0.1, return_cached=False
                 )
-                self.friendly_robot_ids_field = [
+                friendly_robot_ids_field = [
                     robot.id for robot in world.friendly_team.team_robots
                 ]
 
-                if len(self.friendly_robot_ids_field) > 0:
-                    logger.info(f"Friendly team ids {self.friendly_robot_ids_field}")
+                if len(friendly_robot_ids_field) > 0:
+                    logger.info(f"Friendly team ids {friendly_robot_ids_field}")
                     break
             except queue.Empty:
                 continue
 
         self.sim_to_field_robot_id = {
             sim_id: field_id
-            for sim_id, field_id in enumerate(sorted(self.friendly_robot_ids_field))
+            for sim_id, field_id in enumerate(sorted(friendly_robot_ids_field))
         }
         self.field_to_sim_robot_id = {
             field_id: sim_id for sim_id, field_id in self.sim_to_field_robot_id.items()
