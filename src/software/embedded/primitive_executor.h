@@ -153,8 +153,8 @@ class PrimitiveExecutor
     // Velocity PID controllers that correct for error between the robot's actual
     // velocity and the trajectory's feedforward velocity. Separate x/y controllers
     // follow the same pattern as PositionController.
-    PidController<double> velocity_x_pid_{0, 0.1, 2.0, 4.0};
-    PidController<double> velocity_y_pid_{0, 0.1, 2.0, 4.0};
+    PidController<double> velocity_x_pid_{0.5, 0.3, 0.0, 4.0};
+    PidController<double> velocity_y_pid_{0.5, 0.3, 0.0, 4.0};
 
     // The velocities commanded on the previous step. Used to measure the commanded
     // (tick-to-tick) acceleration
