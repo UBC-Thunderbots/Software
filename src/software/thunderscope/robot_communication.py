@@ -190,8 +190,8 @@ class RobotCommunication:
         For Diagnostics protos, does not block and returns cached message if none available
         Sleeps for 10ms for diagnostics
 
-        If the emergency stop is tripped, the PrimitiveSet will not be sent so
-        that the robots timeout and stop.
+        If the emergency stop is tripped, regular primitives are withheld and a
+        stop primitive is sent to every robot instead, so the robots stop immediately.
         """
         while self.running:
             self.communication_manager.poll()
@@ -239,8 +239,10 @@ class RobotCommunication:
                     fullsystem_primitive_set.robot_primitives[robot_id]
                 )
 
-            # sends a final stop primitive to all disconnected robots and removes them from list
-            # in order to prevent robots acting on cached old primitives
+            # send a final stop primitive to all disconnected/estopped robots so
+            # they don't act on cached old primitives;
+
+            force_stop_robot_ids = set()
             for robot_id, num_times_to_send_stop in enumerate(
                 self.robot_stop_primitive_send_count
             ):
@@ -249,9 +251,13 @@ class RobotCommunication:
                     self.robot_stop_primitive_send_count[robot_id] = (
                         num_times_to_send_stop - 1
                     )
+                    force_stop_robot_ids.add(robot_id)
 
             for robot_id, primitive in robot_primitives_map.items():
-                if not self.__should_send_packet(robot_id=robot_id):
+                if (
+                    robot_id not in force_stop_robot_ids
+                    and not self.__should_send_packet(robot_id=robot_id)
+                ):
                     continue
                 primitive.sequence_number = self.sequence_number
                 primitive.time_sent.CopyFrom(
