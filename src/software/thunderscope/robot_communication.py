@@ -116,13 +116,11 @@ class RobotCommunication:
         }
 
     def toggle_keyboard_estop(self) -> None:
-        """If keyboard estop is being used, toggles the estop state
-        And sends a message to the console
+        """Toggle the keyboard estop state, queue stop primitives for all robots,
+        and log the new state. No-op unless in keyboard estop mode.
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
-            self.robot_stop_primitive_send_count = [
-                NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-            ]
+            self.__queue_stop_for_all_robots()
             self.estop_is_playing = not self.estop_is_playing
             logger.debug(
                 "Keyboard Estop changed to "
@@ -136,22 +134,29 @@ class RobotCommunication:
     def toggle_individual_robot_control_mode(
         self, robot_id: int, mode: IndividualRobotMode
     ):
-        """Changes the input mode for a robot between NONE, MANUAL, or AI
-        If changing from MANUAL OR AI to NONE, add robot id to stop primitive
-        map so that multiple stop primitives are sent - safety number one priority
+        """Change a robot's input mode (NONE, MANUAL, or AI).
 
-        :param mode: the mode of input for this robot's primitives
+        Switching to NONE queues stop primitives for the robot so it stops
+        instead of acting on cached primitives.
+
         :param robot_id: the id of the robot whose mode we're changing
+        :param mode: the mode of input for this robot's primitives
         """
         self.robot_control_mode_map[robot_id] = mode
         self.robot_stop_primitive_send_count[robot_id] = (
             NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
         )
 
-    def __send_estop_state(self) -> None:
-        """Constant loop which sends the current estop status proto.
+    def __queue_stop_for_all_robots(self) -> None:
+        """Queue NUM_TIMES_SEND_STOP stop primitives for every robot."""
+        self.robot_stop_primitive_send_count = [
+            NUM_TIMES_SEND_STOP for _ in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
 
-        If estop is set to stop, set flag to send stop primitives to connected robots
+    def __send_estop_state(self) -> None:
+        """Continuously broadcast the estop state, refreshing the physical estop
+        reading each iteration. On a play->stop transition, queue stop primitives
+        for all robots. No-op when estop is disabled.
         """
         if self.estop_mode == EstopMode.DISABLE_ESTOP:
             return
@@ -162,9 +167,7 @@ class RobotCommunication:
                 self.estop_is_playing = self.estop_reader.isEstopPlay()
 
             if prev_estop_playing and not self.estop_is_playing:
-                self.robot_stop_primitive_send_count = [
-                    NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-                ]
+                self.__queue_stop_for_all_robots()
 
             self.current_proto_unix_io.send_proto(
                 EstopState, EstopState(is_playing=self.estop_is_playing)
@@ -185,16 +188,14 @@ class RobotCommunication:
         )
 
     def __run_primitive_set(self) -> None:
-        """Forward PrimitiveSet protos from Fullsystem and MotorControl/PowerControl
-        protos from Robot Diagnostics to the robots.
+        """Forward AI primitives (PrimitiveSet) and diagnostics MotorControl/
+        PowerControl protos to the robots.
 
-        For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
+        Blocks up to ROBOT_COMMUNICATIONS_TIMEOUT_S for an AI proto, falling back
+        to the cached one; diagnostics protos are read non-blocking.
 
-        For Diagnostics protos, does not block and returns cached message if none available
-        Sleeps for 10ms for diagnostics
-
-        If the emergency stop is tripped, regular primitives are withheld and a
-        stop primitive is sent to every robot instead, so the robots stop immediately.
+        While the estop is tripped, regular primitives are withheld and a stop
+        primitive is sent to every robot instead so they stop immediately.
         """
         while self.running:
             self.communication_manager.poll()
@@ -242,9 +243,8 @@ class RobotCommunication:
                     fullsystem_primitive_set.robot_primitives[robot_id]
                 )
 
-            # send a final stop primitive to all disconnected/estopped robots so
-            # they don't act on cached old primitives;
-
+            # force a stop primitive to estopped/uncontrolled robots so they
+            # don't keep acting on their last primitive
             force_stop_robot_ids = set()
             for robot_id, num_times_to_send_stop in enumerate(
                 self.robot_stop_primitive_send_count
@@ -269,7 +269,6 @@ class RobotCommunication:
                 self.communication_manager.send_primitive(
                     robot_id=robot_id, primitive=primitive
                 )
-                print(f"{primitive}: {self.estop_is_playing}")
 
             self.sequence_number += 1
 
