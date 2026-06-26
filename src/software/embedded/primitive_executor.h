@@ -161,6 +161,12 @@ class PrimitiveExecutor
     Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
 
+    // How far ahead of the current elapsed time we sample the trajectory. A small
+    // look-ahead keeps the target leading the robot slightly so it makes forward progress
+    // and tracking lag is reduced. The elapsed time itself still advances by delta_time
+    // each step; this offset only shifts where we sample.
+    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.35;
+
     // If the final destination or any subdestination of the new trajectory differs from
     // the current one by more than this distance, we switch to the new trajectory.
     static constexpr double DESTINATION_THRESHOLD_M = 0.1;

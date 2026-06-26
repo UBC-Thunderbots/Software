@@ -213,12 +213,15 @@ void PrimitiveExecutor::updateState(const RobotState& state)
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 {
     // Progress the trajectory purely by time: advance the elapsed time by this step's
-    // delta and sample the trajectory's expected state at that time (clamped to the end
-    // of the trajectory).
+    // delta. Sample a small look-ahead past the elapsed time so the target leads the
+    // robot slightly. Both the elapsed time and the sample are clamped to the end of the
+    // trajectory.
     trajectory_elapsed_time_ =
         std::min(trajectory_elapsed_time_ + delta_time,
                  Duration::fromSeconds(trajectory_path_->getTotalTime()));
-    const double sample_time_sec = trajectory_elapsed_time_.toSeconds();
+    const double sample_time_sec =
+        std::min(trajectory_elapsed_time_.toSeconds() + TRAJECTORY_LOOKAHEAD_TIME_S,
+                 trajectory_path_->getTotalTime());
 
     const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
     const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
@@ -245,8 +248,11 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
         prev_trajectory_elapsed_time_ =
             std::min(prev_trajectory_elapsed_time_ + delta_time,
                      Duration::fromSeconds(prev_trajectory_path_->getTotalTime()));
+        const double prev_sample_time_sec = std::min(
+            prev_trajectory_elapsed_time_.toSeconds() + TRAJECTORY_LOOKAHEAD_TIME_S,
+            prev_trajectory_path_->getTotalTime());
         const Vector prev_traj_velocity =
-            prev_trajectory_path_->getVelocity(prev_trajectory_elapsed_time_.toSeconds());
+            prev_trajectory_path_->getVelocity(prev_sample_time_sec);
 
         // alpha ramps from 0 (just switched: follow the old trajectory) to 1 (blend
         // finished: fully follow the new trajectory).
@@ -317,11 +323,14 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& delta_time)
 {
-    // Progress the angular trajectory purely by time, mirroring stepTargetLinearVelocity.
+    // Progress the angular trajectory purely by time, mirroring stepTargetLinearVelocity,
+    // including the small look-ahead on the sample.
     angular_trajectory_elapsed_time_ =
         std::min(angular_trajectory_elapsed_time_ + delta_time,
                  Duration::fromSeconds(angular_trajectory_->getTotalTime()));
-    const double sample_time_sec = angular_trajectory_elapsed_time_.toSeconds();
+    const double sample_time_sec = std::min(
+        angular_trajectory_elapsed_time_.toSeconds() + TRAJECTORY_LOOKAHEAD_TIME_S,
+        angular_trajectory_->getTotalTime());
 
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
         {"target_orientation_rad",
@@ -344,8 +353,12 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
         prev_angular_trajectory_elapsed_time_ =
             std::min(prev_angular_trajectory_elapsed_time_ + delta_time,
                      Duration::fromSeconds(prev_angular_trajectory_->getTotalTime()));
-        const AngularVelocity prev_traj_w = prev_angular_trajectory_->getVelocity(
-            prev_angular_trajectory_elapsed_time_.toSeconds());
+        const double prev_sample_time_sec =
+            std::min(prev_angular_trajectory_elapsed_time_.toSeconds() +
+                         TRAJECTORY_LOOKAHEAD_TIME_S,
+                     prev_angular_trajectory_->getTotalTime());
+        const AngularVelocity prev_traj_w =
+            prev_angular_trajectory_->getVelocity(prev_sample_time_sec);
 
         // alpha ramps from 0 (just switched: follow the old trajectory) to 1 (blend
         // finished: fully follow the new trajectory).
