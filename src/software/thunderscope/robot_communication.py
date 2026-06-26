@@ -120,6 +120,9 @@ class RobotCommunication:
         And sends a message to the console
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
+            self.robot_stop_primitive_send_count = [
+                NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+            ]
             self.estop_is_playing = not self.estop_is_playing
             logger.debug(
                 "Keyboard Estop changed to "
@@ -154,10 +157,11 @@ class RobotCommunication:
             return
 
         while True:
+            prev_estop_playing = self.estop_is_playing
             if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                 self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-            if not self.estop_is_playing:
+            if prev_estop_playing and not self.estop_is_playing:
                 self.robot_stop_primitive_send_count = [
                     NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
                 ]
@@ -265,6 +269,7 @@ class RobotCommunication:
                 self.communication_manager.send_primitive(
                     robot_id=robot_id, primitive=primitive
                 )
+                print(f"{primitive}: {self.estop_is_playing}")
 
             self.sequence_number += 1
 
