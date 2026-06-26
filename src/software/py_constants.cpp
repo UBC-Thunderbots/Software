@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "shared/constants.h"
 #include "software/constants.h"
@@ -169,4 +170,13 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("AUTO_CHIP_DISTANCE_DEFAULT_M")     = AUTO_CHIP_DISTANCE_DEFAULT_M;
     m.attr("AUTO_KICK_SPEED_DEFAULT_M_PER_S")  = AUTO_KICK_SPEED_DEFAULT_M_PER_S;
     m.attr("WHEEL_ROTATION_MAX_SPEED_M_PER_S") = WHEEL_ROTATION_MAX_SPEED_M_PER_S;
+
+    // Estop USB-to-serial adapter identifiers, as a list of
+    // (vendor_id, product_id) pairs
+    std::vector<std::pair<std::string, std::string>> estop_usb_device_ids;
+    for (const auto& id : ESTOP_USB_DEVICE_IDS)
+    {
+        estop_usb_device_ids.emplace_back(id.vendor_id, id.product_id);
+    }
+    m.attr("ESTOP_USB_DEVICE_IDS") = estop_usb_device_ids;
 }

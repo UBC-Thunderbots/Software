@@ -107,7 +107,7 @@ LOG_LEVEL_STR_MAP = {
     LogLevel.CONTRACT: "CONTRACT",
 }
 
-# Paths to check for estop when running diagnostics
+# Paths to check for estop when running diagnostics, used as a fallback for Linux.
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
 

@@ -250,6 +250,7 @@ register_toolchains(
 )
 
 register_toolchains(
+    "//toolchains/cc:cc_toolchain_for_macos_robot",
     "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
     "//toolchains/cc:cc_toolchain_for_k8",
     "//toolchains/cc:cc_toolchain_for_aarch64",
@@ -284,6 +285,12 @@ new_local_repository(
     name = "k8_aarch64_linux_gcc",
     build_file = "@//extlibs:k8_aarch64_linux_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_local_repository(
+    name = "macos_robot_gcc",
+    build_file = "@//extlibs:macos_robot_gcc.BUILD",
+    path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
 )
 
 new_local_repository(
