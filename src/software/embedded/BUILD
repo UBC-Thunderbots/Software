@@ -72,6 +72,8 @@ cc_library(
     name = "spi_utils",
     srcs = ["spi_utils.cpp"],
     hdrs = ["spi_utils.h"],
+    # Uses Linux kernel headers (linux/spi/spidev.h); robot-only.
+    target_compatible_with = ["@platforms//os:linux"],
     deps = [
         "//software/logger",
     ],
