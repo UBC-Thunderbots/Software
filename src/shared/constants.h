@@ -220,11 +220,22 @@ static const unsigned int NUM_TIMES_SEND_STOP = 10;
 // disconnected
 static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
 
-// product and vendor id for Arduino Uno Rev3 (retrieved from
-// http://www.linux-usb.org/usb.ids )
-#define ARDUINO_ID_LENGTH 5
-static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
-static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
+// Vendor and product id pairs for the USB-to-serial adapters used by the
+// physical estop. Multiple pairs are supported since estop units may use
+// different adapters. IDs retrieved from http://www.linux-usb.org/usb.ids
+struct EstopUsbId
+{
+    const char* vendor_id;
+    const char* product_id;
+};
+
+constexpr EstopUsbId ESTOP_USB_DEVICE_IDS[] = {
+    {"2341", "0043"},  // Arduino Uno Rev3
+    {"1a86", "7523"},  // CH340-based Arduino clones
+};
+
+constexpr int NUM_ESTOP_USB_DEVICE_IDS =
+    sizeof(ESTOP_USB_DEVICE_IDS) / sizeof(ESTOP_USB_DEVICE_IDS[0]);
 
 // Number of times thunderloop should tick per second
 static const unsigned THUNDERLOOP_HZ = 300u;
