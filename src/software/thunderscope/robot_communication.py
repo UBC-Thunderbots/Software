@@ -58,9 +58,6 @@ class RobotCommunication:
         # dynamic map of robot id to the individual control mode
         self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
 
-        # static map of robot id to stop primitive
-        self.robot_stop_primitives_map: dict[int, StopPrimitive] = {}
-
         # links robot id to the number of times to send a stop primitive
         self.robot_stop_primitive_send_count: list[int] = [0] * MAX_ROBOT_IDS_PER_SIDE
 
@@ -76,9 +73,6 @@ class RobotCommunication:
             PowerControl, self.power_control_primitive_buffer
         )
 
-        # dynamic map of robot id to the individual control mode
-        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
-
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
         )
@@ -86,10 +80,9 @@ class RobotCommunication:
             target=self.__run_primitive_set, daemon=True
         )
 
-        # load control mode and stop primitive maps with default values
+        # load control mode map with default values
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_control_mode_map[robot_id] = IndividualRobotMode.NONE
-            self.robot_stop_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
 
         # TODO: (#3174): move estop state management out of robot_communication
         self.estop_mode = estop_mode
