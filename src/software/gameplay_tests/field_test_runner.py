@@ -1,7 +1,8 @@
-import math
 import queue
 import time
 from typing import override
+
+import software.python_bindings as tbots_cpp
 
 from proto.import_all_protos import (
     AutoChipOrKick,
@@ -23,14 +24,9 @@ logger = create_logger(__name__)
 WORLD_BUFFER_TIMEOUT = 5.0
 LAUNCH_DELAY_S = 0.1
 
-# How close (in metres) a robot must be to its target position before the test
-# is allowed to start
-ROBOT_SETUP_TOLERANCE_M = 0.1
-# How close (in radians) a robot must be to its target orientation before the
-# test is allowed to start
-ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD = 0.1
-# How long to wait for robots to drive to their target positions before giving up
-ROBOT_SETUP_TIMEOUT_S = 30.0
+SETUP_POSITION_TOLERANCE_M = 0.1
+SETUP_ORIENTATION_TOLERANCE_DEG = 15
+SETUP_TIMEOUT_S = 20.0
 
 
 class FieldTestRunner(TbotsTestRunner):
@@ -74,8 +70,7 @@ class FieldTestRunner(TbotsTestRunner):
 
     @override
     def set_world_state(self, world_state: WorldState):
-        """Send move tactics to drive the friendly robots to the positions in
-        the given world state.
+        """Drives the friendly robots to the positions in the given world state.
 
         :param world_state: The WorldState proto with the desired robot states
         """
@@ -205,7 +200,9 @@ class FieldTestRunner(TbotsTestRunner):
             return
 
         logger.info("\x1b[33m" + "Waiting for Estop to be in PLAY state..." + "\x1b[0m")
-        while not self.robot_communication.estop_is_playing and not self._is_cancelled():
+        while (
+            not self.robot_communication.estop_is_playing and not self._is_cancelled()
+        ):
             time.sleep(0.1)
 
         if self._is_cancelled():
@@ -230,7 +227,7 @@ class FieldTestRunner(TbotsTestRunner):
                 ]
 
                 if len(self.friendly_robot_ids_field) > 0:
-                    logger.info(f"friendly team ids {self.friendly_robot_ids_field}")
+                    logger.info(f"Friendly team ids {self.friendly_robot_ids_field}")
                     break
             except queue.Empty:
                 continue
@@ -268,7 +265,7 @@ class FieldTestRunner(TbotsTestRunner):
                 final_orientation=robot_state.global_orientation,
                 dribbler_mode=DribblerMode.OFF,
                 ball_collision_type=BallCollisionType.AVOID,
-                auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+                auto_chip_or_kick=AutoChipOrKick(),
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
                 obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
             )
@@ -276,9 +273,7 @@ class FieldTestRunner(TbotsTestRunner):
         }
 
     def _map_tactics_to_field_ids(self, tactics):
-        """Remap a tactics dict keyed by simulated robot ids to the robot ids
-        available on the field. Tactics for simulated ids with no available
-        field robot are dropped with a warning.
+        """Remap a tactics dict keyed by simulated robot ids to field ids.
 
         :param tactics: None or dict of simulated_robot_id -> tactic
         :return: None if tactics is None, else dict of field_robot_id -> tactic
@@ -288,25 +283,14 @@ class FieldTestRunner(TbotsTestRunner):
 
         mapped_tactics = {}
         for sim_id, tactic in tactics.items():
-            if sim_id not in self.sim_to_field_robot_id:
-                logger.warning(
-                    f"no field robot available for simulated robot id {sim_id}; "
-                    "skipping its tactic"
-                )
-                continue
-            mapped_tactics[self.sim_to_field_robot_id[sim_id]] = tactic
+            if sim_id in self.sim_to_field_robot_id:
+                mapped_tactics[self.sim_to_field_robot_id[sim_id]] = tactic
 
         return mapped_tactics
 
     def _relabel_world_to_sim_ids(self, world: World) -> World:
         """Return a copy of the world with friendly robot ids translated from
-        field ids back to the simulated ids the test uses.
-
-        Validations match robots by the contiguous simulated ids (0, 1, 2, ...),
-        but the world reports the robots' actual field ids. Relabeling the world
-        here lets every id-based validation find the correct robot without each
-        validation needing to know about the mapping. Friendly robots with no
-        mapping (e.g. extras not part of the test) keep their field id.
+        field ids back to the simulated ids the test validations use.
 
         :param world: The World proto reported by the field full system
         :return: a copy of the world with friendly robot ids in simulated-id space
@@ -319,18 +303,10 @@ class FieldTestRunner(TbotsTestRunner):
         return relabeled_world
 
     def _wait_for_robots_at_world_state(self, world_state: WorldState):
-        """Block until every robot in the world state is within
-        ROBOT_SETUP_TOLERANCE_M of its target position and
-        ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD of its target orientation. Returns
-        early if the run is cancelled.
-
-        Robot positions are read from the friendly full system's World in the
-        same fashion as _survey_field_robots. The friendly targets are remapped
-        from simulated ids to the field ids they were assigned to in set_tactics.
+        """Block until robots in the world are close enough to its target position and orientation.
 
         :param world_state: The WorldState proto with the desired robot states
-        :raises Exception: if the robots do not reach their targets within
-                           ROBOT_SETUP_TIMEOUT_S
+        :raises Exception: if the robots do not reach their targets within SETUP_TIMEOUT_S
         """
         friendly_targets = (
             world_state.yellow_robots
@@ -346,10 +322,9 @@ class FieldTestRunner(TbotsTestRunner):
             if sim_id in self.sim_to_field_robot_id
         }
 
-        logger.info("waiting for robots to reach their target positions")
+        logger.info("Waiting for robots to reach their target positions...")
         wait_start_time = time.time()
-        not_at_targets = ["no world received from the field"]
-        while time.time() - wait_start_time < ROBOT_SETUP_TIMEOUT_S:
+        while time.time() - wait_start_time < SETUP_TIMEOUT_S:
             if self._is_cancelled():
                 return
 
@@ -364,59 +339,43 @@ class FieldTestRunner(TbotsTestRunner):
                 robot.id: robot.current_state
                 for robot in world.friendly_team.team_robots
             }
-            not_at_targets = self._describe_robots_not_at_targets(
-                friendly_targets, friendly_states
-            )
-            if not not_at_targets:
-                logger.info("all robots reached their target positions")
+            if self._robots_all_at_target(friendly_targets, friendly_states):
+                logger.info("All robots reached their target positions")
                 return
 
-        # Timed out: report which robots are not yet at their targets, and why,
-        # so the operator knows what to fix
-        for description in not_at_targets:
-            logger.error(description)
         raise Exception(
-            f"robots did not reach their target positions within "
-            f"{ROBOT_SETUP_TIMEOUT_S} seconds: {'; '.join(not_at_targets)}"
+            f"robots did not reach their target positions within {SETUP_TIMEOUT_S} seconds"
         )
 
     @staticmethod
-    def _describe_robots_not_at_targets(targets, states):
-        """Describe each targeted robot that is not within ROBOT_SETUP_TOLERANCE_M
-        of its target position and ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD of its
-        target orientation. An empty result means every robot is in place.
+    def _robots_all_at_target(targets, states):
+        """Checks if all robots have reached their target positions and orientations
+        within a certain threshold.
 
         :param targets: map of field_robot_id -> RobotState with the desired state
         :param states: dict of field_robot_id -> current RobotState
-        :return: list of human-readable strings, one per robot not at its target
+        :return: True if all friendly robots have reached their target state.
         """
-        descriptions = []
         for robot_id, target in targets.items():
             if robot_id not in states:
-                descriptions.append(f"robot {robot_id}: not visible on field")
-                continue
+                return False
 
             current = states[robot_id]
-            distance = math.hypot(
-                current.global_position.x_meters - target.global_position.x_meters,
-                current.global_position.y_meters - target.global_position.y_meters,
-            )
-            # Smallest absolute orientation error, accounting for wraparound
+            distance = (
+                tbots_cpp.createPoint(current.global_position)
+                - tbots_cpp.createPoint(target.global_position)
+            ).length()
+
             orientation_error = (
-                target.global_orientation.radians - current.global_orientation.radians
-            )
-            orientation_error = abs(
-                math.atan2(math.sin(orientation_error), math.cos(orientation_error))
+                tbots_cpp.createAngle(target.global_orientation)
+                .minDiff(tbots_cpp.createAngle(current.global_orientation))
+                .toDegrees()
             )
 
             if (
-                distance > ROBOT_SETUP_TOLERANCE_M
-                or orientation_error > ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD
+                distance > SETUP_POSITION_TOLERANCE_M
+                or orientation_error > SETUP_ORIENTATION_TOLERANCE_DEG
             ):
-                descriptions.append(
-                    f"robot {robot_id}: {distance:.2f}m from target position "
-                    f"(tolerance {ROBOT_SETUP_TOLERANCE_M}m), {orientation_error:.2f}rad "
-                    f"from target orientation "
-                    f"(tolerance {ROBOT_SETUP_ORIENTATION_TOLERANCE_RAD}rad)"
-                )
-        return descriptions
+                return False
+
+        return True
