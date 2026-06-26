@@ -213,8 +213,13 @@ class FieldTestRunner(TbotsTestRunner):
         )
 
     def _survey_field_robots(self):
-        logger.info("determining robots on field")
-        # survey field for available robot ids
+        """Surveys robots on the field and creates mappings to simulated ids.
+
+        Simulated tests create robots with contiguous ids (0, 1, 2, ...), but
+        field robots may have arbitrary ids. Maps each simulated id to an available
+        field id, in ascending order, so set tactics and validations are sent to
+        available field robots. e.g. field robots [2, 5] map to simuated [0, 1].
+        """
         survey_start_time = time.time()
         self.friendly_robot_ids_field = []
         while time.time() - survey_start_time < WORLD_BUFFER_TIMEOUT:
@@ -232,26 +237,14 @@ class FieldTestRunner(TbotsTestRunner):
             except queue.Empty:
                 continue
 
-        if len(self.friendly_robot_ids_field) == 0:
-            raise Exception("no friendly robots found on field within timeout")
-
-        # Simulated tests create robots with contiguous ids (0, 1, 2, ...), but
-        # the robots physically on the field may have arbitrary ids and there may
-        # be fewer of them. Map each simulated id to an available field id, in
-        # ascending order, so tactics written against simulated ids are sent to
-        # the robots that are actually present. e.g. field robots [4, 5] map
-        # simulated id 0 -> 4 and 1 -> 5; field robots [0, 1, 5] map 0 -> 0,
-        # 1 -> 1 and 2 -> 5.
         self.sim_to_field_robot_id = {
             sim_id: field_id
             for sim_id, field_id in enumerate(sorted(self.friendly_robot_ids_field))
         }
-        # Inverse mapping, used to relabel the world's field ids back to the
-        # simulated ids that validations are written against.
         self.field_to_sim_robot_id = {
             field_id: sim_id for sim_id, field_id in self.sim_to_field_robot_id.items()
         }
-        logger.info(f"simulated id to field id mapping {self.sim_to_field_robot_id}")
+        logger.info(f"Simulated id to field id mapping {self.sim_to_field_robot_id}")
 
     def _create_move_tactics(self, robot_states):
         """Create a MoveTactic for each robot to drive it to its world state.
