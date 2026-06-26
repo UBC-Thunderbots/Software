@@ -159,8 +159,7 @@ class RobotCommunication:
 
             if not self.estop_is_playing:
                 self.robot_stop_primitive_send_count = [
-                    NUM_TIMES_SEND_STOP
-                    for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+                    NUM_TIMES_SEND_STOP for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
                 ]
 
             self.current_proto_unix_io.send_proto(
