@@ -1,5 +1,7 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
+#include <cmath>
+
 #include "collision_evaluator.h"
 #include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
 #include "software/geom/algorithms/contains.h"
@@ -62,7 +64,8 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     const Rectangle& navigable_area, const std::optional<Point>& prev_sub_destination)
 {
     if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
-        constraints.getMaxDeceleration() <= 0.0 || constraints.getMaxJerk() <= 0.0)
+        constraints.getMaxDeceleration() <= 0.0 || constraints.getMaxJerk() <= 0.0 ||
+        std::abs(constraints.getMinJerk()) <= 0.0)
     {
         return std::nullopt;
     }

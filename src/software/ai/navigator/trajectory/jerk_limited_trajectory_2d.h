@@ -20,7 +20,7 @@ class JerkLimitedTrajectory2D : public Trajectory2D
 
     void generate(const Point& initial_pos, const Point& final_pos,
                   const Vector& initial_vel, const Vector& initial_accel, double max_vel,
-                  double max_accel, double max_decel, double max_jerk);
+                  double max_accel, double max_decel, double max_jerk, double min_jerk);
 
     Point getPosition(double t_sec) const override;
     Vector getVelocity(double t_sec) const override;

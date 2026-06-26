@@ -37,7 +37,8 @@ MovePrimitive::MovePrimitive(
             robot.position(), destination, robot.velocity(), Vector(), max_speed,
             robot.robotConstants().robot_trajectory_max_acceleration_m_per_s_2,
             robot.robotConstants().robot_trajectory_max_deceleration_m_per_s_2,
-            robot.robotConstants().robot_trajectory_max_jerk_m_per_s_3);
+            robot.robotConstants().robot_max_jerk_m_per_s_3,
+            robot.robotConstants().robot_min_jerk_m_per_s_3);
 
         angular_trajectory.generate(
             robot.orientation(), final_angle, robot.angularVelocity(),
@@ -67,7 +68,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
     KinematicConstraints constraints(
         max_speed, robot.robotConstants().robot_trajectory_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_trajectory_max_deceleration_m_per_s_2,
-        robot.robotConstants().robot_trajectory_max_jerk_m_per_s_3);
+        robot.robotConstants().robot_max_jerk_m_per_s_3,
+        robot.robotConstants().robot_min_jerk_m_per_s_3);
 
     // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if
     // we are in a game Return normal field boundaries if not in a game

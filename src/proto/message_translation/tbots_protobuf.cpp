@@ -440,7 +440,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     KinematicConstraints constraints(
         max_speed, robot_constants.robot_trajectory_max_acceleration_m_per_s_2,
         robot_constants.robot_trajectory_max_deceleration_m_per_s_2,
-        robot_constants.robot_trajectory_max_jerk_m_per_s_3);
+        robot_constants.robot_max_jerk_m_per_s_3,
+        robot_constants.robot_min_jerk_m_per_s_3);
 
     Point initial_destination = createPoint(params.destination());
     if (!params.sub_destinations().empty())

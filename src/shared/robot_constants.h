@@ -111,13 +111,11 @@ struct RobotConstants
     // apply correction on lag. [m/s^2]
     float robot_trajectory_max_deceleration_m_per_s_2;
 
-    // The maximum jerk physically achievable by our robots [m/s^3]
+    // The maximum (positive) jerk used when generating trajectories [m/s^3]
     float robot_max_jerk_m_per_s_3;
 
-    // The maximum jerk the trajectory planner is allowed to use when generating
-    // trajectories. May be lower than the physical limit to leave headroom for the PID to
-    // apply correction on lag. [m/s^3]
-    float robot_trajectory_max_jerk_m_per_s_3;
+    // The minimum (negative) jerk used when generating trajectories [m/s^3]
+    float robot_min_jerk_m_per_s_3;
 
     // The maximum angular speed achievable by our robots [rad/s]
     float robot_max_ang_speed_rad_per_s;

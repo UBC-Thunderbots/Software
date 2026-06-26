@@ -170,7 +170,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     KinematicConstraints constraints(max_speed,
                                      robot_constants.robot_max_acceleration_m_per_s_2,
                                      robot_constants.robot_max_deceleration_m_per_s_2,
-                                     robot_constants.robot_max_jerk_m_per_s_3);
+                                     robot_constants.robot_max_jerk_m_per_s_3,
+                                     robot_constants.robot_min_jerk_m_per_s_3);
 
     Point initial_destination = destination;
     if (!sub_destinations.empty())

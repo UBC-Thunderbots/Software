@@ -10,14 +10,15 @@ JerkLimitedTrajectory2D::JerkLimitedTrajectory2D(const Point& initial_pos,
 {
     generate(initial_pos, final_pos, initial_vel, initial_accel,
              constraints.getMaxVelocity(), constraints.getMaxAcceleration(),
-             constraints.getMaxDeceleration(), constraints.getMaxJerk());
+             constraints.getMaxDeceleration(), constraints.getMaxJerk(),
+             constraints.getMinJerk());
 }
 
 void JerkLimitedTrajectory2D::generate(const Point& initial_pos, const Point& final_pos,
                                        const Vector& initial_vel,
                                        const Vector& initial_accel, const double max_vel,
                                        const double max_accel, const double max_decel,
-                                       const double max_jerk)
+                                       const double max_jerk, const double min_jerk)
 {
     // Bisect angle alpha to split 2D limits into x/y components so both
     // 1D trajectories finish at nearly the same time
@@ -32,11 +33,11 @@ void JerkLimitedTrajectory2D::generate(const Point& initial_pos, const Point& fi
         x_trajectory.generate(initial_pos.x(), final_pos.x(), initial_vel.x(),
                               initial_accel.x(), max_vel * cos_alpha,
                               max_accel * cos_alpha, max_decel * cos_alpha,
-                              max_jerk * cos_alpha);
+                              max_jerk * cos_alpha, min_jerk * cos_alpha);
         y_trajectory.generate(initial_pos.y(), final_pos.y(), initial_vel.y(),
                               initial_accel.y(), max_vel * sin_alpha,
                               max_accel * sin_alpha, max_decel * sin_alpha,
-                              max_jerk * sin_alpha);
+                              max_jerk * sin_alpha, min_jerk * sin_alpha);
 
         if (std::abs(x_trajectory.getTotalTime() - y_trajectory.getTotalTime()) <
             TRAJ_ACCURACY_TOLERANCE_SEC)

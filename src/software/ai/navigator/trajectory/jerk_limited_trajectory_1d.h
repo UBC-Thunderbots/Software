@@ -19,9 +19,13 @@ class JerkLimitedTrajectory1D : public Trajectory<double, double, double>
 
     JerkLimitedTrajectory1D();
 
+    // max_jerk is the maximum positive jerk (used while the acceleration is ramping up in
+    // the direction of travel) and min_jerk is the minimum negative jerk (used while the
+    // acceleration is ramping back down). Their magnitudes are used internally, so the
+    // sign of either argument does not matter.
     void generate(double initial_pos, double final_pos, double initial_vel,
                   double initial_accel, double max_vel, double max_accel,
-                  double max_decel, double max_jerk);
+                  double max_decel, double max_jerk, double min_jerk);
 
     double getPosition(double t_sec) const override;
     double getVelocity(double t_sec) const override;
@@ -45,19 +49,20 @@ class JerkLimitedTrajectory1D : public Trajectory<double, double, double>
     };
 
     static AccelPlan planAccelProfile(double initial_vel, double initial_accel,
-                                      double final_vel, double max_jerk,
+                                      double final_vel, double max_jerk, double min_jerk,
                                       double max_accel);
 
     static AccelPlan planDecelToStop(double initial_vel, double initial_accel,
-                                     double max_jerk, double max_decel);
+                                     double max_jerk, double min_jerk, double max_decel);
 
     static double closestPositionToStop(double initial_pos, double initial_vel,
                                         double initial_accel, double max_jerk,
-                                        double max_decel);
+                                        double min_jerk, double max_decel);
 
     void generateDirect(double start_pos, double final_pos, double initial_vel,
                         double initial_accel, double max_vel, double max_accel,
-                        double max_decel, double max_jerk, double time_offset);
+                        double max_decel, double max_jerk, double min_jerk,
+                        double time_offset);
 
     static void integrateState(double& p, double& v, double& a, double dt, double jerk);
 

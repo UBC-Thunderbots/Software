@@ -223,7 +223,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_robot_obstacle)
 
     TrajectoryPath trajectory(
         std::make_shared<JerkLimitedTrajectory2D>(origin, end, velocity, Vector(),
-                                                  KinematicConstraints(1, 1, 1, 1)),
+                                                  KinematicConstraints(1, 1, 1, 1, -1)),
         JerkLimitedTrajectory2D::generator);
 
     ObstaclePtr obstacle =
@@ -289,7 +289,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_obstacle)
 
     auto trajectory = std::make_shared<JerkLimitedTrajectory2D>(
         origin, destination, velocity, Vector(),
-        KinematicConstraints(1.0, 1.0, 1.0, 1.0));
+        KinematicConstraints(1.0, 1.0, 1.0, 1.0, -1.0));
     TrajectoryPath trajectory_path(trajectory, JerkLimitedTrajectory2D::generator);
 
     Robot robot =
