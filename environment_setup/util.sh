@@ -38,23 +38,14 @@ install_clang_format() {
 
 install_cross_compiler() {
     file_name=aarch64-tbots-linux-gnu-for-aarch64
-    if is_darwin $1; then
-       full_file_name=$file_name.tar.xz
-       curl -L "https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name" \
-           -o /tmp/tbots_download_cache/$full_file_name
-       tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
-       sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
-       rm /tmp/tbots_download_cache/$full_file_name
-    else
-        if is_x86 $1; then
-            file_name=aarch64-tbots-linux-gnu-for-x86
-        fi
-        full_file_name=$file_name.tar.xz
-        wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
-        tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
-        sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
-        rm /tmp/tbots_download_cache/$full_file_name
+    if is_x86 $1; then
+        file_name=aarch64-tbots-linux-gnu-for-x86
     fi
+    full_file_name=$file_name.tar.xz
+    wget https://raw.githubusercontent.com/UBC-Thunderbots/Software-External-Dependencies/refs/heads/main/toolchain/$full_file_name -O /tmp/tbots_download_cache/$full_file_name
+    tar -xf /tmp/tbots_download_cache/$full_file_name -C /tmp/tbots_download_cache/
+    sudo mv /tmp/tbots_download_cache/aarch64-tbots-linux-gnu /opt/tbotspython
+    rm /tmp/tbots_download_cache/$full_file_name
 }
 
 install_gamecontroller () {
@@ -127,14 +118,17 @@ install_python_dev_cross_compile_headers() {
 
 install_stm32_cross_compiler() {
     arch="aarch64"
-    if is_x86 $1; then
+    if is_darwin $1; then
+        arch="darwin-arm64"
+    elif is_x86 $1; then
         arch="x86_64"
     fi
-    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi.tar.xz
+    toolchain_name=arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi
+    download_link=https://developer.arm.com/-/media/Files/downloads/gnu/14.3.rel1/binrel/${toolchain_name}.tar.xz
 
     wget -N $download_link -O /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
     tar -xf /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz -C /tmp/tbots_download_cache/
-    sudo mv /tmp/tbots_download_cache/arm-gnu-toolchain-14.3.rel1-${arch}-arm-none-eabi /opt/tbotspython/arm-none-eabi-gcc
+    sudo mv /tmp/tbots_download_cache/${toolchain_name} /opt/tbotspython/arm-none-eabi-gcc
     rm /tmp/tbots_download_cache/arm-gnu-toolchain.tar.xz
 }
 
