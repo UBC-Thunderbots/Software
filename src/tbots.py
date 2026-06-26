@@ -194,7 +194,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     if config.test_suite and config.action == ActionArgument.test:
         target = """-- //...                              \\
                       -//software/gameplay_tests/...      \\
-                      -//toolchains/cc/...                \\
+                      -//toolchains/...                   \\
                       -//software:unix_full_system_tar_gen"""
     else:
         target = fuzzy_find_target(
@@ -220,6 +220,9 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     for flag, condition in flag_conditions.items():
         if condition:
             command += list(flag.value)
+
+    if config.test_suite and config.action == ActionArgument.test:
+        command += ["--build_tests_only"]
 
     if config.jobs_option:
         command += [f"--jobs={config.jobs_option}"]
@@ -374,19 +377,13 @@ def start_interactive_cli():
                 choices=PLAYBOOK_CHOICES,
                 style=INTERACTIVE_STYLE,
             ).ask()
-            # The DEBUG_POWERLOOP entry reuses the deploy_powerboard playbook but
-            # compiles powerloop_main with the DEBUG_POWERLOOP flag, swapping in
-            # the bare setup()/loop() stubs so arbitrary code can be flashed onto
-            # the powerboard microcontroller for debugging.
+
             if playbook_choice == DEBUG_POWERLOOP_PLAYBOOK:
                 config.ansible_playbook = "deploy_powerboard.yml"
                 config.debug_powerloop = True
             else:
                 config.ansible_playbook = playbook_choice
-            # The deploy_robot_software playbook can compile Thunderloop with
-            # services disabled so it can run on a robot missing a powerboard or
-            # motorboard. Each selected option maps to a Bazel flag that defines
-            # the matching preprocessor macro in thunderloop.cpp.
+
             if config.ansible_playbook == "deploy_robot_software.yml":
                 selected = (
                     questionary.checkbox(

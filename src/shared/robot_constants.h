@@ -1,7 +1,5 @@
 #pragma once
 
-#include "shared/constants.h"
-
 namespace robot_constants
 {
 

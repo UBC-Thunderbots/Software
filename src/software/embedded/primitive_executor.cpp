@@ -13,8 +13,6 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
-namespace
-{
 /**
  * Check whether the destinations and subdestinations of two trajectory paths have
  * changed significantly enough to warrant switching to the new trajectory.
@@ -66,7 +64,6 @@ bool destinationsChangedSignificantly(const TrajectoryPath& current,
 
     return false;
 }
-}  // namespace
 
 PrimitiveExecutor::PrimitiveExecutor(
     const robot_constants::RobotConstants& robot_constants)
@@ -304,6 +301,7 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
         target_v_global =
             prev_target_global_velocity_ + velocity_delta.normalize(max_velocity_delta);
     }
+    prev_target_global_velocity_ = target_v_global;
 
     prev_target_global_velocity_ = target_v_global;
 

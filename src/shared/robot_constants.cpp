@@ -1,5 +1,7 @@
 #include "shared/robot_constants.h"
 
+#include "shared/constants.h"
+
 namespace robot_constants
 {
 

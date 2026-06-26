@@ -98,7 +98,7 @@ Point findOvershootInterceptPosition(const Robot& robot, const Point intercept_p
     double final_speed    = step_speed;
     bool finished         = false;
     double max_speed      = robot.robotConstants().robot_trajectory_max_speed_m_per_s;
-    double max_acc        = robot.robotConstants().robot_max_acceleration_m_per_s_2;
+    double max_acc = robot.robotConstants().robot_trajectory_max_acceleration_m_per_s_2;
 
     while (!finished)
     {
