@@ -44,7 +44,7 @@ class RobotCommunication:
         self.estop_mode = estop_mode
 
         self.estop_path = estop_path
-        self.estop_buadrate = estop_baudrate
+        self.estop_baudrate = estop_baudrate
 
         self.communication_manager = communication_manager
 
