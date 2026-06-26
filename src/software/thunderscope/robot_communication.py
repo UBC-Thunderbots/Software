@@ -146,27 +146,27 @@ class RobotCommunication:
         )
 
     def __send_estop_state(self) -> None:
-        """Constant loop which sends the current estop status proto if estop is not disabled
-        Uses the keyboard estop value for keyboard estop mode
-        If we're in physical estop mode, uses the physical estop value
-        If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
+        """Constant loop which sends the current estop status proto.
+
+        If estop is set to stop, set flag to send stop primitives to connected robots
         """
-        previous_estop_is_playing = True
-        if self.estop_mode != EstopMode.DISABLE_ESTOP:
-            while True:
-                if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
-                    self.estop_is_playing = self.estop_reader.isEstopPlay()
+        if self.estop_mode == EstopMode.DISABLE_ESTOP:
+            return
 
-                if not self.estop_is_playing:
-                    self.robot_stop_primitive_send_count = [
-                        NUM_TIMES_SEND_STOP
-                        for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-                    ]
+        while True:
+            if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+                self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-                self.current_proto_unix_io.send_proto(
-                    EstopState, EstopState(is_playing=self.estop_is_playing)
-                )
-                time.sleep(0.1)
+            if not self.estop_is_playing:
+                self.robot_stop_primitive_send_count = [
+                    NUM_TIMES_SEND_STOP
+                    for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+                ]
+
+            self.current_proto_unix_io.send_proto(
+                EstopState, EstopState(is_playing=self.estop_is_playing)
+            )
+            time.sleep(0.1)
 
     def __should_send_packet(self, robot_id) -> bool:
         """Returns True if the proto should be sent to the robot with the given id
