@@ -7,7 +7,7 @@ Charger::Charger()
 {
     pinMode(FLYBACK_FAULT, INPUT);
 
-    // DONE is active-low, I think we already have a pullup but just in case
+    // DONE is active-low, I think we already have a pullup but just in case//
     pinMode(CHRG_DONE, INPUT_PULLUP);
 
     pinMode(CHRG, OUTPUT);
