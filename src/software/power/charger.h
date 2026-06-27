@@ -16,32 +16,43 @@ class Charger
 
     /**
      * Starts/restarts an LT3750 charge cycle by creating a low -> high edge
-     * on CHRG.
+     * on CHRG. Does nothing while charging is inhibited.
+     * 
+     * New edges may be issued periodically while voltage remains below target threshold.
      */
-    static void chargeCapacitors();
+    void chargeCapacitors();
 
     /**
-     * Minimal recharge maintenance for LT3750.
-     *
-     * This is intentionally simple. It only sends another CHRG rising edge if
-     * DONE was previously seen and later deasserts.
+     * Immediately disables the LT3750 by holding CHRG low.
      */
-    static void maintainCharge();
+    void stopCharging();
 
     /**
-     * Returns the voltage of the capacitors, in volts.
+     * Forces the charger off while true. Used before and during kicker pulses.
+     */
+    void setChargeInhibited(bool inhibited);
+
+    /**
+     * Maintains capacitor voltage using hysteresis and the latest unfiltered
+     * calibrated voltage reading.
+     */
+    void maintainCharge();
+
+    /**
+     * Returns the EMA-smoothed capacitor voltage for telemetry.
+     * Also updates the internal unfiltered control voltage used by maintainCharge().
      */
     float getCapacitorVoltage();
 
     /**
      * Returns whether the flyback fault is tripped.
-     *
-     * Kept for compatibility with previous firmware.
+     * Kept for compatibility with previous firmware, but unused.
      */
     bool getFlybackFault();
 
     /**
      * Returns true when LT3750 DONE is active.
+     * Not supported by all boards, thus unused.
      */
     static bool getChargeDone();
 
@@ -54,8 +65,7 @@ class Charger
 
     // ADS7945 / analog constants.
     //
-    // Use 5.0f for REF5050.
-    // Use 4.096f if this board still uses REF5040.
+    // 5.0f for REF5050.
     static constexpr float ADC_VREF = 5.0f;
 
     static constexpr int ADC_BITS       = 14;
@@ -68,26 +78,40 @@ class Charger
     // ISO224 nominal gain: VOUT_DIFF = VIN / 3.
     static constexpr float ISO224_GAIN = 1.0f / 3.0f;
 
-    // Updated high-voltage divider.
+    // High-voltage divider.
     static constexpr float DIVIDER_R_TOP_OHMS    = 230000.0f;
     static constexpr float DIVIDER_R_BOTTOM_OHMS = 8200.0f;
     static constexpr float DIVIDER_RATIO =
         DIVIDER_R_BOTTOM_OHMS / (DIVIDER_R_TOP_OHMS + DIVIDER_R_BOTTOM_OHMS);
 
-    // Bit-banged SPI timing. Slow and conservative for proof-of-concept.
+    // Bit-banged SPI timing. Slow and conservative.
     static constexpr uint32_t ADC_CLOCK_DELAY_US = 2;
     static constexpr uint32_t ADC_CS_DELAY_US    = 2;
 
     // LT3750 timing.
-    static constexpr uint32_t LT3750_CHARGE_LOW_TIME_US = 250;  // datasheet min is 20 us
-    static constexpr uint32_t MIN_CHARGE_RETRIGGER_INTERVAL_MS = 500;
+    static constexpr uint32_t LT3750_CHARGE_LOW_TIME_US = 25;  // datasheet min is 20 us
 
-    static bool has_seen_done_since_last_charge_edge;
-    static uint32_t last_charge_edge_ms;
+    // Capacitor voltage control for maintainCharge() hysteresis.
+    static constexpr float CHARGE_STOP_VOLTAGE_V = 198.0f;
+    static constexpr float CHARGE_RESTART_VOLTAGE_V = 190.0f;
 
+    // EMA is used for telemetry smoothing, not used for maintainCharge() logic.
     static constexpr float CAP_VOLTAGE_EMA_ALPHA =
         0.02f;  // smaller is smoother but slower to respond
 
+    float capacitor_voltage_control_             = 0.0f;
+    bool capacitor_voltage_control_initialized_  = false;
+
     float capacitor_voltage_ema_            = 0.0f;
     bool capacitor_voltage_ema_initialized_ = false;
+
+    bool charging_enabled_ = false;
+    bool charge_inhibited_ = false;
+
+    // Time of most recent CHRG edge
+    uint32_t last_charge_edge_ms_ = 0;
+
+    // While voltage is below CHARGE_RESTART_VOLTAGE_V,
+    // retry charge edges at interval
+    static constexpr uint32_t CHARGE_RETRY_INTERVAL_MS = 250;
 };

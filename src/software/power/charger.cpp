@@ -1,13 +1,11 @@
 #include "charger.h"
 
-bool Charger::has_seen_done_since_last_charge_edge = false;
-uint32_t Charger::last_charge_edge_ms              = 0;
-
 Charger::Charger()
 {
+    // Currently unused
     pinMode(FLYBACK_FAULT, INPUT);
 
-    // DONE is active-low, I think we already have a pullup but just in case//
+    // DONE is active-low, also have hardware pullup on this pin.
     pinMode(CHRG_DONE, INPUT_PULLUP);
 
     pinMode(CHRG, OUTPUT);
@@ -22,43 +20,76 @@ Charger::Charger()
 
     pinMode(ADC_MISO, INPUT);
 
-    // Do not touch CH_SEL in this proof-of-concept.
-    // Hardware should pull CH_SEL low to select CH0.
+    // Hardware pulls CH_SEL low to select CH0.
+    // Can be changed later to include temperature sensing.
 }
 
 void Charger::chargeCapacitors()
 {
     // LT3750 charging is initiated by a CHARGE rising edge.
+    
+    if (charge_inhibited_)
+    {
+        return;
+    }
+
     digitalWrite(CHRG, LOW);
     delayMicroseconds(LT3750_CHARGE_LOW_TIME_US);
     digitalWrite(CHRG, HIGH);
 
-    last_charge_edge_ms = millis();
-    // has_seen_done_since_last_charge_edge = false;
+    charging_enabled_ = true;
+    last_charge_edge_ms_ = millis();
+}
+
+void Charger::stopCharging()
+{
+    digitalWrite(CHRG, LOW);
+    charging_enabled_ = false;
+}
+
+void Charger::setChargeInhibited(const bool inhibited)
+{
+    charge_inhibited_ = inhibited;
+
+    if (charge_inhibited_)
+    {
+        stopCharging();
+    }
 }
 
 void Charger::maintainCharge()
 {
-    const bool done = getChargeDone();
-
-    // if (done)
-    // {
-    //     has_seen_done_since_last_charge_edge = true;
-    //     return;
-    // }
-
-    // Minimal "continuous charging" approximation:
-    // If the LT3750 previously reached DONE and later DONE deasserts, produce
-    // another rising edge to start a new charge cycle.
-    // if (has_seen_done_since_last_charge_edge &&
-    //     (millis() - last_charge_edge_ms) > MIN_CHARGE_RETRIGGER_INTERVAL_MS)
-    // {
-    //     chargeCapacitors();
-    // }
-
-    if ((millis() - last_charge_edge_ms) > MIN_CHARGE_RETRIGGER_INTERVAL_MS)
+    // Do not enable charging until one valid capacitor-voltage measurement exists.
+    if (!capacitor_voltage_control_initialized_)
     {
-        chargeCapacitors();
+        return;
+    }
+
+    // During kick/chip guard and pulse time, do not charge.
+    if (charge_inhibited_)
+    {
+        stopCharging();
+        return;
+    }
+
+    const float voltage = capacitor_voltage_control_;
+    const uint32_t now  = millis();
+
+    if (voltage >= CHARGE_STOP_VOLTAGE_V)
+    {
+        stopCharging();
+        return;
+    }
+
+    if (voltage <= CHARGE_RESTART_VOLTAGE_V)
+    {
+        const bool retry_due =
+            (now - last_charge_edge_ms_) >= CHARGE_RETRY_INTERVAL_MS;
+
+        if (!charging_enabled_ || retry_due)
+        {
+            chargeCapacitors();
+        }
     }
 }
 
@@ -113,6 +144,7 @@ int16_t Charger::readAds7945SignedCode()
 {
     // ADS7945 outputs the result of the previous conversion.
     // Since CH_SEL is fixed to CH0 and capacitor voltage changes slowly, this is fine.
+    // Consider modifying if temperature sensing is added.
     const uint16_t raw16 = readAds7945WordBitBang();
     const uint16_t raw14 = (raw16 >> ADC_RESULT_RIGHT_SHIFT) & 0x3FFF;
 
@@ -138,7 +170,7 @@ float Charger::getCapacitorVoltage()
 {
     static constexpr int NUM_SAMPLES = 8;
 
-    // Calibration from scope measurements:
+    // Calibration from scope measurements
     // diagnostic 286.0 V corresponds to actual 196.44 V.
     // This linear fit is applied after converting the raw ADC code to a voltage which
     // already accounts for the hardware gain and divider
@@ -172,6 +204,10 @@ float Charger::getCapacitorVoltage()
     // Prevent a small negative reported voltage near 0 V.
     const float physical_capacitor_voltage =
         (calibrated_capacitor_voltage < 0.0f) ? 0.0f : calibrated_capacitor_voltage;
+
+    // Non EMA value used in maintainCharge() logic for hysteresis.
+    capacitor_voltage_control_ = physical_capacitor_voltage;
+    capacitor_voltage_control_initialized_ = true;
 
     // Initialize from the first real reading so startup does not ramp from 0 V.
     if (!capacitor_voltage_ema_initialized_)

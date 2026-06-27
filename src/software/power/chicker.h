@@ -17,18 +17,27 @@ class Chicker
      * Creates a Chicker setting up relevant pins and attaching interrupts
      */
     explicit Chicker(std::shared_ptr<Charger> charger);
+
     /**
      * Sets the action of the chicker. Arguments can not be passed to isr's so these
      * need to be set before calling kick/chip
      */
     static void kick(uint32_t kick_pulse_width);
     static void chip(uint32_t chip_pulse_width);
+
     /**
      * Attaches an interrupt on the BREAK_BEAM_PIN to kick/chip.
      * kick/chip will only be triggered once
      */
     static void autokick(uint32_t kick_pulse_width);
     static void autochip(uint32_t chip_pulse_width);
+
+    /**
+     * Called repeatedly from the main loop.
+     * Re-enables normal charger control after a kick/chip pulse completes.
+     */
+    static void update();
+
     /**
      * Get the current status of whether the break beam was tripped or not
      * This is reset before every kick/chip
@@ -39,11 +48,21 @@ class Chicker
 
    private:
     /**
+     * Disables charging, waits briefly for the flyback to settle, then starts
+     * a one-shot kicker or chipper pulse.
+     *
+     * @param duration pulse width duration in microseconds
+     * @param pin the pin to send the pulse to
+     */
+    static void requestPulse(int duration, int pin);
+
+    /**
      * Along with stopPulse creates a square wave to drive the chicker
      * @param duration pulse width duration in microseconds
      * @param pin the pin the send the pulse to
      */
     static void oneShotPulse(int duration, int pin);
+
     /**
      * Called on a pulse_timer to bring the CHIPPER/KICKER pin low
      */
@@ -56,5 +75,10 @@ class Chicker
     static hw_timer_t* cooldown_timer;
 
     static volatile bool on_cooldown;
+    static volatile bool pulse_finished_;
+
+    // Charger is held off for this long before the solenoid pulse begins.
+    static constexpr uint32_t CHARGE_DISABLE_SETTLE_US = 1000;
+
     static constexpr int COOLDOWN_MICROSECONDS = 3 * MICROSECONDS_IN_SECOND;
 };

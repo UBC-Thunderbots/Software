@@ -16,8 +16,7 @@ const uint8_t ADC_MISO = 5;   // ADS7945 SDO, moved away from GPIO16
 const uint8_t ADC_SCLK = 18;  // ADS7945 SCLK
 const uint8_t ADC_CS   = 21;  // ADS7945 CS
 
-// CH_SEL is intentionally not driven in this proof-of-concept.
-// It should be pulled low in hardware so ADS7945 CH0 is selected.\
+// CH_SEL is intentionally pulled low in hardware so ADS7945 CH0 is selected.
 // CH_SEL could be used for temperature sensing, not a priority for now.
 
 // Break Beam
