@@ -35,8 +35,8 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
 
    private:
     // TODO(#3737): tune constants
-    PidController x_pid_{0.2, 0.0, 0.0, 0.0};
-    PidController y_pid_{0.2, 0.0, 0.0, 0.0};
+    PidController<double> x_pid_{0.2, 0.0, 0.0, 0.0};
+    PidController<double> y_pid_{0.2, 0.0, 0.0, 0.0};
 
     static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 };

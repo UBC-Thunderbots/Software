@@ -64,14 +64,9 @@ class EmbeddedData:
     def get_chip_pulse_width(self) -> str:
         return self._get_value(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)
 
-    def get_current_draw(self) -> str:
-        return self._get_value(ROBOT_CURRENT_DRAW_CONFIG_KEY)
-
-    def get_battery_volt(self) -> str:
-        return self._get_value(ROBOT_BATTERY_VOLTAGE_CONFIG_KEY)
-
-    def get_cap_volt(self) -> str:
-        return self._get_value(ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY)
+    # TODO: #3809
+    # def get_cap_volt(self) -> str:
+    #     return self._get_value(ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY)
 
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
         """Simple Math Clamp function (Faster than numpy & fewer dependencies)
