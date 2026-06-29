@@ -6,6 +6,7 @@ from typing import Callable, override
 import webbrowser
 from software.thunderscope.gl.toolbars.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.common.common_widgets import ToggleableButton
 import qtawesome as qta
 
 
@@ -78,9 +79,8 @@ class GLGamecontrollerToolbar(GLToolbar):
         # set up the menu for selecting plays
         self.plays_menu = QMenu()
 
-        self.plays_menu_button = QPushButton()
+        self.plays_menu_button = StyledButton()
         self.plays_menu_button.setText("Plays")
-        self.plays_menu_button.setStyleSheet(self.get_toggle_button_style())
         self.plays_menu_button.setMenu(self.plays_menu)
 
         # add play items for each team color
@@ -177,9 +177,7 @@ class GLGamecontrollerToolbar(GLToolbar):
     def __toggle_normal_start_button(self) -> None:
         """Toggles the enabled / disabled state of the Normal Start button"""
         self.normal_start_enabled = not self.normal_start_enabled
-        self.normal_start_button.setStyleSheet(
-            self.get_toggle_button_style(self.normal_start_enabled)
-        )
+        self.normal_start_button.toggle_enabled(self.normal_start_enabled)
         self.normal_start_button.setIcon(
             qta.icon(
                 "fa5s.play",
@@ -195,7 +193,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         tooltip: str,
         callback: Callable[[], None],
         display_text: str = None,
-    ) -> QPushButton:
+    ) -> StyledButton:
         """Sets up a button with the given name and callback
 
         :param icon: the icon displayed on the button
@@ -204,14 +202,15 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param display_text: optional param if button needs both text and an icon
         :return: the button
         """
-        button = QPushButton()
+        button = ToggleableButton()
         button.setIcon(icon)
         button.setToolTip(tooltip)
-        button.setStyleSheet(self.get_toggle_button_style())
         button.clicked.connect(callback)
 
         if display_text:
             button.setText(display_text)
+
+        button.toggle_enabled(True)
         return button
 
     def __send_stop_command(self) -> None:

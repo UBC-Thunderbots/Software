@@ -5,7 +5,6 @@ from pyqtgraph.Qt.QtWidgets import *
 import qtawesome as qta
 from software.thunderscope.common.common_widgets import ToggleableButton
 
-
 class GLSandboxSidebar(QWidget):
     """Sidebar widget for the sandbox mode
 
