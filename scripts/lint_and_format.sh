@@ -25,7 +25,7 @@ function run_clang_format () {
     cd $BAZEL_ROOT_DIR
 
     # Generate extension string
-    # Formatted as -iname *.EXTENSION -o
+    # Formatted as -name *.EXTENSION -o
     EXTENSION_STRING=""
     for value in "${CLANG_FORMAT_EXTENSIONS[@]}"
     do
@@ -35,8 +35,8 @@ function run_clang_format () {
     # Find all the files that we want to format, and pass them to
     # clang-format as arguments
     # We remove the last -o flag from the extension string
-    find $CURR_DIR/../src/ ${EXTENSION_STRING::-2}  \
-        | xargs -I{} -n1000 $CLANG_BIN -i -style=file:$CURR_DIR/../.clang-format
+    find $CURR_DIR/../src ${EXTENSION_STRING% -o} \
+        | xargs $CLANG_BIN -i -style=file:$CURR_DIR/../.clang-format
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to run clang-format over all files!***\n\n"
@@ -148,5 +148,11 @@ run_md_toc
 run_eof_new_line
 run_git_diff_check
 run_ansible_lint
+
+# Update markers, telling Git hooks that formatting has been done
+# (Per-branch, so switching branches doesn't confuse the hooks)
+branch="$(git rev-parse --abbrev-ref HEAD)"
+mkdir -p "$CURR_DIR/.format_markers/$(dirname "$branch")"
+touch "$CURR_DIR/.format_markers/${branch}"
 
 exit 0

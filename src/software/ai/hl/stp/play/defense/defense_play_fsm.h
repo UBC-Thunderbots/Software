@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/defense/defense_play_base.h"
-#include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/play/play_fsm.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
@@ -16,9 +16,10 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     /**
      * Creates a defense play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit DefensePlayFSM(TbotsProto::AiConfig ai_config);
+    explicit DefensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
 
     /**
      * Guard to check whether we should be defending more aggressively

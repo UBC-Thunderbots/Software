@@ -21,7 +21,7 @@
  * @return A list of circles, sorted in descending order of radius. If no points were
  * provided, returns an empty list. Any points outside the bounding_box are omitted.
  */
-std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
+std::vector<Circle> findOpenCircles(const Rectangle& bounding_box,
                                     std::vector<Point> points);
 
 /**
@@ -32,5 +32,5 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
  * @param testPoints
  * @return The point in testPoints closest to testPoints.
  */
-std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      const std::vector<Point> &test_points);
+std::optional<Point> findClosestPoint(const Point& origin_point,
+                                      const std::vector<Point>& test_points);

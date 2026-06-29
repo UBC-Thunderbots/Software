@@ -42,24 +42,28 @@
  *     +-----+
  */
 
-struct EnemyBallPlacementPlayFSM
+
+struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayFSM>
 {
-    class WaitState;
-    class AvoidState;
-    class DefenseState;
+    /**
+     * Control parameters for enemy ball placement play
+     */
 
     struct ControlParams
     {
     };
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    class WaitState;
+    class AvoidState;
+    class DefenseState;
 
     /**
      * Creates an enemy ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit EnemyBallPlacementPlayFSM(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Guard that checks if the ball placement point exists
@@ -128,7 +132,6 @@ struct EnemyBallPlacementPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
     std::array<std::shared_ptr<AvoidInterferenceTactic>, 6> avoid_interference_tactics;
     std::array<std::shared_ptr<MoveTactic>, 3> move_tactics;

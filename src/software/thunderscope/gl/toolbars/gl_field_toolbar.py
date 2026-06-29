@@ -108,7 +108,9 @@ class GLFieldToolbar(GLToolbar):
             qta.icon("mdi.help-circle", color=self.BUTTON_ICON_COLOR)
         )
         self.help_button.clicked.connect(
-            lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
+            lambda: QMessageBox.information(
+                self.window(), "Help", THUNDERSCOPE_HELP_TEXT
+            )
         )
 
         # Setup pause button

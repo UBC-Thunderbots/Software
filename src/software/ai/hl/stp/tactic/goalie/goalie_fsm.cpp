@@ -5,9 +5,18 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/math/math_functions.h"
 
+GoalieFSM::GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+                     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+    : TacticFSM<GoalieFSM>(ai_config_ptr),
+      max_allowed_speed_mode(max_allowed_speed_mode),
+      robot_radius_expansion_amount(ROBOT_MAX_RADIUS_METERS *
+                                    ai_config_ptr->robot_navigation_obstacle_config()
+                                        .robot_obstacle_inflation_factor())
+{
+}
 
 Point GoalieFSM::getGoaliePositionToBlock(
-    const Ball &ball, const Field &field,
+    const Ball& ball, const Field& field,
     TbotsProto::GoalieTacticConfig goalie_tactic_config)
 {
     // Check if the ball is in the region where it will be at a sharp
@@ -63,7 +72,7 @@ Point GoalieFSM::getGoaliePositionToBlock(
 }
 
 std::vector<Point> GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegment(
-    const Ball &ball, const Field &field)
+    const Ball& ball, const Field& field)
 {
     // compute intersection points from ball position and velocity
     Ray ball_ray = Ray(ball.position(), ball.velocity());
@@ -79,7 +88,7 @@ std::vector<Point> GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegm
     return intersection(ball_ray, full_goal_segment);
 }
 
-Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
+Rectangle GoalieFSM::getNoChipRectangle(const Field& field)
 {
     return Rectangle(
         field.friendlyGoalpostNeg(),
@@ -87,7 +96,7 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
 }
 
 Point GoalieFSM::findGoodChipTarget(
-    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
+    const World& world, const TbotsProto::GoalieTacticConfig& goalie_tactic_config)
 {
     // Default chip target is the enemy goal
     Point chip_target = world.field().enemyGoalCenter();
@@ -113,7 +122,7 @@ Point GoalieFSM::findGoodChipTarget(
     return chip_target;
 }
 
-bool GoalieFSM::shouldEvacuateCrease(const Update &event)
+bool GoalieFSM::shouldEvacuateCrease(const Update& event)
 {
     Rectangle friendly_defense_area =
         event.common.world_ptr->field().friendlyDefenseArea();
@@ -123,7 +132,8 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
                              ballInInflatedDefenseArea(event);
 
     // goalie should only evacuate crease if there are no enemy robots nearby
-    double safe_distance_multiplier = goalie_tactic_config.safe_distance_multiplier();
+    double safe_distance_multiplier =
+        ai_config_ptr->goalie_tactic_config().safe_distance_multiplier();
     std::optional<Robot> nearest_enemy_robot =
         event.common.world_ptr->enemyTeam().getNearestRobot(ball.position());
     bool safe_to_evacuate = true;
@@ -137,15 +147,16 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
                            goalie_distance_to_ball;
     }
 
-    double ball_velocity_threshold = goalie_tactic_config.ball_speed_panic();
-    bool ball_is_stagnant          = ball.velocity().length() < ball_velocity_threshold;
+    double ball_velocity_threshold =
+        ai_config_ptr->goalie_tactic_config().ball_speed_panic();
+    bool ball_is_stagnant = ball.velocity().length() < ball_velocity_threshold;
 
     return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
 }
 
-bool GoalieFSM::shouldPanic(const Update &event)
+bool GoalieFSM::shouldPanic(const Update& event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(
             event.common.world_ptr->ball(), event.common.world_ptr->field());
@@ -153,17 +164,17 @@ bool GoalieFSM::shouldPanic(const Update &event)
            !intersections.empty();
 }
 
-bool GoalieFSM::shouldPivotChip(const Update &event)
+bool GoalieFSM::shouldPivotChip(const Update& event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     return event.common.world_ptr->ball().velocity().length() <= ball_speed_panic &&
            event.common.world_ptr->field().pointInFriendlyDefenseArea(
                event.common.world_ptr->ball().position());
 }
 
-bool GoalieFSM::panicDone(const Update &event)
+bool GoalieFSM::panicDone(const Update& event)
 {
-    double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
+    double ball_speed_panic = ai_config_ptr->goalie_tactic_config().ball_speed_panic();
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(
             event.common.world_ptr->ball(), event.common.world_ptr->field());
@@ -172,7 +183,7 @@ bool GoalieFSM::panicDone(const Update &event)
            intersections.empty();
 }
 
-void GoalieFSM::panic(const Update &event)
+void GoalieFSM::panic(const Update& event)
 {
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(
@@ -206,7 +217,7 @@ void GoalieFSM::panic(const Update &event)
 }
 
 void GoalieFSM::updatePivotKick(
-    const Update &event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
     // Ensure that we start our chip away from the no chip zone in front of
     // the goal (prevents accidentally scoring an own goal)
@@ -217,7 +228,8 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
-    Point chip_target = findGoodChipTarget(*event.common.world_ptr, goalie_tactic_config);
+    Point chip_target  = findGoodChipTarget(*event.common.world_ptr,
+                                            ai_config_ptr->goalie_tactic_config());
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
@@ -231,11 +243,11 @@ void GoalieFSM::updatePivotKick(
     processEvent(PivotKickFSM::Update(control_params, event.common));
 }
 
-void GoalieFSM::positionToBlock(const Update &event)
+void GoalieFSM::positionToBlock(const Update& event)
 {
-    Point goalie_pos =
-        getGoaliePositionToBlock(event.common.world_ptr->ball(),
-                                 event.common.world_ptr->field(), goalie_tactic_config);
+    Point goalie_pos = getGoaliePositionToBlock(event.common.world_ptr->ball(),
+                                                event.common.world_ptr->field(),
+                                                ai_config_ptr->goalie_tactic_config());
     Angle goalie_orientation =
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 
@@ -246,7 +258,7 @@ void GoalieFSM::positionToBlock(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
 
-bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
+bool GoalieFSM::ballInInflatedDefenseArea(const Update& event)
 {
     Rectangle inflated_defense_area =
         event.common.world_ptr->field().friendlyDefenseArea().expand(
@@ -255,12 +267,12 @@ bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
     return contains(inflated_defense_area, event.common.world_ptr->ball().position());
 }
 
-bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
+bool GoalieFSM::shouldMoveToGoalLine(const Update& event)
 {
     return event.control_params.should_move_to_goal_line;
 }
 
-void GoalieFSM::moveToGoalLine(const Update &event)
+void GoalieFSM::moveToGoalLine(const Update& event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.common.world_ptr->field().friendlyGoalCenter(),
@@ -270,7 +282,7 @@ void GoalieFSM::moveToGoalLine(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
 }
 
-bool GoalieFSM::retrieveDone(const Update &event)
+bool GoalieFSM::retrieveDone(const Update& event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Point retrieve_destination =
@@ -279,7 +291,7 @@ bool GoalieFSM::retrieveDone(const Update &event)
 }
 
 void GoalieFSM::retrieveFromDeadZone(
-    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Vector final_dribble_orientation =

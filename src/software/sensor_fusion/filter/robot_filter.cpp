@@ -16,7 +16,7 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state,
 }
 
 std::optional<Robot> RobotFilter::getFilteredData(
-    const std::vector<RobotDetection> &new_robot_data,
+    const std::vector<RobotDetection>& new_robot_data,
     const std::optional<RobotId> breakbeam_tripped_id)
 {
     int data_num               = 0;
@@ -28,7 +28,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
                                     .angular_velocity = AngularVelocity::fromRadians(0),
                                     .timestamp        = Timestamp().fromSeconds(0)};
 
-    for (const RobotDetection &robot_data : new_robot_data)
+    for (const RobotDetection& robot_data : new_robot_data)
     {
         // add up all data points for this robot and then average it
         if (robot_data.id == this->getRobotId() &&

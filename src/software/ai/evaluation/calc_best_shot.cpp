@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 
-std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &shot_origin,
-                                       const std::vector<Robot> &robot_obstacles,
+std::optional<Shot> calcBestShotOnGoal(const Segment& goal_post, const Point& shot_origin,
+                                       const std::vector<Robot>& robot_obstacles,
                                        TeamType goal, double radius)
 {
     // Don't return a shot if the ball is behind the net
@@ -27,7 +27,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     }
     AngleMap angle_map(pos_post_angle, neg_post_angle, max_num_obstacles);
 
-    for (const Robot &robot_obstacle : robot_obstacles)
+    for (const Robot& robot_obstacle : robot_obstacles)
     {
         Point enemy_robot_pos    = robot_obstacle.position();
         Vector perpendicular_vec = (enemy_robot_pos - shot_origin).perpendicular();
@@ -59,9 +59,9 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     }
 
     std::sort(obstacles.begin(), obstacles.end(),
-              [](AngleSegment &a, AngleSegment &b) -> bool { return a > b; });
+              [](AngleSegment& a, AngleSegment& b) -> bool { return a > b; });
 
-    for (AngleSegment &obstacle_angle_seg : obstacles)
+    for (AngleSegment& obstacle_angle_seg : obstacles)
     {
         angle_map.addNonViableAngleSegment(obstacle_angle_seg);
     }
@@ -96,10 +96,10 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
         Shot(shot_point, Angle::fromDegrees(biggest_angle_seg.getDeltaInDegrees())));
 }
 
-std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
-                                       const Team &enemy_team, const Point &shot_origin,
+std::optional<Shot> calcBestShotOnGoal(const Field& field, const Team& friendly_team,
+                                       const Team& enemy_team, const Point& shot_origin,
                                        TeamType goal,
-                                       const std::vector<Robot> &robots_to_ignore,
+                                       const std::vector<Robot>& robots_to_ignore,
                                        double radius)
 {
     if (shot_origin.x() < field.friendlyGoalCenter().x() ||
@@ -118,7 +118,7 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
     all_robots.insert(all_robots.begin(), friendly_team.getAllRobots().begin(),
                       friendly_team.getAllRobots().end());
 
-    for (const Robot &robot : all_robots)
+    for (const Robot& robot : all_robots)
     {
         if (std::count(robots_to_ignore.begin(), robots_to_ignore.end(), robot) == 0)
         {

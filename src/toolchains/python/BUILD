@@ -56,8 +56,8 @@ py_cc_toolchain(
 )
 
 py_cc_toolchain(
-    name = "k8_jetson_nano_cross_compile_py_cc_toolchain_data",
-    headers = "@py_cc_toolchain_for_k8_jetson_nano_cross_compile//:headers",
+    name = "k8_aarch64_linux_py_cc_toolchain_data",
+    headers = "@py_cc_toolchain_for_k8_aarch64_linux//:headers",
     libs = ":empty",
     python_version = "3.12",
 )
@@ -69,7 +69,7 @@ cc_library(
 )
 
 toolchain(
-    name = "k8_jetson_nano_cross_compile_py_cc_toolchain",
+    name = "k8_aarch64_linux_py_cc_toolchain",
     exec_compatible_with = [
         # Higher version of bazel has stricter hermeticy requirement,
         # thus refuses to pull in local python dev headers from aarch64.
@@ -80,6 +80,6 @@ toolchain(
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
     ],
-    toolchain = ":k8_jetson_nano_cross_compile_py_cc_toolchain_data",
+    toolchain = ":k8_aarch64_linux_py_cc_toolchain_data",
     toolchain_type = "@rules_python//python/cc:toolchain_type",
 )

@@ -10,88 +10,95 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
-PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
-                                     const RobotConstants_t &robot_constants,
-                                     const TeamColour friendly_team_colour,
-                                     const RobotId robot_id)
-    : current_primitive_(),
-      friendly_team_colour_(friendly_team_colour),
-      robot_constants_(robot_constants),
-      time_step_(time_step),
-      robot_id_(robot_id)
+PrimitiveExecutor::PrimitiveExecutor(
+    const robot_constants::RobotConstants& robot_constants)
+    : state_(), current_primitive_(), robot_constants_(robot_constants)
 {
 }
 
-void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive &primitive_msg)
+void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_msg)
 {
     current_primitive_ = primitive_msg;
 
     if (current_primitive_.has_move())
     {
-        trajectory_path_ = createTrajectoryPathFromParams(
-            current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
+        const auto new_trajectory_path =
+            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+                                           state_.velocity(), robot_constants_);
 
-        angular_trajectory_ =
+        const auto new_angular_trajectory =
             createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(),
-                                              angular_velocity_, robot_constants_);
+                                              state_.angularVelocity(), robot_constants_);
 
-        time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        trajectory_path_ = new_trajectory_path;
+        position_controller_.reset();
+        time_since_linear_trajectory_creation_ =
+            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+
+        angular_trajectory_ = new_angular_trajectory;
+        orientation_controller_.reset();
+        time_since_angular_trajectory_creation_ =
+            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
     }
 }
 
-void PrimitiveExecutor::setStopPrimitive()
+void PrimitiveExecutor::updateState(const RobotState& state)
 {
-    current_primitive_ = *createStopPrimitiveProto();
+    state_ = state;
 }
 
-void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
-                                       const AngularVelocity &angular_velocity)
+Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 {
-    Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
-    velocity_                     = actual_global_velocity;
-    angular_velocity_             = angular_velocity;
-}
+    Vector target_v_global =
+        position_controller_.step(state_.position(), *trajectory_path_,
+                                  time_since_linear_trajectory_creation_, delta_time);
 
-Vector PrimitiveExecutor::getTargetLinearVelocity()
-{
-    Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
-        orientation_);
-    Point position =
-        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
-    double distance_to_destination =
-        distance(position, trajectory_path_->getDestination());
+    // make sure robot doesn't go faster than max speed (speed is frame-invariant)
+    target_v_global = target_v_global.normalize(
+        std::min(target_v_global.length(),
+                 static_cast<double>(robot_constants_.robot_max_speed_m_per_s)));
 
-    // Dampen velocity as we get closer to the destination to reduce jittering
-    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
+    const Vector velocity_delta = target_v_global - prev_target_global_velocity_;
+    const double max_velocity_delta =
+        robot_constants_.robot_max_acceleration_m_per_s_2 * delta_time.toSeconds();
+    if (velocity_delta.length() > max_velocity_delta)
     {
-        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
+        target_v_global =
+            prev_target_global_velocity_ + velocity_delta.normalize(max_velocity_delta);
     }
-    return local_velocity;
+    prev_target_global_velocity_ = target_v_global;
+
+    return globalToLocalVelocity(target_v_global, state_.orientation());
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
+AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& delta_time)
 {
-    orientation_ =
-        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
+    auto target_w =
+        orientation_controller_.step(state_.orientation(), *angular_trajectory_,
+                                     time_since_angular_trajectory_creation_, delta_time);
 
-    AngularVelocity angular_velocity =
-        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
-    Angle orientation_to_destination =
-        orientation_.minDiff(angular_trajectory_->getDestination());
-    if (orientation_to_destination.toDegrees() < 5)
-    {
-        angular_velocity *= orientation_to_destination.toDegrees() / 5;
-    }
+    // make sure robot doesn't rotate faster than max angular speed
+    const double max_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
+    const double clamped_w = std::clamp(target_w.toRadians(), -max_speed, max_speed);
+    target_w               = AngularVelocity::fromRadians(clamped_w);
 
-    return angular_velocity;
+    const double max_angular_velocity_delta =
+        robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_time.toSeconds();
+    const double angular_velocity_delta =
+        std::clamp((target_w - prev_target_angular_velocity_).toRadians(),
+                   -max_angular_velocity_delta, max_angular_velocity_delta);
+    target_w = prev_target_angular_velocity_ +
+               AngularVelocity::fromRadians(angular_velocity_delta);
+    prev_target_angular_velocity_ = target_w;
+    return target_w;
 }
 
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
-    TbotsProto::PrimitiveExecutorStatus &status)
+    TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time)
 {
-    time_since_trajectory_creation_ += time_step_;
+    time_since_linear_trajectory_creation_ += delta_time;
+    time_since_angular_trajectory_creation_ += delta_time;
     status.set_running_primitive(true);
 
     switch (current_primitive_.primitive_case())
@@ -103,10 +110,24 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             status.set_running_primitive(false);
+            setPrevCommandedVelocity(Vector(), AngularVelocity());
             return output;
         }
         case TbotsProto::Primitive::kDirectControl:
         {
+            const auto& motor_control =
+                current_primitive_.direct_control().motor_control();
+            if (motor_control.has_direct_velocity_control())
+            {
+                setPrevCommandedVelocity(
+                    createVector(motor_control.direct_velocity_control().velocity()),
+                    createAngularVelocity(
+                        motor_control.direct_velocity_control().angular_velocity()));
+            }
+            else
+            {
+                setPrevCommandedVelocity(Vector(), AngularVelocity());
+            }
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 current_primitive_.direct_control());
         }
@@ -120,11 +141,15 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
                 LOG(INFO)
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
+                setPrevCommandedVelocity(Vector(), AngularVelocity());
                 return output;
             }
 
-            Vector local_velocity            = getTargetLinearVelocity();
-            AngularVelocity angular_velocity = getTargetAngularVelocity();
+            Vector local_velocity            = stepTargetLinearVelocity(delta_time);
+            AngularVelocity angular_velocity = stepTargetAngularVelocity(delta_time);
+
+            // For debugging:
+            // sendLinearMotionToPlotJuggler(local_velocity, delta_time);
 
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
@@ -144,10 +169,27 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // LOG(DEBUG) << "No primitive set!";
         }
     }
+    setPrevCommandedVelocity(Vector(), AngularVelocity());
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
 }
 
-void PrimitiveExecutor::setRobotId(const RobotId robot_id)
+void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
+                                                 const AngularVelocity& angular_velocity)
 {
-    robot_id_ = robot_id;
+    prev_target_global_velocity_ =
+        localToGlobalVelocity(local_velocity, state_.orientation());
+    prev_target_angular_velocity_ = angular_velocity;
+}
+
+void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
+                                                      const Duration& delta_time) const
+{
+    const Vector& local_acceleration =
+        (target_local_velocity - state_.localVelocity()) / delta_time.toSeconds();
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"x", state_.position().x()},
+                                                 {"y", state_.position().y()},
+                                                 {"v_x", target_local_velocity.x()},
+                                                 {"v_y", target_local_velocity.y()},
+                                                 {"a_x", local_acceleration.x()},
+                                                 {"a_y", local_acceleration.y()}});
 }

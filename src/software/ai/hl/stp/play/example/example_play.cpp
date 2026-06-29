@@ -3,19 +3,12 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ExamplePlay::ExamplePlay(TbotsProto::AiConfig config)
-    : Play(config, false), fsm{ExamplePlayFSM{}}, control_params{}
+ExamplePlay::ExamplePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<ExamplePlayFSM>(ai_config_ptr, false)
 {
 }
 
-void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                 const WorldPtr &world_ptr)
-{
-    // This function doesn't get called and it will be removed once coroutines are phased
-    // out
-}
-
-void ExamplePlay::updateTactics(const PlayUpdate &play_update)
+void ExamplePlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(ExamplePlayFSM::Update(control_params, play_update));
 }
@@ -28,4 +21,6 @@ std::vector<std::string> ExamplePlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ExamplePlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, ExamplePlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
+    factory;

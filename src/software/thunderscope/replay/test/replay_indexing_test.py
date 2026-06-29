@@ -13,7 +13,7 @@ from software.py_constants import *
 
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.simulated_test_fixture import pytest_main
 from software.thunderscope.replay.test.replay_corruption_test import (
     create_valid_log_entry,
     create_random_proto,

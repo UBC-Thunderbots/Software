@@ -4,9 +4,9 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/geom/algorithms/distance.h"
 
-std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
-                                                         const Ball &ball,
-                                                         const Field &field)
+std::optional<Robot> getRobotWithEffectiveBallPossession(const Team& team,
+                                                         const Ball& ball,
+                                                         const Field& field)
 {
     if (team.numRobots() == 0)
     {
@@ -18,7 +18,7 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
     auto baller_robot = team.getAllRobots().at(0);
 
     // Find the robot that can intercept the ball the quickest
-    for (const auto &robot : team.getAllRobots())
+    for (const auto& robot : team.getAllRobots())
     {
         auto intercept = findBestInterceptForBall(ball, field, robot);
         if (!best_intercept || (intercept && intercept->second < best_intercept->second))

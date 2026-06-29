@@ -1,6 +1,6 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 
-Point calculateBlockCone(const Vector &a, const Vector &b, const double radius)
+Point calculateBlockCone(const Vector& a, const Vector& b, const double radius)
 {
     if (a.length() < FIXED_EPSILON || b.length() < FIXED_EPSILON)
     {
@@ -12,7 +12,7 @@ Point calculateBlockCone(const Vector &a, const Vector &b, const double radius)
     return Point(c * (radius / std::fabs(au.cross(c))));
 }
 
-Point calculateBlockCone(const Point &a, const Point &b, const Point &p,
+Point calculateBlockCone(const Point& a, const Point& b, const Point& p,
                          const double radius)
 {
     return p + (calculateBlockCone(a - p, b - p, radius)).toVector();

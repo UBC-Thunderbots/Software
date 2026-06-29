@@ -1,19 +1,22 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 
 /**
  * The GetBehindBallTactic will move the assigned robot to the given destination and
  * arrive with the specified final orientation and speed
  */
-class GetBehindBallTactic : public Tactic
+class GetBehindBallTactic : public TacticBase<GetBehindBallFSM>
 {
    public:
     /**
      * Creates a new GetBehindBallTactic
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit GetBehindBallTactic();
+    explicit GetBehindBallTactic(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Updates the control parameters for this GetBehindBallTactic.
@@ -24,13 +27,4 @@ class GetBehindBallTactic : public Tactic
     void updateControlParams(const Point& ball_location, Angle chick_direction);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<GetBehindBallFSM>>> fsm_map;
-
-    GetBehindBallFSM::ControlParams control_params;
 };

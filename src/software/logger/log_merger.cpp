@@ -5,14 +5,13 @@ LogMerger::LogMerger(bool enable_merging)
 {
 }
 
-std::list<g3::LogMessage> LogMerger::log(g3::LogMessage &log)
+std::list<g3::LogMessage> LogMerger::log(g3::LogMessage& log)
 {
     if (enable_merging)
     {
         std::string msg = log.message();
 
-        std::chrono::_V2::system_clock::time_point current_time =
-            std::chrono::system_clock::now();
+        Clock::time_point current_time = std::chrono::system_clock::now();
         // add passed time from testing
         current_time += passed_time;
         std::list<g3::LogMessage> messages_to_log = _getOldMessages(current_time);
@@ -38,8 +37,7 @@ std::list<g3::LogMessage> LogMerger::log(g3::LogMessage &log)
     }
 }
 
-std::list<g3::LogMessage> LogMerger::_getOldMessages(
-    std::chrono::_V2::system_clock::time_point current_time)
+std::list<g3::LogMessage> LogMerger::_getOldMessages(Clock::time_point current_time)
 {
     std::list<g3::LogMessage> result;
     while (message_list.size() > 0)
@@ -66,7 +64,7 @@ std::list<g3::LogMessage> LogMerger::_getOldMessages(
     return result;
 }
 
-g3::LogMessage LogMerger::_addRepeats(g3::LogMessage &log, int repeats)
+g3::LogMessage LogMerger::_addRepeats(g3::LogMessage& log, int repeats)
 {
     // if no repeats, do nothing
     if (repeats == 0)

@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "shared/constants.h"
 #include "software/constants.h"
@@ -126,6 +127,8 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("MILLISECONDS_PER_NANOSECOND")  = MILLISECONDS_PER_NANOSECOND;
     m.attr("SECONDS_PER_MINUTE")           = SECONDS_PER_MINUTE;
 
+    m.attr("DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK") =
+        DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK;
     m.attr("DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK") =
         DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK;
 
@@ -143,18 +146,14 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
     m.attr("DIV_B_NUM_ROBOTS")       = DIV_B_NUM_ROBOTS;
 
-    // Redis Keys, Ports, & Host
-    m.attr("ROBOT_ID_REDIS_KEY")                = ROBOT_ID_REDIS_KEY;
-    m.attr("ROBOT_MULTICAST_CHANNEL_REDIS_KEY") = ROBOT_MULTICAST_CHANNEL_REDIS_KEY;
-    m.attr("ROBOT_NETWORK_INTERFACE_REDIS_KEY") = ROBOT_NETWORK_INTERFACE_REDIS_KEY;
-    m.attr("ROBOT_KICK_CONSTANT_REDIS_KEY")     = ROBOT_KICK_CONSTANT_REDIS_KEY;
-    m.attr("ROBOT_KICK_EXP_COEFF_REDIS_KEY")    = ROBOT_KICK_EXP_COEFF_REDIS_KEY;
-    m.attr("ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY")  = ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY;
-    m.attr("ROBOT_CURRENT_DRAW_REDIS_KEY")      = ROBOT_CURRENT_DRAW_REDIS_KEY;
-    m.attr("ROBOT_BATTERY_VOLTAGE_REDIS_KEY")   = ROBOT_BATTERY_VOLTAGE_REDIS_KEY;
-    m.attr("ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY") = ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY;
-    m.attr("REDIS_DEFAULT_HOST")                = REDIS_DEFAULT_HOST;
-    m.attr("REDIS_DEFAULT_PORT")                = REDIS_DEFAULT_PORT;
+    // TOML Config Keys and File Path
+    m.attr("ROBOT_ID_CONFIG_KEY")                = ROBOT_ID_CONFIG_KEY;
+    m.attr("ROBOT_MULTICAST_CHANNEL_CONFIG_KEY") = ROBOT_MULTICAST_CHANNEL_CONFIG_KEY;
+    m.attr("ROBOT_NETWORK_INTERFACE_CONFIG_KEY") = ROBOT_NETWORK_INTERFACE_CONFIG_KEY;
+    m.attr("ROBOT_KICK_CONSTANT_CONFIG_KEY")     = ROBOT_KICK_CONSTANT_CONFIG_KEY;
+    m.attr("ROBOT_KICK_EXP_COEFF_CONFIG_KEY")    = ROBOT_KICK_EXP_COEFF_CONFIG_KEY;
+    m.attr("ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY")  = ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY;
+    m.attr("TOML_CONFIG_FILE_PATH")              = TOML_CONFIG_FILE_PATH;
 
     // Robot power constants
     m.attr("MIN_CAPACITOR_VOLTAGE")   = MIN_CAPACITOR_VOLTAGE;
@@ -171,4 +170,13 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("AUTO_CHIP_DISTANCE_DEFAULT_M")     = AUTO_CHIP_DISTANCE_DEFAULT_M;
     m.attr("AUTO_KICK_SPEED_DEFAULT_M_PER_S")  = AUTO_KICK_SPEED_DEFAULT_M_PER_S;
     m.attr("WHEEL_ROTATION_MAX_SPEED_M_PER_S") = WHEEL_ROTATION_MAX_SPEED_M_PER_S;
+
+    // Estop USB-to-serial adapter identifiers, as a list of
+    // (vendor_id, product_id) pairs
+    std::vector<std::pair<std::string, std::string>> estop_usb_device_ids;
+    for (const auto& id : ESTOP_USB_DEVICE_IDS)
+    {
+        estop_usb_device_ids.emplace_back(id.vendor_id, id.product_id);
+    }
+    m.attr("ESTOP_USB_DEVICE_IDS") = estop_usb_device_ids;
 }

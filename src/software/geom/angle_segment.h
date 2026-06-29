@@ -23,28 +23,28 @@ class AngleSegment
      *
      * @return the top angle of the angle segment
      */
-    const Angle &getAngleTop() const;
+    const Angle& getAngleTop() const;
 
     /**
      * Sets the top (most positive) angle of the angle segment
      *
      * @param angle_top the top angle of the angle segment
      */
-    void setAngleTop(const Angle &angle_top);
+    void setAngleTop(const Angle& angle_top);
 
     /**
      * Gets the bottom (most negative) angle of the angle segment
      *
      * @return the bottom angle of the angle segment
      */
-    const Angle &getAngleBottom() const;
+    const Angle& getAngleBottom() const;
 
     /**
      * Sets the bottom (most negative) angle of the angle segment
      *
      * @param angle_bottom the bottom angle of the angle segment
      */
-    void setAngleBottom(const Angle &angle_bottom);
+    void setAngleBottom(const Angle& angle_bottom);
 
 
     /**
@@ -61,7 +61,7 @@ class AngleSegment
      * @param other the other AngleSegment to compare to
      * @return true if both AngleSegment's top angles are equal
      */
-    bool operator==(const AngleSegment &other) const;
+    bool operator==(const AngleSegment& other) const;
 
     /**
      * Compares another AngleSegment's top angle
@@ -69,7 +69,7 @@ class AngleSegment
      * @param other the other AngleSegment to compare to
      * @return true if both AngleSegment's top angles are not equal
      */
-    bool operator!=(const AngleSegment &other) const;
+    bool operator!=(const AngleSegment& other) const;
 
     /**
      * Compares another AngleSegment's top angle
@@ -77,7 +77,7 @@ class AngleSegment
      * @param other the other AngleSegment to compare to
      * @return true if this top angle is less than the other's top angle
      */
-    bool operator<(const AngleSegment &other) const;
+    bool operator<(const AngleSegment& other) const;
 
     /**
      * Compares another AngleSegment's top angle
@@ -85,7 +85,7 @@ class AngleSegment
      * @param other the other AngleSegment to compare to
      * @return true if this top angle is greater than the other's top angle
      */
-    bool operator>(const AngleSegment &other) const;
+    bool operator>(const AngleSegment& other) const;
 
    private:
     Angle angle_top_;

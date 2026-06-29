@@ -4,19 +4,24 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/distance.h"
 
-Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
-                                         const Robot &shadowee,
-                                         const double &shadow_distance)
+ShadowEnemyFSM::ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : TacticFSM<ShadowEnemyFSM>(ai_config_ptr)
+{
+}
+
+Point ShadowEnemyFSM::findBlockPassPoint(const Point& ball_position,
+                                         const Robot& shadowee,
+                                         const double& shadow_distance)
 {
     Vector enemy_to_shadowee_vector = ball_position - shadowee.position();
 
     return shadowee.position() + enemy_to_shadowee_vector.normalize(shadow_distance);
 }
 
-Point ShadowEnemyFSM::findBlockShotPoint(const Robot &robot, const Field &field,
-                                         const Team &friendlyTeam, const Team &enemyTeam,
-                                         const Robot &shadowee,
-                                         const double &shadow_distance)
+Point ShadowEnemyFSM::findBlockShotPoint(const Robot& robot, const Field& field,
+                                         const Team& friendlyTeam, const Team& enemyTeam,
+                                         const Robot& shadowee,
+                                         const double& shadow_distance)
 {
     std::vector<Robot> robots_to_ignore = {robot};
     if (friendlyTeam.goalie().has_value())
@@ -37,7 +42,7 @@ Point ShadowEnemyFSM::findBlockShotPoint(const Robot &robot, const Field &field,
     return shadowee.position() + enemy_shot_vector.normalize(shadow_distance);
 }
 
-bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
+bool ShadowEnemyFSM::enemyThreatHasBall(const Update& event)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
 
@@ -75,7 +80,7 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
  *                       |    \    ++    <-- Goalie
  *+----------------------+----|----------|----+------------------+
  */
-bool ShadowEnemyFSM::blockedShot(const Update &event)
+bool ShadowEnemyFSM::blockedShot(const Update& event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Ray shot_block_direction(ball_position,
@@ -91,12 +96,12 @@ bool ShadowEnemyFSM::blockedShot(const Update &event)
 }
 
 
-bool ShadowEnemyFSM::contestedBall(const Update &event)
+bool ShadowEnemyFSM::contestedBall(const Update& event)
 {
     return event.common.robot.breakbeamTripped();
 }
 
-void ShadowEnemyFSM::blockPass(const Update &event)
+void ShadowEnemyFSM::blockPass(const Update& event)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
     auto ball_position = event.common.world_ptr->ball().position();
@@ -125,7 +130,7 @@ void ShadowEnemyFSM::blockPass(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
-void ShadowEnemyFSM::blockShot(const Update &event,
+void ShadowEnemyFSM::blockShot(const Update& event,
                                boost::sml::back::process<MoveFSM::Update> processEvent)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
@@ -197,7 +202,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
  *                       |         ++    <-- Goalie
  *+----------------------+---------++---------+------------------+
  */
-void ShadowEnemyFSM::goAndSteal(const Update &event)
+void ShadowEnemyFSM::goAndSteal(const Update& event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Angle face_ball_orientation =
@@ -281,7 +286,7 @@ void ShadowEnemyFSM::goAndSteal(const Update &event)
     }
 }
 
-void ShadowEnemyFSM::stealAndPull(const Update &event)
+void ShadowEnemyFSM::stealAndPull(const Update& event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Angle face_ball_orientation =

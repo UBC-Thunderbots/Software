@@ -12,14 +12,14 @@ AngleMap::AngleMap(AngleSegment angle_seg, size_t reserved_num_obstacles)
     taken_angle_segments.reserve(reserved_num_obstacles);
 }
 
-const AngleSegment &AngleMap::getAngleSegment() const
+const AngleSegment& AngleMap::getAngleSegment() const
 {
     return angle_seg;
 }
 
-void AngleMap::addNonViableAngleSegment(AngleSegment &obstacle_angle_seg)
+void AngleMap::addNonViableAngleSegment(AngleSegment& obstacle_angle_seg)
 {
-    for (AngleSegment &taken_angle_seg : taken_angle_segments)
+    for (AngleSegment& taken_angle_seg : taken_angle_segments)
     {
         if (!(obstacle_angle_seg.getAngleBottom() > taken_angle_seg.getAngleTop() ||
               obstacle_angle_seg.getAngleTop() < taken_angle_seg.getAngleBottom()))

@@ -28,8 +28,8 @@
  * @param global_orientation The global orientation of the robot
  * @return The local velocity vector
  */
-inline Vector globalToLocalVelocity(const Vector &global_vector,
-                                    const Angle &global_orientation)
+inline Vector globalToLocalVelocity(const Vector& global_vector,
+                                    const Angle& global_orientation)
 {
     return global_vector.rotate(-global_orientation);
 }
@@ -40,8 +40,8 @@ inline Vector globalToLocalVelocity(const Vector &global_vector,
  * @param global_orientation The global orientation of the robot
  * @return The global velocity vector
  */
-inline Vector localToGlobalVelocity(const Vector &local_vector,
-                                    const Angle &global_orientation)
+inline Vector localToGlobalVelocity(const Vector& local_vector,
+                                    const Angle& global_orientation)
 {
     return local_vector.rotate(global_orientation);
 }

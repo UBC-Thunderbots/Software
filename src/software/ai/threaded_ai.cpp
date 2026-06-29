@@ -12,8 +12,8 @@ ThreadedAi::ThreadedAi(const TbotsProto::AiConfig& ai_config)
     // always want AI to use the latest World
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
-      ai(ai_config),
-      ai_config(ai_config),
+      ai_config_ptr(std::make_shared<TbotsProto::AiConfig>(ai_config)),
+      ai(ai_config_ptr),
       ai_control_config(ai_config.ai_control_config())
 {
 }
@@ -29,14 +29,14 @@ void ThreadedAi::overrideTactics(
 {
     std::scoped_lock lock(ai_mutex);
 
-    auto play = std::make_unique<AssignedTacticsPlay>(ai_config);
+    auto play = std::make_unique<AssignedTacticsPlay>(ai_config_ptr);
     std::map<RobotId, std::shared_ptr<Tactic>> tactic_assignment_map;
 
     // override to stop primitive
     for (auto& assigned_tactic : assigned_tactic_play_control_params.assigned_tactics())
     {
         tactic_assignment_map[assigned_tactic.first] =
-            createTactic(assigned_tactic.second, ai_config);
+            createTactic(assigned_tactic.second, ai_config_ptr);
     }
 
     play->updateControlParams(tactic_assignment_map);
@@ -56,10 +56,10 @@ void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
     std::scoped_lock lock(ai_mutex);
 
     // Update the AI with thew new config
-    ai_config         = config.ai_config();
+    *ai_config_ptr    = config.ai_config();
     ai_control_config = config.ai_config().ai_control_config();
 
-    ai.updateAiConfig(ai_config);
+    ai.updateAiConfig();
 }
 
 void ThreadedAi::runAiAndSendPrimitives(const WorldPtr& world_ptr)

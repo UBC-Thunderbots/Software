@@ -20,8 +20,9 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
     game_state.setBallPlacementPoint(ball_placement_point);
     world_ptr->updateGameState(game_state);
 
-    TbotsProto::AiConfig ai_config;
-    FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{ai_config});
+
+    FSM<BallPlacementPlayFSM> fsm(
+        BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 
@@ -50,8 +51,9 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     game_state.setBallPlacementPoint(ball_placement_point);
     world_ptr->updateGameState(game_state);
 
-    TbotsProto::AiConfig ai_config;
-    FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{ai_config});
+
+    FSM<BallPlacementPlayFSM> fsm(
+        BallPlacementPlayFSM{std::make_shared<TbotsProto::AiConfig>()});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 
@@ -78,8 +80,7 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
 
 TEST(BallPlacementPlayFSMTest, test_kick_off_wall_angle)
 {
-    TbotsProto::AiConfig ai_config;
-    BallPlacementPlayFSM fsm(ai_config);
+    BallPlacementPlayFSM fsm(std::make_shared<TbotsProto::AiConfig>());
 
     Field field           = Field::createField(TbotsProto::FieldType::DIV_B);
     Rectangle field_lines = field.fieldLines();

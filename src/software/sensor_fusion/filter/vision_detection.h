@@ -18,7 +18,7 @@ struct RobotDetection
     double confidence;
     Timestamp timestamp;
 
-    bool operator<(const RobotDetection &r) const
+    bool operator<(const RobotDetection& r) const
     {
         return timestamp < r.timestamp;
     }
@@ -41,7 +41,7 @@ struct BallDetection
     Timestamp timestamp;
     double confidence;
 
-    bool operator<(const BallDetection &b) const
+    bool operator<(const BallDetection& b) const
     {
         return timestamp < b.timestamp;
     }

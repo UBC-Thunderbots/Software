@@ -1,8 +1,8 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = [
     "//software/ai:__subpackages__",
-    "//software/simulated_tests:__subpackages__",
+    "//software/gameplay_tests:__subpackages__",
 ])
 
 cc_library(
@@ -102,6 +102,18 @@ cc_library(
         ":trajectory_path",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/trajectory:collision_evaluator",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
+    ],
+)
+
+cc_library(
+    name = "collision_evaluator",
+    srcs = ["collision_evaluator.cpp"],
+    hdrs = ["collision_evaluator.h"],
+    deps = [
+        ":trajectory_path",
+        "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
     ],
 )
@@ -141,11 +153,10 @@ cc_test(
 py_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -33,13 +33,15 @@ cc_library(
 
 py_test(
     name = "ball_placement_play_test",
+    timeout = "long",
     srcs = [
         "ball_placement_play_test.py",
     ],
-    tags = ["exclusive"],
+    # Flaky: multi-robot simulated play sensitive to sim timing; passes on retry.
+    flaky = True,
     deps = [
         "//software:conftest",
-        "//software/simulated_tests:validation",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

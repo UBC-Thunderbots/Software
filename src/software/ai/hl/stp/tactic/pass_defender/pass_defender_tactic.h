@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
 /**
@@ -11,15 +11,16 @@
  * an active enemy pass is directed towards the defender.
  *
  */
-class PassDefenderTactic : public Tactic
+class PassDefenderTactic : public TacticBase<PassDefenderFSM, DribbleFSM>
 {
    public:
     /**
      * Creates a new PassDefenderTactic
      *
-     * @param ai_config The AI configuration
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit PassDefenderTactic(TbotsProto::AiConfig ai_config);
+    explicit PassDefenderTactic(
+        std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Update control params for this tactic
@@ -31,14 +32,4 @@ class PassDefenderTactic : public Tactic
                              TbotsProto::BallStealMode ball_steal_mode);
 
     void accept(TacticVisitor& visitor) const override;
-
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
-
-   private:
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
-
-    std::map<RobotId, std::unique_ptr<FSM<PassDefenderFSM>>> fsm_map;
-
-    PassDefenderFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };

@@ -1,6 +1,6 @@
 #include "software/ai/navigator/trajectory/trajectory_path_with_cost.h"
 
-TrajectoryPathWithCost::TrajectoryPathWithCost(const TrajectoryPath &traj_path)
+TrajectoryPathWithCost::TrajectoryPathWithCost(const TrajectoryPath& traj_path)
     : traj_path(traj_path)
 {
 }

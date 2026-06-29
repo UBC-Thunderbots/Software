@@ -1,23 +1,21 @@
-import sys
-
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import Play, PlayName
+from proto.play_pb2 import PlayName
 
-from software.simulated_tests.or_validation import OrValidation
+from software.gameplay_tests.validation.or_validation import OrValidation
 
-from software.simulated_tests.ball_moves_from_rest import (
-    BallEventuallyMovesFromRest,
-)
-from software.simulated_tests.friendly_team_scored import *
-from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.robot_enters_region import (
+from software.gameplay_tests.validation.friendly_team_scored import *
+from software.gameplay_tests.validation.ball_enters_region import *
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 
 
 @pytest.mark.parametrize(
@@ -94,38 +92,11 @@ from proto.ssl_gc_common_pb2 import Team
         ),
     ],
 )
-# TODO: #3503
-@pytest.mark.skip(
-    "Disabling this test because OrValidation is passed both an always validation and eventually validation"
-)
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
-    # Setup Bots
     def setup(*args):
-        # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.DIRECT, team=Team.YELLOW
-        )
-
-        # Force play override here
-        blue_play = Play()
-        blue_play.name = PlayName.EnemyFreeKickPlay
-
-        yellow_play = Play()
-        yellow_play.name = PlayName.FreeKickPlay
-
-        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
-
-        # Create world state
-        simulated_test_runner.simulator_proto_unix_io.send_proto(
-            WorldState,
+        simulated_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -134,19 +105,33 @@ def test_enemy_free_kick_play(
             ),
         )
 
-    # Always Validation
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=Command.Type.DIRECT, team=Team.YELLOW
+        )
+
+        simulated_test_runner.set_plays(
+            blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
+        )
+
+    # Validation RoboCup SSL rules: can't be within 0.5m of ball before its kicked
     always_validation_sequence_set = [
         [
             OrValidation(
                 [
                     RobotNeverEntersRegion(
+                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]
+                    ),
+                    BallNeverEntersRegion(
                         regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
                     ),
-                    BallEventuallyMovesFromRest(position=ball_initial_pos),
                 ]
             )
         ]
     ]
+
     # Eventually Validation
     eventually_validation_sequence_set = [
         [RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 1)])]
@@ -164,5 +149,4 @@ def test_enemy_free_kick_play(
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

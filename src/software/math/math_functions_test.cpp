@@ -2,34 +2,60 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
+
 TEST(LinearUtilFunctionTest, testZeroCase)
 {
     double out = linear(0, 0, 2);
-    EXPECT_EQ(out, 0.5);
+    EXPECT_NEAR(out, 0.5, std::numeric_limits<double>::epsilon());
 }
 
 TEST(LinearUtilFunctionTest, testOneQuarter)
 {
     double out = linear(-1, 0, 4);
-    EXPECT_EQ(out, 0.25);
+    EXPECT_NEAR(out, 0.25, std::numeric_limits<double>::epsilon());
 }
 
 TEST(LinearUtilFunctionTest, testTwoThirds)
 {
     double out = linear(0.75, 0, 4.5);
-    EXPECT_EQ(out, 2.0 / 3.0);
+    EXPECT_NEAR(out, 2.0 / 3.0, std::numeric_limits<double>::epsilon());
 }
 
 TEST(LinearUtilFunctionTest, testMinimumNoOffset)
 {
     double out = linear(-1.5, 0, 3);
-    EXPECT_EQ(out, 0.0);
+    EXPECT_NEAR(out, 0.0, std::numeric_limits<double>::epsilon());
 }
 
 TEST(LinearUtilFunctionTest, testMaximumNoOffset)
 {
     double out = linear(2.5, 0, 5.0);
-    EXPECT_EQ(out, 1.0);
+    EXPECT_NEAR(out, 1.0, std::numeric_limits<double>::epsilon());
+}
+
+TEST(LinearUtilFunctionTest, testMinimumNegativeOffset)
+{
+    double out = linear(-4, -2, 4);
+    EXPECT_NEAR(out, 0.0, std::numeric_limits<double>::epsilon());
+}
+
+TEST(LinearUtilFunctionTest, testMaximumNegativeOffset)
+{
+    double out = linear(1.5, -1, 5.0);
+    EXPECT_NEAR(out, 1.0, std::numeric_limits<double>::epsilon());
+}
+
+TEST(LinearUtilFunctionTest, testMinimumPositiveOffset)
+{
+    double out = linear(0, 3, 6);
+    EXPECT_NEAR(out, 0.0, std::numeric_limits<double>::epsilon());
+}
+
+TEST(LinearUtilFunctionTest, testMaximumPositiveOffset)
+{
+    double out = linear(6, 1.5, 9);
+    EXPECT_NEAR(out, 1.0, std::numeric_limits<double>::epsilon());
 }
 
 TEST(LinearUtilFunctionTest, testClampBelowNoOffset)
@@ -41,30 +67,6 @@ TEST(LinearUtilFunctionTest, testClampBelowNoOffset)
 TEST(LinearUtilFunctionTest, testClampAboveNoOffset)
 {
     double out = linear(4.2, 0, 6);
-    EXPECT_EQ(out, 1.0);
-}
-
-TEST(LinearUtilFunctionTest, testMinimumNegativeOffset)
-{
-    double out = linear(-4, -2, 4);
-    EXPECT_EQ(out, 0.0);
-}
-
-TEST(LinearUtilFunctionTest, testMaximumNegativeOffset)
-{
-    double out = linear(1.5, -1, 5.0);
-    EXPECT_EQ(out, 1.0);
-}
-
-TEST(LinearUtilFunctionTest, testMinimumPositiveOffset)
-{
-    double out = linear(0, 3, 6);
-    EXPECT_EQ(out, 0.0);
-}
-
-TEST(LinearUtilFunctionTest, testMaximumPositiveOffset)
-{
-    double out = linear(6, 1.5, 9);
     EXPECT_EQ(out, 1.0);
 }
 

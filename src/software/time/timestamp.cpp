@@ -26,57 +26,57 @@ const Timestamp Timestamp::fromMilliseconds(double milliseconds)
 }
 
 const Timestamp Timestamp::fromTimestampProto(
-    const TbotsProto::Timestamp &timestamp_proto)
+    const TbotsProto::Timestamp& timestamp_proto)
 {
     return fromSeconds(timestamp_proto.epoch_timestamp_seconds());
 }
 
-Timestamp Timestamp::operator+(const Duration &duration) const
+Timestamp Timestamp::operator+(const Duration& duration) const
 {
     return Timestamp::fromSeconds(toSeconds() + duration.toSeconds());
 }
 
-bool Timestamp::operator==(const Timestamp &other) const
+bool Timestamp::operator==(const Timestamp& other) const
 {
     return std::fabs(other.toSeconds() - toSeconds()) < EPSILON;
 }
 
-bool Timestamp::operator!=(const Timestamp &other) const
+bool Timestamp::operator!=(const Timestamp& other) const
 {
     return !(*this == other);
 }
 
-bool Timestamp::operator<(const Timestamp &other) const
+bool Timestamp::operator<(const Timestamp& other) const
 {
     return (*this != other) && (toSeconds() < other.toSeconds());
 }
 
-bool Timestamp::operator>=(const Timestamp &other) const
+bool Timestamp::operator>=(const Timestamp& other) const
 {
     return !(*this < other);
 }
 
-bool Timestamp::operator>(const Timestamp &other) const
+bool Timestamp::operator>(const Timestamp& other) const
 {
     return (*this != other) && (toSeconds() > other.toSeconds());
 }
 
-bool Timestamp::operator<=(const Timestamp &other) const
+bool Timestamp::operator<=(const Timestamp& other) const
 {
     return !(*this > other);
 }
 
-Timestamp Timestamp::operator-(const Duration &duration) const
+Timestamp Timestamp::operator-(const Duration& duration) const
 {
     return Timestamp::fromSeconds(toSeconds() - duration.toSeconds());
 }
 
-Duration Timestamp::operator-(const Timestamp &timestamp) const
+Duration Timestamp::operator-(const Timestamp& timestamp) const
 {
     return Duration::fromSeconds(toSeconds() - timestamp.toSeconds());
 }
 
-std::ostream &operator<<(std::ostream &output_stream, const Timestamp &time)
+std::ostream& operator<<(std::ostream& output_stream, const Timestamp& time)
 {
     output_stream << std::setprecision(2) << std::fixed << time.toSeconds() << "s";
 

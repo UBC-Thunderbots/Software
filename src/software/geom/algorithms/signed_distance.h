@@ -17,8 +17,8 @@
  * @param second
  * @return the signed shortest distance between the perimeter of the first and the second
  */
-double signedDistance(const Rectangle &first, const Point &second);
-double signedDistance(const Point &first, const Rectangle &second);
+double signedDistance(const Rectangle& first, const Point& second);
+double signedDistance(const Point& first, const Rectangle& second);
 
 /**
  * Finds the shortest distance between the perimeter of a Circle and a Point.
@@ -29,8 +29,8 @@ double signedDistance(const Point &first, const Rectangle &second);
  * @param second
  * @return the signed shortest distance between the perimeter of the first and the second
  */
-double signedDistance(const Circle &first, const Point &second);
-double signedDistance(const Point &first, const Circle &second);
+double signedDistance(const Circle& first, const Point& second);
+double signedDistance(const Point& first, const Circle& second);
 
 /**
  * Finds the shortest distance between the perimeter of a Polygon and a Point.
@@ -41,8 +41,8 @@ double signedDistance(const Point &first, const Circle &second);
  * @param second
  * @return the signed shortest distance between the perimeter of the first and the second
  */
-double signedDistance(const Polygon &first, const Point &second);
-double signedDistance(const Point &first, const Polygon &second);
+double signedDistance(const Polygon& first, const Point& second);
+double signedDistance(const Point& first, const Polygon& second);
 
 /**
  * Finds the shortest distance between the perimeter of a Stadium and a Point.
@@ -53,5 +53,5 @@ double signedDistance(const Point &first, const Polygon &second);
  * @param second
  * @return the signed shortest distance between the perimeter of the first and the second
  */
-double signedDistance(const Stadium &first, const Point &second);
-double signedDistance(const Point &first, const Stadium &second);
+double signedDistance(const Stadium& first, const Point& second);
+double signedDistance(const Point& first, const Stadium& second);

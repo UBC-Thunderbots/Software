@@ -148,7 +148,7 @@ TEST_F(GroupGoalLanesByDensityTest, single_dense_cluster)
 
     // Create goal lanes from threat positions
     std::vector<GoalLane> goal_lanes;
-    for (const auto &threat_position : threat_positions)
+    for (const auto& threat_position : threat_positions)
     {
         auto lane          = Segment(threat_position, field.friendlyGoalCenter());
         auto angle_to_goal = lane.reverse().toVector().orientation();
@@ -180,7 +180,7 @@ TEST_F(GroupGoalLanesByDensityTest, multiple_dense_clusters)
 
     // Create goal lanes from threat positions
     std::vector<GoalLane> goal_lanes;
-    for (const auto &threat_position : threat_positions)
+    for (const auto& threat_position : threat_positions)
     {
         auto lane          = Segment(threat_position, field.friendlyGoalCenter());
         auto angle_to_goal = lane.reverse().toVector().orientation();

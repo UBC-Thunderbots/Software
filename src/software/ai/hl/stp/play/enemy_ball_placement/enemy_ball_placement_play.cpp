@@ -2,19 +2,13 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
-    : Play(config, false), fsm{EnemyBallPlacementPlayFSM{config}}, control_params{}
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayBase<EnemyBallPlacementPlayFSM>(ai_config_ptr, false)
 {
 }
 
-void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                            const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing, will be removed once
-    // coroutines are phased out
-}
-
-void EnemyBallPlacementPlay::updateTactics(const PlayUpdate &play_update)
+void EnemyBallPlacementPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(EnemyBallPlacementPlayFSM::Update(control_params, play_update));
 }
@@ -27,5 +21,6 @@ std::vector<std::string> EnemyBallPlacementPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay,
+                       std::shared_ptr<const TbotsProto::AiConfig>>
     factory;

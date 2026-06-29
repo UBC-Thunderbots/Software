@@ -6,23 +6,27 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 
+
 /**
  * An example play that moves the robots in a circle around the ball
  */
-struct ExamplePlayFSM
+struct ExamplePlayFSM : PlayFSM<ExamplePlayFSM>
 {
-    class MoveState;
-
+    /**
+     * Control parameters for Example Play
+     */
     struct ControlParams
     {
     };
 
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    class MoveState;
 
     /**
      * Creates an example play FSM
+     *
+     * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit ExamplePlayFSM();
+    explicit ExamplePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that moves the robots to certain positions around the ball

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/geom/point.h"
 
-struct ChipFSM
+struct ChipFSM : TacticFSM<ChipFSM>
 {
-   public:
     class ChipState;
 
     struct ControlParams
@@ -18,14 +18,21 @@ struct ChipFSM
         double chip_distance_meters;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<ChipFSM>::Update;
+
+    /**
+     * Constructor for ChipFSM
+     *
+     * @param ai_config_ptr Shared pointer to ai_config
+     */
+    explicit ChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
      * Action that updates the MovePrimitive
      *
      * @param event ChipFSM::Update event
      */
-    void updateChip(const Update &event);
+    void updateChip(const Update& event);
 
     /**
      * Action that updates the GetBehindBallFSM
@@ -34,7 +41,7 @@ struct ChipFSM
      * @param processEvent processes the GetBehindBallFSM::Update
      */
     void updateGetBehindBall(
-        const Update &event,
+        const Update& event,
         boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
 
     /**
@@ -44,7 +51,7 @@ struct ChipFSM
      *
      * @return if the ball has been chicked
      */
-    bool ballChicked(const Update &event);
+    bool ballChicked(const Update& event);
 
     /**
      * Guard that checks if the robot is aligned for the chip
@@ -53,7 +60,7 @@ struct ChipFSM
      *
      * @return if the robot is aligned for the chip
      */
-    bool shouldRealignWithBall(const Update &event);
+    bool shouldRealignWithBall(const Update& event);
 
     auto operator()()
     {

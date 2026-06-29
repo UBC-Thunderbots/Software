@@ -30,8 +30,8 @@ class ObstacleVisitor
      *
      * @param The Obstacle to visit
      */
-    virtual void visit(const GeomObstacle<Circle> &geom_obstacle)    = 0;
-    virtual void visit(const GeomObstacle<Polygon> &geom_obstacle)   = 0;
-    virtual void visit(const GeomObstacle<Rectangle> &geom_obstacle) = 0;
-    virtual void visit(const GeomObstacle<Stadium> &geom_obstacle)   = 0;
+    virtual void visit(const GeomObstacle<Circle>& geom_obstacle)    = 0;
+    virtual void visit(const GeomObstacle<Polygon>& geom_obstacle)   = 0;
+    virtual void visit(const GeomObstacle<Rectangle>& geom_obstacle) = 0;
+    virtual void visit(const GeomObstacle<Stadium>& geom_obstacle)   = 0;
 };

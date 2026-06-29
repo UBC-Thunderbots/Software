@@ -18,7 +18,7 @@
 class PossessionTracker
 {
    public:
-    explicit PossessionTracker(const TbotsProto::PossessionTrackerConfig &config);
+    explicit PossessionTracker(const TbotsProto::PossessionTrackerConfig& config);
 
     /**
      * Returns a TeamPossession value indicating which team has possession of the ball.
@@ -29,9 +29,9 @@ class PossessionTracker
      * @param field the field being played on
      * @return a TeamPossession value indicating which team has possession of the ball
      */
-    TeamPossession getTeamWithPossession(const Team &friendly_team,
-                                         const Team &enemy_team, const Ball &ball,
-                                         const Field &field);
+    TeamPossession getTeamWithPossession(const Team& friendly_team,
+                                         const Team& enemy_team, const Ball& ball,
+                                         const Field& field);
 
    private:
     // Max distance in meters between robot and ball for robot
@@ -74,6 +74,6 @@ class PossessionTracker
      * @param ball the ball
      * @param field the field being played on
      */
-    void updateTimes(const Team &friendly_team, const Team &enemy_team, const Ball &ball,
-                     const Field &field);
+    void updateTimes(const Team& friendly_team, const Team& enemy_team, const Ball& ball,
+                     const Field& field);
 };

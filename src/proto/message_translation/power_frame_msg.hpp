@@ -49,6 +49,11 @@ std::vector<uint8_t> serializeToVector(const T& data)
         fields = TbotsProto_PowerStatus_fields;
         size   = TbotsProto_PowerStatus_size;
     }
+    else if (std::is_same<T, TbotsProto_DribblerControl>::value)
+    {
+        fields = TbotsProto_DribblerControl_fields;
+        size   = TbotsProto_DribblerControl_size;
+    }
     else
     {
         throw std::runtime_error("Unexpected type as argument");
@@ -83,6 +88,13 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
 {
     frame.which_power_msg        = TbotsProto_PowerFrame_power_status_tag;
     frame.power_msg.power_status = status;
+}
+
+void inline setPowerMsg(TbotsProto_PowerFrame& frame,
+                        const TbotsProto_DribblerControl& dribble_control)
+{
+    frame.which_power_msg            = TbotsProto_PowerFrame_dribbler_control_tag;
+    frame.power_msg.dribbler_control = dribble_control;
 }
 
 /**
@@ -142,6 +154,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
     kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
 
+    nanopb_control.has_chicker = true;
+
     switch (power_control.chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
@@ -157,6 +171,18 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
             nanopb_control.chicker.chicker_command.chip_pulse_width = chip_pulse_width;
+            break;
+        case TbotsProto::PowerControl::ChickerControl::kKickPulseWidth:
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
+            nanopb_control.chicker.chicker_command.kick_pulse_width =
+                static_cast<uint32_t>(power_control.chicker().kick_pulse_width());
+            break;
+        case TbotsProto::PowerControl::ChickerControl::kChipPulseWidth:
+            nanopb_control.chicker.which_chicker_command =
+                TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
+            nanopb_control.chicker.chicker_command.chip_pulse_width =
+                static_cast<uint32_t>(power_control.chicker().chip_pulse_width());
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
@@ -181,7 +207,26 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .auto_chip_or_kick.autochip_pulse_width = chip_pulse_width;
                     break;
-
+                case TbotsProto::AutoChipOrKick::kAutokickPulseWidth:
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .which_auto_chip_or_kick =
+                        TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(power_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autokick_pulse_width());
+                    break;
+                case TbotsProto::AutoChipOrKick::kAutochipPulseWidth:
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .which_auto_chip_or_kick =
+                        TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
+                    nanopb_control.chicker.chicker_command.auto_chip_or_kick
+                        .auto_chip_or_kick.autokick_pulse_width =
+                        static_cast<uint32_t>(power_control.chicker()
+                                                  .auto_chip_or_kick()
+                                                  .autochip_pulse_width());
+                    break;
                 default:
                     break;
             }
@@ -229,17 +274,17 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     switch (chicker_command)
     {
         case ChickerCommandMode::CHIP:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
             chicker.chicker_command.chip_pulse_width = chip_pulse_width;
             break;
         case ChickerCommandMode::KICK:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             chicker.chicker_command.kick_pulse_width = kick_pulse_width;
             break;
         case ChickerCommandMode::AUTOCHIPORKICK:
-            control.chicker.which_chicker_command =
+            chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_auto_chip_or_kick_tag;
             switch (auto_chip_or_kick)
             {
@@ -263,6 +308,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
             break;
     }
 
+    control.has_chicker = true;
     control.chicker     = chicker;
     control.geneva_slot = geneva_slot;
 
@@ -281,5 +327,19 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
     auto proto_status = std::make_unique<TbotsProto::PowerStatus>();
     proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
     return proto_status;
+}
+
+/**
+ * Creates a nanopb dribbler control msg with the provided fields
+ *
+ * @param dribbler_speed_rpm The target dribbler speed in RPM
+ * @return a nanopb dribbler control msg with the provided fields
+ */
+TbotsProto_DribblerControl inline createNanoPbDribblerControl(
+    const uint32_t dribbler_speed_rpm)
+{
+    TbotsProto_DribblerControl control = TbotsProto_DribblerControl_init_default;
+    control.dribbler_speed             = dribbler_speed_rpm;
+    return control;
 }
 #endif

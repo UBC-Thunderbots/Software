@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 compile_pip_requirements(
     name = "requirements",
     src = "requirements.in",
+    requirements_darwin = "requirements_lock.darwin.txt",
     requirements_txt = "requirements_lock.txt",
 )
 
@@ -20,7 +21,9 @@ py_binary(
         ":util",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:runtime_manager",
         "//software/thunderscope/binary_context_managers:simulator",
+        "//software/thunderscope/log/stats",
     ],
 )
 
@@ -187,7 +190,9 @@ py_library(
 py_library(
     name = "estop_helpers",
     srcs = ["estop_helpers.py"],
+    data = ["//software:py_constants.so"],
     deps = [
         "//software/thunderscope:constants",
+        requirement("pyserial"),
     ],
 )

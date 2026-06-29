@@ -1,27 +1,27 @@
 #include "software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h"
 
-FreeKickPlayFSM::FreeKickPlayFSM(const TbotsProto::AiConfig &ai_config)
-    : ai_config(ai_config),
-      align_to_ball_tactic(std::make_shared<MoveTactic>()),
-      shoot_tactic(std::make_shared<KickTactic>()),
-      chip_tactic(std::make_shared<ChipTactic>()),
-      passer_tactic(std::make_shared<KickTactic>()),
-      receiver_tactic(
-          std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
-      receiver_positioning_tactics(
-          {std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()}),
-      defense_play(std::make_shared<DefensePlay>(ai_config)),
+FreeKickPlayFSM::FreeKickPlayFSM(
+    std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
+    : PlayFSM<FreeKickPlayFSM>(ai_config_ptr),
+      align_to_ball_tactic(std::make_shared<MoveTactic>(ai_config_ptr)),
+      shoot_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
+      chip_tactic(std::make_shared<ChipTactic>(ai_config_ptr)),
+      passer_tactic(std::make_shared<KickTactic>(ai_config_ptr)),
+      receiver_tactic(std::make_shared<ReceiverTactic>(ai_config_ptr)),
+      receiver_positioning_tactics({std::make_shared<MoveTactic>(ai_config_ptr),
+                                    std::make_shared<MoveTactic>(ai_config_ptr)}),
+      defense_play(std::make_shared<DefensePlay>(ai_config_ptr)),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
           std::make_shared<const EighteenZonePitchDivision>(
               Field::createSSLDivisionBField()),
-          ai_config.passing_config())),
-      pass_generator(ai_config.passing_config()),
+          ai_config_ptr->passing_config())),
+      pass_generator(ai_config_ptr->passing_config()),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0})
 {
 }
 
-void FreeKickPlayFSM::setupPosition(const Update &event)
+void FreeKickPlayFSM::setupPosition(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -36,15 +36,15 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-bool FreeKickPlayFSM::setupDone(const Update &event)
+bool FreeKickPlayFSM::setupDone(const Update& event)
 {
     return align_to_ball_tactic->done();
 }
 
 void FreeKickPlayFSM::updateReceiverPositioningTactics(
     const WorldPtr world, unsigned int num_tactics,
-    const std::vector<Point> &existing_receiver_positions,
-    const std::optional<Point> &pass_origin_override)
+    const std::vector<Point>& existing_receiver_positions,
+    const std::optional<Point>& pass_origin_override)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -54,7 +54,7 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
             std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
         std::generate(receiver_positioning_tactics.begin(),
                       receiver_positioning_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(); });
+                      [this]() { return std::make_shared<MoveTactic>(ai_config_ptr); });
     }
 
     std::vector<Point> best_receiving_positions =
@@ -76,10 +76,10 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
 }
 
 void FreeKickPlayFSM::setReceiverAndDefenderTactics(
-    PriorityTacticVector &tactics_to_run, const Update &event, int ideal_num_receivers,
+    PriorityTacticVector& tactics_to_run, const Update& event, int ideal_num_receivers,
     int num_tactics_already_assigned,
-    const std::vector<Point> &existing_receiver_positions,
-    const std::optional<Point> &pass_origin_override)
+    const std::vector<Point>& existing_receiver_positions,
+    const std::optional<Point>& pass_origin_override)
 {
     int num_tactics_remaining = std::max(
         0, static_cast<int>(event.common.num_tactics) - num_tactics_already_assigned);
@@ -104,7 +104,7 @@ void FreeKickPlayFSM::setReceiverAndDefenderTactics(
             event.common.world_ptr, num_defenders,
             [&tactics_to_run](PriorityTacticVector new_tactics)
             {
-                for (const auto &tactic_vector : new_tactics)
+                for (const auto& tactic_vector : new_tactics)
                 {
                     tactics_to_run.push_back(tactic_vector);
                 }
@@ -114,7 +114,7 @@ void FreeKickPlayFSM::setReceiverAndDefenderTactics(
     }
 }
 
-void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
+void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr& world_ptr)
 {
     // Face towards the center of the left segment of the enemy defense area,
     // so we are prepared to take a shot on enemy net, or pass the ball near
@@ -129,7 +129,7 @@ void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
         direction_to_face.orientation());
 }
 
-bool FreeKickPlayFSM::shotFound(const Update &event)
+bool FreeKickPlayFSM::shotFound(const Update& event)
 {
     shot = calcBestShotOnGoal(event.common.world_ptr->field(),
                               event.common.world_ptr->friendlyTeam(),
@@ -138,10 +138,10 @@ bool FreeKickPlayFSM::shotFound(const Update &event)
     return shot.has_value() &&
            shot->getOpenAngle() >
                Angle::fromDegrees(
-                   ai_config.attacker_tactic_config().min_open_angle_for_shot_deg());
+                   ai_config_ptr->attacker_tactic_config().min_open_angle_for_shot_deg());
 }
 
-void FreeKickPlayFSM::shootBall(const Update &event)
+void FreeKickPlayFSM::shootBall(const Update& event)
 {
     LOG(INFO) << "Shooting ball.";
     PriorityTacticVector tactics_to_run = {{}};
@@ -156,20 +156,20 @@ void FreeKickPlayFSM::shootBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update &event)
+void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update& event)
 {
     pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
 
-bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
+bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update& event)
 {
     Duration time_since_pass_optimization_start =
         event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
     return time_since_pass_optimization_start.toSeconds() >
-           ai_config.free_kick_play_config().max_time_commit_to_pass_seconds();
+           ai_config_ptr->free_kick_play_config().max_time_commit_to_pass_seconds();
 }
 
-void FreeKickPlayFSM::chipBall(const Update &event)
+void FreeKickPlayFSM::chipBall(const Update& event)
 {
     LOG(INFO) << "Time to look for pass expired. Chipping ball.";
     PriorityTacticVector tactics_to_run = {{}};
@@ -186,7 +186,7 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     // Chip towards the friendly farthest up the enemy half,
     // or the center of the field if no friendly is in the enemy half.
     Point chip_target(0, 0);
-    for (const Robot &friendly : event.common.world_ptr->friendlyTeam().getAllRobots())
+    for (const Robot& friendly : event.common.world_ptr->friendlyTeam().getAllRobots())
     {
         // Skip over the robot kicking the ball
         if (friendly.id() == robot_kicking_opt->id())
@@ -207,7 +207,7 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
+void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -239,18 +239,18 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-bool FreeKickPlayFSM::passFound(const Update &event)
+bool FreeKickPlayFSM::passFound(const Update& event)
 {
     double time_since_pass_optimization_start_seconds =
         (event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time)
             .toSeconds();
 
     double abs_min_pass_score =
-        ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        ai_config_ptr->shoot_or_pass_play_config().abs_min_pass_score();
     double min_perfect_pass_score =
-        ai_config.shoot_or_pass_play_config().min_perfect_pass_score();
+        ai_config_ptr->shoot_or_pass_play_config().min_perfect_pass_score();
     double pass_score_ramp_down_duration =
-        ai_config.free_kick_play_config().max_time_commit_to_pass_seconds();
+        ai_config_ptr->free_kick_play_config().max_time_commit_to_pass_seconds();
 
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
@@ -262,7 +262,7 @@ bool FreeKickPlayFSM::passFound(const Update &event)
     return best_pass_and_score_so_far.rating > min_score;
 }
 
-bool FreeKickPlayFSM::shouldAbortPass(const Update &event)
+bool FreeKickPlayFSM::shouldAbortPass(const Update& event)
 {
     // Check if ball has already been passed
     if (distance(event.common.world_ptr->ball().position(),
@@ -275,14 +275,14 @@ bool FreeKickPlayFSM::shouldAbortPass(const Update &event)
     // Abort pass if the pass score has dropped significantly
     best_pass_and_score_so_far.rating =
         ratePass(*event.common.world_ptr, best_pass_and_score_so_far.pass,
-                 ai_config.passing_config());
+                 ai_config_ptr->passing_config());
     double abs_min_pass_score =
-        ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        ai_config_ptr->shoot_or_pass_play_config().abs_min_pass_score();
     return best_pass_and_score_so_far.rating < abs_min_pass_score;
 }
 
 
-void FreeKickPlayFSM::passBall(const Update &event)
+void FreeKickPlayFSM::passBall(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -302,17 +302,17 @@ void FreeKickPlayFSM::passBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-bool FreeKickPlayFSM::shotDone(const Update &event)
+bool FreeKickPlayFSM::shotDone(const Update& event)
 {
     return shoot_tactic->done();
 }
 
-bool FreeKickPlayFSM::passDone(const FreeKickPlayFSM::Update &event)
+bool FreeKickPlayFSM::passDone(const FreeKickPlayFSM::Update& event)
 {
     return receiver_tactic->done();
 }
 
-bool FreeKickPlayFSM::chipDone(const FreeKickPlayFSM::Update &event)
+bool FreeKickPlayFSM::chipDone(const FreeKickPlayFSM::Update& event)
 {
     return chip_tactic->done();
 }

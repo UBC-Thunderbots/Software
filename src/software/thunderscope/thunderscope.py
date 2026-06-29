@@ -40,9 +40,6 @@ class Thunderscope:
             The interval in milliseconds to refresh all the widgets.
         """
         self.refresh_interval_ms = refresh_interval_ms
-        self.refresh_timers = []
-
-        self.tabs = QTabWidget()
 
         # ProtoUnixIOs
         #
@@ -59,13 +56,9 @@ class Thunderscope:
 
         # initialize proto unix io map with initial values or default if not provided
         self.proto_unix_io_map = config.proto_unix_io_map
-        self.tab_dock_map = {}
 
-        # iterate through each tab and add one by one
-        for tab in config.tabs:
-            self.tab_dock_map[tab.name] = tab.dock_area
-            self.tabs.addTab(tab.dock_area, tab.name)
-            self.register_refresh_function(tab.refresh)
+        self.tabs = QTabWidget()
+        self.tab_dock_map = {}
 
         self.window = QMainWindow()
         self.window.setCentralWidget(self.tabs)
@@ -73,6 +66,11 @@ class Thunderscope:
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
         )
         self.window.setWindowTitle("Thunderscope")
+
+        for tab in config.tabs:
+            self.tab_dock_map[tab.name] = tab.dock_area
+            self.tabs.addTab(tab.dock_area, tab.name)
+            self.register_refresh_function(tab.refresh)
 
         # Load the layout file if it exists
         path = layout_path if layout_path else LAST_OPENED_LAYOUT_PATH
@@ -197,15 +195,17 @@ class Thunderscope:
 
         :param refresh_func: The function to call at refresh_interval_ms
         """
-        refresh_timer = QtCore.QTimer()
+        refresh_timer = QtCore.QTimer(parent=self.window)
         refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
         refresh_timer.timeout.connect(lambda: refresh_func())
         refresh_timer.start(self.refresh_interval_ms)
 
-        self.refresh_timers.append(refresh_timer)
-
     def show(self) -> None:
-        """Show the main window"""
+        """Show the main window.
+
+        This method will start the Qt event loop and block until the
+        window is closed.
+        """
         self.window.showMaximized()
         pyqtgraph.exec()
 
@@ -214,5 +214,13 @@ class Thunderscope:
         return self.window.isVisible()
 
     def close(self) -> None:
-        """Close the main window"""
+        """Close the main window.
+
+        Once the window is closed, it will be deleted from memory to
+        prevent it from lingering around and interfering with any new
+        Thunderscope instances we may create. Therefore, you should NOT
+        attempt to reopen the window after it has been closed since the
+        reference to it will be invalid.
+        """
+        self.window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         QtCore.QTimer.singleShot(0, self.window.close)

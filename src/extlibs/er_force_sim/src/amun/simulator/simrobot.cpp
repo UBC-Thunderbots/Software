@@ -31,8 +31,8 @@ using namespace camun::simulator;
 
 const float MAX_SPEED = 1000;
 
-SimRobot::SimRobot(const robot::Specs &specs,
-                   std::shared_ptr<btDiscreteDynamicsWorld> world, const btVector3 &pos,
+SimRobot::SimRobot(const robot::Specs& specs,
+                   std::shared_ptr<btDiscreteDynamicsWorld> world, const btVector3& pos,
                    float dir)
     : m_specs(specs),
       m_world(world),
@@ -54,11 +54,11 @@ SimRobot::SimRobot(const robot::Specs &specs,
         createRobotMesh(m_specs.radius() - COLLISION_MARGIN / SIMULATOR_SCALE,
                         m_specs.height() - 2 * COLLISION_MARGIN / SIMULATOR_SCALE,
                         m_specs.angle(), 0.04f, m_specs.dribbler_height() + 0.02f);
-    for (const auto &hullPart : mesh)
+    for (const auto& hullPart : mesh)
     {
         std::unique_ptr<btConvexHullShape> hullPartShape =
             std::make_unique<btConvexHullShape>();
-        for (const auto &[x, y, z] : hullPart)
+        for (const auto& [x, y, z] : hullPart)
         {
             hullPartShape->addPoint(btVector3(x, y, z) * SIMULATOR_SCALE);
         }
@@ -158,7 +158,7 @@ void SimRobot::calculateDribblerMove(const btVector3 pos, const btQuaternion rot
     m_dribblerBody->setAngularVelocity(btVector3(0, 0, 0));
 }
 
-void SimRobot::dribble(const SimBall &ball, float speed)
+void SimRobot::dribble(const SimBall& ball, float speed)
 {
     if (m_perfectDribbler)
     {
@@ -210,7 +210,7 @@ void SimRobot::setDribbleMode(bool perfectDribbler)
     m_perfectDribbler = perfectDribbler;
 }
 
-void SimRobot::begin(SimBall &ball, double time)
+void SimRobot::begin(SimBall& ball, double time)
 {
     m_commandTime += time;
     m_inStandby = false;
@@ -235,7 +235,7 @@ void SimRobot::begin(SimBall &ball, double time)
         stopDribbling();
     }
 
-    auto sendPartialCoordError = [this](const std::string &msg)
+    auto sendPartialCoordError = [this](const std::string& msg)
     {
         std::cerr << "Partial coordinates are not implemented yet" << msg << std::endl;
         if (!m_move.has_by_force() || !m_move.by_force())
@@ -335,7 +335,7 @@ void SimRobot::begin(SimBall &ball, double time)
             }
             else
             {
-                const auto &transform = m_body->getWorldTransform();
+                const auto& transform = m_body->getWorldTransform();
                 rot                   = transform.getRotation();
                 pos                   = transform.getOrigin();
             }
@@ -543,7 +543,7 @@ float SimRobot::bound(float acceleration, float oldSpeed, float speedupLimit,
     }
 }
 
-btVector3 SimRobot::relativeBallSpeed(const SimBall &ball) const
+btVector3 SimRobot::relativeBallSpeed(const SimBall& ball) const
 {
     btTransform t             = m_body->getWorldTransform();
     const btVector3 ballSpeed = ball.speed();
@@ -554,7 +554,7 @@ btVector3 SimRobot::relativeBallSpeed(const SimBall &ball) const
     return diff;
 }
 
-bool SimRobot::canKickBall(const SimBall &ball) const
+bool SimRobot::canKickBall(const SimBall& ball) const
 {
     const btVector3 ballPos = ball.position();
     // can't kick jumping ball
@@ -572,17 +572,17 @@ bool SimRobot::canKickBall(const SimBall &ball) const
     int numManifolds = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < numManifolds; ++i)
     {
-        btPersistentManifold *contactManifold =
+        btPersistentManifold* contactManifold =
             m_world->getDispatcher()->getManifoldByIndexInternal(i);
-        btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
-        btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
+        btCollisionObject* objectA = (btCollisionObject*)(contactManifold->getBody0());
+        btCollisionObject* objectB = (btCollisionObject*)(contactManifold->getBody1());
         if ((objectA == m_dribblerBody.get() && objectB == ball.body()) ||
             (objectA == ball.body() && objectB == m_dribblerBody.get()))
         {
             int numContacts = contactManifold->getNumContacts();
             for (int j = 0; j < numContacts; ++j)
             {
-                btManifoldPoint &pt = contactManifold->getContactPoint(j);
+                btManifoldPoint& pt = contactManifold->getContactPoint(j);
                 if (pt.getDistance() < 0.001f * SIMULATOR_SCALE)
                 {
                     return true;
@@ -593,8 +593,8 @@ bool SimRobot::canKickBall(const SimBall &ball) const
     return false;
 }
 
-robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand &command,
-                                          const SimBall &ball, bool charge, float rxLoss,
+robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand& command,
+                                          const SimBall& ball, bool charge, float rxLoss,
                                           float txLoss)
 {
     m_sslCommand  = command;
@@ -619,7 +619,7 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
     float v_s   = v_local.x() / SIMULATOR_SCALE;
     float omega = m_body->getAngularVelocity().z();
 
-    robot::SpeedStatus *speedStatus = response.mutable_estimated_speed();
+    robot::SpeedStatus* speedStatus = response.mutable_estimated_speed();
     speedStatus->set_v_f(v_f);
     speedStatus->set_v_s(v_s);
     speedStatus->set_omega(omega);
@@ -627,7 +627,7 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
     return response;
 }
 
-void SimRobot::update(SSLProto::SSL_DetectionRobot &robot, float stddev_p,
+void SimRobot::update(SSLProto::SSL_DetectionRobot& robot, float stddev_p,
                       float stddev_phi, int64_t time, btVector3 positionOffset)
 {
     // setup vision packet
@@ -651,7 +651,7 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot &robot, float stddev_p,
     m_lastSendTime = time;
 }
 
-bool SimRobot::touchesBall(const SimBall &ball) const
+bool SimRobot::touchesBall(const SimBall& ball) const
 {
     // for some reason btHingeConstraints, which is used when dribbling, are not always
     // detected as contact by bullet. so if the ball is being dribbled then we assume it
@@ -666,12 +666,12 @@ bool SimRobot::touchesBall(const SimBall &ball) const
     int num_manifolds = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < num_manifolds; ++i)
     {
-        btPersistentManifold *contact_manifold =
+        btPersistentManifold* contact_manifold =
             m_world->getDispatcher()->getManifoldByIndexInternal(i);
 
         // determine if the two objects are the ball and robot body/dribbler
-        btCollisionObject *objectA = (btCollisionObject *)(contact_manifold->getBody0());
-        btCollisionObject *objectB = (btCollisionObject *)(contact_manifold->getBody1());
+        btCollisionObject* objectA = (btCollisionObject*)(contact_manifold->getBody0());
+        btCollisionObject* objectB = (btCollisionObject*)(contact_manifold->getBody1());
         if ((objectA == m_dribblerBody.get() && objectB == ball.body()) ||
             (objectA == ball.body() && objectB == m_dribblerBody.get()) ||
             (objectA == m_body.get() && objectB == ball.body()) ||
@@ -681,7 +681,7 @@ bool SimRobot::touchesBall(const SimBall &ball) const
             int num_contacts = contact_manifold->getNumContacts();
             for (int j = 0; j < num_contacts; ++j)
             {
-                btManifoldPoint &pt = contact_manifold->getContactPoint(j);
+                btManifoldPoint& pt = contact_manifold->getContactPoint(j);
                 if (pt.getDistance() < 0.001f * SIMULATOR_SCALE)
                 {
                     return true;
@@ -693,7 +693,7 @@ bool SimRobot::touchesBall(const SimBall &ball) const
     return false;
 }
 
-void SimRobot::update(world::SimRobot &robot, const SimBall &ball) const
+void SimRobot::update(world::SimRobot& robot, const SimBall& ball) const
 {
     btTransform transform;
     m_motionState->getWorldTransform(transform);
@@ -704,7 +704,7 @@ void SimRobot::update(world::SimRobot &robot, const SimBall &ball) const
     robot.set_id(m_specs.id());
 
     const btQuaternion q = transform.getRotation();
-    auto *rotation       = robot.mutable_rotation();
+    auto* rotation       = robot.mutable_rotation();
     rotation->set_real(q.getX());
     rotation->set_i(q.getY());
     rotation->set_j(q.getZ());
@@ -731,10 +731,10 @@ void SimRobot::update(world::SimRobot &robot, const SimBall &ball) const
     int numManifolds      = m_world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < numManifolds; ++i)
     {
-        btPersistentManifold *contactManifold =
+        btPersistentManifold* contactManifold =
             m_world->getDispatcher()->getManifoldByIndexInternal(i);
-        btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
-        btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
+        btCollisionObject* objectA = (btCollisionObject*)(contactManifold->getBody0());
+        btCollisionObject* objectB = (btCollisionObject*)(contactManifold->getBody1());
         if ((objectA == m_dribblerBody.get() && objectB == ball.body()) ||
             (objectA == ball.body() && objectB == m_dribblerBody.get()) ||
             (objectA == m_body.get() && objectB == ball.body()) ||
@@ -746,7 +746,7 @@ void SimRobot::update(world::SimRobot &robot, const SimBall &ball) const
     robot.set_touches_ball(ballTouchesRobot);
 }
 
-void SimRobot::restoreState(const world::SimRobot &robot)
+void SimRobot::restoreState(const world::SimRobot& robot)
 {
     btVector3 position(robot.p_x(), robot.p_y(), robot.p_z());
     m_body->getWorldTransform().setOrigin(position * SIMULATOR_SCALE);
@@ -759,7 +759,7 @@ void SimRobot::restoreState(const world::SimRobot &robot)
     m_body->setAngularVelocity(angular);
 }
 
-void SimRobot::move(const sslsim::TeleportRobot &robot)
+void SimRobot::move(const sslsim::TeleportRobot& robot)
 {
     m_move = robot;
 }

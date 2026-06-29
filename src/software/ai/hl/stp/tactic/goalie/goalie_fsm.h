@@ -5,7 +5,7 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
@@ -13,10 +13,11 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 
-
-struct GoalieFSM
+/**
+ * Finite State Machine class for the Goalie
+ */
+struct GoalieFSM : TacticFSM<GoalieFSM>
 {
-   public:
     class Panic;
     class PositionToBlock;
     class MoveToGoalLine;
@@ -26,31 +27,22 @@ struct GoalieFSM
         bool should_move_to_goal_line;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    using Update = TacticFSM<GoalieFSM>::Update;
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
+
     /**
      * Constructor for GoalieFSM struct
      *
-     * @param goalie_tactic_config The config to fetch parameters from
-     * @param max_allowed_speed_mode The maximum allowed speed mode
+     *  @param ai_config_ptr shared pointer to ai_config proto
+     *  @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieFSM(
-        TbotsProto::GoalieTacticConfig goalie_tactic_config,
-        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config,
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
-        : goalie_tactic_config(goalie_tactic_config),
-          robot_navigation_obstacle_config(robot_navigation_obstacle_config),
-          max_allowed_speed_mode(max_allowed_speed_mode),
-          robot_radius_expansion_amount(
-              ROBOT_MAX_RADIUS_METERS *
-              robot_navigation_obstacle_config.robot_obstacle_inflation_factor())
-    {
-    }
-
+    explicit GoalieFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr,
+                       TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                           TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     /**
      * Gets the position for the goalie to move to, to best position itself between the
      * ball and the friendly goal
@@ -61,7 +53,7 @@ struct GoalieFSM
      * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(
-        const Ball &ball, const Field &field,
+        const Ball& ball, const Field& field,
         TbotsProto::GoalieTacticConfig goalie_tactic_config);
 
     /**
@@ -73,14 +65,14 @@ struct GoalieFSM
      * @return the intersections between the ball velocity ray and the full goal segment
      */
     static std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment(
-        const Ball &ball, const Field &field);
+        const Ball& ball, const Field& field);
 
     /**
      * Gets the area within the friendly goalie's no-chip rectangle
      *
      * @return the area within the friendly goalie's no-chip rectangle
      */
-    static Rectangle getNoChipRectangle(const Field &field);
+    static Rectangle getNoChipRectangle(const Field& field);
 
     /**
      * Finds a good point to chip the ball to from its current position
@@ -91,7 +83,7 @@ struct GoalieFSM
      * @return a point on the field that is a good place to chip to
      */
     static Point findGoodChipTarget(
-        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
+        const World& world, const TbotsProto::GoalieTacticConfig& goalie_tactic_config);
 
     /**
      * Guard that checks if the goalie should leave the crease the intercept the ball
@@ -100,7 +92,7 @@ struct GoalieFSM
      * @param event
      * @return if the goalie should leave the crease
      */
-    bool shouldEvacuateCrease(const Update &event);
+    bool shouldEvacuateCrease(const Update& event);
 
     /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold
@@ -111,9 +103,9 @@ struct GoalieFSM
      *
      * @return if the goalie should panic
      */
-    bool shouldPanic(const Update &event);
+    bool shouldPanic(const Update& event);
 
-    bool shouldMoveToGoalLine(const Update &event);
+    bool shouldMoveToGoalLine(const Update& event);
 
     /**
      * Guard that checks if the ball is moving slower than the panic threshold and is
@@ -124,7 +116,7 @@ struct GoalieFSM
      *
      * @return if the goalie should pivot chip the ball
      */
-    bool shouldPivotChip(const Update &event);
+    bool shouldPivotChip(const Update& event);
 
     /**
      * Guard that checks if the ball is moving slower than the panic threshold
@@ -135,30 +127,30 @@ struct GoalieFSM
      *
      * @return if the goalie should stop panicking
      */
-    bool panicDone(const Update &event);
+    bool panicDone(const Update& event);
 
     /**
      * Action that updates the MovePrimitive to time_to_panic and stop the ball
      *
      * @param event GoalieFSM::Update event
      */
-    void panic(const Update &event);
+    void panic(const Update& event);
 
     /**
      * Guard that checks whether the goalie has finished retrieving the ball from the dead
      * zone
      *
-     * @param event
+     * @param event GoalieFSM::Update event
      */
-    bool retrieveDone(const Update &event);
+    bool retrieveDone(const Update& event);
 
     /**
      * Action that prompts the goalie to leave the crease momentarily to chip the ball
      * away
      *
-     * @param event
+     * @param event GoalieFSM::Update event
      */
-    void retrieveFromDeadZone(const Update &event,
+    void retrieveFromDeadZone(const Update& event,
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
@@ -166,7 +158,7 @@ struct GoalieFSM
      *
      * @param event GoalieFSM::Update event
      */
-    void moveToGoalLine(const Update &event);
+    void moveToGoalLine(const Update& event);
 
     /**
      * Action that updates the PivotKickFSM
@@ -174,7 +166,7 @@ struct GoalieFSM
      * @param event GoalieFSM::Update event
      * @param processEvent processes the PivotKickFSM::Update
      */
-    void updatePivotKick(const Update &event,
+    void updatePivotKick(const Update& event,
                          boost::sml::back::process<PivotKickFSM::Update> processEvent);
 
     /**
@@ -183,14 +175,14 @@ struct GoalieFSM
      *
      * @param event GoalieFSM::Update event
      */
-    void positionToBlock(const Update &event);
+    void positionToBlock(const Update& event);
 
     /**
      * Checks if ball is in the friendly defense area
      *
      * @param event GoalieFSM::Update event
      */
-    bool ballInInflatedDefenseArea(const Update &event);
+    bool ballInInflatedDefenseArea(const Update& event);
 
     auto operator()()
     {
@@ -256,10 +248,6 @@ struct GoalieFSM
     // The step amount between speeds we check that the goalie is observed to
     // go at during the save
     static constexpr double GOALIE_STEP_SPEED_M_PER_S = 0.2;
-    // The goalie tactic config
-    TbotsProto::GoalieTacticConfig goalie_tactic_config;
-    // Configuration values for inflated obstacles
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     // Expansion factor for inflated obstacles

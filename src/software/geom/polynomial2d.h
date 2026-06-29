@@ -36,7 +36,7 @@ class Polynomial2d
      *               must be at least two points.
      * @throw std::invalid_argument If there are less then two points
      */
-    explicit Polynomial2d(const std::vector<Point> &points);
+    explicit Polynomial2d(const std::vector<Point>& points);
 
     /**
      * Construct a 2d polynomial that passes through the given points
@@ -64,13 +64,13 @@ class Polynomial2d
      * Get the polynomial x(t) underlying this 2d Polynomial
      * @return The polynomial x(t) underlying this 2d Polynomial
      */
-    const Polynomial1d &getPolyX() const;
+    const Polynomial1d& getPolyX() const;
 
     /**
      * Get the polynomial y(t) underlying this 2d Polynomial
      * @return The polynomial y(t) underlying this 2d Polynomial
      */
-    const Polynomial1d &getPolyY() const;
+    const Polynomial1d& getPolyY() const;
 
    private:
     Polynomial1d poly_x;
@@ -85,7 +85,7 @@ class Polynomial2d
  *
  * @return the sum of the Polynomials
  */
-Polynomial2d operator+(const Polynomial2d &p1, const Polynomial2d &p2);
+Polynomial2d operator+(const Polynomial2d& p1, const Polynomial2d& p2);
 
 /**
  * Subtracts two Polynomials
@@ -95,7 +95,7 @@ Polynomial2d operator+(const Polynomial2d &p1, const Polynomial2d &p2);
  *
  * @return the difference of the Polynomials
  */
-Polynomial2d operator-(const Polynomial2d &p1, const Polynomial2d &p2);
+Polynomial2d operator-(const Polynomial2d& p1, const Polynomial2d& p2);
 
 /**
  * Adds a Polynomial2d to another Polynomial2d
@@ -105,7 +105,7 @@ Polynomial2d operator-(const Polynomial2d &p1, const Polynomial2d &p2);
  *
  * @return the new Polynomial2d
  */
-Polynomial2d &operator+=(Polynomial2d &p1, const Polynomial2d &p2);
+Polynomial2d& operator+=(Polynomial2d& p1, const Polynomial2d& p2);
 
 /**
  * Subtracts a Polynomial2d to another Polynomial2d
@@ -115,7 +115,7 @@ Polynomial2d &operator+=(Polynomial2d &p1, const Polynomial2d &p2);
  *
  * @return the new Polynomial2d
  */
-Polynomial2d &operator-=(Polynomial2d &p1, const Polynomial2d &p2);
+Polynomial2d& operator-=(Polynomial2d& p1, const Polynomial2d& p2);
 
 /**
  * Compares two Polynomials for equality
@@ -127,4 +127,4 @@ Polynomial2d &operator-=(Polynomial2d &p1, const Polynomial2d &p2);
  *
  * @return true if p1 is equal to p2, and false otherwise.
  */
-bool operator==(const Polynomial2d &p1, const Polynomial2d &p2);
+bool operator==(const Polynomial2d& p1, const Polynomial2d& p2);

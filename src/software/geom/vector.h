@@ -23,7 +23,7 @@ class Vector final
      *
      * @return Vector the Vector
      */
-    static Vector createFromAngle(const Angle &angle);
+    static Vector createFromAngle(const Angle& angle);
 
     /**
      * Creates a Vector with arbitrary x and y values.
@@ -38,7 +38,7 @@ class Vector final
      *
      * @param the Vector to duplicate
      */
-    Vector(const Vector &v);
+    Vector(const Vector& v);
 
     /**
      * Returns the magnitude in the x-coordinate of this Vector
@@ -124,7 +124,7 @@ class Vector final
      *
      * @return the Vector rotated by rot
      */
-    Vector rotate(const Angle &rot) const;
+    Vector rotate(const Angle& rot) const;
 
     /**
      * Projects this vector onto the line formed by another vector
@@ -133,7 +133,7 @@ class Vector final
      *
      * @return the projection of this vector onto the line formed by the given Vector
      */
-    Vector project(const Vector &other) const;
+    Vector project(const Vector& other) const;
 
     /**
      * Takes the dot product of two vectors
@@ -142,7 +142,7 @@ class Vector final
      *
      * @return the dot product of the vectors
      */
-    double dot(const Vector &other) const;
+    double dot(const Vector& other) const;
 
     /**
      * Takes the cross product of two vectors
@@ -152,7 +152,7 @@ class Vector final
      * @return the z component of the 3-dimensional cross product between this Vector and
      * the other Vector
      */
-    double cross(const Vector &other) const;
+    double cross(const Vector& other) const;
 
     /**
      * Calculates the determinant of a 2x2 matrix
@@ -161,7 +161,7 @@ class Vector final
      *
      * @return the determinant with rows from the specified vectors
      */
-    double determinant(const Vector &other) const;
+    double determinant(const Vector& other) const;
 
     /**
      * Returns the direction of this Vector
@@ -189,7 +189,7 @@ class Vector final
      *
      * @return this Vector
      */
-    Vector &operator=(const Vector &other);
+    Vector& operator=(const Vector& other);
 
     /**
      * Returns true if this vector is to the right of the given vector. Geometrically, in
@@ -198,7 +198,7 @@ class Vector final
      *
      * @param other the Vector to compare this Vector to
      */
-    bool isClockwiseOf(const Vector &other) const;
+    bool isClockwiseOf(const Vector& other) const;
 
     /**
      * In the acute angle given by the two vectors, this function returns true if this
@@ -206,7 +206,7 @@ class Vector final
      *
      * @param other the Vector to compare this Vector to
      */
-    bool isCounterClockwiseOf(const Vector &other) const;
+    bool isCounterClockwiseOf(const Vector& other) const;
 
    private:
     /**
@@ -230,7 +230,7 @@ class Vector final
  *
  * @return the vector-sum of the two vectors
  */
-Vector operator+(const Vector &p, const Vector &q) __attribute__((warn_unused_result));
+Vector operator+(const Vector& p, const Vector& q) __attribute__((warn_unused_result));
 
 /**
  * Adds a Vector to another Vector and set the former vector to the sum
@@ -240,7 +240,7 @@ Vector operator+(const Vector &p, const Vector &q) __attribute__((warn_unused_re
  *
  * @return the new value of Vector u
  */
-Vector &operator+=(Vector &u, const Vector &v);
+Vector& operator+=(Vector& u, const Vector& v);
 
 /**
  * Negates a Vector
@@ -249,7 +249,7 @@ Vector &operator+=(Vector &u, const Vector &v);
  *
  * @return the vector with its magnitudes negated
  */
-Vector operator-(const Vector &p) __attribute__((warn_unused_result));
+Vector operator-(const Vector& p) __attribute__((warn_unused_result));
 
 /**
  * Subtracts one Vector from another
@@ -259,7 +259,7 @@ Vector operator-(const Vector &p) __attribute__((warn_unused_result));
  *
  * @return the vector-difference of the two vectors
  */
-Vector operator-(const Vector &u, const Vector &v) __attribute__((warn_unused_result));
+Vector operator-(const Vector& u, const Vector& v) __attribute__((warn_unused_result));
 
 /**
  * Subtracts from a Vector another Vector and set the former vector to the difference
@@ -269,7 +269,7 @@ Vector operator-(const Vector &u, const Vector &v) __attribute__((warn_unused_re
  *
  * @return the new value of Vector u
  */
-Vector &operator-=(Vector &u, const Vector &v);
+Vector& operator-=(Vector& u, const Vector& v);
 
 /**
  * Multiplies a vector by a scalar
@@ -279,7 +279,7 @@ Vector &operator-=(Vector &u, const Vector &v);
  *
  * @return the scaled vector
  */
-Vector operator*(double s, const Vector &v) __attribute__((warn_unused_result));
+Vector operator*(double s, const Vector& v) __attribute__((warn_unused_result));
 
 /**
  * Multiplies a vector by a scalar
@@ -289,7 +289,7 @@ Vector operator*(double s, const Vector &v) __attribute__((warn_unused_result));
  *
  * @return the scaled vector
  */
-Vector operator*(const Vector &p, double s) __attribute__((warn_unused_result));
+Vector operator*(const Vector& p, double s) __attribute__((warn_unused_result));
 
 /**
  * Scales a vector by a scalar
@@ -299,7 +299,7 @@ Vector operator*(const Vector &p, double s) __attribute__((warn_unused_result));
  *
  * @return p scaled by the scaling factor
  */
-Vector &operator*=(Vector &p, double s);
+Vector& operator*=(Vector& p, double s);
 
 /**
  * Divides a vector by a scalar
@@ -309,7 +309,7 @@ Vector &operator*=(Vector &p, double s);
  *
  * @return the scaled vector
  */
-Vector operator/(const Vector &p, double s) __attribute__((warn_unused_result));
+Vector operator/(const Vector& p, double s) __attribute__((warn_unused_result));
 
 /**
  * Scales a vector by a scalar
@@ -319,7 +319,7 @@ Vector operator/(const Vector &p, double s) __attribute__((warn_unused_result));
  *
  * @return p scaled by the scaling factor
  */
-Vector &operator/=(Vector &p, double s);
+Vector& operator/=(Vector& p, double s);
 
 /**
  * Prints a vector to a stream
@@ -329,7 +329,7 @@ Vector &operator/=(Vector &p, double s);
  *
  * @return the stream with the Vector printed
  */
-std::ostream &operator<<(std::ostream &os, const Vector &v);
+std::ostream& operator<<(std::ostream& os, const Vector& v);
 
 /**
  * Compares two Vectors for equality
@@ -339,7 +339,7 @@ std::ostream &operator<<(std::ostream &os, const Vector &v);
  *
  * @return true if the two vectors represent the same vector, and false otherwise
  */
-bool operator==(const Vector &u, const Vector &v);
+bool operator==(const Vector& u, const Vector& v);
 
 /**
  * Compares two vectors for inequality
@@ -349,7 +349,7 @@ bool operator==(const Vector &u, const Vector &v);
  *
  * @return true if the two vectors represent different vectors, and false otherwise
  */
-bool operator!=(const Vector &u, const Vector &v);
+bool operator!=(const Vector& u, const Vector& v);
 
 // We need to define a hash function so that the Vector class can be used in unordered STL
 // containers
@@ -360,7 +360,7 @@ namespace std
 template <>
 struct hash<Vector> final
 {
-    size_t operator()(const Vector &v) const
+    size_t operator()(const Vector& v) const
     {
         hash<double> h;
         return h(v.x()) * 17 + h(v.y());
