@@ -25,7 +25,6 @@ from software.thunderscope.gl.layers import (
     gl_passing_layer,
     gl_attacker_layer,
     gl_sandbox_world_layer,
-    gl_world_layer,
     gl_debug_shapes_layer,
     gl_simulator_layer,
     gl_tactic_layer,
@@ -110,13 +109,11 @@ def setup_gl_widget(
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
     )
-    world_layer = (
-        gl_sandbox_world_layer.GLSandboxWorldLayer(
-            "Vision",
-            sim_proto_unix_io,
-            friendly_colour_yellow,
-            visualization_buffer_size,
-        )
+    world_layer = gl_sandbox_world_layer.GLSandboxWorldLayer(
+        "Vision",
+        sim_proto_unix_io,
+        friendly_colour_yellow,
+        visualization_buffer_size,
     )
     field_movement_layer = gl_movement_field_test_layer.GLMovementFieldTestLayer(
         "Field Movement Layer", full_system_proto_unix_io

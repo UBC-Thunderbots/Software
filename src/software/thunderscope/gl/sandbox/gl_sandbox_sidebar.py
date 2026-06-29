@@ -5,6 +5,7 @@ from pyqtgraph.Qt.QtWidgets import *
 import qtawesome as qta
 from software.thunderscope.common.common_widgets import ToggleableButton
 
+
 class GLSandboxSidebar(QWidget):
     """Sidebar widget for the sandbox mode
 
@@ -35,8 +36,7 @@ class GLSandboxSidebar(QWidget):
 
         # Style with a dark background so it's visible when overlaying
         self.setStyleSheet(
-            "background-color: rgba(30, 30, 30, 220);"
-            "border-left: 1px solid #555;"
+            "background-color: rgba(30, 30, 30, 220);" "border-left: 1px solid #555;"
         )
 
         # Setup sandbox mode toggle checkbox

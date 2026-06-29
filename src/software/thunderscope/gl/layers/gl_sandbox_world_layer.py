@@ -307,8 +307,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
 
     def clear_field(self) -> None:
-        """
-        Removes all robots from the field.
+        """Removes all robots from the field.
         Adds a GroupOperation to the undo list that can restore all robots.
         """
         # collect current robot positions into a GroupOperation for undo

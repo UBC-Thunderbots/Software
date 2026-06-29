@@ -92,8 +92,7 @@ class GLWidget(QWidget):
         self.sandbox_mode_enabled = False
         self.sandbox_mode_callback = None
         self.sandbox_sidebar = GLSandboxSidebar(
-            parent=self.gl_view_widget,
-            on_sandbox_mode_toggle=self.toggle_sandbox_mode
+            parent=self.gl_view_widget, on_sandbox_mode_toggle=self.toggle_sandbox_mode
         )
 
         # Setup toolbar
@@ -111,7 +110,7 @@ class GLWidget(QWidget):
             toolbars_menu=self.toolbars_menu,
             replay_mode=player is not None,
             on_add_bookmark=self.add_bookmark,
-            on_toggle_sidebar=self.toggle_sidebar_visibility
+            on_toggle_sidebar=self.toggle_sidebar_visibility,
         )
 
         # Setup gamecontroller toolbar

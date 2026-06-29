@@ -197,6 +197,7 @@ class ColorProgressBar(QProgressBar):
         """Gets the current value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
+
 class StyledButton(QPushButton):
     """A QPushButton with the toolbar button stylesheet pre-applied.
 
@@ -515,6 +516,7 @@ def display_tooltip(event, tooltip_text):
         )
     elif str(event.type()) == "Type.Leave":
         QToolTip.hideText()
+
 
 def get_toggle_button_style(is_enabled: bool = True) -> str:
     """Returns the stylesheet for a QPushButton based on if it's enabled or not
