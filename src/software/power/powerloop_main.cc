@@ -103,6 +103,7 @@ void loop()
     }
 
     dribbler->update();
+    charger->update();
 
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
