@@ -308,24 +308,42 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
 
     def clear_field(self) -> None:
-        """Removes all robots from the field.
+        """
+        Removes all robots from the field.
         Adds a GroupOperation to the undo list that can restore all robots.
         """
         # collect current robot positions into a GroupOperation for undo
-        operations = []
-        for robot_id in list(self.curr_robot_ids):
-            # get the current position from pre_sim_robot_positions
-            pos_data = self.pre_sim_robot_positions.get(robot_id)
-            if pos_data is not None:
-                pos, _ = pos_data
-                operations.append(
-                    RobotOperation(
-                        id=robot_id,
-                        prev_pos=None,  # robot will be removed
-                        pos=pos,  # restore to this position on undo
-                        next_id=self.next_id,
-                    )
-                )
+        operations = {}
+
+        # check the cached world state first
+        for robot_ in self.cached_world.friendly_team.team_robots:
+            # get the coordinates from the robot state
+            pos_x = robot_.current_state.global_position.x_meters
+            pos_y = robot_.current_state.global_position.y_meters
+
+            operations[robot_.id] = RobotOperation(
+                id=robot_.id,
+                prev_pos=None,
+                pos=QVector3D(
+                    robot.current_state.global_position.x_meters,
+                    robot.current_state.global_position.y_meters,
+                    0,
+                ),
+                next_id=self.next_id,
+            )
+
+        # then, update with local state
+        for robot_id, pos in self.local_robot_positions.items():
+            # if the local robot has already been removed, skip it
+            if pos is None:
+                continue
+
+            operations[robot_id] = RobotOperation(
+                id=robot_id,
+                prev_pos=None,
+                pos=pos,
+                next_id=self.next_id,
+            )
 
         if operations:
             self.undo_operations.append(GroupOperation(operations=operations))

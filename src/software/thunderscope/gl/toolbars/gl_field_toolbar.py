@@ -33,7 +33,7 @@ class GLFieldToolbar(GLToolbar):
         sandbox_mode: bool = False,
         replay_mode: bool = False,
         on_add_bookmark=Callable[[], None],
-        on_toggle_sandbox_sidebar: Callable[[], None],
+        on_toggle_sidebar: Callable[[], None],
     ):
         """Set up the toolbar with these buttons:
 
@@ -54,7 +54,7 @@ class GLFieldToolbar(GLToolbar):
         :param toolbars_menu: the QMenu for the toolbars menu selection
         :param replay_mode: if replay mode is enabled
         :param on_add_bookmark: the callback function when adding a bookmark
-        :param on_toggle_sandbox_sidebar: the callback function when toggling the sandbox sidebar
+        :param on_toggle_sidebar: the callback function when toggling the sandbox sidebar
         """
         super(GLFieldToolbar, self).__init__(parent=parent)
 
@@ -156,31 +156,7 @@ class GLFieldToolbar(GLToolbar):
         self.sandbox_sidebar_button.setIcon(
             qta.icon("mdi.view-sidebar-outline", color=self.BUTTON_ICON_COLOR)
         )
-        self.sandbox_sidebar_button.clicked.connect(on_toggle_sandbox_sidebar)
-
-        # if sandbox mode, set up the sandbox control buttons
-        if sandbox_mode:
-            # Setup Undo button
-            self.undo_button = ToggleableButton(False)
-            self.undo_button.setToolTip("Undo")
-            self.undo_button.setIcon(
-                qta.icon("mdi6.undo-variant", color=self.BUTTON_ICON_COLOR)
-            )
-
-            # Setup Redo button
-            self.redo_button = ToggleableButton(False)
-            self.redo_button.setToolTip("Redo")
-            self.redo_button.setIcon(
-                qta.icon("mdi6.redo-variant", color=self.BUTTON_ICON_COLOR)
-            )
-
-            self.reset_button = StyledButton()
-            self.reset_button.setToolTip("Reset")
-            self.reset_button.setIcon(
-                qta.icon(
-                    "ph.arrow-counter-clockwise-fill", color=self.BUTTON_ICON_COLOR
-                )
-            )
+        self.sandbox_sidebar_button.clicked.connect(self.on_toggle_sidebar)
 
         # Setup toolbar
         self.layout().addWidget(self.layers_button)
@@ -247,3 +223,10 @@ class GLFieldToolbar(GLToolbar):
         :param callback: the callback function to update the simulation speed
         """
         self.speed_callback = callback
+
+    def set_sandbox_toggle_callback(self, callback: Callable[[bool], None]) -> None:
+        """Sets the callback function for toggling sandbox mode
+
+        :param callback: the callback function to toggle sandbox mode
+        """
+        self.sandbox_toggle_callback = callback

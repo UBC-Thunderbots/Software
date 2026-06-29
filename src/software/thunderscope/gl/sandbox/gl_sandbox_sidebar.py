@@ -46,8 +46,6 @@ class GLSandboxSidebar(QWidget):
             lambda checked: on_sandbox_mode_toggle(
                 self.sandbox_mode_checkbox.isChecked()
             )
-            if on_sandbox_mode_toggle
-            else None
         )
         self.layout().addWidget(self.sandbox_mode_checkbox)
 
@@ -101,9 +99,9 @@ class GLSandboxSidebar(QWidget):
         # Listen for parent resize events to reposition
         parent.installEventFilter(self)
 
-    def toggle_visibility(self):
+    def toggle_visibility(self, enabled: bool):
         """Toggle the sidebar visibility"""
-        self.sidebar_enabled = not self.sidebar_enabled
+        self.sidebar_enabled = enabled
         if self.sidebar_enabled:
             self.reposition()
             self.show()

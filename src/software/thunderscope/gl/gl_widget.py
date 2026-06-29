@@ -88,9 +88,12 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.gl_view_widget)
 
         # Setup sandbox sidebar
+        self.sandbox_sidebar_visible = False
+        self.sandbox_mode_enabled = False
+        self.sandbox_mode_callback = None
         self.sandbox_sidebar = GLSandboxSidebar(
             parent=self.gl_view_widget,
-            on_sandbox_mode_toggle=self.on_sandbox_mode_toggle,
+            on_sandbox_mode_toggle=self.toggle_sandbox_mode
         )
 
         # Setup toolbar
@@ -108,7 +111,7 @@ class GLWidget(QWidget):
             toolbars_menu=self.toolbars_menu,
             replay_mode=player is not None,
             on_add_bookmark=self.add_bookmark,
-            on_toggle_sandbox_sidebar=self.toggle_sandbox_sidebar,
+            on_toggle_sidebar=self.toggle_sidebar_visibility
         )
 
         # Setup gamecontroller toolbar
@@ -335,16 +338,16 @@ class GLWidget(QWidget):
         else:
             self.remove_layer(self.measure_layer)
 
-    def toggle_sandbox_sidebar(self) -> None:
+    def toggle_sidebar_visibility(self) -> None:
         """Toggles whether the sandbox sidebar is displayed"""
-        self.sandbox_sidebar.toggle_visibility()
+        self.sidebar_enabled = not self.sidebar_enabled
+        self.sandbox_sidebar.toggle_visibility(self.sidebar_enabled)
 
-    def on_sandbox_mode_toggle(self, enabled: bool) -> None:
-        """Callback when sandbox mode is toggled in the sidebar
+    def toggle_sandbox_mode(self) -> None:
+        self.sandbox_mode_enabled = not self.sandbox_mode_enabled
 
-        :param enabled: whether sandbox mode is enabled
-        """
-        pass
+        if self.sandbox_mode_callback:
+            self.sandbox_mode_callback(self.sandbox_mode_enabled)
 
     def __add_toolbar_toggle(self, toolbar: QWidget, name: str) -> None:
         """Adds a button to the toolbar menu to toggle the given toolbar
