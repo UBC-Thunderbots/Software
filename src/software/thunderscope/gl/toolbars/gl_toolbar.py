@@ -29,28 +29,3 @@ class GLToolbar(QWidget):
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""
         raise NotImplementedError("Subclasses must implement this method!")
-
-    def get_button_style(self, is_enabled: bool = True) -> str:
-        """Returns the stylesheet for a QPushButton based on if it's enabled or not
-
-        :param is_enabled: True if button is enabled, False if not
-        :return: the corresponding stylesheet indicating the button state
-        """
-        # the style for each toolbar button
-        return textwrap.dedent(
-            f"""
-            QPushButton {{
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                icon-size: 22px;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }}
-            QPushButton:hover {{
-                background-color: {"#363636" if is_enabled else "transparent"};
-                border-color: {"#363636" if is_enabled else "transparent"};
-            }}
-            """
-        )

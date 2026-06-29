@@ -3,8 +3,8 @@ load("@thunderscope_deps//:requirements.bzl", "requirement")
 package(default_visibility = ["//visibility:public"])
 
 py_library(
-    name = "icon_loader",
-    srcs = ["icon_loader.py"],
+    name = "gl_sandbox_sidebar",
+    srcs = ["gl_sandbox_sidebar.py"],
     deps = [
         requirement("pyqtgraph"),
     ],

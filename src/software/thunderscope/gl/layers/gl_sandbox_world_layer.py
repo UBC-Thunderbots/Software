@@ -1,5 +1,6 @@
 import math
 from typing import Optional, override
+from dataclasses import dataclass
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -10,24 +11,24 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
+@dataclass
 class RobotOperation:
     """An operation that changes the state of the robots on the field
     Contains the id of the robot to change, its new and previous positions if applicable
     And the id of the next robot to add after this operation completes
     """
 
-    def __init__(
-        self,
-        id: int,
-        prev_pos: Optional[tuple[int, int]],
-        pos: Optional[tuple[int, int]],
-        next_id: int,
-    ):
-        self.type = type
-        self.id = id
-        self.prev_pos = prev_pos
-        self.pos = pos
-        self.next_id = next_id
+    id: int
+    prev_pos: Optional[QVector3D]
+    pos: Optional[QVector3D]
+    next_id: int
+
+
+@dataclass
+class GroupOperation:
+    """A group of RobotOperations that should be applied together"""
+
+    operations: list[RobotOperation]
 
 
 class EnemyAtMousePositionError(Exception):

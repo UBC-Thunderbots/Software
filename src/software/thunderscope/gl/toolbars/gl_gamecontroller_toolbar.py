@@ -4,7 +4,7 @@ from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from typing import Callable, override
 import webbrowser
-from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+from software.thunderscope.gl.toolbars.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import qtawesome as qta
 
@@ -80,7 +80,7 @@ class GLGamecontrollerToolbar(GLToolbar):
 
         self.plays_menu_button = QPushButton()
         self.plays_menu_button.setText("Plays")
-        self.plays_menu_button.setStyleSheet(self.get_button_style())
+        self.plays_menu_button.setStyleSheet(self.get_toggle_button_style())
         self.plays_menu_button.setMenu(self.plays_menu)
 
         # add play items for each team color
@@ -178,7 +178,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         """Toggles the enabled / disabled state of the Normal Start button"""
         self.normal_start_enabled = not self.normal_start_enabled
         self.normal_start_button.setStyleSheet(
-            self.get_button_style(self.normal_start_enabled)
+            self.get_toggle_button_style(self.normal_start_enabled)
         )
         self.normal_start_button.setIcon(
             qta.icon(
@@ -207,7 +207,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         button = QPushButton()
         button.setIcon(icon)
         button.setToolTip(tooltip)
-        button.setStyleSheet(self.get_button_style())
+        button.setStyleSheet(self.get_toggle_button_style())
         button.clicked.connect(callback)
 
         if display_text:

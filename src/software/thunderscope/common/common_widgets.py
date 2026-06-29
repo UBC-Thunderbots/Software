@@ -197,6 +197,10 @@ class ColorProgressBar(QProgressBar):
         """Gets the current value of this progress bar as a float"""
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
+class StyledButton(QPushButton):
+    def __init__(self):
+        self.setStyleSheet(self.get_toggle_button_style())
+
 
 class ToggleableButton(QPushButton):
     """A QPushButton which can be enabled or disabled
@@ -498,3 +502,28 @@ def display_tooltip(event, tooltip_text):
         )
     elif str(event.type()) == "Type.Leave":
         QToolTip.hideText()
+
+def get_toggle_button_style(is_enabled: bool = True) -> str:
+    """Returns the stylesheet for a QPushButton based on if it's enabled or not
+
+    :param is_enabled: True if button is enabled, False if not
+    :return: the corresponding stylesheet indicating the button state
+    """
+    # the style for each toolbar button
+    return textwrap.dedent(
+        f"""
+        QPushButton {{
+            color: #969696;
+            background-color: transparent;
+            border-color: transparent;
+            icon-size: 22px;
+            border-width: 4px;
+            border-radius: 4px;
+            height: 16px;
+        }}
+        QPushButton:hover {{
+            background-color: {"#363636" if is_enabled else "transparent"};
+            border-color: {"#363636" if is_enabled else "transparent"};
+        }}
+        """
+    )

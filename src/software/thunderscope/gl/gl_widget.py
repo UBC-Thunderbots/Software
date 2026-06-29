@@ -14,11 +14,11 @@ from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
+from software.thunderscope.gl.toolbars.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
-from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
+from software.thunderscope.gl.toolbars.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -27,6 +27,7 @@ from proto.replay_bookmark_pb2 import ReplayBookmark
 from proto.tbots_timestamp_msg_pb2 import Timestamp
 
 from software.thunderscope.common.toast_msg_helper import success_toast
+from software.thunderscope.gl.sandbox.gl_sandbox_sidebar import GLSandboxSidebar
 from typing import override
 
 
@@ -41,7 +42,6 @@ class GLWidget(QWidget):
         friendly_color_yellow: bool,
         frame_swap_counter: Optional[FrameTimeCounter] = None,
         player: Optional[ProtoPlayer] = None,
-        sandbox_mode: bool = False,
     ) -> None:
         """Initialize the GLWidget
 
@@ -49,7 +49,6 @@ class GLWidget(QWidget):
         :param friendly_color_yellow: Whether the friendly team is yellow (true) or blue (false)
         :param frame_swap_counter: A FrameTimeCounter to track the time between frame swaps
         :param player: The replay player to optionally display media controls for
-        :param sandbox_mode: Whether sandbox mode should be enabled
         """
         super().__init__()
 
@@ -88,6 +87,12 @@ class GLWidget(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.gl_view_widget)
 
+        # Setup sandbox sidebar
+        self.sandbox_sidebar = GLSandboxSidebar(
+            parent=self.gl_view_widget,
+            on_sandbox_mode_toggle=self.on_sandbox_mode_toggle,
+        )
+
         # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
@@ -101,9 +106,9 @@ class GLWidget(QWidget):
             on_measure_mode=self.toggle_measure_mode,
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
-            sandbox_mode=sandbox_mode,
             replay_mode=player is not None,
             on_add_bookmark=self.add_bookmark,
+            on_toggle_sandbox_sidebar=self.toggle_sandbox_sidebar,
         )
 
         # Setup gamecontroller toolbar
@@ -321,6 +326,17 @@ class GLWidget(QWidget):
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)
+
+    def toggle_sandbox_sidebar(self) -> None:
+        """Toggles whether the sandbox sidebar is displayed"""
+        self.sandbox_sidebar.toggle_visibility()
+
+    def on_sandbox_mode_toggle(self, enabled: bool) -> None:
+        """Callback when sandbox mode is toggled in the sidebar
+
+        :param enabled: whether sandbox mode is enabled
+        """
+        pass
 
     def __add_toolbar_toggle(self, toolbar: QWidget, name: str) -> None:
         """Adds a button to the toolbar menu to toggle the given toolbar
