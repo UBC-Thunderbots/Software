@@ -9,7 +9,6 @@ from software.thunderscope.constants import (
     SIMULATION_SPEEDS,
 )
 from software.thunderscope.common.common_widgets import (
-    ToggleableButton,
     StyledButton,
 )
 from software.thunderscope.gl.toolbars.gl_toolbar import GLToolbar
@@ -28,12 +27,12 @@ class GLFieldToolbar(GLToolbar):
         parent: QWidget,
         on_camera_view_change: Callable[[CameraView], None],
         on_measure_mode: Callable[[], None],
+        on_toggle_sidebar: Callable[[], None],
         layers_menu: QMenu,
         toolbars_menu: QMenu,
         sandbox_mode: bool = False,
         replay_mode: bool = False,
         on_add_bookmark=Callable[[], None],
-        on_toggle_sidebar: Callable[[], None],
     ):
         """Set up the toolbar with these buttons:
 
