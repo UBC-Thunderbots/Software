@@ -1,4 +1,5 @@
 import math
+from abc import ABC, abstractmethod
 from typing import Optional, override
 from dataclasses import dataclass
 from proto.import_all_protos import *
@@ -11,8 +12,21 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
+class Operation(ABC):
+    """Interface for operations that can be undone/redone"""
+
+    @abstractmethod
+    def reverse(self, next_id: int) -> "Operation":
+        """Returns the reverse of this operation
+
+        :param next_id: the next robot id to use in the reversed operation
+        :return: the reverse of this operation
+        """
+        pass
+
+
 @dataclass
-class RobotOperation:
+class RobotOperation(Operation):
     """An operation that changes the state of the robots on the field
     Contains the id of the robot to change, its new and previous positions if applicable
     And the id of the next robot to add after this operation completes
@@ -23,12 +37,35 @@ class RobotOperation:
     pos: Optional[QVector3D]
     next_id: int
 
+    @override
+    def reverse(self, next_id: int) -> Operation:
+        return RobotOperation(
+            id=self.id,
+            prev_pos=self.pos,
+            pos=self.prev_pos,
+            next_id=next_id,
+        )
+
 
 @dataclass
-class GroupOperation:
+class GroupOperation(Operation):
     """A group of RobotOperations that should be applied together"""
 
     operations: list[RobotOperation]
+
+    @override
+    def reverse(self, next_id: int) -> Operation:
+        return GroupOperation(
+            operations=[
+                RobotOperation(
+                    id=op.id,
+                    prev_pos=op.pos,
+                    pos=op.prev_pos,
+                    next_id=next_id,
+                )
+                for op in self.operations
+            ]
+        )
 
 
 class EnemyAtMousePositionError(Exception):
@@ -230,33 +267,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # get the operation which undoes the previous one
         operation = self.undo_operations.pop()
 
-        if isinstance(operation, GroupOperation):
-            # For a GroupOperation, create a reverse GroupOperation for redo
-            redo_ops = []
-            for op in operation.operations:
-                redo_ops.append(
-                    RobotOperation(
-                        id=op.id,
-                        prev_pos=op.pos,
-                        pos=op.prev_pos,
-                        next_id=self.next_id,
-                    )
-                )
-            self.redo_operations.append(GroupOperation(operations=redo_ops))
+        # add the reverse operation to the redo list
+        self.redo_operations.append(operation.reverse(self.next_id))
 
-            # Apply each operation (restore each robot)
+        # apply the operation
+        if isinstance(operation, GroupOperation):
             for op in operation.operations:
                 self.__undo_redo_internal(op)
         else:
-            # add an opposite operation to the redo list with pos and prev_pos swapped
-            self.redo_operations.append(
-                RobotOperation(
-                    id=operation.id,
-                    prev_pos=operation.pos,
-                    pos=operation.prev_pos,
-                    next_id=self.next_id,
-                )
-            )
             self.__undo_redo_internal(operation)
 
         # enable / disable the undo and redo buttons
@@ -274,33 +292,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # get the operation
         operation = self.redo_operations.pop()
 
-        if isinstance(operation, GroupOperation):
-            # For a GroupOperation, create a reverse GroupOperation for undo
-            undo_ops = []
-            for op in operation.operations:
-                undo_ops.append(
-                    RobotOperation(
-                        id=op.id,
-                        prev_pos=op.pos,
-                        pos=op.prev_pos,
-                        next_id=self.next_id,
-                    )
-                )
-            self.undo_operations.append(GroupOperation(operations=undo_ops))
+        # add the reverse operation to the undo list
+        self.undo_operations.append(operation.reverse(self.next_id))
 
-            # Apply each operation
+        # apply the operation
+        if isinstance(operation, GroupOperation):
             for op in operation.operations:
                 self.__undo_redo_internal(op)
         else:
-            # add an opposite operation to the undo list with pos and prev_pos swapped
-            self.undo_operations.append(
-                RobotOperation(
-                    id=operation.id,
-                    prev_pos=operation.pos,
-                    pos=operation.prev_pos,
-                    next_id=self.next_id,
-                )
-            )
             self.__undo_redo_internal(operation)
 
         # enable / disable the undo and redo buttons
