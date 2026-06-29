@@ -53,8 +53,8 @@ class Charger
     static void updateCHRGDoneISR();
 
     static volatile bool CHRG_DONE_STATE;
-    static constexpr float VOLTAGE_DIVIDER = 1003.0 / 13.0;
-    static constexpr float RESOLUTION      = 4096.0;
-    static constexpr float SCALE_VOLTAGE   = 3.3;
-    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE  = 1.0;
+    static constexpr float VOLTAGE_DIVIDER            = 1003.0 / 13.0;
+    static constexpr float RESOLUTION                 = 4096.0;
+    static constexpr float SCALE_VOLTAGE              = 3.3;
+    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE = 1.0;
 };

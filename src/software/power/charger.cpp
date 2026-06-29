@@ -28,7 +28,8 @@ bool Charger::getFlybackFault()
 
 bool Charger::getDonePinState()
 {
-    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <= DONE_PIN_THRESHOLD_VOLTAGE;
+    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <=
+           DONE_PIN_THRESHOLD_VOLTAGE;
 }
 
 void Charger::update()
