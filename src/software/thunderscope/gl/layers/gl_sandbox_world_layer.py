@@ -230,22 +230,38 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # get the operation which undoes the previous one
         operation = self.undo_operations.pop()
 
-        # add an opposite operation to the redo list with pos and prev_pos swapped
-        self.redo_operations.append(
-            RobotOperation(
-                id=operation.id,
-                prev_pos=operation.pos,
-                pos=operation.prev_pos,
-                next_id=self.next_id,
+        if isinstance(operation, GroupOperation):
+            # For a GroupOperation, create a reverse GroupOperation for redo
+            redo_ops = []
+            for op in operation.operations:
+                redo_ops.append(
+                    RobotOperation(
+                        id=op.id,
+                        prev_pos=op.pos,
+                        pos=op.prev_pos,
+                        next_id=self.next_id,
+                    )
+                )
+            self.redo_operations.append(GroupOperation(operations=redo_ops))
+
+            # Apply each operation (restore each robot)
+            for op in operation.operations:
+                self.__undo_redo_internal(op)
+        else:
+            # add an opposite operation to the redo list with pos and prev_pos swapped
+            self.redo_operations.append(
+                RobotOperation(
+                    id=operation.id,
+                    prev_pos=operation.pos,
+                    pos=operation.prev_pos,
+                    next_id=self.next_id,
+                )
             )
-        )
+            self.__undo_redo_internal(operation)
 
         # enable / disable the undo and redo buttons
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
-
-        # apply the operation
-        self.__undo_redo_internal(operation)
 
     def redo(self) -> None:
         """Redoes the last undo operation
@@ -258,22 +274,74 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # get the operation
         operation = self.redo_operations.pop()
 
-        # add an opposite operation to the undo list with pos and prev_pos swapped
-        self.undo_operations.append(
-            RobotOperation(
-                id=operation.id,
-                prev_pos=operation.pos,
-                pos=operation.prev_pos,
-                next_id=self.next_id,
+        if isinstance(operation, GroupOperation):
+            # For a GroupOperation, create a reverse GroupOperation for undo
+            undo_ops = []
+            for op in operation.operations:
+                undo_ops.append(
+                    RobotOperation(
+                        id=op.id,
+                        prev_pos=op.pos,
+                        pos=op.prev_pos,
+                        next_id=self.next_id,
+                    )
+                )
+            self.undo_operations.append(GroupOperation(operations=undo_ops))
+
+            # Apply each operation
+            for op in operation.operations:
+                self.__undo_redo_internal(op)
+        else:
+            # add an opposite operation to the undo list with pos and prev_pos swapped
+            self.undo_operations.append(
+                RobotOperation(
+                    id=operation.id,
+                    prev_pos=operation.pos,
+                    pos=operation.prev_pos,
+                    next_id=self.next_id,
+                )
             )
-        )
+            self.__undo_redo_internal(operation)
 
         # enable / disable the undo and redo buttons
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
 
-        # apply the operation
-        self.__undo_redo_internal(operation)
+    def clear_field(self) -> None:
+        """Removes all robots from the field.
+        Adds a GroupOperation to the undo list that can restore all robots.
+        """
+        # collect current robot positions into a GroupOperation for undo
+        operations = []
+        for robot_id in list(self.curr_robot_ids):
+            # get the current position from pre_sim_robot_positions
+            pos_data = self.pre_sim_robot_positions.get(robot_id)
+            if pos_data is not None:
+                pos, _ = pos_data
+                operations.append(
+                    RobotOperation(
+                        id=robot_id,
+                        prev_pos=None,  # robot will be removed
+                        pos=pos,  # restore to this position on undo
+                        next_id=self.next_id,
+                    )
+                )
+
+        if operations:
+            self.undo_operations.append(GroupOperation(operations=operations))
+            self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
+
+        # clear internal state
+        self.curr_robot_ids.clear()
+        self.pre_sim_robot_positions.clear()
+        self.local_robot_positions.clear()
+
+        # clear redo list since this is a new action
+        self.redo_operations.clear()
+        self.redo_toggle_enabled_signal.emit(False)
+
+        # send empty world state
+        self.simulator_io.send_proto(WorldState, WorldState())
 
     @override
     def toggle_play_state(self) -> bool:

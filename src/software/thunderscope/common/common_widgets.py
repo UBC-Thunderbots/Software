@@ -198,13 +198,23 @@ class ColorProgressBar(QProgressBar):
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
 class StyledButton(QPushButton):
-    def __init__(self):
-        self.setStyleSheet(self.get_toggle_button_style())
+    """A QPushButton with the toolbar button stylesheet pre-applied.
+
+    This button automatically applies the toggle button style used by toolbar
+    buttons, so callers don't need to manually call setStyleSheet with
+    get_toggle_button_style(). StyledButton defaults to the enabled state, with
+    hover highlighting applied.
+    """
+
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        self.setStyleSheet(get_toggle_button_style())
 
 
 class ToggleableButton(QPushButton):
     """A QPushButton which can be enabled or disabled
     Indicates with cursor if it is enabled or disabled
+    Auto-updates the toolbar button stylesheet based on enabled state
     """
 
     def __init__(self, enabled: bool):
@@ -214,12 +224,15 @@ class ToggleableButton(QPushButton):
         """
         super(ToggleableButton, self).__init__()
         self.enabled = enabled
+        self.setStyleSheet(get_toggle_button_style(enabled))
 
     def toggle_enabled(self, enabled: bool):
-        """Toggles the enabled state of the button
+        """Toggles the enabled state of the button and updates the stylesheet
+
         :param enabled: the new enabled state
         """
         self.enabled = enabled
+        self.setStyleSheet(get_toggle_button_style(enabled))
 
     @override
     def enterEvent(self, event) -> None:

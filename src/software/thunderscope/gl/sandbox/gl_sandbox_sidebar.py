@@ -71,30 +71,31 @@ class GLSandboxSidebar(QWidget):
         button_layout.addWidget(self.redo_button)
         self.layout().addLayout(button_layout)
 
-        self.layout().addStretch()
-
         # Setup Clear Field button
-        self.clear_field = ToggleableButton(False)
-        self.clear_field.setToolTip("Clear Field")
-        self.clear_field.setIcon(
-            qta.icon("mdi6.redo-variant", color=self.BUTTON_ICON_COLOR)
+        self.clear_field_button = ToggleableButton(False)
+        self.clear_field_button.setToolTip("Clear Field")
+        self.clear_field_button.setIcon(
+            qta.icon("mdi6.delete-variant", color=self.BUTTON_ICON_COLOR)
         )
-
-        self.layout().addStretch()
+        self.layout().addWidget(self.clear_field_button)
 
         # Setup Create new Test button
-        self.clear_field = ToggleableButton(False)
-        self.clear_field.setToolTip("Create new Test")
-        self.clear_field.setIcon(
-            qta.icon("mdi6.redo-variant", color=self.BUTTON_ICON_COLOR)
+        self.create_test_button = ToggleableButton(False)
+        self.create_test_button.setToolTip("Create new Test")
+        self.create_test_button.setIcon(
+            qta.icon("mdi6.flask-outline", color=self.BUTTON_ICON_COLOR)
         )
+        self.layout().addWidget(self.create_test_button)
 
         # Setup Add Case to Existing Test button
-        self.clear_field = ToggleableButton(False)
-        self.clear_field.setToolTip("Add Case to Existing Test")
-        self.clear_field.setIcon(
-            qta.icon("mdi6.redo-variant", color=self.BUTTON_ICON_COLOR)
+        self.add_case_button = ToggleableButton(False)
+        self.add_case_button.setToolTip("Add Case to Existing Test")
+        self.add_case_button.setIcon(
+            qta.icon("mdi6.test-tube", color=self.BUTTON_ICON_COLOR)
         )
+        self.layout().addWidget(self.add_case_button)
+
+        self.layout().addStretch()
 
         self.hide()
 

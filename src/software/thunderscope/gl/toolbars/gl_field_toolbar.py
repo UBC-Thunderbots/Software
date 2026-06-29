@@ -8,7 +8,10 @@ from software.thunderscope.constants import (
     THUNDERSCOPE_HELP_TEXT,
     SIMULATION_SPEEDS,
 )
-from software.thunderscope.common.common_widgets import ToggleableButton, get_toggle_button_style
+from software.thunderscope.common.common_widgets import (
+    ToggleableButton,
+    StyledButton,
+)
 from software.thunderscope.gl.toolbars.gl_toolbar import GLToolbar
 import qtawesome as qta
 
@@ -56,18 +59,16 @@ class GLFieldToolbar(GLToolbar):
         super(GLFieldToolbar, self).__init__(parent=parent)
 
         # Setup Layers button for toggling visibility of layers
-        self.layers_button = QPushButton()
+        self.layers_button = StyledButton()
         self.layers_button.setText("Layers")
-        self.layers_button.setStyleSheet(self.get_toggle_button_style())
         self.layers_button.setMenu(layers_menu)
 
         # Set up View button for setting the camera position to standard views
-        self.camera_view_button = QPushButton()
+        self.camera_view_button = StyledButton()
         self.camera_view_button.setToolTip("View")
         self.camera_view_button.setIcon(
             qta.icon("msc.device-camera-video", color=self.BUTTON_ICON_COLOR)
         )
-        self.camera_view_button.setStyleSheet(self.get_toggle_button_style())
         self.camera_view_menu = QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
         self.camera_view_actions = [
@@ -92,55 +93,49 @@ class GLFieldToolbar(GLToolbar):
             self.camera_view_menu.addAction(camera_view_action)
 
         # Setup Measure button for enabling/disabling measure mode
-        self.measure_button = QPushButton()
+        self.measure_button = StyledButton()
         self.measure_button.setToolTip("Measure")
         self.measure_button.setIcon(
             qta.icon("ph.ruler-light", color=self.BUTTON_ICON_COLOR)
         )
-        self.measure_button.setStyleSheet(self.get_toggle_button_style())
         self.measure_button.setShortcut("m")
         self.measure_button.clicked.connect(lambda: on_measure_mode())
 
         # Setup Help button
-        self.help_button = QPushButton()
+        self.help_button = StyledButton()
         self.help_button.setToolTip("Help")
         self.help_button.setIcon(
             qta.icon("mdi.help-circle", color=self.BUTTON_ICON_COLOR)
         )
-        self.help_button.setStyleSheet(self.get_toggle_button_style())
         self.help_button.clicked.connect(
             lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
         # Setup pause button
-        self.pause_button = QPushButton()
-        self.pause_button.setStyleSheet(self.get_toggle_button_style())
+        self.pause_button = StyledButton()
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
         self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
 
         # Setup Toolbars button for toggling visibility of toolbars
-        self.toolbars_button = QPushButton()
+        self.toolbars_button = StyledButton()
         self.toolbars_button.setText("Toolbars")
         self.toolbars_menu = QMenu()
         self.toolbars_menu_checkboxes = {}
         self.toolbars_button.setMenu(toolbars_menu)
-        self.toolbars_button.setStyleSheet(self.get_toggle_button_style())
 
         if not replay_mode:
-            self.bookmark_button = QPushButton()
+            self.bookmark_button = StyledButton()
             self.bookmark_button.setIcon(
                 qta.icon(("fa6.bookmark"), color=self.BUTTON_ICON_COLOR)
             )
             self.bookmark_button.setShortcut("b")
-            self.bookmark_button.setStyleSheet(self.get_toggle_button_style())
             self.bookmark_button.clicked.connect(on_add_bookmark)
 
         # Setup simulation speed button and menu
         self.sim_speed_menu = QMenu()
-        self.sim_speed_button = QPushButton()
+        self.sim_speed_button = StyledButton()
         self.sim_speed_button.setText("Speed: 1.00x")
-        self.sim_speed_button.setStyleSheet(self.get_toggle_button_style())
         self.sim_speed_button.setMenu(self.sim_speed_menu)
         self.sim_speed_button.setToolTip("Simulation Speed")
 
@@ -154,12 +149,11 @@ class GLFieldToolbar(GLToolbar):
                 lambda new_speed=speed: self.speed_callback(new_speed),
             )
 
-        self.sandbox_sidebar_button = QPushButton()
+        self.sandbox_sidebar_button = StyledButton()
         self.sandbox_sidebar_button.setToolTip("Toggle Sandbox Sidebar")
         self.sandbox_sidebar_button.setIcon(
             qta.icon("mdi.view-sidebar-outline", color=self.BUTTON_ICON_COLOR)
         )
-        self.sandbox_sidebar_button.setStyleSheet(self.get_toggle_button_style())
         self.sandbox_sidebar_button.clicked.connect(on_toggle_sandbox_sidebar)
 
         # if sandbox mode, set up the sandbox control buttons
@@ -170,7 +164,6 @@ class GLFieldToolbar(GLToolbar):
             self.undo_button.setIcon(
                 qta.icon("mdi6.undo-variant", color=self.BUTTON_ICON_COLOR)
             )
-            self.undo_button.setStyleSheet(self.get_toggle_button_style(False))
 
             # Setup Redo button
             self.redo_button = ToggleableButton(False)
@@ -178,16 +171,14 @@ class GLFieldToolbar(GLToolbar):
             self.redo_button.setIcon(
                 qta.icon("mdi6.redo-variant", color=self.BUTTON_ICON_COLOR)
             )
-            self.redo_button.setStyleSheet(self.get_toggle_button_style(False))
 
-            self.reset_button = QPushButton()
+            self.reset_button = StyledButton()
             self.reset_button.setToolTip("Reset")
             self.reset_button.setIcon(
                 qta.icon(
                     "ph.arrow-counter-clockwise-fill", color=self.BUTTON_ICON_COLOR
                 )
             )
-            self.reset_button.setStyleSheet(self.get_toggle_button_style())
 
         # Setup toolbar
         self.layout().addWidget(self.layers_button)
@@ -238,7 +229,6 @@ class GLFieldToolbar(GLToolbar):
         :param enabled: if the undo button is enabled or not
         """
         self.undo_button.toggle_enabled(enabled)
-        self.undo_button.setStyleSheet(self.get_toggle_button_style(enabled))
         self.undo_button.repaint()
 
     def toggle_redo_enabled(self, enabled: bool) -> None:
@@ -247,7 +237,6 @@ class GLFieldToolbar(GLToolbar):
         :param enabled: if the redo button is enabled or not
         """
         self.redo_button.toggle_enabled(enabled)
-        self.redo_button.setStyleSheet(self.get_toggle_button_style(enabled))
         self.redo_button.repaint()
 
     def set_speed_callback(self, callback: Callable[[float], None]) -> None:
