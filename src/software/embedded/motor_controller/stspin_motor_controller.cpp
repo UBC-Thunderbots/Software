@@ -287,7 +287,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
     }
 
     LOG(WARNING) << "Motor " << motor << " did not acknowledge message (seq_num "
-                 << motor_status_.at(motor).seq_num << ") after "
+                 << static_cast<int>(motor_status_.at(motor).seq_num) << ") after "
                  << MAX_SPI_TRANSFER_ATTEMPTS << " SPI attempts; giving up";
 }
 
