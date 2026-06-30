@@ -28,12 +28,16 @@ RobotConstants createRobotConstants()
         // Dribbler speeds are negative as that is the direction that sucks the ball in
         .indefinite_dribbler_speed_rpm = -10000,
         .max_force_dribbler_speed_rpm  = -12000,
+        .release_ball_dribbler_speed_rpm = 2000,
 
         // Motor constant
         .motor_max_acceleration_m_per_s_2 = 8.0f,
 
         // Robot's linear movement constants
         .robot_max_speed_m_per_s            = 5.0f,
+        .ball_placement_wall_max_speed_m_per_s    = 0.3f,
+        .ball_placement_retreat_max_speed_m_per_s = 0.3f,
+        .dribble_speed_m_per_s                    = 1.5f,
         .robot_trajectory_max_speed_m_per_s = 3.5f,
 
         .robot_max_acceleration_m_per_s_2 = 4.0f,

@@ -45,20 +45,26 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StartState
-StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
-StartState --> KickOffWallState : [shouldKickOffWall]
-KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
-KickOffWallState --> KickOffWallState : [kickDone]
-KickOffWallState --> AlignPlacementState : [!kickDone]
-AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
+StartState --> AlignPlacementState : [!shouldPickOffWall]\n<i>alignPlacement</i>
+StartState --> AlignWallState : [shouldPickOffWall]\n<i>alignWall</i>
+AlignWallState --> AlignWallState : [!wallAlignDone && shouldPickOffWall]\n<i>alignWall</i>
+AlignWallState --> PickOffWallState : [wallAlignDone]\n<i>setPickOffDest, pickOffWall</i>
+AlignWallState --> AlignPlacementState : [!shouldPickOffWall]\n<i>alignPlacement</i>
+PickOffWallState --> StartState : [ballLost]
+PickOffWallState --> PickOffWallState : [!wallPickOffDone && !ballLost]\n<i>pickOffWall</i>
+PickOffWallState --> ReleaseBallState : [wallPickOffDone]\n<i>startWait</i>
+AlignPlacementState --> AlignWallState : [shouldPickOffWall]\n<i>alignWall</i>
 AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
-AlignPlacementState --> PlaceBallState : [alignDone]
-PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
-PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
-WaitState --> WaitState : [!waitDone]
-WaitState --> RetreatState : [waitDone]
+AlignPlacementState --> PlaceBallState : [alignDone]\n<i>placeBall</i>
+PlaceBallState --> StartState : [ballLost]
+PlaceBallState --> PlaceBallState : [!ballPlaced && !ballLost]\n<i>placeBall</i>
+PlaceBallState --> ReleaseBallState : [ballPlaced]\n<i>startWait</i>
+ReleaseBallState --> ReleaseBallState : [!waitDone && ballPlaced]\n<i>releaseBall</i>
+ReleaseBallState --> StartState : [!ballPlaced]
+ReleaseBallState --> RetreatState : [waitDone]\n<i>retreat</i>
 RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
 RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
+RetreatState --> StartState : [!ballPlaced]
 
 ```
 
@@ -457,7 +463,7 @@ direction LR
 MoveState --> MoveState : [!moveDone]\n<i>updateMove</i>
 MoveState --> Terminate:::terminate : [moveDone]\n<i>updateMove</i>
 Terminate:::terminate --> MoveState : [!moveDone]\n<i>updateMove</i>
-Terminate:::terminate --> Terminate:::terminate : <i>updateMove</i>
+Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
 
