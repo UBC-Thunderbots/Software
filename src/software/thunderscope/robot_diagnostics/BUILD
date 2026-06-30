@@ -40,7 +40,10 @@ py_library(
         ":controller_base",
         "//software/thunderscope:constants",
     ] + select({
-        "@platforms//os:linux": [requirement("evdev"), requirement("numpy")],
+        "@platforms//os:linux": [
+            requirement("evdev"),
+            requirement("numpy"),
+        ],
         "//conditions:default": [requirement("numpy")],
     }),
 )

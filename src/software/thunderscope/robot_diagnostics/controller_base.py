@@ -22,7 +22,8 @@ class ControllerBase(ABC):
     @abstractmethod
     def get_move_velocity(self) -> tuple[float, float, float]:
         """Return (x, y, angular) velocity, each normalized to [-1, 1] with deadzone applied.
-        Positive x = forward, positive y = strafe left, positive angular = CCW."""
+        Positive x = forward, positive y = strafe left, positive angular = CCW.
+        """
         ...
 
     @abstractmethod
@@ -38,13 +39,15 @@ class ControllerBase(ABC):
     @abstractmethod
     def get_kick_power_step(self) -> int:
         """Return -1, 0, or +1 for kick/chip power step direction.
-        Non-zero only once per new input (edge-detected)."""
+        Non-zero only once per new input (edge-detected).
+        """
         ...
 
     @abstractmethod
     def get_dribbler_step(self) -> int:
         """Return -1, 0, or +1 for dribbler RPM step direction.
-        Non-zero only once per new input (edge-detected)."""
+        Non-zero only once per new input (edge-detected).
+        """
         ...
 
     @abstractmethod
