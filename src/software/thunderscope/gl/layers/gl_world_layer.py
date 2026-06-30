@@ -291,8 +291,9 @@ class GLWorldLayer(GLLayer):
         if not self.point_in_scene_picked or not self.ball_velocity_vector:
             return
 
+        ball_velocity = self.ball_velocity_vector
         if self._should_invert_coordinate_frame():
-            self.ball_velocity_vector = -self.ball_velocity_vector
+            ball_velocity = -ball_velocity
 
         # Send a command to the simulator to give the ball the specified
         # velocity (i.e. kick it)
@@ -305,8 +306,8 @@ class GLWorldLayer(GLLayer):
                     y_meters=self.point_in_scene_picked.y(),
                 ),
                 global_velocity=Vector(
-                    x_component_meters=self.ball_velocity_vector.x(),
-                    y_component_meters=self.ball_velocity_vector.y(),
+                    x_component_meters=ball_velocity.x(),
+                    y_component_meters=ball_velocity.y(),
                 ),
             )
         )
@@ -681,7 +682,9 @@ class GLWorldLayer(GLLayer):
         # as a speed line
         if self.ball_velocity_vector:
             ball_state = self.cached_world.ball.current_state
-            velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
+            velocity = self._invert_vector_if_defending_negative_half(
+                self.ball_velocity_vector * SPEED_SEGMENT_SCALE
+            )
 
             self.ball_kick_velocity_graphic.show()
             self.ball_kick_velocity_graphic.set_points(
@@ -758,3 +761,15 @@ class GLWorldLayer(GLLayer):
         if self._should_invert_coordinate_frame():
             return QtGui.QVector3D(-point[0], -point[1], point[2])
         return point
+
+    def _invert_vector_if_defending_negative_half(
+        self, vector: QtGui.QVector3D
+    ) -> QtGui.QVector3D:
+        """Convert a simulator-space vector to display-space for rendering.
+
+        :param vector: The vector in simulator coordinates
+        :return: The vector in display coordinates (if needed to be inverted)
+        """
+        if self._should_invert_coordinate_frame():
+            return QtGui.QVector3D(-vector.x(), -vector.y(), vector.z())
+        return vector
