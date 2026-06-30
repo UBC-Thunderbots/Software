@@ -7,6 +7,7 @@
 - [Table of Contents](#table-of-contents)
   - [Flashing the robot's compute module](#flashing-the-robots-compute-module)
   - [Flashing the powerboard](#flashing-the-powerboard)
+  - [Flashing the Motor Driver Boards from Raspberry Pi](#flashing-the-motor-driver-boards-from-raspberry-pi)
   - [Setting up the embedded host](#setting-up-the-embedded-host)
     - [Raspberry Pi](#raspberry-pi)
   - [Robot Diagnostics](#robot-diagnostics)
@@ -104,6 +105,13 @@ Looking from the back of the robot the reset and boot buttons are on right side 
 ```bash
 bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
+
+## Flashing the Motor Driver Boards from Raspberry Pi
+This will flash from our Firmware repository's master branch onto all 4 motor driver boards. 
+```bash
+./tbots.py run run_ansible -- --playbook deploy_motor_firmware.yml --hosts robot@<robot_ip> --ssh_pass <robot_password>
+```
+
 
 ## Setting up the embedded host
 

@@ -16,11 +16,14 @@ test --test_output=all
 
 ################ Machine Configurations ################
 
-# The XDR_RUNTIME_DIR and DISPLAY environment variables must be passed to the tests
-# so that our GUIs can be enabled for simulated tests. This is needed for Qt
-# to find the X-Window system and create windows
+# The XDG_RUNTIME_DIR, DISPLAY, WAYLAND_DISPLAY, and QT_QPA_PLATFORM
+# environment variables must be passed to the tests so that our GUIs can be
+# enabled for simulated tests. This is needed for Qt to find the X-Window
+# system or Wayland and create windows.
 build --test_env=XDG_RUNTIME_DIR
 build --test_env=DISPLAY
+build --test_env=WAYLAND_DISPLAY
+build --test_env=QT_QPA_PLATFORM
 
 # Setup python bin/lib to point to our venv
 build --action_env=PYTHON_BIN_PATH=/opt/tbotspython/bin/python3.12

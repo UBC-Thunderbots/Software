@@ -42,52 +42,52 @@ enum class StSpinFaultCode
     DP_FAULT     = 0x0400
 };
 
-struct NoOpFrame
+struct NoOpMessage
 {
 };
 
-struct SetTargetSpeedFrame
+struct SetTargetSpeedMessage
 {
     bool motor_enabled;
     int16_t motor_target_speed_rpm;
 };
 
-struct SetTargetTorqueFrame
+struct SetTargetTorqueMessage
 {
     bool motor_enabled;
     int16_t motor_target_torque;
 };
 
-struct SetResponseTypeFrame
+struct SetResponseTypeMessage
 {
     StSpinResponseType response_type;
 };
 
-struct SetPidTorqueKpKiFrame
+struct SetPidTorqueKpKiMessage
 {
     int16_t kp;
     int16_t ki;
 };
 
-struct SetPidFluxKpKiFrame
+struct SetPidFluxKpKiMessage
 {
     int16_t kp;
     int16_t ki;
 };
 
-struct SetPidSpeedKpKiFrame
+struct SetPidSpeedKpKiMessage
 {
     int16_t kp;
     int16_t ki;
 };
 
-struct SetSpeedFeedForwardKaKvFrame
+struct SetSpeedFeedForwardKaKvMessage
 {
     int16_t ka;
     int16_t kv;
 };
 
-struct SetSpeedFeedForwardKsFrame
+struct SetSpeedFeedForwardKsMessage
 {
     int16_t ks;
 };

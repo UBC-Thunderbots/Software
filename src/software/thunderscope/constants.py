@@ -107,7 +107,7 @@ LOG_LEVEL_STR_MAP = {
     LogLevel.CONTRACT: "CONTRACT",
 }
 
-# Paths to check for estop when running diagnostics
+# Paths to check for estop when running diagnostics, used as a fallback for Linux.
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
 
@@ -264,6 +264,7 @@ class Colors:
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
+    SELECTED_ROBOT_OUTLINE = QtGui.QColor(0, 255, 255, 200)
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
@@ -404,17 +405,8 @@ class RuntimeManagerConstants:
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
 
-    RUNTIME_STATS_DIRECTORY_PATH = "/tmp/tbots/stats"
-    RUNTIME_FRIENDLY_STATS_FILE = "blue.toml"
-    RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE = "yellow_from_blue.toml"
-    RUNTIME_ENEMY_STATS_FILE = "yellow.toml"
-    RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE = "blue_from_yellow.toml"
-
-    RUNTIME_STATS_SCORE_KEY = "goals"
-    RUNTIME_STATS_RED_CARDS_KEY = "red_cards"
-    RUNTIME_STATS_YELLOW_CARDS_KEY = "yellow_cards"
-    RUNTIME_STATS_SHOTS_ON_NET = "shots_on_net"
-    RUNTIME_STATS_SHOTS_BLOCKED = "shots_blocked"
+    RUNTIME_EVENTS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_EVENTS_FILE = "game_events.csv"
 
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"

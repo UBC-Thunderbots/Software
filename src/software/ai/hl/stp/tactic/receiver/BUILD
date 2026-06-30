@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -38,12 +38,9 @@ cc_test(
 py_test(
     name = "receiver_tactic_test",
     srcs = ["receiver_tactic_test.py"],
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

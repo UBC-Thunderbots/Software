@@ -5,10 +5,10 @@ from proto.import_all_protos import *
 from proto.play_pb2 import PlayName
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.simulated_test_fixture import pytest_main
 
 
 @pytest.mark.skip(
