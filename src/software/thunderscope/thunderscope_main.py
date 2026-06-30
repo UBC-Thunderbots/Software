@@ -11,7 +11,7 @@ from google.protobuf.internal import api_implementation
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.evaluation.loggers.stats_logger import StatsLogger
+from software.stats.loggers.stats_logger import StatsLogger
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
