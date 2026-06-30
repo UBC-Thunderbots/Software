@@ -171,12 +171,13 @@ def setup_gl_widget(
 
     # connect all sandbox controls
     sandbox_sidebar.register_sandbox_mode_callback(
-        simulation_control_toolbar.set_sandbox_enabled
+        simulation_control_toolbar.set_sandbox_mode_enabled
     )
     sandbox_sidebar.register_sandbox_mode_callback(world_layer.set_sandbox_enabled)
     sandbox_sidebar.pause_button.clicked.connect(world_layer.toggle_play_state)
     sandbox_sidebar.undo_button.clicked.connect(world_layer.undo)
     sandbox_sidebar.redo_button.clicked.connect(world_layer.redo)
+    sandbox_sidebar.clear_field_button.clicked.connect(world_layer.clear_field)
     world_layer.undo_toggle_enabled_signal.connect(sandbox_sidebar.toggle_undo_enabled)
     world_layer.redo_toggle_enabled_signal.connect(sandbox_sidebar.toggle_redo_enabled)
 

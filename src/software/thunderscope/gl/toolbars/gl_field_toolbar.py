@@ -15,8 +15,8 @@ from software.thunderscope.gl.toolbars.gl_toolbar import GLToolbar
 import qtawesome as qta
 
 # Sandbox status label colors
-ON_COLOR = "#FF0000"
-OFF_COLOR = "#00D000"
+ON_COLOR = "#00D000"
+OFF_COLOR = "#FF0000"
 
 
 class GLFieldToolbar(GLToolbar):
@@ -31,7 +31,6 @@ class GLFieldToolbar(GLToolbar):
         parent: QWidget,
         on_camera_view_change: Callable[[CameraView], None],
         on_measure_mode: Callable[[], None],
-        on_toggle_sidebar: Callable[[], None],
         layers_menu: QMenu,
         toolbars_menu: QMenu,
         sandbox_mode: bool = False,
@@ -45,7 +44,6 @@ class GLFieldToolbar(GLToolbar):
         - Measure Mode Toggle
         - Camera View Select menu
         - Add bookmark
-        - Toggle sandbox sidebar
 
         :param parent: the parent to overlay this toolbar over
         :param on_camera_view_change: the callback function for when the camera view is changed
@@ -54,7 +52,6 @@ class GLFieldToolbar(GLToolbar):
         :param toolbars_menu: the QMenu for the toolbars menu selection
         :param replay_mode: if replay mode is enabled
         :param on_add_bookmark: the callback function when adding a bookmark
-        :param on_toggle_sidebar: the callback function when toggling the sandbox sidebar
         """
         super(GLFieldToolbar, self).__init__(parent=parent)
 
@@ -71,25 +68,11 @@ class GLFieldToolbar(GLToolbar):
         )
         self.camera_view_menu = QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_actions = [
-            QtGui.QAction("[1] Orthographic Top Down"),
-            QtGui.QAction("[2] Landscape High Angle"),
-            QtGui.QAction("[3] Left Half High Angle"),
-            QtGui.QAction("[4] Right Half High Angle"),
-        ]
-        self.camera_view_actions[0].triggered.connect(
-            lambda: on_camera_view_change(CameraView.ORTHOGRAPHIC)
-        )
-        self.camera_view_actions[1].triggered.connect(
-            lambda: on_camera_view_change(CameraView.LANDSCAPE_HIGH_ANGLE)
-        )
-        self.camera_view_actions[2].triggered.connect(
-            lambda: on_camera_view_change(CameraView.LEFT_HALF_HIGH_ANGLE)
-        )
-        self.camera_view_actions[3].triggered.connect(
-            lambda: on_camera_view_change(CameraView.RIGHT_HALF_HIGH_ANGLE)
-        )
-        for camera_view_action in self.camera_view_actions:
+        for idx, camera_view in enumerate(CameraView):
+            camera_view_action = QtGui.QAction(f"[{idx}] {camera_view.value}")
+            camera_view_action.triggered.connect(
+                lambda: on_camera_view_change(camera_view)
+            )
             self.camera_view_menu.addAction(camera_view_action)
 
         # Setup Measure button for enabling/disabling measure mode
@@ -185,7 +168,7 @@ class GLFieldToolbar(GLToolbar):
             self.layout().addWidget(self.bookmark_button)
 
         self.layout().addStretch()
-        self.layout().addWidget(self.sandbox_sidebar_container)
+        self.layout().addWidget(self.sidebar_button_container)
 
     @override
     def refresh(self) -> None:

@@ -236,6 +236,9 @@ class ToggleableButton(QPushButton):
         self.enabled = enabled
         self.setStyleSheet(get_toggle_button_style(enabled))
 
+    def is_enabled(self):
+        return self.enabled
+
     @override
     def enterEvent(self, event) -> None:
         """Sets the cursor to depending on if the button is enabled

@@ -4,7 +4,8 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 import qtawesome as qta
-from software.thunderscope.common.common_widgets import ToggleableButton
+from software.thunderscope.common.common_widgets import ToggleableButton, StyledButton
+from software.thunderscope.constants import SANDBOX_MODE_HELP_TEXT
 
 
 class GLSandboxSidebar(QWidget):
@@ -48,7 +49,7 @@ class GLSandboxSidebar(QWidget):
             f"    background-color: {self.BACKGROUND_COLOR};"
             f"    border: 2px solid {self.CONTENT_COLOR};"
             f"    border-radius: 5px;"
-            f"    padding: 10px;"
+            f"    padding: 15px 10px;"
             f"    padding-top: 10px;"
             f"}}"
         )
@@ -71,13 +72,30 @@ class GLSandboxSidebar(QWidget):
         self.sidebar_container.layout().addStretch()
         self.sidebar_container.layout().addLayout(self.checkbox_layout)
 
+        self.help_layout = QHBoxLayout()
+        self.help_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.help_layout.addWidget(QLabel("How to Use: "))
+
+        self.help_button = StyledButton()
+        self.help_button.setToolTip("Help")
+        self.help_button.setIcon(qta.icon("mdi6.help-circle", color=self.CONTENT_COLOR))
+        self.help_layout.addWidget(self.help_button)
+        self.help_button.clicked.connect(
+            lambda: QMessageBox.information(
+                self.window(), "Help", SANDBOX_MODE_HELP_TEXT
+            )
+        )
+        self.sidebar_container.layout().addStretch()
+        self.sidebar_container.layout().addLayout(self.help_layout)
+
         # Setup pause button
-        self.pause_button = ToggleableButton()
+        self.pause_button = ToggleableButton(False)
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
         self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
 
         # Setup Undo button
+        self.undo_button_enabled = False
         self.undo_button = ToggleableButton(False)
         self.undo_button.setToolTip("Undo")
         self.undo_button.setIcon(
@@ -85,6 +103,7 @@ class GLSandboxSidebar(QWidget):
         )
 
         # Setup Redo button
+        self.redo_button_enabled = False
         self.redo_button = ToggleableButton(False)
         self.redo_button.setToolTip("Redo")
         self.redo_button.setIcon(
@@ -145,9 +164,16 @@ class GLSandboxSidebar(QWidget):
         self.sandbox_mode_enabled = not self.sandbox_mode_enabled
         for callback in self._sandbox_mode_callbacks:
             callback(self.sandbox_mode_enabled)
+
         self.pause_button.toggle_enabled(self.sandbox_mode_enabled)
-        self.undo_button.toggle_enabled(self.sandbox_mode_enabled)
-        self.redo_button.toggle_enabled(self.sandbox_mode_enabled)
+        self.clear_field_button.toggle_enabled(self.sandbox_mode_enabled)
+
+        self.undo_button.toggle_enabled(
+            self.undo_button_enabled and self.sandbox_mode_enabled
+        )
+        self.redo_button.toggle_enabled(
+            self.redo_button_enabled and self.sandbox_mode_enabled
+        )
 
     def toggle_pause_button(self, is_playing: bool) -> None:
         """Toggles the state of the pause button by updating its text and icon
@@ -178,8 +204,6 @@ class GLSandboxSidebar(QWidget):
             parent.height(),
         )
 
-        # self.move(parent.geometry().right() - int((1 + self.POSITION_PADDING_MULTIPLIER) * self.sidebar_container.width()), parent.geometry().top() + self.widget_above.height())
-
     @override
     def eventFilter(self, obj, event):
         """Reposition when the parent is resized"""
@@ -192,6 +216,7 @@ class GLSandboxSidebar(QWidget):
 
         :param enabled: if the undo button is enabled or not
         """
+        self.undo_button_enabled = enabled
         self.undo_button.toggle_enabled(enabled)
         self.undo_button.repaint()
 
@@ -200,5 +225,6 @@ class GLSandboxSidebar(QWidget):
 
         :param enabled: if the redo button is enabled or not
         """
+        self.redo_button_enabled = enabled
         self.redo_button.toggle_enabled(enabled)
         self.redo_button.repaint()

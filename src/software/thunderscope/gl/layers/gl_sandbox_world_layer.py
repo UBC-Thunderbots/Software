@@ -142,6 +142,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # forward event to super method for ball placement
         super().mouse_in_scene_pressed(event)
 
+        # if sandbox mode is disabled, don't do anything
+        if not self.sandbox_enabled:
+            return
+
         # only allow robot editing if Ctrl + Shift is pressed to avoid conflicting with the ball placement
         if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             return
@@ -172,6 +176,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param event: the event containing the xy-plane and other plane coordinates
         """
         super().mouse_in_scene_dragged(event)
+
+        # if sandbox mode is disabled, don't do anything
+        if not self.sandbox_enabled:
+            return
 
         # only allow robot editing if Ctrl + Shift is pressed to avoid conflicting with the ball placement
         if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
@@ -224,6 +232,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param event: the mouse event
         """
         super().mouse_in_scene_released(event)
+
+        # if sandbox mode is disabled, don't do anything
+        if not self.sandbox_enabled:
+            return
 
         # ends the currently happening move
         self.selected_robot_id = None
@@ -325,8 +337,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 id=robot_.id,
                 prev_pos=None,
                 pos=QVector3D(
-                    robot.current_state.global_position.x_meters,
-                    robot.current_state.global_position.y_meters,
+                    robot_.current_state.global_position.x_meters,
+                    robot_.current_state.global_position.y_meters,
                     0,
                 ),
                 next_id=self.next_id,
@@ -346,7 +358,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             )
 
         if operations:
-            self.undo_operations.append(GroupOperation(operations=operations))
+            self.undo_operations.append(GroupOperation(operations=operations.values()))
             self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
 
         # clear internal state
@@ -358,8 +370,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_operations.clear()
         self.redo_toggle_enabled_signal.emit(False)
 
-        # send empty world state
-        self.simulator_io.send_proto(WorldState, WorldState())
+        # send out empty world state
+        world_state = WorldState()
+        self.simulator_io.send_proto(WorldState, world_state)
 
     @override
     def toggle_play_state(self) -> bool:
@@ -381,11 +394,17 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.__update_world_state(robot_id, state[0], state[1])
 
     def set_sandbox_enabled(self, enabled: bool) -> None:
-        """Sets the sandbox mode enabled state
+        """Sets the sandbox mode enabled state and syncs undo / redo enable state
 
         :param enabled: whether sandbox mode is enabled
         """
         self.sandbox_enabled = enabled
+
+        # resync undo / redo enabled state once sandbox mode is enabled
+        # as enabling sandbox mode enables the buttons
+        if self.sandbox_enabled:
+            self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
+            self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
 
     def __add_undo_operation(self, operation: RobotOperation) -> None:
         """Adds an undo operation to the list and emits the toggle enable signal
@@ -405,6 +424,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.__update_world_state(
             operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
         )
+
+    def __get_empty_world_state(self) -> WorldState:
+        """Constructs an empty WorldState with just the ball state filled in
+        from the cached world state
+
+        :return: the empty world state with ball state
+        """
+        world_state = WorldState()
+        world_state.ball_state.CopyFrom(self.cached_world.ball.current_state)
+        return world_state
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
     #       ADD / REMOVE / MOVE ROBOT METHODS       #
@@ -707,6 +736,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # remove an existing robot
             self.curr_robot_ids.remove(robot_id)
             del self.pre_sim_robot_positions[robot_id]
+            self.local_robot_positions[robot_id] = None
             world_state = self.__remove_robot_from_state(world_state, robot_id)
 
         return world_state

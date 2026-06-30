@@ -7,7 +7,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
 import numpy as np
-from typing import Callable, Optional
+from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
@@ -105,7 +105,6 @@ class GLWidget(QWidget):
         )
 
         # Setup sandbox sidebar
-        self._sandbox_mode_callbacks: list[Callable[[bool], None]] = []
         self.sandbox_sidebar = GLSandboxSidebar(
             parent=self.gl_view_widget, widget_above=self.simulation_control_toolbar
         )
@@ -413,16 +412,3 @@ class GLWidget(QWidget):
         )
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
         success_toast(self.parentWidget(), "Added bookmark!")
-
-    def register_sandbox_mode_callback(self, callback: Callable[[bool], None]) -> None:
-        """Register a callback that will be called when sandbox mode is toggled.
-
-        :param callback: A callable that takes one boolean argument (the new state).
-        """
-        self._sandbox_mode_callbacks.append(callback)
-
-    def toggle_sandbox_mode(self) -> None:
-        """Toggle sandbox mode on/off and notify all registered callbacks."""
-        self.sandbox_mode_enabled = not self.sandbox_mode_enabled
-        for callback in self._sandbox_mode_callbacks:
-            callback(self.sandbox_mode_enabled)
