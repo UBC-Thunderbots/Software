@@ -207,6 +207,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def_static("half", &Angle::half)
         .def_static("threeQuarter", &Angle::threeQuarter)
         .def("toRadians", &Angle::toRadians)
+        .def("toDegrees", &Angle::toDegrees)
         .def("minDiff", &Angle::minDiff)
         // Overloaded
         .def("__repr__",
@@ -308,6 +309,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createPoint", &createPoint);
     m.def("createPolygon", &createPolygon);
     m.def("createCircle", &createCircle);
+    m.def("createAngle", &createAngle);
     m.def("createVector", &createVector);
     m.def("createSegment", &createSegment);
     m.def("createStadium", &createStadium);
