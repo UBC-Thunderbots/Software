@@ -34,6 +34,25 @@ from cli.cli_params import (
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
+HISTORY_FILE = "/tmp/tbots_history"
+HISTORY_MAX_ENTRIES = 50
+
+
+def load_history() -> list[str]:
+    if not os.path.exists(HISTORY_FILE):
+        return []
+    with open(HISTORY_FILE) as f:
+        lines = [line.strip() for line in f.readlines()]
+    return [l for l in lines if l]
+
+
+def save_to_history(cmd_str: str):
+    history = load_history()
+    history = [h for h in history if h != cmd_str]
+    history.append(cmd_str)
+    history = history[-HISTORY_MAX_ENTRIES:]
+    with open(HISTORY_FILE, "w") as f:
+        f.write("\n".join(history) + "\n")
 
 
 @dataclass
@@ -231,6 +250,7 @@ def execute_command(command: list[str], print_only: bool = False):
         print(cmd_str)
     else:
         print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{cmd_str}\n\n{'=' * 81}\n")
+        save_to_history(cmd_str)
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
 
@@ -240,12 +260,29 @@ def start_interactive_cli():
     config = BuildConfig(action=ActionArgument.run)  # Default action
     extra_args = []
 
+    history = load_history()
+    choices = ["Run thunderscope", "Test", "Flash"]
+    if history:
+        choices = ["Repeat a past command"] + choices
+
     category = questionary.select(
-        "What would you like to do?", choices=["Run thunderscope", "Test", "Flash"]
+        "What would you like to do?", choices=choices
     ).ask()
 
     if not category:
         return
+
+    if category == "Repeat a past command":
+        past_cmd = questionary.select(
+            "Select a command to re-run:",
+            choices=list(reversed(history)),
+        ).ask()
+        if not past_cmd:
+            return
+        print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{past_cmd}\n\n{'=' * 81}\n")
+        save_to_history(past_cmd)
+        code = os.system(past_cmd)
+        sys.exit(1 if code != 0 else 0)
 
     match category:
         case "Run thunderscope":
