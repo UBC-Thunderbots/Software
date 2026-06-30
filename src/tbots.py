@@ -130,10 +130,6 @@ def main(
     :param robot_name: hostname of the robot targeted by an Ansible playbook
     :param ansible_playbook: name of the Ansible playbook to run
     """
-    if not action and not search_query:
-        start_interactive_cli()
-        return
-
     config = BuildConfig(
         action=action,
         search_query=search_query,
@@ -152,6 +148,10 @@ def main(
         robot_name=robot_name,
         ansible_playbook=ansible_playbook,
     )
+
+    if not action and not search_query:
+        start_interactive_cli(config)
+        return
 
     validate(config)
     command = create_command(config, ctx.args)
@@ -302,16 +302,18 @@ def execute_command(command: list[str], print_only: bool = False):
         sys.exit(1 if code != 0 else 0)
 
 
-def start_interactive_cli():
+def start_interactive_cli(config: BuildConfig):
     """Run the menu-driven interactive CLI.
 
     Walks the user through a series of questionary prompts to assemble a
-    :class:`BuildConfig`, then validates, builds, and executes the resulting
-    Bazel command. The menu choices (and their inline descriptions) live in
-    cli_params.py. Returns early without running anything if the user aborts
-    the top-level prompt.
+    :class:`BuildConfig` by modifying an existing config, then validates,
+    builds, and executes the resulting Bazel command. The menu choices (and
+    their inline descriptions) live in cli_params.py. Returns early without
+    running anything if the user aborts the top-level prompt.
+
+    :param config: The cli config to modify.
     """
-    config = BuildConfig(action=ActionArgument.run)  # Default action
+    config.action = ActionArgument.run  # Default action
     extra_args = []
 
     category = questionary.select(
