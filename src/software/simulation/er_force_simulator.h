@@ -144,6 +144,9 @@ class ErForceSimulator
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
    private:
+    // Grants the ramping unit test access to the private getRampedVelocityPrimitive()
+    friend class ErForceSimulatorRampingTest;
+
     /**
      * Sets the primitive being simulated by the robot in simulation
      *
@@ -231,6 +234,18 @@ class ErForceSimulator
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool ramping;
+
+    struct LocalVelocity
+    {
+        Vector linear;
+        AngularVelocity angular;
+    };
+
+    // The previously commanded velocity for each robot, kept per team. When ramping is
+    // enabled the wheel velocities are ramped open-loop from these setpoints, mirroring
+    // the real motor service
+    std::unordered_map<RobotId, LocalVelocity> blue_prev_ramp_velocities;
+    std::unordered_map<RobotId, LocalVelocity> yellow_prev_ramp_velocities;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

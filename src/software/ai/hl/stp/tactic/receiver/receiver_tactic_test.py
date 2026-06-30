@@ -236,6 +236,7 @@ def test_receiver(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        test_timeout_s=4,
         run_till_end=False,
     )
 
