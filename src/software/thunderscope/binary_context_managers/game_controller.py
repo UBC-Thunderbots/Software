@@ -1,6 +1,7 @@
 from __future__ import annotations
 import itertools
 
+import fcntl
 import queue
 import random
 import logging
@@ -35,6 +36,9 @@ class Gamecontroller:
     RESET_MATCH_DELAY_S = 1
     NO_GAME_PROGRESS_DURATION_S = 120
 
+    GC_PORT_LOCK = "/tmp/tbots_gc_port.lock"
+    GC_PORT_STATE = "/tmp/tbots_gc_last_port.txt"
+
     def __init__(
         self,
         suppress_logs: bool = False,
@@ -43,24 +47,16 @@ class Gamecontroller:
     ) -> None:
         """Run Gamecontroller
 
-        :param suppress_logs: Whether to suppress the logs
-        :param use_conventional_port: whether or not to use the conventional port!
-        :param automate_referee: whether or not referee commands should be automated
+        :param suppress_logs: True if logs should be suppressed
+        :param use_conventional_port: True when using static referee port. False for dynamic port assignments.
+        :param automate_referee: True if referee commands should be automated
         """
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
 
-        # We default to using a non-conventional port to avoid emitting
-        # on the same port as what other teams may be listening on.
-        if use_conventional_port:
-            if not self.is_valid_port(SSL_REFEREE_PORT):
-                raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
-
-            self.referee_port = SSL_REFEREE_PORT
-        else:
-            self.referee_port = self.next_free_port(random.randint(1024, 65535))
-
-        self.ci_port = self.next_free_port()
+        self.use_conventional_port = use_conventional_port
+        self.referee_port = None
+        self.ci_port = None
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
@@ -92,23 +88,51 @@ class Gamecontroller:
         """
         command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
-        # Kill any gamecontroller, even those with different IP/port, because
-        # of the port assignment logic when use_conventional_port=False
-        kill_cmd_if_running(command)
+        lock_fd = None
+        if not self.use_conventional_port:
+            # Acquire mutex for port assignments over IPC as they are critical sections
+            lock_fd = open(Gamecontroller.GC_PORT_LOCK, "w")
+            fcntl.flock(lock_fd, fcntl.LOCK_EX)
 
-        command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
-        command += ["-ciAddress", f"localhost:{self.ci_port}"]
+        try:
+            if self.use_conventional_port:
+                kill_cmd_if_running(command)
+                if not self.is_valid_port(SSL_REFEREE_PORT):
+                    raise OSError(
+                        f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller"
+                    )
+                self.referee_port = SSL_REFEREE_PORT
+                self.ci_port = self.next_free_port(Gamecontroller.GC_PORT_STATE)
+            else:
+                self.referee_port = self.next_free_port(Gamecontroller.GC_PORT_STATE)
+                self.ci_port = self.next_free_port(Gamecontroller.GC_PORT_STATE)
 
-        if self.suppress_logs:
-            with open(os.devnull, "w") as fp:
-                self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
+            command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+            command += ["-ciAddress", f"localhost:{self.ci_port}"]
+            command += [
+                "-address",
+                "localhost:0",
+                "-autorefAddress",
+                "localhost:0",
+                "-remoteControlAddress",
+                "localhost:0",
+                "-teamAddress",
+                "localhost:0",
+                "-backendOnly",
+            ]
 
-        else:
-            self.gamecontroller_proc = Popen(command)
+            if self.suppress_logs:
+                with open(os.devnull, "w") as fp:
+                    self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
+            else:
+                self.gamecontroller_proc = Popen(command)
 
-        # We can't connect to the ci port right away, it takes
-        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        finally:
+            if lock_fd is not None:
+                fcntl.flock(lock_fd, fcntl.LOCK_UN)
+                lock_fd.close()
+
         self.ci_socket = SslSocket(self.ci_port)
 
         return self
@@ -160,20 +184,39 @@ class Gamecontroller:
         except OSError:
             return False
 
-    def next_free_port(self, start_port: int = 40000, max_port: int = 65535) -> int:
-        """Find the next free port. We need to find 2 free ports to use for the gamecontroller
-        so that we can run multiple gamecontroller instances in parallel.
+    def next_free_port(
+        self, port_counter_path: str, start_port: int = 40000, max_port: int = 65535
+    ) -> int:
+        """Find and claims the next free port using a file-backed counter to avoid race conditions.
+        Ports are assigned monotonically and tracked in port_counter_path.
+        Wraps to start_port, when max_port is reached.
 
+        :param port_counter_path: The shared data location for IPC of port assignments
         :param start_port: The port to start looking from
         :param max_port: The maximum port to look up to
         :return: The next free port
         """
-        while start_port <= max_port:
-            if self.is_valid_port(start_port):
-                return start_port
-            start_port += 1
+        assert start_port < max_port
 
-        raise IOError("no free ports")
+        try:
+            with open(port_counter_path, "r") as f:
+                last_port = int(f.read().strip())
+        except (FileNotFoundError, ValueError):
+            last_port = random.randint(start_port, max_port)
+
+        port = last_port + 1
+        if port > max_port:
+            port = start_port
+
+        while not self.is_valid_port(port):
+            port += 1
+            if port > max_port:
+                port = start_port
+
+        with open(port_counter_path, "w") as f:
+            f.write(str(port))
+
+        return port
 
     def setup_proto_unix_io(
         self,

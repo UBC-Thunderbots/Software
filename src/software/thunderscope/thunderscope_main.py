@@ -11,7 +11,7 @@ from google.protobuf.internal import api_implementation
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.thunderscope.log.stats.stats import Stats
+from software.stats.loggers.stats_logger import StatsLogger
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
@@ -98,12 +98,6 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Debug the simulator",
-    )
-    parser.add_argument(
-        "--visualize_cpp_test",
-        action="store_true",
-        default=False,
-        help="Visualize C++ Tests",
     )
     parser.add_argument(
         "--log_level",
@@ -260,49 +254,6 @@ if __name__ == "__main__":
         )
 
     ###########################################################################
-    #                      Visualize CPP Tests                                #
-    ###########################################################################
-    # TODO (#2581) remove this
-    if args.visualize_cpp_test:
-        runtime_dir = "/tmp/tbots/gtest_logs"
-
-        try:
-            os.makedirs(runtime_dir)
-        except OSError:
-            pass
-
-        tscope = Thunderscope(
-            config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size
-            ),
-            layout_path=args.layout,
-        )
-        proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-
-        # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
-        # to true to decode from base64.
-        for arg in [
-            {"proto_class": ObstacleList},
-            {"proto_class": PathVisualization},
-            {"proto_class": PassVisualization},
-            {"proto_class": AttackerVisualization},
-            {"proto_class": CostVisualization},
-            {"proto_class": DebugShapes},
-            {"proto_class": NamedValue},
-            {"proto_class": PrimitiveSet},
-            {"proto_class": World},
-            {"proto_class": PlayInfo},
-            {"proto_class": BallPlacementVisualization},
-        ]:
-            proto_unix_io.attach_unix_receiver(
-                runtime_dir, from_log_visualize=True, **arg
-            )
-
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
-
-        tscope.show()
-
-    ###########################################################################
     #              AI + Robot Communication + Robot Diagnostics               #
     ###########################################################################
     #
@@ -328,6 +279,9 @@ if __name__ == "__main__":
             config=tscope_config,
             layout_path=args.layout,
         )
+
+        # Fetch the AI runtime/backends
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
 
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
@@ -378,12 +332,8 @@ if __name__ == "__main__":
             )
 
             if args.run_blue or args.run_yellow:
-                full_system_runtime_dir = (
-                    args.blue_full_system_runtime_dir
-                    if args.run_blue
-                    else args.yellow_full_system_runtime_dir
-                )
                 with FullSystem(
+                    path_to_binary=runtime_config.get_blue_runtime_path(),
                     full_system_runtime_dir=runtime_dir,
                     debug_full_system=debug,
                     friendly_colour_yellow=friendly_colour_yellow,
@@ -499,17 +449,21 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref, (
-            Stats(
+            StatsLogger(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 record_enemy_stats=True,
+                friendly_colour_yellow=False,
             )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as blue_stats, (
-            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+        ) as blue_stats_logger, (
+            StatsLogger(
+                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                friendly_colour_yellow=True,
+            )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as yellow_stats:
+        ) as yellow_stats_logger:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
@@ -520,9 +474,9 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
 
-            if args.record_stats:
-                tscope.register_refresh_function(blue_stats.refresh)
-                tscope.register_refresh_function(yellow_stats.refresh)
+            if args.record_stats and blue_stats_logger and yellow_stats_logger:
+                tscope.register_refresh_function(blue_stats_logger.refresh)
+                tscope.register_refresh_function(yellow_stats_logger.refresh)
 
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],

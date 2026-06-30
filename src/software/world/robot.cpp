@@ -8,7 +8,7 @@ Robot::Robot(RobotId id, const Point& position, const Vector& velocity,
              const Angle& orientation, const AngularVelocity& angular_velocity,
              const Timestamp& timestamp, bool breakbeam_tripped,
              const std::set<RobotCapability>& unavailable_capabilities,
-             const RobotConstants_t& robot_constants)
+             const robot_constants::RobotConstants& robot_constants)
     : id_(id),
       current_state_(position, velocity, orientation, angular_velocity,
                      breakbeam_tripped),
@@ -22,7 +22,7 @@ Robot::Robot(RobotId id, const Point& position, const Vector& velocity,
              const Angle& orientation, const AngularVelocity& angular_velocity,
              const Timestamp& timestamp,
              const std::set<RobotCapability>& unavailable_capabilities,
-             const RobotConstants_t& robot_constants)
+             const robot_constants::RobotConstants& robot_constants)
     : id_(id),
       current_state_(position, velocity, orientation, angular_velocity, false),
       timestamp_(timestamp),
@@ -33,7 +33,7 @@ Robot::Robot(RobotId id, const Point& position, const Vector& velocity,
 
 Robot::Robot(RobotId id, const RobotState& initial_state, const Timestamp& timestamp,
              const std::set<RobotCapability>& unavailable_capabilities,
-             const RobotConstants_t& robot_constants)
+             const robot_constants::RobotConstants& robot_constants)
     : id_(id),
       current_state_(initial_state),
       timestamp_(timestamp),
@@ -171,7 +171,7 @@ std::set<RobotCapability>& Robot::getMutableRobotCapabilities()
     return unavailable_capabilities_;
 }
 
-const RobotConstants_t& Robot::robotConstants() const
+const robot_constants::RobotConstants& Robot::robotConstants() const
 {
     return robot_constants_;
 }
@@ -218,7 +218,8 @@ Duration Robot::getTimeToPosition(const Point& destination,
     double initial_velocity_1d = velocity().dot(dist_vector.normalize());
     double final_velocity_1d   = final_velocity.dot(dist_vector.normalize());
 
-    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_m_per_s,
-                                   robot_constants_.robot_max_acceleration_m_per_s_2,
-                                   initial_velocity_1d, final_velocity_1d);
+    return getTimeToTravelDistance(
+        dist, robot_constants_.robot_trajectory_max_speed_m_per_s,
+        robot_constants_.robot_trajectory_max_acceleration_m_per_s_2, initial_velocity_1d,
+        final_velocity_1d);
 }

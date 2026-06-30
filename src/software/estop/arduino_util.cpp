@@ -21,11 +21,14 @@ std::optional<std::string> ArduinoUtil::getArduinoPort()
         std::optional<HwInfo> hwInfo = getInfo(device);
         if (hwInfo.has_value())
         {
-            if (hwInfo.value().vendor == ARDUINO_VENDOR_ID &&
-                hwInfo.value().product == ARDUINO_PRODUCT_ID)
+            for (const auto& id : ESTOP_USB_DEVICE_IDS)
             {
-                std::string device_path = (boost::format("/dev/%1%") % device).str();
-                return device_path;
+                if (hwInfo.value().vendor == id.vendor_id &&
+                    hwInfo.value().product == id.product_id)
+                {
+                    std::string device_path = (boost::format("/dev/%1%") % device).str();
+                    return device_path;
+                }
             }
         }
     }

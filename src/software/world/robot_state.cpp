@@ -1,5 +1,7 @@
 #include "software/world/robot_state.h"
 
+#include "software/physics/velocity_conversion_util.h"
+
 RobotState::RobotState(const Point& position, const Vector& velocity,
                        const Angle& orientation, const AngularVelocity& angular_velocity,
                        const bool breakbeam_tripped)
@@ -33,6 +35,11 @@ Vector RobotState::velocity() const
     return velocity_;
 }
 
+Vector RobotState::localVelocity() const
+{
+    return globalToLocalVelocity(velocity_, orientation_);
+}
+
 Angle RobotState::orientation() const
 {
     return orientation_;
@@ -46,6 +53,26 @@ AngularVelocity RobotState::angularVelocity() const
 bool RobotState::breakbeamTripped() const
 {
     return breakbeam_tripped_;
+}
+
+void RobotState::setPosition(const Point& position)
+{
+    position_ = position;
+}
+
+void RobotState::setVelocity(const Vector& velocity)
+{
+    velocity_ = velocity;
+}
+
+void RobotState::setOrientation(const Angle& orientation)
+{
+    orientation_ = orientation;
+}
+
+void RobotState::setAngularVelocity(const AngularVelocity& angular_velocity)
+{
+    angular_velocity_ = angular_velocity;
 }
 
 bool RobotState::operator==(const RobotState& other) const
