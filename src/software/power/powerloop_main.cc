@@ -3,6 +3,7 @@
 #include "chicker.h"
 #include "constants_platformio.h"
 #include "control_executor.h"
+#include "dribbler.h"
 #include "geneva.h"
 #include "power_frame_msg_platformio.h"
 #include "power_monitor.h"
@@ -17,11 +18,21 @@
 #include "software/power/charger.h"
 #include "software/power/chicker.h"
 #include "software/power/control_executor.h"
+#include "software/power/dribbler.h"
 #include "software/power/geneva.h"
 #include "software/power/power_monitor.h"
 #endif
 
 #include <Arduino.h>
+
+#ifdef DEBUG_POWERLOOP
+/**
+ * This section of code is reserved for DIRECT testing on the microcontroller/debug
+ * functionality.
+ */
+void setup() {}
+void loop() {}
+#else
 
 // Used for uart communication
 std::vector<uint8_t> buffer;
@@ -34,6 +45,7 @@ std::shared_ptr<Chicker> chicker;
 std::shared_ptr<PowerMonitor> monitor;
 std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
+std::shared_ptr<Dribbler> dribbler;
 
 void setup()
 {
@@ -41,11 +53,12 @@ void setup()
     receiving    = false;
     sequence_num = 0;
     charger      = std::make_shared<Charger>();
-    chicker      = std::make_shared<Chicker>();
+    chicker      = std::make_shared<Chicker>(charger);
     monitor      = std::make_shared<PowerMonitor>();
     geneva       = std::make_shared<Geneva>();
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
-    charger->chargeCapacitors();
+    dribbler     = std::make_shared<Dribbler>();
+    charger->setCapacitorPin(HIGH);
 }
 
 void loop()
@@ -63,8 +76,16 @@ void loop()
                 if (unmarshalUartPacket(buffer, frame))
                 {
                     // On successful decoding execute the given command
-                    TbotsProto_PowerPulseControl control = frame.power_msg.power_control;
-                    executor->execute(control);
+                    if (frame.which_power_msg == TbotsProto_PowerFrame_power_control_tag)
+                    {
+                        executor->execute(frame.power_msg.power_control);
+                    }
+                    else if (frame.which_power_msg ==
+                             TbotsProto_PowerFrame_dribbler_control_tag)
+                    {
+                        dribbler->setTargetSpeed(
+                            frame.power_msg.dribbler_control.dribbler_speed);
+                    }
                 }
 
                 buffer.clear();
@@ -81,6 +102,8 @@ void loop()
         }
     }
 
+    dribbler->update();
+
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
@@ -95,3 +118,4 @@ void loop()
 
     delay(5);
 }
+#endif

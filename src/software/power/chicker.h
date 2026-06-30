@@ -3,6 +3,10 @@
 #include <Arduino.h>
 #include <pins.h>
 
+#include <memory>
+
+#include "charger.h"
+
 /**
  * Represents the chicker on the power board
  */
@@ -12,7 +16,7 @@ class Chicker
     /**
      * Creates a Chicker setting up relevant pins and attaching interrupts
      */
-    Chicker();
+    explicit Chicker(std::shared_ptr<Charger> charger);
     /**
      * Sets the action of the chicker. Arguments can not be passed to isr's so these
      * need to be set before calling kick/chip
@@ -46,9 +50,12 @@ class Chicker
     static void stopPulse();
     static void offCooldown();
 
+    static std::shared_ptr<Charger> charger_;
+
     static hw_timer_t* pulse_timer;
     static hw_timer_t* cooldown_timer;
 
     static volatile bool on_cooldown;
-    static constexpr int COOLDOWN_MICROSECONDS = 3 * MICROSECONDS_IN_SECOND;
+    static constexpr int COOLDOWN_MICROSECONDS     = 3 * MICROSECONDS_IN_SECOND;
+    static constexpr int CHARGE_DELAY_MILLISECONDS = 5;
 };

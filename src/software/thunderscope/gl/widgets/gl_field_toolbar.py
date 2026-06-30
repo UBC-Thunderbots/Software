@@ -107,7 +107,9 @@ class GLFieldToolbar(GLToolbar):
         )
         self.help_button.setStyleSheet(self.get_button_style())
         self.help_button.clicked.connect(
-            lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
+            lambda: QMessageBox.information(
+                self.window(), "Help", THUNDERSCOPE_HELP_TEXT
+            )
         )
 
         # Setup pause button

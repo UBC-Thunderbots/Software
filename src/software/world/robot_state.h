@@ -1,7 +1,6 @@
 #pragma once
 
 #include "proto/vision.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/geom/angle.h"
@@ -18,6 +17,11 @@ using RobotId = unsigned int;
 class RobotState
 {
    public:
+    /**
+     * Creates a robot state with default values
+     */
+    RobotState() = default;
+
     /**
      * Creates a new robot state with the given position, velocity, orientation, angular
      * velocity, and timestamp
@@ -56,6 +60,13 @@ class RobotState
     Vector velocity() const;
 
     /**
+     * Returns the local velocity of the robot represented by this state
+     *
+     * @return the local velocity of the robot represented by this state
+     */
+    Vector localVelocity() const;
+
+    /**
      * Returns the orientation of the robot represented by this state
      *
      * @return the orientation of the robot represented by this state
@@ -75,6 +86,34 @@ class RobotState
      * @return the breakbeam status of the robot represented by this state
      */
     bool breakbeamTripped() const;
+
+    /**
+     * Sets the position of the robot, with coordinates in metres
+     *
+     * @param position The new position of the robot
+     */
+    void setPosition(const Point& position);
+
+    /**
+     * Sets the velocity of the robot, in metres per second
+     *
+     * @param velocity The new velocity of the robot
+     */
+    void setVelocity(const Vector& velocity);
+
+    /**
+     * Sets the orientation of the robot
+     *
+     * @param orientation The new orientation of the robot
+     */
+    void setOrientation(const Angle& orientation);
+
+    /**
+     * Sets the angular velocity of the robot
+     *
+     * @param angular_velocity The new angular velocity of the robot
+     */
+    void setAngularVelocity(const AngularVelocity& angular_velocity);
 
     /**
      * Defines the equality operator for a RobotState. RobotStates are equal if
