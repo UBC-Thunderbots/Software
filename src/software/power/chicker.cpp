@@ -23,20 +23,14 @@ void Chicker::kick(uint32_t kick_pulse_width)
 {
     oneShotPulse(kick_pulse_width, KICKER_PIN);
     // Charging occurs on rising edge, so toggle the pin
-    delay(CHARGE_DELAY_MILLISECONDS);
-    charger_->setCapacitorPin(LOW);
-    delay(CHARGE_DELAY_MILLISECONDS);
-    charger_->setCapacitorPin(HIGH);
+    charger_->chargeCapacitors();
 }
 
 void Chicker::chip(uint32_t chip_pulse_width)
 {
     oneShotPulse(chip_pulse_width, CHIPPER_PIN);
     // Charging occurs on rising edge, so toggle the pin
-    delay(CHARGE_DELAY_MILLISECONDS);
-    charger_->setCapacitorPin(LOW);
-    delay(CHARGE_DELAY_MILLISECONDS);
-    charger_->setCapacitorPin(HIGH);
+    charger_->chargeCapacitors();
 }
 
 void Chicker::autokick(uint32_t kick_pulse_width)

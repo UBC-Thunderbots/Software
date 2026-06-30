@@ -56,6 +56,5 @@ class Chicker
     static hw_timer_t* cooldown_timer;
 
     static volatile bool on_cooldown;
-    static constexpr int COOLDOWN_MICROSECONDS     = 3 * MICROSECONDS_IN_SECOND;
-    static constexpr int CHARGE_DELAY_MILLISECONDS = 5;
+    static constexpr int COOLDOWN_MICROSECONDS = 3 * MICROSECONDS_IN_SECOND;
 };

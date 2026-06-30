@@ -30,8 +30,33 @@
  * This section of code is reserved for DIRECT testing on the microcontroller/debug
  * functionality.
  */
-void setup() {}
-void loop() {}
+void setup()
+{
+    pinMode(CHRG, OUTPUT);
+
+    // Start with a valid low -> high transition.
+    digitalWrite(CHRG, LOW);
+    delayMicroseconds(100);  // comfortably above LT3750's 20 us requirement
+    digitalWrite(CHRG, HIGH);
+}
+
+void loop()
+{
+    static uint32_t last_charge_edge_ms = 0;
+
+    // Retrigger every 500 ms:
+    // CHRG stays HIGH normally, briefly goes LOW, then returns HIGH.
+    if ((millis() - last_charge_edge_ms) >= 500)
+    {
+        digitalWrite(CHRG, LOW);
+        delayMicroseconds(100);
+        digitalWrite(CHRG, HIGH);
+
+        last_charge_edge_ms = millis();
+    }
+
+    delay(1);
+}
 #else
 
 // Used for uart communication
@@ -58,7 +83,7 @@ void setup()
     geneva       = std::make_shared<Geneva>();
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     dribbler     = std::make_shared<Dribbler>();
-    charger->setCapacitorPin(HIGH);
+    charger->chargeCapacitors();
 }
 
 void loop()
@@ -103,6 +128,9 @@ void loop()
     }
 
     dribbler->update();
+
+    // Minimal LT3750 maintenance.
+    charger->maintainCharge();
 
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
