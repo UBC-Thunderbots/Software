@@ -19,6 +19,11 @@ class ControllerBase(ABC):
         """Release any resources held by the input source."""
         ...
 
+    def update(self) -> None:
+        """Refresh controller input state. Called once per frame before reading inputs.
+        Override for polled backends; push-based controllers can leave this as a no-op."""
+        pass
+
     @abstractmethod
     def get_move_velocity(self) -> tuple[float, float, float]:
         """Return (x, y, angular) velocity, each normalized to [-1, 1] with deadzone applied.

@@ -1,11 +1,5 @@
 import numpy
 
-# TODO: remove the try-catch when we rewrite this with macOS-compatible lib
-try:
-    import evdev
-except ImportError:
-    pass
-
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore
@@ -56,20 +50,13 @@ class HandheldControllerWidget(QWidget):
         self.detect_controller()
 
     def detect_controller(self) -> None:
-        """Scan through the list of currently connected devices for a supported
-        handheld controller and, if one is found, set it as the device to accept
+        """Scan the currently connected devices for a supported handheld
+        controller and, if one is found, set it as the device to accept
         controller inputs from.
         """
         if self.handheld_controller is not None:
             self.handheld_controller.close()
-        self.handheld_controller = None
-
-        for path in evdev.list_devices():
-            device = evdev.InputDevice(path)
-            if device.name in DiagnosticsConstants.SUPPORTED_CONTROLLERS:
-                self.handheld_controller = HandheldController(path)
-                break
-
+        self.handheld_controller = HandheldController.detect()
         self.__update_controller_status()
 
     def use_keyboard_controller(self) -> None:
@@ -90,7 +77,10 @@ class HandheldControllerWidget(QWidget):
         if self.handheld_controller is None:
             return
 
+        self.handheld_controller.update()
+
         if not self.handheld_controller.connected():
+            self.handheld_controller.close()
             self.handheld_controller = None
             self.__update_controller_status()
             return
