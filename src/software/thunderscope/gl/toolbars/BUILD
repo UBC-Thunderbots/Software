@@ -28,6 +28,8 @@ py_library(
         ":gl_toolbar",
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
+        "//software/thunderscope/gl/widgets:gl_runtime_installer",
+        "//software/thunderscope/gl/widgets:gl_runtime_selector",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
         requirement("pyqtgraph"),

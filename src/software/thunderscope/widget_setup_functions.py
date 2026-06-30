@@ -151,23 +151,9 @@ def setup_gl_widget(
     gl_widget.add_layer(referee_layer)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
-    simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
 
-    # connect all sandbox controls if using sandbox mode
-    simulation_control_toolbar.undo_button.clicked.connect(world_layer.undo)
-    simulation_control_toolbar.redo_button.clicked.connect(world_layer.redo)
-    simulation_control_toolbar.reset_button.clicked.connect(
-        world_layer.reset_to_pre_sim
-    )
-    world_layer.undo_toggle_enabled_signal.connect(
-        simulation_control_toolbar.toggle_undo_enabled
-    )
-    world_layer.redo_toggle_enabled_signal.connect(
-        simulation_control_toolbar.toggle_redo_enabled
-    )
-    simulation_control_toolbar.pause_button.clicked.connect(
-        world_layer.toggle_play_state
-    )
+    sandbox_sidebar = gl_widget.get_sandbox_sidebar()
+    
     sim_proto_unix_io.register_observer(
         SimulationState, simulation_control_toolbar.simulation_state_buffer
     )
@@ -176,6 +162,30 @@ def setup_gl_widget(
     )
     sim_proto_unix_io.register_observer(
         SimulationState, gl_widget.simulation_state_buffer
+    )
+    sim_proto_unix_io.register_observer(
+        SimulationState, sandbox_sidebar.simulation_state_buffer
+    )
+
+    simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
+
+    # connect all sandbox controls
+    sandbox_sidebar.register_sandbox_mode_callback(
+        simulation_control_toolbar.set_sandbox_enabled
+    )
+    sandbox_sidebar.register_sandbox_mode_callback(
+        world_layer.set_sandbox_enabled
+    )
+    sandbox_sidebar.pause_button.clicked.connect(
+        world_layer.toggle_play_state
+    )
+    sandbox_sidebar.undo_button.clicked.connect(world_layer.undo)
+    sandbox_sidebar.redo_button.clicked.connect(world_layer.redo)
+    world_layer.undo_toggle_enabled_signal.connect(
+        sandbox_sidebar.toggle_undo_enabled
+    )
+    world_layer.redo_toggle_enabled_signal.connect(
+        sandbox_sidebar.toggle_redo_enabled
     )
 
     for arg in [

@@ -20,7 +20,7 @@ class GLToolbar(QWidget):
         super(GLToolbar, self).__init__(parent=parent)
 
         # Setup toolbar
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
         self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
@@ -28,3 +28,12 @@ class GLToolbar(QWidget):
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""
         raise NotImplementedError("Subclasses must implement this method!")
+
+    def add_separator(self, layout: QBoxLayout) -> None:
+        """Adds a separator line with enough spacing to the given layout
+
+        :param layout: the layout to add the separator to
+        """
+        layout.addSpacing(10)
+        layout.addWidget(QLabel("<b>|</b>"))
+        layout.addSpacing(10)

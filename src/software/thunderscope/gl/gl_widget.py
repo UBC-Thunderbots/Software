@@ -7,7 +7,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
 import numpy as np
-from typing import Optional
+from typing import Callable, Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
@@ -87,14 +87,6 @@ class GLWidget(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.gl_view_widget)
 
-        # Setup sandbox sidebar
-        self.sandbox_sidebar_visible = False
-        self.sandbox_mode_enabled = False
-        self.sandbox_mode_callback = None
-        self.sandbox_sidebar = GLSandboxSidebar(
-            parent=self.gl_view_widget, on_sandbox_mode_toggle=self.toggle_sandbox_mode
-        )
-
         # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
@@ -110,8 +102,16 @@ class GLWidget(QWidget):
             toolbars_menu=self.toolbars_menu,
             replay_mode=player is not None,
             on_add_bookmark=self.add_bookmark,
-            on_toggle_sidebar=self.toggle_sidebar_visibility,
         )
+
+        # Setup sandbox sidebar
+        self._sandbox_mode_callbacks: list[Callable[[bool], None]] = []
+        self.sandbox_sidebar = GLSandboxSidebar(
+            parent=self.gl_view_widget, 
+            widget_above=self.simulation_control_toolbar
+        )
+        # let toolbar update the sidebar visibility
+        self.simulation_control_toolbar.set_sidebar_visibility_callback(self.sandbox_sidebar.toggle_visibility)
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
@@ -142,6 +142,10 @@ class GLWidget(QWidget):
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""
         return self.simulation_control_toolbar
+
+    def get_sandbox_sidebar(self):
+        """Returns the sandbox mode sidebar"""
+        return self.sandbox_sidebar
 
     @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -277,7 +281,12 @@ class GLWidget(QWidget):
 
         if self.simulation_control_toolbar:
             self.simulation_control_toolbar.refresh()
+
+        if self.gamecontroller_toolbar:
             self.gamecontroller_toolbar.refresh()
+
+        if self.sandbox_sidebar:
+            self.sandbox_sidebar.refresh()
 
         simulation_state = self.simulation_state_buffer.get(block=False)
         # Don't refresh the layers if the simulation is paused
@@ -336,17 +345,6 @@ class GLWidget(QWidget):
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)
-
-    def toggle_sidebar_visibility(self) -> None:
-        """Toggles whether the sandbox sidebar is displayed"""
-        self.sidebar_enabled = not self.sidebar_enabled
-        self.sandbox_sidebar.toggle_visibility(self.sidebar_enabled)
-
-    def toggle_sandbox_mode(self) -> None:
-        self.sandbox_mode_enabled = not self.sandbox_mode_enabled
-
-        if self.sandbox_mode_callback:
-            self.sandbox_mode_callback(self.sandbox_mode_enabled)
 
     def __add_toolbar_toggle(self, toolbar: QWidget, name: str) -> None:
         """Adds a button to the toolbar menu to toggle the given toolbar
@@ -414,3 +412,18 @@ class GLWidget(QWidget):
         )
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
         success_toast(self.parentWidget(), "Added bookmark!")
+
+    def register_sandbox_mode_callback(
+        self, callback: Callable[[bool], None]
+    ) -> None:
+        """Register a callback that will be called when sandbox mode is toggled.
+
+        :param callback: A callable that takes one boolean argument (the new state).
+        """
+        self._sandbox_mode_callbacks.append(callback)
+
+    def toggle_sandbox_mode(self) -> None:
+        """Toggle sandbox mode on/off and notify all registered callbacks."""
+        self.sandbox_mode_enabled = not self.sandbox_mode_enabled
+        for callback in self._sandbox_mode_callbacks:
+            callback(self.sandbox_mode_enabled)

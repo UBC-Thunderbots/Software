@@ -14,6 +14,10 @@ from software.thunderscope.common.common_widgets import (
 from software.thunderscope.gl.toolbars.gl_toolbar import GLToolbar
 import qtawesome as qta
 
+# Sandbox status label colors
+ON_COLOR = "#FF0000"
+OFF_COLOR = "#00D000"
+
 
 class GLFieldToolbar(GLToolbar):
     """Toolbar for the GL Field Widget
@@ -37,9 +41,6 @@ class GLFieldToolbar(GLToolbar):
         """Set up the toolbar with these buttons:
 
         - Layers select menu
-        - Undo
-        - Pause
-        - Redo
         - Help
         - Measure Mode Toggle
         - Camera View Select menu
@@ -112,10 +113,7 @@ class GLFieldToolbar(GLToolbar):
             )
         )
 
-        # Setup pause button
-        self.pause_button = StyledButton()
-        self.toggle_pause_button(True)
-        # buffer for the simulator pause / play state
+        # buffer for the simulator state
         self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
 
         # Setup Toolbars button for toggling visibility of toolbars
@@ -150,48 +148,55 @@ class GLFieldToolbar(GLToolbar):
                 lambda new_speed=speed: self.speed_callback(new_speed),
             )
 
+        self.sandbox_sidebar_visible = False
+        self.sidebar_visibility_callback = None
+
+        self.sidebar_button_container = QWidget()
+        sidebar_button_layout = QHBoxLayout()
+        sidebar_button_layout.setContentsMargins(0, 0, 0, 0)
+        sidebar_button_layout.setSpacing(4)
+
+        # button to show sidebar
         self.sandbox_sidebar_button = StyledButton()
+        self.sandbox_sidebar_button.setText("Sandbox Mode")
         self.sandbox_sidebar_button.setToolTip("Toggle Sandbox Sidebar")
-        self.sandbox_sidebar_button.setIcon(
-            qta.icon("mdi.view-sidebar-outline", color=self.BUTTON_ICON_COLOR)
-        )
-        self.sandbox_sidebar_button.clicked.connect(self.on_toggle_sidebar)
+        self.sandbox_sidebar_button.clicked.connect(self.toggle_sidebar_visibility)
+
+        # label to indicate sandbox mode state
+        self.sandbox_sidebar_label = QLabel()
+
+        sidebar_button_layout.addWidget(self.sandbox_sidebar_button)
+        sidebar_button_layout.addWidget(self.sandbox_sidebar_label)
+        self.sidebar_button_container.setLayout(sidebar_button_layout)
+
+        # turn off sandbox mode as default
+        self.set_sandbox_mode_enabled(False)
 
         # Setup toolbar
         self.layout().addWidget(self.layers_button)
+        self.add_separator(self.layout())
         self.layout().addWidget(self.toolbars_button)
-        self.layout().addStretch()
+        self.add_separator(self.layout())
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
-        self.layout().addWidget(self.sandbox_sidebar_button)
 
         if not replay_mode:
             self.layout().addWidget(self.bookmark_button)
+            
+        self.layout().addStretch()
+        self.layout().addWidget(self.sandbox_sidebar_container)
 
     @override
     def refresh(self) -> None:
-        """Refreshes the UI for all the toolbar icons and updates toolbar position"""
-        # update the pause button state
+        """Updates the sim speed"""
         simulation_state = self.simulation_state_buffer.get(
             block=False, return_cached=False
         )
         if simulation_state:
-            self.toggle_pause_button(simulation_state.is_playing)
             self.update_simulation_speed(simulation_state.simulation_speed)
 
-    def toggle_pause_button(self, is_playing: bool) -> None:
-        """Toggles the state of the pause button by updating its text and icon
-
-        :param is_playing: True if the button is in the Play state, False if its in the Pause state
-        """
-        self.pause_button.setToolTip("Pause" if is_playing else "Play")
-        self.pause_button.setIcon(
-            qta.icon(
-                "fa6s.pause" if is_playing else "fa5s.play",
-                color=self.BUTTON_ICON_COLOR,
-            )
-        )
+        self.setGeometry(0, 0, self.parentWidget().width(), self.height())
 
     def update_simulation_speed(self, speed: float) -> None:
         """Updates the simulation speed label
@@ -200,22 +205,6 @@ class GLFieldToolbar(GLToolbar):
         """
         self.sim_speed_button.setText(f"Speed: {speed:.2f}x")
 
-    def toggle_undo_enabled(self, enabled: bool) -> None:
-        """Callback function to enable / disable the undo button based on the given state
-
-        :param enabled: if the undo button is enabled or not
-        """
-        self.undo_button.toggle_enabled(enabled)
-        self.undo_button.repaint()
-
-    def toggle_redo_enabled(self, enabled: bool) -> None:
-        """Callback function to enable / disable the redo button based on the given state
-
-        :param enabled: if the redo button is enabled or not
-        """
-        self.redo_button.toggle_enabled(enabled)
-        self.redo_button.repaint()
-
     def set_speed_callback(self, callback: Callable[[float], None]) -> None:
         """Sets the callback function for updating the simulation speed
 
@@ -223,9 +212,26 @@ class GLFieldToolbar(GLToolbar):
         """
         self.speed_callback = callback
 
-    def set_sandbox_toggle_callback(self, callback: Callable[[bool], None]) -> None:
-        """Sets the callback function for toggling sandbox mode
+    def set_sidebar_visibility_callback(self, callback: Callable[[float], None]) -> None:
+        """Sets the callback function for toggling sidebar visibility
 
-        :param callback: the callback function to toggle sandbox mode
+        :param callback: the callback function for toggling sidebar visibility
         """
-        self.sandbox_toggle_callback = callback
+        self.sidebar_visibility_callback = callback
+
+    def toggle_sidebar_visibility(self) -> None:
+        self.sandbox_sidebar_visible = not self.sandbox_sidebar_visible
+        if self.sidebar_visibility_callback:
+            self.sidebar_visibility_callback(self.sandbox_sidebar_visible)
+
+    def set_sandbox_mode_enabled(self, enabled: bool) -> None:
+        """Sets the sandbox enabled state and updates the label
+
+        :param enabled: whether sandbox mode is enabled
+        """
+        self.sandbox_enabled = enabled
+        color = ON_COLOR if enabled else OFF_COLOR
+        self.sandbox_sidebar_label.setText("On" if enabled else "Off")
+        self.sandbox_sidebar_label.setStyleSheet(
+            f"color: {color}; font-weight: bold;"
+        )

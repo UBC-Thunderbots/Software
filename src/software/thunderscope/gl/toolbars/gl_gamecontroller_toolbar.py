@@ -10,7 +10,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.widgets.gl_runtime_installer import (
     GLRuntimeInstallerDialog,
 )
-from software.thunderscope.common.common_widgets import ToggleableButton
+from software.thunderscope.common.common_widgets import ToggleableButton, StyledButton
 import qtawesome as qta
 
 
@@ -118,17 +118,17 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__toggle_normal_start_button()
 
         self.layout().addWidget(QLabel("<b>Gamecontroller</b>"))
-        self.__add_separator(self.layout())
+        self.add_separator(self.layout())
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
         self.layout().addWidget(self.force_start_button)
-        self.__add_separator(self.layout())
+        self.add_separator(self.layout())
         self.layout().addWidget(self.plays_menu_button)
         self.layout().addWidget(self.normal_start_button)
-        self.__add_separator(self.layout())
+        self.add_separator(self.layout())
         self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
-        self.__add_separator(self.layout())
+        self.add_separator(self.layout())
         self.layout().addWidget(self.runtime_installer_button)
         self.layout().addWidget(self.runtime_selector_button)
 
@@ -137,14 +137,6 @@ class GLGamecontrollerToolbar(GLToolbar):
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
-    def __add_separator(self, layout: QBoxLayout) -> None:
-        """Adds a separator line with enough spacing to the given layout
-
-        :param layout: the layout to add the separator to
-        """
-        layout.addSpacing(10)
-        layout.addWidget(QLabel("<b>|</b>"))
-        layout.addSpacing(10)
 
     def __add_plays_menu_items(self, is_blue: bool) -> None:
         """Initializes the plays menu with the available plays for the given team
@@ -223,7 +215,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param display_text: optional param if button needs both text and an icon
         :return: the button
         """
-        button = ToggleableButton()
+        button = ToggleableButton(enabled=True)
         button.setIcon(icon)
         button.setToolTip(tooltip)
         button.clicked.connect(callback)
@@ -231,7 +223,6 @@ class GLGamecontrollerToolbar(GLToolbar):
         if display_text:
             button.setText(display_text)
 
-        button.toggle_enabled(True)
         return button
 
     def __send_stop_command(self) -> None:

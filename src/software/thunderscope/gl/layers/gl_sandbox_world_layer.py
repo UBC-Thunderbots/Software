@@ -127,6 +127,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations = []
         self.redo_operations = []
 
+        self.sandbox_enabled = False
+
     @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Requires Ctrl + Shift to be pressed along with mouse click
@@ -377,6 +379,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """Resets all robot positions to what they were before the simulator ran"""
         for robot_id, state in self.pre_sim_robot_positions.items():
             self.__update_world_state(robot_id, state[0], state[1])
+
+    def set_sandbox_enabled(self, enabled: bool) -> None:
+        """Sets the sandbox mode enabled state
+
+        :param enabled: whether sandbox mode is enabled
+        """
+        self.sandbox_enabled = enabled
 
     def __add_undo_operation(self, operation: RobotOperation) -> None:
         """Adds an undo operation to the list and emits the toggle enable signal

@@ -4,6 +4,7 @@ from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
 from software.thunderscope.util import color_from_gradient
 from typing import override
+import textwrap
 
 
 class FloatSlider(QSlider):
