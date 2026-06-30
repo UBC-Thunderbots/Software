@@ -318,10 +318,7 @@ def start_interactive_cli():
         "What would you like to do?",
         choices=CATEGORY_CHOICES,
         style=INTERACTIVE_STYLE,
-    ).ask()
-
-    if not category:
-        return
+    ).unsafe_ask()
 
     match category:
         case "Run thunderscope":
@@ -331,25 +328,25 @@ def start_interactive_cli():
                 "Launch mode?",
                 choices=LAUNCH_MODE_CHOICES,
                 style=INTERACTIVE_STYLE,
-            ).ask()
+            ).unsafe_ask()
             if launch == "Simulator":
                 selected = questionary.checkbox(
                     "Options:",
                     choices=THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
                     style=INTERACTIVE_STYLE,
-                ).ask()
+                ).unsafe_ask()
                 for opt in selected:
                     extra_args.extend([f"--{opt}"])
                     if opt == "record_stats":
                         time = questionary.text(
                             "Enter record stats duration (minutes):",
                             style=INTERACTIVE_STYLE,
-                        ).ask()
+                        ).unsafe_ask()
                         extra_args.extend([time])
             else:
                 iface = questionary.text(
                     "Network interface?", style=INTERACTIVE_STYLE
-                ).ask()
+                ).unsafe_ask()
                 extra_args.extend(["--run_diagnostics", "--interface", iface])
 
         case "Test":
@@ -357,7 +354,7 @@ def start_interactive_cli():
             test_name = questionary.text(
                 "Enter test name (leave empty for entire suite)",
                 style=INTERACTIVE_STYLE,
-            ).ask()
+            ).unsafe_ask()
             if not test_name:
                 config.test_suite = True
             else:
@@ -365,7 +362,7 @@ def start_interactive_cli():
                 runs_str = questionary.text(
                     "Number of times to run each test (leave empty for 1):",
                     style=INTERACTIVE_STYLE,
-                ).ask()
+                ).unsafe_ask()
                 if runs_str and runs_str.isdigit() and int(runs_str) > 1:
                     config.runs = int(runs_str)
 
@@ -376,7 +373,7 @@ def start_interactive_cli():
                 "Select playbook:",
                 choices=PLAYBOOK_CHOICES,
                 style=INTERACTIVE_STYLE,
-            ).ask()
+            ).unsafe_ask()
 
             if playbook_choice == DEBUG_POWERLOOP_PLAYBOOK:
                 config.ansible_playbook = "deploy_powerboard.yml"
@@ -390,17 +387,17 @@ def start_interactive_cli():
                         "Options:",
                         choices=DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
                         style=INTERACTIVE_STYLE,
-                    ).ask()
+                    ).unsafe_ask()
                     or []
                 )
                 config.disable_power_service = "DISABLE_POWER_SERVICE" in selected
                 config.disable_motor_service = "DISABLE_MOTOR_SERVICE" in selected
             config.robot_name = questionary.text(
                 "Robot name?", style=INTERACTIVE_STYLE
-            ).ask()
+            ).unsafe_ask()
             config.ssh_password = questionary.password(
                 "SSH password?", style=INTERACTIVE_STYLE
-            ).ask()
+            ).unsafe_ask()
 
     validate(config)
     command = create_command(config, extra_args)
