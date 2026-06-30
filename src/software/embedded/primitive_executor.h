@@ -147,6 +147,14 @@ class PrimitiveExecutor
     Duration linear_blend_remaining_;
     Duration angular_blend_remaining_;
 
+    // How long the robot has been parked at the end (destination) of the trajectory it
+    // is currently following. Advanced each step once the trajectory's elapsed time
+    // reaches its total time, and reset to zero while the robot is still traversing the
+    // trajectory or starts following a new one. Used to time out and switch to a newer
+    // trajectory when the onboard estimate believes the robot has arrived but the AI
+    // still wants it to keep moving.
+    Duration time_at_trajectory_end_;
+
     PositionController position_controller_;
     OrientationController orientation_controller_;
 
@@ -165,7 +173,7 @@ class PrimitiveExecutor
     // look-ahead keeps the target leading the robot slightly so it makes forward progress
     // and tracking lag is reduced. The elapsed time itself still advances by delta_time
     // each step; this offset only shifts where we sample.
-    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.35;
+    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.15;
 
     // If the final destination or any subdestination of the new trajectory differs from
     // the current one by more than this distance, we switch to the new trajectory.
@@ -184,6 +192,21 @@ class PrimitiveExecutor
     // If the new angular trajectory's final orientation differs from the current one's
     // by more than this, we switch to the new angular trajectory.
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
+
+    // If the robot has reached the end of its current trajectory but newly received
+    // trajectories indicate it still hasn't reached the destination (the AI's view
+    // disagrees with the onboard estimate), switch to the new trajectory once the robot
+    // has been parked at the end of the current trajectory for this long. This
+    // resynchronizes the robot with the AI's view when the onboard estimate prematurely
+    // believes the robot has arrived.
+    static constexpr double REACHED_DESTINATION_TIMEOUT_S = 0.5;
+
+    // When deciding whether the newly received trajectory still wants the robot to move,
+    // we compare the AI's view of the robot's current position (the new trajectory's
+    // start) against the new trajectory's destination. This uses a much smaller
+    // threshold than DESTINATION_THRESHOLD_M so that even a small remaining distance to
+    // the destination counts as "not yet arrived" and keeps the robot inching toward it.
+    static constexpr double NEW_TRAJECTORY_REACHED_DESTINATION_THRESHOLD_M = 0.02;
 
     // Duration over which we blend the velocity setpoint from the old trajectory into
     // the new one after switching, so the setpoint doesn't change abruptly. Kept short
