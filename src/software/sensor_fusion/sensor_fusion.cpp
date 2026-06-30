@@ -63,20 +63,24 @@ void SensorFusion::processSensorProto(const SensorProto& sensor_msg)
 
     updateWorld(sensor_msg.robot_status_msgs());
 
-    friendly_team.assignGoalie(friendly_goalie_id);
-    enemy_team.assignGoalie(enemy_goalie_id);
+    unsigned int unresolved_friendly_goalie_id = friendly_goalie_id;
+    unsigned int unresolved_enemy_goalie_id    = enemy_goalie_id;
 
     if (sensor_fusion_config.override_game_controller_friendly_goalie_id())
     {
         RobotId friendly_goalie_id_override = sensor_fusion_config.friendly_goalie_id();
-        friendly_team.assignGoalie(friendly_goalie_id_override);
+        unresolved_friendly_goalie_id       = friendly_goalie_id_override;
     }
 
     if (sensor_fusion_config.override_game_controller_enemy_goalie_id())
     {
         RobotId enemy_goalie_id_override = sensor_fusion_config.enemy_goalie_id();
-        enemy_team.assignGoalie(enemy_goalie_id_override);
+        unresolved_enemy_goalie_id       = enemy_goalie_id_override;
     }
+
+    friendly_team.assignGoalie(
+        resolveGoalieId(friendly_team, unresolved_friendly_goalie_id));
+    enemy_team.assignGoalie(resolveGoalieId(enemy_team, unresolved_enemy_goalie_id));
 }
 
 
@@ -468,6 +472,33 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
     return ball_detection;
+}
+
+unsigned int SensorFusion::resolveGoalieId(const Team& team, unsigned int goalie_id)
+{
+    // If the desired goalie exists on the team, use it
+    if (team.getRobotById(goalie_id).has_value())
+    {
+        return goalie_id;
+    }
+
+    // Otherwise, find the lowest robot ID present on the team
+    const auto& all_robots = team.getAllRobots();
+    if (!all_robots.empty())
+    {
+        RobotId lowest_id = all_robots.front().id();
+        for (const auto& robot : all_robots)
+        {
+            if (robot.id() < lowest_id)
+            {
+                lowest_id = robot.id();
+            }
+        }
+        return lowest_id;
+    }
+
+    // If there are no robots on the team yet, fall back to the desired goalie ID
+    return goalie_id;
 }
 
 bool SensorFusion::teamHasBall(const Team& team, const Ball& ball)

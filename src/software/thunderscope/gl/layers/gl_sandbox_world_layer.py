@@ -10,6 +10,7 @@ from software.py_constants import *
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.constants import Colors, DepthValues
 
 
 class Operation(ABC):
@@ -72,6 +73,10 @@ class EnemyAtMousePositionError(Exception):
     pass
 
 
+class LastRobotRemoveError(Exception):
+    pass
+
+
 class GLSandboxWorldLayer(GLWorldLayer):
     """GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field"""
 
@@ -79,6 +84,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
     redo_toggle_enabled_signal = pyqtSignal(bool)
 
     DEFAULT_ROBOT_ANGLE = 0
+
+    MIN_ROBOT_ID = 0
 
     def __init__(
         self,
@@ -119,10 +126,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # (easier to keep track of robots rather than removing the entry entirely)
         self.local_robot_positions: dict[int, tuple[QVector3D, float]] = {}
 
-        # the state of robots before running the simulator
-        # the robot state if only manual moves are considered
-        self.pre_sim_robot_positions: dict[int, tuple[QVector3D, float]] = {}
-
         # stacks for undo and redo operations
         self.undo_operations = []
         self.redo_operations = []
@@ -162,7 +165,17 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.__handle_new_robot_event(event)
         else:
             # if a robot was clicked
-            self.__handle_existing_robot_event(event, robot_id, index)
+            try:
+                self.__handle_existing_robot_event(event, robot_id, index)
+            except LastRobotRemoveError:
+                # if the user attempted to remove the last robot
+                # self.__display_last_remove_warning(event)
+                return
+
+        # robots are normally auto-rendered by refresh fn when sim is unpaused
+        # when sim is paused, have to manually render
+        if not self.is_playing:
+            self._update_robots_graphics()
 
     @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
@@ -225,6 +238,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 self.selected_robot_id, point_on_current_plane, self.DEFAULT_ROBOT_ANGLE
             )
 
+            # robots are normally auto-rendered by refresh fn when sim is unpaused
+            # when sim is paused, have to manually render
+            if not self.is_playing:
+                self._update_robots_graphics()
+
     @override
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Reset the selected robot and the in progress move
@@ -258,14 +276,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # for robots in the world, add the ids them to curr robots
             for robot in self.cached_world.friendly_team.team_robots:
                 self.curr_robot_ids.add(robot.id)
-                self.pre_sim_robot_positions[robot.id] = (
-                    QVector3D(
-                        robot.current_state.global_position.x_meters,
-                        robot.current_state.global_position.y_meters,
-                        0,
-                    ),
-                    robot.current_state.global_orientation.radians,
-                )
 
             self.next_id = len(self.curr_robot_ids)
             self.should_init_curr_robot_ids = False
@@ -285,15 +295,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_operations.append(operation.reverse(self.next_id))
 
         # apply the operation
-        if isinstance(operation, GroupOperation):
-            for op in operation.operations:
-                self.__undo_redo_internal(op)
-        else:
-            self.__undo_redo_internal(operation)
+        self.__undo_redo_internal(operation)
 
         # enable / disable the undo and redo buttons
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
+
+        # robots are normally auto-rendered by refresh fn when sim is unpaused
+        # when sim is paused, have to manually render
+        if not self.is_playing:
+            self._update_robots_graphics()
 
     def redo(self) -> None:
         """Redoes the last undo operation
@@ -310,15 +321,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations.append(operation.reverse(self.next_id))
 
         # apply the operation
-        if isinstance(operation, GroupOperation):
-            for op in operation.operations:
-                self.__undo_redo_internal(op)
-        else:
-            self.__undo_redo_internal(operation)
+        self.__undo_redo_internal(operation)
 
         # enable / disable the undo and redo buttons
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
+
+        # robots are normally auto-rendered by refresh fn when sim is unpaused
+        # when sim is paused, have to manually render
+        if not self.is_playing:
+            self._update_robots_graphics()
 
     def clear_field(self) -> None:
         """Removes all robots from the field.
@@ -345,15 +357,17 @@ class GLSandboxWorldLayer(GLWorldLayer):
             )
 
         # then, update with local state
-        for robot_id, pos in self.local_robot_positions.items():
+        for robot_id, pos_and_orient in self.local_robot_positions.items():
             # if the local robot has already been removed, skip it
-            if pos is None:
+            if pos_and_orient is None:
                 continue
+
+            position, _ = pos_and_orient
 
             operations[robot_id] = RobotOperation(
                 id=robot_id,
                 prev_pos=None,
-                pos=pos,
+                pos=position,
                 next_id=self.next_id,
             )
 
@@ -363,7 +377,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         # clear internal state
         self.curr_robot_ids.clear()
-        self.pre_sim_robot_positions.clear()
         self.local_robot_positions.clear()
 
         # clear redo list since this is a new action
@@ -371,8 +384,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_toggle_enabled_signal.emit(False)
 
         # send out empty world state
-        world_state = WorldState()
+        world_state = self.__get_empty_world_state()
+
         self.simulator_io.send_proto(WorldState, world_state)
+
+        # robots are normally auto-rendered by refresh fn when sim is unpaused
+        # when sim is paused, have to manually render
+        if not self.is_playing:
+            self._update_robots_graphics()
 
     @override
     def toggle_play_state(self) -> bool:
@@ -387,11 +406,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.local_robot_positions = {}
 
         return curr_play_state
-
-    def reset_to_pre_sim(self) -> None:
-        """Resets all robot positions to what they were before the simulator ran"""
-        for robot_id, state in self.pre_sim_robot_positions.items():
-            self.__update_world_state(robot_id, state[0], state[1])
 
     def set_sandbox_enabled(self, enabled: bool) -> None:
         """Sets the sandbox mode enabled state and syncs undo / redo enable state
@@ -414,25 +428,55 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations.append(operation)
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
 
-    def __undo_redo_internal(self, operation: RobotOperation) -> None:
-        """Helper method to apply a RobotOperation
+    def __undo_redo_internal(self, operation: Operation) -> None:
+        """Helper method to apply an Operation
         Updates robot positions and the next id
 
         :param operation: the operation to apply
         """
-        self.next_id = operation.next_id
-        self.__update_world_state(
-            operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
-        )
+        if isinstance(operation, GroupOperation):
+            self.next_id = float("inf")
+
+            world_state = self.__get_curr_world_state()
+
+            for inner_op in operation.operations:
+                self.next_id = int(min(self.next_id, inner_op.next_id))
+                world_state = self.__update_with_new_position(
+                    world_state, inner_op.id, inner_op.pos, self.DEFAULT_ROBOT_ANGLE
+                )
+
+            # send out world state
+            self.simulator_io.send_proto(WorldState, world_state)
+        else:
+            self.next_id = operation.next_id
+            self.__update_world_state(
+                operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
+            )
 
     def __get_empty_world_state(self) -> WorldState:
-        """Constructs an empty WorldState with just the ball state filled in
-        from the cached world state
+        """Constructs a WorldState with just the ball state filled in
+        from the cached world state and 1 robot placed at
+        the edge of the center circle on the half line
 
-        :return: the empty world state with ball state
+        Replaces all local states as well
+
+        :return: the base world state with ball state and 1 robot
         """
         world_state = WorldState()
         world_state.ball_state.CopyFrom(self.cached_world.ball.current_state)
+
+        center_circle_radius = self.cached_world.field.center_circle_radius
+        robot_pos = QVector3D(-center_circle_radius, 0, 0)
+
+        for robot_id in self.local_robot_positions.keys():
+            self.local_robot_positions[robot_id] = None
+
+        world_state = self.__update_with_new_position(
+            world_state, self.MIN_ROBOT_ID, robot_pos, self.DEFAULT_ROBOT_ANGLE
+        )
+
+        self.next_id = self.MIN_ROBOT_ID + 1
+
         return world_state
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -462,6 +506,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_remove_double_click
             and self.robot_remove_double_click == event.multi_plane_points[index]
         ):
+            # prevent removing the last robot
+            if len(self.curr_robot_ids) <= 1:
+                self.__toggle_robot_remove_double_click()
+                raise LastRobotRemoveError("Trying to remove the final robot!")
+
             # add an undo operation to add back the robot
             self.__add_undo_operation(
                 RobotOperation(
@@ -480,6 +529,18 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # start a remove double click
             self.robot_remove_double_click = event.multi_plane_points[index]
             QTimer.singleShot(500, self.__toggle_robot_remove_double_click)
+
+    def __display_last_remove_warning(self, event: MouseInSceneEvent) -> None:
+        warning = GLTextItem(font=GLWorldLayer.TEXT_GRAPHICS_QFONT, color=Colors.RED)
+        warning.show()
+        warning.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
+        warning.setData(
+            text="Can't remove last robot!",
+            pos=[
+                event.position().x() - int(warning.width() / 2),
+                event.position().y() + int(warning.height() * 1.1),
+            ],
+        )
 
     def __handle_new_robot_event(self, event: MouseInSceneEvent) -> None:
         """Handles a mouse event when an empty position is clicked
@@ -567,7 +628,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
         """Removes a robot with the given id from the right team in the given world state
-        Based on current team color
+        Based on current team color, then shifts down all higher robot IDs to fill the gap
 
         :param world_state: the world state to remove robot from
         :param id: the id of the robot to remove
@@ -647,23 +708,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 return index
         return None
 
-    def __update_world_state(
-        self,
-        new_robot_id: int,
-        new_pos: Optional[QVector3D],
-        new_orientation: float,
-        clear_redo=True,
-    ) -> None:
-        """Send out a WorldState proto with the existing robots
-        If new position is provided, adds a robot with the given id at the given position
-        Else, removes the robot with the given id from the robot state
-
-        :param new_robot_id: the id of the robot to add / remove / move
-        :param new_pos: the new QVector3D position of the robot (None if robot to be removed)
-        :param new_orientation: the new orientation of the robot (radians)
-        :param clear_redo: If True, indicates a new action instead of an action from the undo/redo list.
-                            clears redo list if True
-        """
+    def __get_curr_world_state(self) -> WorldState:
         world_state = WorldState()
 
         # copy over existing robots for the current team
@@ -689,6 +734,27 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 world_state = self.__add_robot_to_state(
                     world_state, robot_id, pos[0], pos[1]
                 )
+
+        return world_state
+
+    def __update_world_state(
+        self,
+        new_robot_id: int,
+        new_pos: Optional[QVector3D],
+        new_orientation: float,
+        clear_redo=True,
+    ) -> None:
+        """Send out a WorldState proto with the existing robots
+        If new position is provided, adds a robot with the given id at the given position
+        Else, removes the robot with the given id from the robot state
+
+        :param new_robot_id: the id of the robot to add / remove / move
+        :param new_pos: the new QVector3D position of the robot (None if robot to be removed)
+        :param new_orientation: the new orientation of the robot (radians)
+        :param clear_redo: If True, indicates a new action instead of an action from the undo/redo list.
+                            clears redo list if True
+        """
+        world_state = self.__get_curr_world_state()
 
         world_state = self.__update_with_new_position(
             world_state, new_robot_id, new_pos, new_orientation
@@ -724,18 +790,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 world_state, robot_id, new_pos, new_orientation
             )
 
-            # saves the state to local and pre-sim dicts
-            self.pre_sim_robot_positions[robot_id] = (new_pos, new_orientation)
-            if not self.is_playing:
-                # update the local state to the converted position
-                self.local_robot_positions[robot_id] = (
-                    new_pos,
-                    new_orientation,
-                )
+            # saves the state to local dict
+            self.local_robot_positions[robot_id] = (
+                new_pos,
+                new_orientation,
+            )
         else:
             # remove an existing robot
             self.curr_robot_ids.remove(robot_id)
-            del self.pre_sim_robot_positions[robot_id]
             self.local_robot_positions[robot_id] = None
             world_state = self.__remove_robot_from_state(world_state, robot_id)
 
@@ -767,12 +829,17 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """Overrides the _update_robots_graphics method in the super class
         Adds local state robots to the friendly team cache before updating the robot graphics
         """
-        for robot_id, pos in self.local_robot_positions.items():
-            if pos is None and robot_id in self._cached_friendly_team:
-                # if removed in local state, remove from dict
-                del self._cached_friendly_team[robot_id]
-            elif pos is not None:
-                # override position using local pos
-                self._cached_friendly_team[robot_id] = (pos[0].x(), pos[0].y(), pos[1])
+        if not self.is_playing:
+            for robot_id, pos in self.local_robot_positions.items():
+                if pos is None and robot_id in self._cached_friendly_team:
+                    # if removed in local state, remove from dict
+                    del self._cached_friendly_team[robot_id]
+                elif pos is not None:
+                    # override position using local pos
+                    self._cached_friendly_team[robot_id] = (
+                        pos[0].x(),
+                        pos[0].y(),
+                        pos[1],
+                    )
 
         super()._update_robots_graphics()
