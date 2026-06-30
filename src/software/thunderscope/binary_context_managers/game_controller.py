@@ -7,6 +7,8 @@ import random
 import logging
 import os
 import time
+import netifaces
+
 from subprocess import Popen
 from typing import Any
 
@@ -245,15 +247,10 @@ class Gamecontroller:
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-        if is_current_platform_macos():
-            loopback_iface = "en0"
-        else:
-            loopback_iface = "lo"
-
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             self.referee_port,
-            loopback_iface,
+            self.__get_referee_multicast_interface(),
             __send_referee_command,
             True,
         )
@@ -630,3 +627,19 @@ class Gamecontroller:
                 robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
             except queue.Empty:
                 return
+
+    @staticmethod
+    def __get_referee_multicast_interface() -> str:
+        """Determine the network interface to join the referee multicast group on.
+
+        :return: the name of the interface to receive referee multicast on
+        """
+        if not is_current_platform_macos():
+            return "lo"
+
+        default = netifaces.gateways().get("default", {}).get(netifaces.AF_INET)
+        if default:
+            # default is a (gateway_ip, interface_name) tuple
+            return default[1]
+
+        raise RuntimeError("Could not determine the default network interface on macOS")
