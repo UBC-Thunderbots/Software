@@ -17,7 +17,7 @@ class Charger
     /**
      * Starts/restarts an LT3750 charge cycle by creating a low -> high edge
      * on CHRG. Does nothing while charging is inhibited.
-     * 
+     *
      * New edges may be issued periodically while voltage remains below target threshold.
      */
     void chargeCapacitors();
@@ -92,15 +92,15 @@ class Charger
     static constexpr uint32_t LT3750_CHARGE_LOW_TIME_US = 25;  // datasheet min is 20 us
 
     // Capacitor voltage control for maintainCharge() hysteresis.
-    static constexpr float CHARGE_STOP_VOLTAGE_V = 198.0f;
+    static constexpr float CHARGE_STOP_VOLTAGE_V    = 198.0f;
     static constexpr float CHARGE_RESTART_VOLTAGE_V = 190.0f;
 
     // EMA is used for telemetry smoothing, not used for maintainCharge() logic.
     static constexpr float CAP_VOLTAGE_EMA_ALPHA =
         0.02f;  // smaller is smoother but slower to respond
 
-    float capacitor_voltage_control_             = 0.0f;
-    bool capacitor_voltage_control_initialized_  = false;
+    float capacitor_voltage_control_            = 0.0f;
+    bool capacitor_voltage_control_initialized_ = false;
 
     float capacitor_voltage_ema_            = 0.0f;
     bool capacitor_voltage_ema_initialized_ = false;

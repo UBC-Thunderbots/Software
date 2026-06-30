@@ -30,15 +30,9 @@
  * This section of code is reserved for DIRECT testing on the microcontroller/debug
  * functionality.
  */
-void setup()
-{
+void setup() {}
 
-}
-
-void loop()
-{
-
-}
+void loop() {}
 #else
 
 // Used for uart communication
@@ -121,9 +115,8 @@ void loop()
 
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
-    monitor->getBatteryVoltage(), capacitor_voltage,
-    monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
-    chicker->getBreakBeamTripped());
+        monitor->getBatteryVoltage(), capacitor_voltage, monitor->getCurrentDrawAmp(),
+        geneva->getCurrentSlot(), sequence_num++, chicker->getBreakBeamTripped());
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);

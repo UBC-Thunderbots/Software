@@ -27,7 +27,7 @@ Charger::Charger()
 void Charger::chargeCapacitors()
 {
     // LT3750 charging is initiated by a CHARGE rising edge.
-    
+
     if (charge_inhibited_)
     {
         return;
@@ -37,7 +37,7 @@ void Charger::chargeCapacitors()
     delayMicroseconds(LT3750_CHARGE_LOW_TIME_US);
     digitalWrite(CHRG, HIGH);
 
-    charging_enabled_ = true;
+    charging_enabled_    = true;
     last_charge_edge_ms_ = millis();
 }
 
@@ -83,8 +83,7 @@ void Charger::maintainCharge()
 
     if (voltage <= CHARGE_RESTART_VOLTAGE_V)
     {
-        const bool retry_due =
-            (now - last_charge_edge_ms_) >= CHARGE_RETRY_INTERVAL_MS;
+        const bool retry_due = (now - last_charge_edge_ms_) >= CHARGE_RETRY_INTERVAL_MS;
 
         if (!charging_enabled_ || retry_due)
         {
@@ -206,7 +205,7 @@ float Charger::getCapacitorVoltage()
         (calibrated_capacitor_voltage < 0.0f) ? 0.0f : calibrated_capacitor_voltage;
 
     // Non EMA value used in maintainCharge() logic for hysteresis.
-    capacitor_voltage_control_ = physical_capacitor_voltage;
+    capacitor_voltage_control_             = physical_capacitor_voltage;
     capacitor_voltage_control_initialized_ = true;
 
     // Initialize from the first real reading so startup does not ramp from 0 V.
