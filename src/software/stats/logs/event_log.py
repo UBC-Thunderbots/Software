@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team
 from typing import Any, override
 from software.stats.logs.log_interface import TimestampedEvalLog
 from software.stats.logs.world_state_log import WorldStateLog
@@ -23,13 +24,6 @@ class EventType(StrEnum):
     GOAL_SCORED = auto()
     YELLOW_CARD = auto()
     RED_CARD = auto()
-
-
-class Team(StrEnum):
-    """The teams present in the game"""
-
-    BLUE = auto()
-    YELLOW = auto()
 
 
 @dataclass(kw_only=True)
@@ -77,8 +71,8 @@ class EventLog(TimestampedEvalLog):
             super().to_array()
             + [
                 self.event_type.value,
-                self.from_team.value,
-                self.for_team.value,
+                self.from_team,
+                self.for_team,
             ]
             + self.world_state_log.to_array()
         )
@@ -90,8 +84,8 @@ class EventLog(TimestampedEvalLog):
         timestamp = float(next(row_iter))
 
         event_type = EventType(next(row_iter))
-        from_team = Team(next(row_iter))
-        for_team = Team(next(row_iter))
+        from_team = int(next(row_iter))
+        for_team = int(next(row_iter))
 
         world_state = WorldStateLog.from_csv_row(row_iter)
 

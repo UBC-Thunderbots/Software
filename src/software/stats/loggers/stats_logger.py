@@ -8,25 +8,13 @@ from software.stats.trackers import (
     RefereeTracker,
     GoalieTracker,
 )
-from dataclasses import dataclass
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
-from software.stats.logs.event_log import Team as TeamEnum, EventLog
+from software.stats.logs.event_log import EventLog
 import logging
 from proto.import_all_protos import *
 import queue
-
-
-@dataclass
-class FSStats:
-    """Stats for how well a FullSystem is performing"""
-
-    num_yellow_cards: int = 0
-    num_red_cards: int = 0
-    num_scores: int = 0
-
-    num_shots_on_net: int = 0
-    num_enemy_shots_blocked: int = 0
+from proto.ssl_gc_common_pb2 import Team
 
 
 class StatsLogger:
@@ -70,9 +58,7 @@ class StatsLogger:
         self.tracker = (
             TrackerBuilder(
                 proto_unix_io=proto_unix_io,
-                from_team=(
-                    TeamEnum.YELLOW if self.friendly_colour_yellow else TeamEnum.BLUE
-                ),
+                from_team=(Team.YELLOW if self.friendly_colour_yellow else Team.BLUE),
                 event_queue=self.event_queue,
                 buffer_size=buffer_size,
             )
@@ -93,14 +79,10 @@ class StatsLogger:
                 TrackerBuilder(
                     proto_unix_io=proto_unix_io,
                     from_team=(
-                        TeamEnum.YELLOW
-                        if self.friendly_colour_yellow
-                        else TeamEnum.BLUE
+                        Team.YELLOW if self.friendly_colour_yellow else Team.BLUE
                     ),
                     for_team=(
-                        TeamEnum.BLUE
-                        if self.friendly_colour_yellow
-                        else TeamEnum.YELLOW
+                        Team.BLUE if self.friendly_colour_yellow else Team.YELLOW
                     ),
                     event_queue=self.event_queue,
                     buffer_size=buffer_size,

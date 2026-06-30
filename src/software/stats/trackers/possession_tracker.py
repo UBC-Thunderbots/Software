@@ -72,9 +72,9 @@ class PossessionTracker(Tracker):
         """
         new_possession = None
 
-        if self._check_posession_for_team(friendly_team, ball_position):
+        if self._check_possession_for_team(friendly_team, ball_position):
             new_possession = True
-        elif self._check_posession_for_team(enemy_team, ball_position):
+        elif self._check_possession_for_team(enemy_team, ball_position):
             new_possession = False
 
         # if possession didn't change, no need to log
@@ -95,7 +95,7 @@ class PossessionTracker(Tracker):
 
         self.curr_possession = new_possession
 
-    def _check_posession_for_team(
+    def _check_possession_for_team(
         self, team: tbots_cpp.Team, ball_position: tbots_cpp.Point
     ) -> bool:
         """Check if the given team has possession of the ball
