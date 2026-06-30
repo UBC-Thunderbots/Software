@@ -124,6 +124,25 @@ bool PrimitiveExecutor::shouldFollowNewLinearTrajectory(
         return true;
     }
 
+    // If we've reached the end of the trajectory we're currently following, but the
+    // newly received trajectory indicates the robot still hasn't reached the
+    // destination (its start is still meaningfully far from its destination, i.e. the
+    // AI's view of the robot disagrees with what the robot believes onboard), switch to
+    // the new trajectory once this disagreement has persisted past the timeout. This
+    // keeps the robot moving toward the AI's intended destination instead of sitting
+    // still where its onboard estimate thinks the destination is.
+    const bool reached_current_destination =
+        trajectory_elapsed_time_.toSeconds() >= trajectory_path_->getTotalTime();
+    const Point new_start = new_trajectory.getPosition(0);
+    const Point new_dest  = new_trajectory.getPosition(new_trajectory.getTotalTime());
+    const bool new_trajectory_wants_movement =
+        (new_start - new_dest).length() > NEW_TRAJECTORY_REACHED_DESTINATION_THRESHOLD_M;
+    if (reached_current_destination && new_trajectory_wants_movement &&
+        time_at_trajectory_end_.toSeconds() > REACHED_DESTINATION_TIMEOUT_S)
+    {
+        return true;
+    }
+
     // Measure how well we're tracking the current trajectory by comparing the robot's
     // actual state against where the trajectory expects it to be at the current elapsed
     // time. If we are already tracking it well (position and velocity errors are small),
@@ -181,6 +200,7 @@ void PrimitiveExecutor::startFollowingNewLinearTrajectory(
 
     trajectory_path_         = new_trajectory;
     trajectory_elapsed_time_ = Duration::fromSeconds(0);
+    time_at_trajectory_end_  = Duration::fromSeconds(0);
     position_controller_.reset();
     velocity_x_pid_.reset();
     velocity_y_pid_.reset();
@@ -216,6 +236,20 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     trajectory_elapsed_time_ =
         std::min(trajectory_elapsed_time_ + delta_time,
                  Duration::fromSeconds(trajectory_path_->getTotalTime()));
+
+    // Track how long we've been parked at the end of the current trajectory (i.e. we've
+    // reached its destination). shouldFollowNewLinearTrajectory uses this to decide when
+    // to give up and switch to a newer trajectory that still wants the robot to move.
+    // Reset to zero while the robot is still traversing the trajectory.
+    if (trajectory_elapsed_time_.toSeconds() >= trajectory_path_->getTotalTime())
+    {
+        time_at_trajectory_end_ += delta_time;
+    }
+    else
+    {
+        time_at_trajectory_end_ = Duration::fromSeconds(0);
+    }
+
     const double sample_time_sec =
         std::min(trajectory_elapsed_time_.toSeconds() + TRAJECTORY_LOOKAHEAD_TIME_S,
                  trajectory_path_->getTotalTime());
