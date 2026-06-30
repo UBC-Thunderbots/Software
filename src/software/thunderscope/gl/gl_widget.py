@@ -107,11 +107,12 @@ class GLWidget(QWidget):
         # Setup sandbox sidebar
         self._sandbox_mode_callbacks: list[Callable[[bool], None]] = []
         self.sandbox_sidebar = GLSandboxSidebar(
-            parent=self.gl_view_widget, 
-            widget_above=self.simulation_control_toolbar
+            parent=self.gl_view_widget, widget_above=self.simulation_control_toolbar
         )
         # let toolbar update the sidebar visibility
-        self.simulation_control_toolbar.set_sidebar_visibility_callback(self.sandbox_sidebar.toggle_visibility)
+        self.simulation_control_toolbar.set_sidebar_visibility_callback(
+            self.sandbox_sidebar.toggle_visibility
+        )
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
@@ -413,9 +414,7 @@ class GLWidget(QWidget):
         self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
         success_toast(self.parentWidget(), "Added bookmark!")
 
-    def register_sandbox_mode_callback(
-        self, callback: Callable[[bool], None]
-    ) -> None:
+    def register_sandbox_mode_callback(self, callback: Callable[[bool], None]) -> None:
         """Register a callback that will be called when sandbox mode is toggled.
 
         :param callback: A callable that takes one boolean argument (the new state).

@@ -137,7 +137,6 @@ class GLGamecontrollerToolbar(GLToolbar):
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
-
     def __add_plays_menu_items(self, is_blue: bool) -> None:
         """Initializes the plays menu with the available plays for the given team
 

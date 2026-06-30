@@ -8,6 +8,6 @@ py_library(
     deps = [
         "//software/thunderscope/common:common_widgets",
         requirement("pyqtgraph"),
-        requirement("qtawesome")
+        requirement("qtawesome"),
     ],
 )

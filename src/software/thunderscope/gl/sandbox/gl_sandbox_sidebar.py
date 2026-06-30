@@ -4,7 +4,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 import qtawesome as qta
-from software.thunderscope.common.common_widgets import ToggleableButton, StyledButton
+from software.thunderscope.common.common_widgets import ToggleableButton
 
 
 class GLSandboxSidebar(QWidget):
@@ -20,11 +20,7 @@ class GLSandboxSidebar(QWidget):
     POSITION_PADDING_MULTIPLIER = 0.1
     SIDEBAR_WIDTH_RATIO = 0.2
 
-    def __init__(
-        self,
-        parent: QWidget,
-        widget_above: QWidget
-    ):
+    def __init__(self, parent: QWidget, widget_above: QWidget):
         """Set up the sandbox sidebar
 
         :param parent: the parent widget to attach this sidebar to
@@ -56,8 +52,12 @@ class GLSandboxSidebar(QWidget):
             f"    padding-top: 10px;"
             f"}}"
         )
-        self.sidebar_container.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
-        self.sidebar_container.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
+        self.sidebar_container.setAttribute(
+            QtCore.Qt.WidgetAttribute.WA_StyledBackground
+        )
+        self.sidebar_container.setSizePolicy(
+            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred
+        )
 
         # Setup sandbox mode toggle checkbox
         self.checkbox_layout = QHBoxLayout()
@@ -117,7 +117,7 @@ class GLSandboxSidebar(QWidget):
         parent.installEventFilter(self)
 
     def refresh(self) -> None:
-        """Refreshes the UI to move the sidebar and update the pause button state""" 
+        """Refreshes the UI to move the sidebar and update the pause button state"""
         if not self.sidebar_rendered:
             if self.sidebar_enabled:
                 self.reposition()
@@ -125,7 +125,7 @@ class GLSandboxSidebar(QWidget):
             else:
                 self.hide()
             self.sidebar_rendered = True
-        
+
         # update the pause button state
         simulation_state = self.simulation_state_buffer.get(
             block=False, return_cached=False
@@ -133,9 +133,7 @@ class GLSandboxSidebar(QWidget):
         if simulation_state:
             self.toggle_pause_button(simulation_state.is_playing)
 
-    def register_sandbox_mode_callback(
-        self, callback: Callable[[bool], None]
-    ) -> None:
+    def register_sandbox_mode_callback(self, callback: Callable[[bool], None]) -> None:
         """Register a callback that will be called when sandbox mode is toggled.
 
         :param callback: A callable that takes one boolean argument (the new state).

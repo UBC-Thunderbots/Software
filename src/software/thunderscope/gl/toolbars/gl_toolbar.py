@@ -20,7 +20,9 @@ class GLToolbar(QWidget):
         super(GLToolbar, self).__init__(parent=parent)
 
         # Setup toolbar
-        self.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(
+            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed
+        )
         self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())

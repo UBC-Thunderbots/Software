@@ -183,7 +183,7 @@ class GLFieldToolbar(GLToolbar):
 
         if not replay_mode:
             self.layout().addWidget(self.bookmark_button)
-            
+
         self.layout().addStretch()
         self.layout().addWidget(self.sandbox_sidebar_container)
 
@@ -212,7 +212,9 @@ class GLFieldToolbar(GLToolbar):
         """
         self.speed_callback = callback
 
-    def set_sidebar_visibility_callback(self, callback: Callable[[float], None]) -> None:
+    def set_sidebar_visibility_callback(
+        self, callback: Callable[[float], None]
+    ) -> None:
         """Sets the callback function for toggling sidebar visibility
 
         :param callback: the callback function for toggling sidebar visibility
@@ -232,6 +234,4 @@ class GLFieldToolbar(GLToolbar):
         self.sandbox_enabled = enabled
         color = ON_COLOR if enabled else OFF_COLOR
         self.sandbox_sidebar_label.setText("On" if enabled else "Off")
-        self.sandbox_sidebar_label.setStyleSheet(
-            f"color: {color}; font-weight: bold;"
-        )
+        self.sandbox_sidebar_label.setStyleSheet(f"color: {color}; font-weight: bold;")
