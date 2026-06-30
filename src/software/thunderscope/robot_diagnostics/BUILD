@@ -28,6 +28,8 @@ py_library(
     srcs = ["keyboard_controller.py"],
     deps = [
         ":controller_base",
+        "//software/thunderscope:constants",
+        requirement("pyqtgraph"),
     ],
 )
 
@@ -36,7 +38,11 @@ py_library(
     srcs = ["handheld_controller.py"],
     deps = [
         ":controller_base",
-    ],
+        "//software/thunderscope:constants",
+    ] + select({
+        "@platforms//os:linux": [requirement("evdev"), requirement("numpy")],
+        "//conditions:default": [requirement("numpy")],
+    }),
 )
 
 py_library(

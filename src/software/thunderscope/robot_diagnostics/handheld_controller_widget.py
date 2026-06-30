@@ -3,7 +3,6 @@ import numpy
 # TODO: remove the try-catch when we rewrite this with macOS-compatible lib
 try:
     import evdev
-    from evdev import ecodes
 except ImportError:
     pass
 
@@ -44,11 +43,6 @@ class HandheldControllerWidget(QWidget):
         self.constants = tbots_cpp.createRobotConstants()
 
         self.handheld_controller: ControllerBase | None = None
-
-        self.last_d_pad_axis_x_value = 0
-        self.last_d_pad_axis_y_value = 0
-        self.last_btn_a_value = False
-        self.last_btn_b_value = False
 
         self.motor_control = MotorControl()
         self.dribbler_speed = 0
@@ -142,84 +136,54 @@ class HandheldControllerWidget(QWidget):
         return box
 
     def __read_controller_inputs(self) -> None:
-        """Read and interpret the current controller input values."""
-
-        def with_deadzone(abs_value: float) -> float:
-            return (
-                abs_value
-                if abs(abs_value) >= DiagnosticsConstants.DEADZONE_PERCENTAGE
-                else 0
-            )
-
-        move_axis_x = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_Y))
-        move_axis_y = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_X))
-        move_axis_rot = with_deadzone(self.handheld_controller.abs_value(ecodes.ABS_RX))
-
-        left_trigger_value = self.handheld_controller.abs_value(ecodes.ABS_Z)
-        speed_factor = (
-            DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR
-            if left_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
-            else 1
-        )
+        """Read controller state and update motor control proto."""
+        vx, vy, vrot = self.handheld_controller.get_move_velocity()
+        speed = self.handheld_controller.get_speed_factor()
 
         self.motor_control.direct_velocity_control.velocity.x_component_meters = (
-            -move_axis_x * self.constants.robot_max_speed_m_per_s * speed_factor
+            vx * self.constants.robot_max_speed_m_per_s * speed
         )
         self.motor_control.direct_velocity_control.velocity.y_component_meters = (
-            -move_axis_y * self.constants.robot_max_speed_m_per_s * speed_factor
+            vy * self.constants.robot_max_speed_m_per_s * speed
         )
         self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            -move_axis_rot * self.constants.robot_max_ang_speed_rad_per_s * speed_factor
+            vrot * self.constants.robot_max_ang_speed_rad_per_s * speed
         )
 
-        d_pad_axis_x = self.handheld_controller.abs_value(ecodes.ABS_HAT0X)
-        d_pad_axis_y = self.handheld_controller.abs_value(ecodes.ABS_HAT0Y)
-
-        if d_pad_axis_x != self.last_d_pad_axis_x_value:
-            self.last_d_pad_axis_x_value = d_pad_axis_x
+        kick_step = self.handheld_controller.get_kick_power_step()
+        if kick_step:
             self.kick_power = numpy.clip(
-                a=self.kick_power
-                + int(d_pad_axis_x) * DiagnosticsConstants.KICK_POWER_STEPPER,
+                a=self.kick_power + kick_step * DiagnosticsConstants.KICK_POWER_STEPPER,
                 a_min=DiagnosticsConstants.MIN_KICK_POWER,
                 a_max=DiagnosticsConstants.MAX_KICK_POWER,
             )
             self.chip_distance = numpy.clip(
                 a=self.chip_distance
-                + d_pad_axis_x * DiagnosticsConstants.CHIP_DISTANCE_STEPPER,
+                + kick_step * DiagnosticsConstants.CHIP_DISTANCE_STEPPER,
                 a_min=DiagnosticsConstants.MIN_CHIP_POWER,
                 a_max=DiagnosticsConstants.MAX_CHIP_POWER,
             )
 
-        if d_pad_axis_y != self.last_d_pad_axis_y_value:
-            self.last_d_pad_axis_y_value = d_pad_axis_y
+        dribbler_step = self.handheld_controller.get_dribbler_step()
+        if dribbler_step:
             self.dribbler_speed = int(
                 numpy.clip(
                     a=self.dribbler_speed
-                    - d_pad_axis_y * DiagnosticsConstants.DRIBBLER_RPM_STEPPER,
+                    + dribbler_step * DiagnosticsConstants.DRIBBLER_RPM_STEPPER,
                     a_min=self.constants.indefinite_dribbler_speed_rpm,
                     a_max=-self.constants.indefinite_dribbler_speed_rpm,
                 )
             )
 
-        right_trigger_value = self.handheld_controller.abs_value(ecodes.ABS_RZ)
         self.motor_control.dribbler_speed_rpm = (
-            self.dribbler_speed
-            if right_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
-            else 0
+            self.dribbler_speed if self.handheld_controller.is_dribbler_held() else 0
         )
 
-        btn_a = self.handheld_controller.key_down(ecodes.BTN_A)
-        btn_b = self.handheld_controller.key_down(ecodes.BTN_B)
+        if self.handheld_controller.is_kick_fired():
+            self.kick_button_pressed.emit()
 
-        if btn_a != self.last_btn_a_value:
-            self.last_btn_a_value = btn_a
-            if btn_a:
-                self.kick_button_pressed.emit()
-
-        if btn_b != self.last_btn_b_value:
-            self.last_btn_b_value = btn_b
-            if btn_b:
-                self.chip_button_pressed.emit()
+        if self.handheld_controller.is_chip_fired():
+            self.chip_button_pressed.emit()
 
     def __update_controller_status(self) -> None:
         """Update the widget to display the current controller connection status."""
