@@ -90,6 +90,7 @@ class RobotCommunication:
         # if using keyboard estop, skips this step
         self.estop_reader = None
         self.estop_is_playing = False
+        self.prev_estop_is_playing = False
 
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
@@ -109,7 +110,7 @@ class RobotCommunication:
         and log the new state. No-op unless in keyboard estop mode.
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
-            self.__queue_stop_for_all_robots()
+            self.prev_estop_is_playing = self.estop_is_playing
             self.estop_is_playing = not self.estop_is_playing
             logger.debug(
                 "Keyboard Estop changed to "
@@ -151,11 +152,11 @@ class RobotCommunication:
             return
 
         while True:
-            prev_estop_playing = self.estop_is_playing
             if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+                self.prev_estop_is_playing = self.estop_is_playing
                 self.estop_is_playing = self.estop_reader.isEstopPlay()
 
-            if prev_estop_playing and not self.estop_is_playing:
+            if self.prev_estop_is_playing and not self.estop_is_playing:
                 self.__queue_stop_for_all_robots()
 
             self.current_proto_unix_io.send_proto(
