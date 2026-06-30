@@ -335,7 +335,7 @@ def start_interactive_cli():
     extra_args = []
 
     history = load_history()
-    choices = ["Run thunderscope", "Test", "Flash"]
+    choices = CATEGORY_CHOICES
     if history:
         choices = ["Repeat a past command"] + CATEGORY_CHOICES
 
