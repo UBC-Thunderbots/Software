@@ -1,6 +1,6 @@
 #include "charger.h"
 
-volatile bool Charger::CHRG_DONE_STATE = true;
+volatile bool Charger::charge_done_pending = false;
 
 Charger::Charger()
 {
@@ -9,6 +9,8 @@ Charger::Charger()
     pinMode(CHRG_DONE, INPUT);
     attachInterrupt(digitalPinToInterrupt(CHRG_DONE), updateCHRGDoneISR, FALLING);
     pinMode(CHRG, OUTPUT);
+    pinMode(CHRG_SHUTOFF, OUTPUT);
+    digitalWrite(CHRG_SHUTOFF, HIGH);
 }
 
 void Charger::setCapacitorPin(bool pin_state)
@@ -21,11 +23,6 @@ float Charger::getCapacitorVoltage()
     return analogRead(HV_SENSE) / RESOLUTION * SCALE_VOLTAGE * VOLTAGE_DIVIDER;
 }
 
-bool Charger::getFlybackFault()
-{
-    return !digitalRead(FLYBACK_FAULT);
-}
-
 bool Charger::getDonePinState()
 {
     return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <=
@@ -34,17 +31,17 @@ bool Charger::getDonePinState()
 
 void Charger::update()
 {
-    if (!CHRG_DONE_STATE && getDonePinState())
+    if (charge_done_pending)
     {
-        delay(300);
-        setCapacitorPin(LOW);
-        delay(300);
-        setCapacitorPin(HIGH);
-        CHRG_DONE_STATE = true;
+        charge_done_pending = false;
+        if (getDonePinState())
+        {
+            setCapacitorPin(LOW);
+        }
     }
 }
 
 void IRAM_ATTR Charger::updateCHRGDoneISR()
 {
-    CHRG_DONE_STATE = false;
+    charge_done_pending = true;
 }

@@ -24,12 +24,6 @@ class Charger
      * @return voltage of capacitors
      */
     float getCapacitorVoltage();
-    /**
-     * Returns the status of the flyback fault
-     *
-     * @return whether the flyback fault is tripped or not
-     */
-    bool getFlybackFault();
 
     /**
      * Updates the capacitor charger and recharges if necessary.
@@ -38,23 +32,21 @@ class Charger
 
    private:
     /**
-     * Reads the Done pin to determine if the capacitors have finished charging.
-     * The Done pin is driven LOW (below DONE_PIN_THRESHOLD_VOLTAGE) once charging
-     * completes.
+     * Reads CHRG_DONE with the ADC to confirm the capacitors have finished charging.
      *
-     * @return True if the done pin is below threshold (charging done), false otherwise
+     * @return True if CHRG_DONE is below threshold (charging done), false otherwise
      */
-    bool getDonePinState();
+    static bool getDonePinState();
 
     /**
-     * Called on the falling edge of the Charge Done pin (CHRG_DONE) to flag that the
-     * capacitors need to be recharged.
+     * Called on the falling edge of CHRG_DONE.
      */
     static void updateCHRGDoneISR();
 
-    static volatile bool CHRG_DONE_STATE;
-    static constexpr float VOLTAGE_DIVIDER            = 1003.0 / 13.0;
-    static constexpr float RESOLUTION                 = 4096.0;
-    static constexpr float SCALE_VOLTAGE              = 3.3;
-    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE = 1.0;
+    static volatile bool charge_done_pending;
+    static constexpr float VOLTAGE_DIVIDER                  = 1003.0 / 13.0;
+    static constexpr float MAX_CHARGE_DURATION_MILLISECONDS = 2000;
+    static constexpr float RESOLUTION                       = 4096.0;
+    static constexpr float SCALE_VOLTAGE                    = 3.3;
+    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE       = 1.0;
 };

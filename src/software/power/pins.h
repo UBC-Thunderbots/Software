@@ -11,6 +11,7 @@ const uint8_t HV_SENSE      = 36;
 const uint8_t FLYBACK_FAULT = 27;
 const uint8_t CHRG_DONE     = 25;
 const uint8_t CHRG          = 26;
+const uint8_t CHRG_SHUTOFF  = 27;
 
 // Break Beam
 const uint8_t BREAK_BEAM_PIN = 37;
