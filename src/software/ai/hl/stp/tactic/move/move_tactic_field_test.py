@@ -16,10 +16,11 @@ from software.gameplay_tests.validation.robot_enters_region import (
 
 
 @pytest.mark.parametrize(
-    "angle",
-    [0, 45, 90, 180, 270, 360],
+    "prev_angle, angle",
+    [(0, 45), (45, 90), (90, 180), (180, 270), (270, 360)],
 )
-def test_basic_rotation(angle, gameplay_test_runner):
+def test_basic_rotation(prev_angle, angle, gameplay_test_runner):
+    start_angle = tbots_cpp.Angle.fromDegrees(prev_angle)
     target_angle = tbots_cpp.Angle.fromDegrees(angle)
     start_position_1 = tbots_cpp.Point(-1.5, 0.6)
     start_position_2 = tbots_cpp.Point(1.5, 0.6)
@@ -30,6 +31,10 @@ def test_basic_rotation(angle, gameplay_test_runner):
                 blue_robot_locations=[
                     start_position_1,
                     start_position_2,
+                ],
+                blue_robot_orientations=[
+                    start_angle,
+                    start_angle,
                 ],
                 yellow_robot_locations=[],
                 ball_location=tbots_cpp.Point(0, 0),
@@ -112,6 +117,7 @@ def test_one_robots_square(start_position, end_position, gameplay_test_runner):
                 blue_robot_locations=[
                     start_position,
                 ],
+                blue_robot_orientations=[tbots_cpp.Angle.threeQuarter()],
                 yellow_robot_locations=[],
                 ball_location=tbots_cpp.Point(0, 0),
                 ball_velocity=tbots_cpp.Vector(0, 0),
