@@ -200,12 +200,13 @@ class GLWorldLayer(GLLayer):
 
         :return: the current play state
         """
-        self.is_playing = not self.is_playing
         simulator_state = SimulationState(
-            is_playing=self.is_playing, simulation_speed=self.simulation_speed
+            is_playing=not self.is_playing, simulation_speed=self.simulation_speed
         )
+        self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
+
         return self.is_playing
 
     def set_simulation_speed(self, speed: float) -> None:
@@ -313,12 +314,18 @@ class GLWorldLayer(GLLayer):
         self.ball_velocity_vector = None
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def _get_cached_teams_from_proto(self) -> None:
+    @override
+    def refresh_graphics(self) -> None:
+        """Update graphics in this layer"""
         self.cached_world = self.world_buffer.get(block=False, return_cached=True)
 
         # if not receiving worlds, just render an empty field
         if is_field_message_empty(self.cached_world.field):
             self.cached_world = DEFAULT_EMPTY_FIELD_WORLD
+
+        self.__update_field_graphics(self.cached_world.field)
+        self.__update_goal_graphics(self.cached_world.field)
+        self.__update_ball_graphics(self.cached_world.ball.current_state)
 
         self._cached_friendly_team = {
             robot.id: (
@@ -337,15 +344,6 @@ class GLWorldLayer(GLLayer):
             )
             for robot in self.cached_world.enemy_team.team_robots
         }
-
-    @override
-    def refresh_graphics(self) -> None:
-        """Update graphics in this layer"""
-        self._get_cached_teams_from_proto()
-
-        self.__update_field_graphics(self.cached_world.field)
-        self.__update_goal_graphics(self.cached_world.field)
-        self.__update_ball_graphics(self.cached_world.ball.current_state)
 
         self._update_robots_graphics()
 
