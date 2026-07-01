@@ -3,54 +3,38 @@ import os
 # Suppress the pygame "Hello from the pygame community" banner on import
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
-import numpy
 import pygame
 
-from proto.import_all_protos import *
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore
 
-
-import software.python_bindings as tbots_cpp
-
-from software.py_constants import *
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.handheld_controller import (
     HandheldController,
 )
+from software.thunderscope.robot_diagnostics.manual_input_widget import (
+    ManualInputWidget,
+)
 
 
-class HandheldControllerWidget(QWidget):
-    """This widget lets the user detect and use a connected handheld controller
-    to manually control our robots. The user can toggle whether controller input
-    is enabled or disabled.
+class HandheldControllerWidget(ManualInputWidget):
+    """Input source that drives a robot from a connected handheld game
+    controller (e.g. an Xbox gamepad).
+
+    Displays the controller's connection status and lets the user (re)scan for
+    a controller. Reads the controller's analog sticks, triggers, D-pad and
+    face buttons and feeds them through the shared
+    :meth:`ManualInputWidget._apply_inputs` mapping.
     """
-
-    kick_button_pressed = QtCore.pyqtSignal()
-    """Signal emitted when the kick button is pressed on the controller"""
-
-    chip_button_pressed = QtCore.pyqtSignal()
-    """Signal emitted when the chip button is pressed on the controller"""
 
     def __init__(self) -> None:
         """Initialize the HandheldControllerWidget."""
         super().__init__()
 
-        self.constants = tbots_cpp.createRobotConstants()
-
         self.handheld_controller: HandheldController | None = None
 
-        self.last_d_pad_axis_x_value = 0
-        self.last_d_pad_axis_y_value = 0
-        self.last_btn_a_value = False
-        self.last_btn_b_value = False
-
-        self.motor_control = MotorControl()
-        self.dribbler_speed = 0
-        self.kick_power = DiagnosticsConstants.MIN_KICK_POWER
-        self.chip_distance = DiagnosticsConstants.MIN_CHIP_POWER
-
         widget_layout = QVBoxLayout()
+        widget_layout.setContentsMargins(0, 0, 0, 0)
         widget_layout.addWidget(self.__create_widgets())
         self.setLayout(widget_layout)
 
@@ -61,40 +45,80 @@ class HandheldControllerWidget(QWidget):
         controller and, if one is found, set it as the device to accept
         controller inputs from.
         """
+        if self.handheld_controller is not None:
+            self.handheld_controller.close()
         self.handheld_controller = HandheldController.detect()
         self.__update_controller_status()
 
-    def controller_input_enabled(self) -> bool:
-        """Check whether controller input is enabled.
+    def is_connected(self) -> bool:
+        """Check whether a handheld controller is currently connected.
 
-        :return: true if controller input is enabled, false otherwise
+        :return: true if a controller is connected, false otherwise
         """
-        return self.enable_input_checkbox.isChecked()
+        return (
+            self.handheld_controller is not None
+            and self.handheld_controller.connected()
+        )
 
-    def refresh(self) -> None:
+    def refresh_status(self) -> None:
+        """Refresh the controller's connection state and status display.
+
+        Should be called every refresh tick while the controller is the
+        selected source so the UI reflects connects and disconnects.
+        """
         if self.handheld_controller is None:
             return
 
-        # Refresh the controller's input state before reading from it or
-        # checking whether it is still connected
         self.handheld_controller.update()
 
         if not self.handheld_controller.connected():
             self.handheld_controller.close()
             self.handheld_controller = None
             self.__update_controller_status()
+
+    def poll(self) -> None:
+        """Read the controller's inputs and update the manual control outputs."""
+        if not self.is_connected():
             return
 
-        if self.enable_input_checkbox.isChecked():
-            self.__read_controller_inputs()
+        controller = self.handheld_controller
 
-    def __create_widgets(self) -> QGroupBox:
+        slow_mode = (
+            controller.abs_value(pygame.CONTROLLER_AXIS_TRIGGERLEFT)
+            > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
+        )
+        dribbler_on = (
+            controller.abs_value(pygame.CONTROLLER_AXIS_TRIGGERRIGHT)
+            > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
+        )
+
+        # SDL exposes the D-pad as four buttons; synthesize hat axis values
+        # (right/down = +1, left/up = -1) to match the previous behaviour.
+        d_pad_axis_x = controller.key_down(
+            pygame.CONTROLLER_BUTTON_DPAD_RIGHT
+        ) - controller.key_down(pygame.CONTROLLER_BUTTON_DPAD_LEFT)
+        d_pad_axis_y = controller.key_down(
+            pygame.CONTROLLER_BUTTON_DPAD_DOWN
+        ) - controller.key_down(pygame.CONTROLLER_BUTTON_DPAD_UP)
+
+        self._apply_inputs(
+            move_x=controller.abs_value(pygame.CONTROLLER_AXIS_LEFTY),
+            move_y=controller.abs_value(pygame.CONTROLLER_AXIS_LEFTX),
+            move_rot=controller.abs_value(pygame.CONTROLLER_AXIS_RIGHTX),
+            slow_mode=slow_mode,
+            dribbler_on=dribbler_on,
+            d_pad_axis_x=d_pad_axis_x,
+            d_pad_axis_y=d_pad_axis_y,
+            kick=controller.key_down(pygame.CONTROLLER_BUTTON_A),
+            chip=controller.key_down(pygame.CONTROLLER_BUTTON_B),
+        )
+
+    def __create_widgets(self) -> QWidget:
         """Create the widgets that make up the HandheldControllerWidget UI.
 
-        :return: a QGroupBox containing:
+        :return: a QWidget containing:
             - a QLabel for displaying the current controller connection status
             - a QPushButton that tries detecting a controller when pressed
-            - a QCheckBox that controls whether controller input is enabled
         """
         self.controller_status_label = QLabel()
         self.controller_status_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -102,131 +126,21 @@ class HandheldControllerWidget(QWidget):
         self.detect_controller_button = QPushButton("Detect Controller")
         self.detect_controller_button.clicked.connect(self.detect_controller)
 
-        self.enable_input_checkbox = QCheckBox("Enable Input")
-        self.enable_input_checkbox.setChecked(False)
-        self.enable_input_checkbox.setEnabled(True)
+        layout = QHBoxLayout()
+        layout.addWidget(self.controller_status_label, stretch=4)
+        layout.addWidget(self.detect_controller_button, stretch=1)
 
-        grid_layout = QGridLayout()
-        grid_layout.addWidget(self.controller_status_label, 0, 0, 2, 1)
-        grid_layout.addWidget(self.detect_controller_button, 0, 1)
-        grid_layout.addWidget(
-            self.enable_input_checkbox, 1, 1, QtCore.Qt.AlignmentFlag.AlignHCenter
-        )
-        grid_layout.setColumnStretch(0, 4)
-        grid_layout.setColumnStretch(1, 1)
-
-        box = QGroupBox()
-        box.setTitle("Controller Status")
-        box.setLayout(grid_layout)
-
-        return box
-
-    def __read_controller_inputs(self) -> None:
-        """Read and interpret the current controller input values."""
-
-        def with_deadzone(abs_value: float) -> float:
-            return (
-                abs_value
-                if abs(abs_value) >= DiagnosticsConstants.DEADZONE_PERCENTAGE
-                else 0
-            )
-
-        move_axis_x = with_deadzone(
-            self.handheld_controller.abs_value(pygame.CONTROLLER_AXIS_LEFTY)
-        )
-        move_axis_y = with_deadzone(
-            self.handheld_controller.abs_value(pygame.CONTROLLER_AXIS_LEFTX)
-        )
-        move_axis_rot = with_deadzone(
-            self.handheld_controller.abs_value(pygame.CONTROLLER_AXIS_RIGHTX)
-        )
-
-        left_trigger_value = self.handheld_controller.abs_value(
-            pygame.CONTROLLER_AXIS_TRIGGERLEFT
-        )
-        speed_factor = (
-            DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR
-            if left_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
-            else 1
-        )
-
-        self.motor_control.direct_velocity_control.velocity.x_component_meters = (
-            -move_axis_x * self.constants.robot_max_speed_m_per_s * speed_factor
-        )
-        self.motor_control.direct_velocity_control.velocity.y_component_meters = (
-            -move_axis_y * self.constants.robot_max_speed_m_per_s * speed_factor
-        )
-        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            -move_axis_rot * self.constants.robot_max_ang_speed_rad_per_s * speed_factor
-        )
-
-        # SDL exposes the D-pad as four buttons; synthesize hat axis values
-        # (right/down = +1, left/up = -1) to match the previous behaviour.
-        d_pad_axis_x = self.handheld_controller.key_down(
-            pygame.CONTROLLER_BUTTON_DPAD_RIGHT
-        ) - self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_DPAD_LEFT)
-        d_pad_axis_y = self.handheld_controller.key_down(
-            pygame.CONTROLLER_BUTTON_DPAD_DOWN
-        ) - self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_DPAD_UP)
-
-        if d_pad_axis_x != self.last_d_pad_axis_x_value:
-            self.last_d_pad_axis_x_value = d_pad_axis_x
-            self.kick_power = numpy.clip(
-                a=self.kick_power
-                + int(d_pad_axis_x) * DiagnosticsConstants.KICK_POWER_STEPPER,
-                a_min=DiagnosticsConstants.MIN_KICK_POWER,
-                a_max=DiagnosticsConstants.MAX_KICK_POWER,
-            )
-            self.chip_distance = numpy.clip(
-                a=self.chip_distance
-                + d_pad_axis_x * DiagnosticsConstants.CHIP_DISTANCE_STEPPER,
-                a_min=DiagnosticsConstants.MIN_CHIP_POWER,
-                a_max=DiagnosticsConstants.MAX_CHIP_POWER,
-            )
-
-        if d_pad_axis_y != self.last_d_pad_axis_y_value:
-            self.last_d_pad_axis_y_value = d_pad_axis_y
-            self.dribbler_speed = int(
-                numpy.clip(
-                    a=self.dribbler_speed
-                    - d_pad_axis_y * DiagnosticsConstants.DRIBBLER_RPM_STEPPER,
-                    a_min=self.constants.indefinite_dribbler_speed_rpm,
-                    a_max=-self.constants.indefinite_dribbler_speed_rpm,
-                )
-            )
-
-        right_trigger_value = self.handheld_controller.abs_value(
-            pygame.CONTROLLER_AXIS_TRIGGERRIGHT
-        )
-        self.motor_control.dribbler_speed_rpm = (
-            self.dribbler_speed
-            if right_trigger_value > DiagnosticsConstants.BUTTON_PRESSED_THRESHOLD
-            else 0
-        )
-
-        btn_a = self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_A)
-        btn_b = self.handheld_controller.key_down(pygame.CONTROLLER_BUTTON_B)
-
-        if btn_a != self.last_btn_a_value:
-            self.last_btn_a_value = btn_a
-            if btn_a:
-                self.kick_button_pressed.emit()
-
-        if btn_b != self.last_btn_b_value:
-            self.last_btn_b_value = btn_b
-            if btn_b:
-                self.chip_button_pressed.emit()
+        panel = QWidget()
+        panel.setLayout(layout)
+        return panel
 
     def __update_controller_status(self) -> None:
         """Update the widget to display the current controller connection status."""
-        if self.handheld_controller and self.handheld_controller.connected():
+        if self.is_connected():
             self.controller_status_label.setText(
                 f"Connected: {self.handheld_controller.name()}"
             )
             self.controller_status_label.setStyleSheet("background-color: green")
-            self.enable_input_checkbox.setEnabled(True)
         else:
             self.controller_status_label.setText("Disconnected")
             self.controller_status_label.setStyleSheet("background-color: red")
-            self.enable_input_checkbox.setChecked(False)
-            self.enable_input_checkbox.setEnabled(False)

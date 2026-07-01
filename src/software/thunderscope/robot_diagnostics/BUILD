@@ -32,12 +32,46 @@ py_library(
 )
 
 py_library(
+    name = "manual_input_widget",
+    srcs = ["manual_input_widget.py"],
+    deps = [
+        "//proto:import_all_protos",
+        "//software:python_bindings.so",
+        "//software/thunderscope:constants",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "handheld_controller_widget",
     srcs = ["handheld_controller_widget.py"],
     deps = [
         ":handheld_controller",
+        ":manual_input_widget",
         "//software/thunderscope:constants",
         requirement("pygame"),
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "keyboard_controller_widget",
+    srcs = ["keyboard_controller_widget.py"],
+    deps = [
+        ":manual_input_widget",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "manual_control_widget",
+    srcs = ["manual_control_widget.py"],
+    deps = [
+        ":handheld_controller_widget",
+        ":keyboard_controller_widget",
+        ":manual_input_widget",
+        "//proto:import_all_protos",
+        "//software/thunderscope:constants",
         requirement("pyqtgraph"),
     ],
 )
@@ -52,7 +86,7 @@ py_library(
         "//software/thunderscope:thunderscope_types",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
-        "//software/thunderscope/robot_diagnostics:handheld_controller_widget",
+        "//software/thunderscope/robot_diagnostics:manual_control_widget",
         requirement("pyqtgraph"),
     ],
 )
