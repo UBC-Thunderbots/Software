@@ -266,7 +266,7 @@ class ProtoConfigurationWidget(QWidget):
             try:
                 exec(f"self.proto_to_configure.{child_name} = {data}")
             except SyntaxError:
-                exec(f"self.proto_to_configure.{child_name} = \"\"")
+                exec(f'self.proto_to_configure.{child_name} = ""')
             except (TypeError, NameError):
                 exec(f"self.proto_to_configure.{child_name} = data")
 
