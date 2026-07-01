@@ -1,6 +1,6 @@
 import math
 from abc import ABC, abstractmethod
-from typing import Optional, override
+from typing import Callable, Tuple, Optional, override
 from dataclasses import dataclass
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
@@ -80,6 +80,67 @@ class LastRobotRemoveError(Exception):
 class GLSandboxWorldLayer(GLWorldLayer):
     """GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field"""
 
+    class SandboxWorldState:
+        """Wrapper around WorldState that automatically handles coordinate frame
+        inversion when adding robots by delegating to the parent layer's
+        _invert_position_if_defending_negative_half method.
+        """
+
+        def __init__(
+            self,
+            invert_fn: Callable[[QVector3D, float], Tuple[QVector3D, float]],
+            friendly_colour_yellow: bool,
+        ):
+            self._proto = WorldState()
+            self._invert_fn = invert_fn
+            self._friendly_colour_yellow = friendly_colour_yellow
+
+        @property
+        def proto(self) -> WorldState:
+            """Returns the underlying WorldState proto"""
+            return self._proto
+
+        def set_ball_state(self, ball_state: BallState) -> None:
+            """Sets the ball state in the world state
+
+            :param ball_state: the ball state to set
+            """
+            self._proto.ball_state.CopyFrom(ball_state)
+
+        def add_robot(self, robot_id: int, pos: QVector3D, orientation: float) -> None:
+            """Adds a robot to the world state, automatically inverting the
+            position and orientation if the coordinate frame should be inverted
+
+            :param robot_id: the id of the robot to add
+            :param pos: the position of the robot
+            :param orientation: the orientation of the robot (radians)
+            """
+            converted_pos, converted_orientation = self._invert_fn(
+                QVector3D(pos.x(), pos.y(), 0), orientation
+            )
+
+            robot_state = RobotState(
+                global_position=Point(
+                    x_meters=converted_pos.x(),
+                    y_meters=converted_pos.y(),
+                ),
+                global_orientation=Angle(radians=converted_orientation),
+            )
+            if self._friendly_colour_yellow:
+                self._proto.yellow_robots[robot_id].CopyFrom(robot_state)
+            else:
+                self._proto.blue_robots[robot_id].CopyFrom(robot_state)
+
+        def remove_robot(self, robot_id: int) -> None:
+            """Removes a robot from the world state
+
+            :param robot_id: the id of the robot to remove
+            """
+            if self._friendly_colour_yellow:
+                del self._proto.yellow_robots[robot_id]
+            else:
+                del self._proto.blue_robots[robot_id]
+
     undo_toggle_enabled_signal = pyqtSignal(bool)
     redo_toggle_enabled_signal = pyqtSignal(bool)
 
@@ -131,6 +192,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_operations = []
 
         self.sandbox_enabled = False
+
+        self._referee_defined = False
 
     @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
@@ -262,6 +325,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.move_in_progress = False
 
     @override
+    def _get_cached_teams_from_proto(self) -> None:
+        super()._get_cached_teams_from_proto()
+
+        self.__check_referee_status()
+
+
+    @override
     def refresh_graphics(self) -> None:
         """Calls the super class refresh graphics
 
@@ -279,6 +349,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
             self.next_id = len(self.curr_robot_ids)
             self.should_init_curr_robot_ids = False
+
+    def __check_referee_status(self) -> None:
+        """Checks if a referee message has been received.
+        Once a referee message is received and has content, sets a flag
+        permanently to True indicating we know which half we are defending.
+        """
+        referee = self.referee_buffer.get(block=False)
+        if referee and referee.IsInitialized():
+            self._referee_defined = True
 
     def undo(self) -> None:
         """Undoes the last operation
@@ -386,7 +465,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # send out empty world state
         world_state = self.__get_empty_world_state()
 
-        self.simulator_io.send_proto(WorldState, world_state)
+        self.simulator_io.send_proto(WorldState, world_state.proto)
 
         # robots are normally auto-rendered by refresh fn when sim is unpaused
         # when sim is paused, have to manually render
@@ -446,24 +525,26 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 )
 
             # send out world state
-            self.simulator_io.send_proto(WorldState, world_state)
+            self.simulator_io.send_proto(WorldState, world_state.proto)
         else:
             self.next_id = operation.next_id
             self.__update_world_state(
                 operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
             )
 
-    def __get_empty_world_state(self) -> WorldState:
-        """Constructs a WorldState with just the ball state filled in
+    def __get_empty_world_state(self) -> SandboxWorldState:
+        """Constructs a SandboxWorldState with just the ball state filled in
         from the cached world state and 1 robot placed at
         the edge of the center circle on the half line
 
         Replaces all local states as well
 
-        :return: the base world state with ball state and 1 robot
+        :return: the sandbox world state with ball state and 1 robot
         """
-        world_state = WorldState()
-        world_state.ball_state.CopyFrom(self.cached_world.ball.current_state)
+        world_state = GLSandboxWorldLayer.SandboxWorldState(
+            self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
+        )
+        world_state.set_ball_state(self.cached_world.ball.current_state)
 
         center_circle_radius = self.cached_world.field.center_circle_radius
         robot_pos = QVector3D(-center_circle_radius, 0, 0)
@@ -594,51 +675,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         if self.robot_remove_double_click:
             self.robot_remove_double_click = None
 
-    def __add_robot_to_state(
-        self, world_state: WorldState, id: int, pos: QVector3D, orientation: float
-    ) -> WorldState:
-        """Adds a robot with the given state and id to the given world state
-        To the right team based on current team color
-        Converts position and orientation if needed
-
-        :param world_state: the world state to add robot to
-        :param id: the id of the robot to add
-        :param pos: the new QVector3D position of the robot
-        :param orientation: the new orientation of the robot (radians)
-        """
-        # convert position and orientation if needed
-        (
-            converted_pos,
-            converted_orientation,
-        ) = self.__invert_robot_if_defending_negative_half(pos, orientation)
-        # build the robot state
-        robot_state = RobotState(
-            global_position=Point(
-                x_meters=converted_pos.x(),
-                y_meters=converted_pos.y(),
-            ),
-            global_orientation=Angle(radians=converted_orientation),
-        )
-
-        if self.friendly_colour_yellow:
-            world_state.yellow_robots[id].CopyFrom(robot_state)
-        else:
-            world_state.blue_robots[id].CopyFrom(robot_state)
-        return world_state
-
-    def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
-        """Removes a robot with the given id from the right team in the given world state
-        Based on current team color, then shifts down all higher robot IDs to fill the gap
-
-        :param world_state: the world state to remove robot from
-        :param id: the id of the robot to remove
-        """
-        if self.friendly_colour_yellow:
-            del world_state.yellow_robots[id]
-        else:
-            del world_state.blue_robots[id]
-        return world_state
-
     def __identify_robot(
         self, multi_plane_points: list[QVector3D]
     ) -> tuple[Optional[int], Optional[int]]:
@@ -708,13 +744,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 return index
         return None
 
-    def __get_curr_world_state(self) -> WorldState:
-        world_state = WorldState()
+    def __get_curr_world_state(self) -> SandboxWorldState:
+        world_state = GLSandboxWorldLayer.SandboxWorldState(
+            self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
+        )
 
         # copy over existing robots for the current team
         for robot_ in self.cached_world.friendly_team.team_robots:
-            world_state = self.__add_robot_to_state(
-                world_state,
+            world_state.add_robot(
                 robot_.id,
                 QVector3D(
                     robot_.current_state.global_position.x_meters,
@@ -731,9 +768,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 if pos is None:
                     continue
 
-                world_state = self.__add_robot_to_state(
-                    world_state, robot_id, pos[0], pos[1]
-                )
+                world_state.add_robot(robot_id, pos[0], pos[1])
 
         return world_state
 
@@ -766,15 +801,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.redo_operations.clear()
 
         # send out world state
-        self.simulator_io.send_proto(WorldState, world_state)
+        self.simulator_io.send_proto(WorldState, world_state.proto)
 
     def __update_with_new_position(
         self,
-        world_state: WorldState,
+        world_state: SandboxWorldState,
         robot_id: int,
         new_pos: Optional[QVector3D],
         new_orientation: float = 0,
-    ) -> WorldState:
+    ) -> SandboxWorldState:
         """Updates the world state with the new robot position for the given id
         New position is defined if adding / moving a robot and None if removing one
 
@@ -786,9 +821,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         if new_pos:
             self.curr_robot_ids.add(robot_id)
-            world_state = self.__add_robot_to_state(
-                world_state, robot_id, new_pos, new_orientation
-            )
+            world_state.add_robot(robot_id, new_pos, new_orientation)
 
             # saves the state to local dict
             self.local_robot_positions[robot_id] = (
@@ -799,9 +832,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # remove an existing robot
             self.curr_robot_ids.remove(robot_id)
             self.local_robot_positions[robot_id] = None
-            world_state = self.__remove_robot_from_state(world_state, robot_id)
+            world_state.remove_robot(robot_id)
 
         return world_state
+
+    @override
+    def _should_invert_coordinate_frame(self) -> bool:
+        if not self._referee_defined:
+            return False
+        
+        return super()._should_invert_coordinate_frame()
 
     def __invert_robot_if_defending_negative_half(
         self, point: QVector3D, orientation: float
