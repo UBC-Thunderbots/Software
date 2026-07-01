@@ -51,3 +51,15 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+py_test(
+    name = "star_field_test",
+    srcs = [
+        "star_field_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
