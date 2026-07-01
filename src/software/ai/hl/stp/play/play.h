@@ -116,6 +116,25 @@ class Play
     assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);
 
+    /**
+     * Parses a CSV string of robot IDs and adds the given capability to the missing
+     * capabilities map for each robot ID
+     *
+     * @param csv_ids A comma-separated string of robot IDs
+     * @param capability The capability that is missing for the given robot IDs
+     * @param missing_caps_map The map to populate
+     */
+    static void parseAndAddCapability(
+        const std::string& csv_ids, RobotCapability capability,
+        std::map<int, std::set<RobotCapability>>& missing_caps_map);
+
+    /**
+     * Builds a map from robot ID to the set of capabilities that are missing according
+     * to the robot capabilities config
+     *
+     * @return A map from robot ID to the set of missing capabilities
+     */
+    std::map<int, std::set<RobotCapability>> getMissingCapabilities();
 
     // HaltTactics common to all plays for robots that don't have tactics assigned
     TacticVector halt_tactics;
