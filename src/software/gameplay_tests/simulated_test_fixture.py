@@ -591,7 +591,8 @@ def simulated_test_runner():
         running_in_realtime=args.enable_thunderscope and not args.ci_mode,
     ) as yellow_fs:
         with Gamecontroller(
-            suppress_logs=(not args.show_gamecontroller_logs)
+            suppress_logs=(not args.show_gamecontroller_logs),
+            parallelized=True,
         ) as gamecontroller:
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
             yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)
