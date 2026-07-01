@@ -7,9 +7,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 @pytest.mark.parametrize(
@@ -38,12 +36,12 @@ from software.gameplay_tests.simulated_test_fixture import (
         (tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0), tbots_cpp.Angle.zero()),
     ],
 )
-def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
+def test_kick(ball_offset_from_robot, angle_to_kick_at, gameplay_test_runner):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -55,7 +53,7 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: KickTactic(
                     kick_origin=tbots_cpp.createPointProto(ball_position),
@@ -71,10 +69,9 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
     )
 
 
