@@ -254,8 +254,8 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
         std::min(trajectory_elapsed_time_.toSeconds() + TRAJECTORY_LOOKAHEAD_TIME_S,
                  trajectory_path_->getTotalTime());
 
-    const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
-    const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
+    // const Point target_position  = trajectory_path_->getPosition(sample_time_sec);
+    // const Vector target_velocity = trajectory_path_->getVelocity(sample_time_sec);
 
     Vector target_v_global =
         position_controller_.step(state_.position(), *trajectory_path_,
@@ -339,16 +339,16 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 
     prev_target_global_velocity_ = target_v_global;
 
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"target_pos_x", target_position.x()},
-                                                 {"target_pos_y", target_position.y()},
-                                                 {"target_vel_x", target_v_global.x()},
-                                                 {"target_vel_y", target_v_global.y()},
-                                                 {"actual_pos_x", state_.position().x()},
-                                                 {"actual_pos_y", state_.position().y()},
-                                                 {"actual_vel_x", state_.velocity().x()},
-                                                 {"actual_vel_y", state_.velocity().y()},
-                                                 {"traj_vel_x", target_velocity.x()},
-                                                 {"traj_vel_y", target_velocity.y()}});
+    // LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"target_pos_x", target_position.x()},
+    //                                              {"target_pos_y", target_position.y()},
+    //                                              {"target_vel_x", target_v_global.x()},
+    //                                              {"target_vel_y", target_v_global.y()},
+    //                                              {"actual_pos_x", state_.position().x()},
+    //                                              {"actual_pos_y", state_.position().y()},
+    //                                              {"actual_vel_x", state_.velocity().x()},
+    //                                              {"actual_vel_y", state_.velocity().y()},
+    //                                              {"traj_vel_x", target_velocity.x()},
+    //                                              {"traj_vel_y", target_velocity.y()}});
 
     return globalToLocalVelocity(target_v_global, state_.orientation());
 }
@@ -364,14 +364,14 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
         angular_trajectory_elapsed_time_.toSeconds() + TRAJECTORY_LOOKAHEAD_TIME_S,
         angular_trajectory_->getTotalTime());
 
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"target_orientation_rad",
-         angular_trajectory_->getPosition(sample_time_sec).toRadians()},
-        {"target_angular_vel_rad_per_s",
-         angular_trajectory_->getVelocity(sample_time_sec).toRadians()},
-        {"actual_orientation_rad", state_.orientation().toRadians()},
-        {"actual_angular_vel_rad_per_s", state_.angularVelocity().toRadians()},
-    });
+    // LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+    //     {"target_orientation_rad",
+    //      angular_trajectory_->getPosition(sample_time_sec).toRadians()},
+    //     {"target_angular_vel_rad_per_s",
+    //      angular_trajectory_->getVelocity(sample_time_sec).toRadians()},
+    //     {"actual_orientation_rad", state_.orientation().toRadians()},
+    //     {"actual_angular_vel_rad_per_s", state_.angularVelocity().toRadians()},
+    // });
 
     auto target_w =
         orientation_controller_.step(state_.orientation(), *angular_trajectory_,

@@ -29,35 +29,54 @@ void JerkLimitedTrajectory1D::generate(const double initial_pos, const double fi
 
     const double distance = final_pos - initial_pos;
 
-    if (std::abs(distance) < EPSILON)
+    if (std::abs(distance) < EPSILON && std::abs(initial_vel) < EPSILON &&
+        std::abs(initial_accel) < EPSILON)
     {
-        // Already at target, bring the robot to a stop at current state
-        const AccelPlan stop =
-            planDecelToStop(initial_vel, initial_accel, max_jerk, min_jerk, max_decel);
-        if (stop.phases.empty())
-        {
-            addTrajectoryPart({0.0, initial_pos, initial_vel, initial_accel, 0.0});
-            return;
-        }
-        double t = 0.0, p = 0.0, v = initial_vel, a = initial_accel;
-        applyPlan(stop, initial_pos, p, v, a, t);
+        // Already at the target and at rest, nothing to do
+        addTrajectoryPart({0.0, initial_pos, initial_vel, initial_accel, 0.0});
         return;
+    }
+
+    // Note: if we are already at the target but still moving, we intentionally do not stop
+    // here. Doing so would leave the robot wherever its momentum carries it rather than at
+    // the destination. Instead we fall through to the logic below, which will overshoot the
+    // target and then plan a trajectory back to it.
+
+    // Ramp the initial acceleration to zero via a preliminary jerk phase, then plan the
+    // rest of the trajectory from that zero-acceleration state. The 2D layer feeds the
+    // robot's actual (unscaled) initial acceleration into each axis while scaling the
+    // per-axis acceleration/jerk limits, so the initial acceleration can exceed or conflict
+    // with those limits. The planning primitives below (planAccelProfile, planDecelToStop,
+    // planDecelToSpeed) are only well-defined for a zero initial acceleration; feeding them
+    // an out-of-range initial acceleration produces inconsistent profiles (e.g. negative
+    // phase durations) that fail to reach the destination.
+    double t = 0.0, p = 0.0, v = initial_vel, a = initial_accel;
+    if (std::abs(a) > EPSILON)
+    {
+        // Ramp acceleration down to zero: negative jerk if accelerating, positive if
+        // decelerating, each bounded by the corresponding jerk limit
+        const double jerk     = (a > 0.0) ? -min_jerk : max_jerk;
+        const double duration = std::abs(a) / ((a > 0.0) ? min_jerk : max_jerk);
+        addTrajectoryPart({t + duration, initial_pos + p, v, a, jerk});
+        integrateState(p, v, a, duration, jerk);
+        t += duration;
+        a = 0.0;
     }
 
     // If we can stop before or at the destination, plan directly
     // Otherwise, decelerate to a full stop first, then plan from there
-    const double stop_pos = closestPositionToStop(initial_pos, initial_vel, initial_accel,
-                                                  max_jerk, min_jerk, max_decel);
-    if (isInRangeInclusive(stop_pos, initial_pos, final_pos))
+    const double current_pos = initial_pos + p;
+    const double stop_pos =
+        closestPositionToStop(current_pos, v, 0.0, max_jerk, min_jerk, max_decel);
+    if (isInRangeInclusive(stop_pos, current_pos, final_pos))
     {
-        generateDirect(initial_pos, final_pos, initial_vel, initial_accel, max_vel,
-                       max_accel, max_decel, max_jerk, min_jerk, 0.0);
+        generateDirect(current_pos, final_pos, v, 0.0, max_vel, max_accel, max_decel,
+                       max_jerk, min_jerk, t);
     }
     else
     {
         const AccelPlan stop_plan =
-            planDecelToStop(initial_vel, initial_accel, max_jerk, min_jerk, max_decel);
-        double t = 0.0, p = 0.0, v = initial_vel, a = initial_accel;
+            planDecelToStop(v, 0.0, max_jerk, min_jerk, max_decel);
         applyPlan(stop_plan, initial_pos, p, v, a, t);
 
         // Recursively plan from the stopped position to the final target
@@ -371,6 +390,82 @@ JerkLimitedTrajectory1D::AccelPlan JerkLimitedTrajectory1D::planDecelToStop(
     return result;
 }
 
+JerkLimitedTrajectory1D::AccelPlan JerkLimitedTrajectory1D::planDecelToSpeed(
+    const double initial_vel, const double initial_accel, const double target_speed,
+    const double max_jerk, const double min_jerk, const double max_decel)
+{
+    AccelPlan result;
+
+    // This is only meaningful when we are actually slowing down; the caller guarantees
+    // target_speed < |initial_vel| and initial_vel != 0
+    const double dir = std::copysign(1.0, initial_vel);
+    double a         = initial_accel * dir;
+
+    double p = 0.0, v = std::abs(initial_vel);
+
+    // If acceleration exceeds the deceleration limit, bring it up to
+    // -max_decel first (acceleration ramping up, so +max_jerk)
+    if (a < -max_decel)
+    {
+        const double t = (-max_decel - a) / max_jerk;
+        result.phases.push_back({max_jerk * dir, t});
+        integrateState(p, v, a, t, max_jerk);
+    }
+
+    const double delta_vel = target_speed - v;
+    // Acceleration ramps down to -max_decel at -min_jerk, then back up to zero at
+    // +max_jerk
+    const double t_to_max_decel   = std::max(a + max_decel, 0.0) / min_jerk;
+    const double t_max_decel_zero = max_decel / max_jerk;
+    const double delta_vel_min =
+        (a - max_decel) / 2.0 * t_to_max_decel - max_decel / 2.0 * t_max_decel_zero;
+
+    double t1, t2, t3;
+    if (delta_vel <= delta_vel_min)
+    {
+        // Trapezoidal deceleration (reaches -max_decel)
+        t1 = t_to_max_decel;
+        t2 = (delta_vel_min - delta_vel) / max_decel;
+        t3 = t_max_decel_zero;
+    }
+    else
+    {
+        // Triangular deceleration (does not reach -max_decel)
+        const double peak_decel =
+            std::max(-std::sqrt(std::max(0.0, (a * a / min_jerk - 2.0 * delta_vel) /
+                                                  (1.0 / min_jerk + 1.0 / max_jerk))),
+                     -max_decel);
+
+        t1 = (a - peak_decel) / min_jerk;
+        t2 = 0.0;
+        t3 = -peak_decel / max_jerk;
+    }
+
+    // Phase 1: decrease acceleration to -max_decel at -min_jerk
+    if (t1 > 0)
+    {
+        result.phases.push_back({-min_jerk * dir, t1});
+        integrateState(p, v, a, t1, -min_jerk);
+    }
+
+    // Phase 2: hold constant deceleration (zero jerk)
+    if (t2 > 0)
+    {
+        result.phases.push_back({0.0, t2});
+        integrateState(p, v, a, t2, 0.0);
+    }
+
+    // Phase 3: increase acceleration to zero at +max_jerk
+    if (t3 > 0)
+    {
+        result.phases.push_back({max_jerk * dir, t3});
+        integrateState(p, v, a, t3, max_jerk);
+    }
+
+    result.total_distance = p * dir;
+    return result;
+}
+
 double JerkLimitedTrajectory1D::closestPositionToStop(
     const double initial_pos, const double initial_vel, const double initial_accel,
     const double max_jerk, const double min_jerk, const double max_decel)
@@ -395,13 +490,29 @@ void JerkLimitedTrajectory1D::generateDirect(
         return;
     }
 
+    // Plan the phase that brings the robot from its initial velocity to signed_peak. We
+    // accelerate if the peak is above the initial speed, but decelerate if the initial
+    // speed already exceeds the peak (which happens when a scaled 2D axis velocity limit is
+    // smaller than the robot's initial speed component along that axis). Previously this
+    // always used planAccelProfile, which returns an empty plan when the initial speed is
+    // already above the peak. The robot would then never slow down to the cruise speed, so
+    // the cruise/deceleration distances were computed for the peak speed while the robot
+    // was actually travelling faster, causing it to overshoot the destination.
+    auto planToPeak = [&](const double signed_peak)
+    {
+        if (std::abs(signed_peak) >= std::abs(initial_vel))
+        {
+            return planAccelProfile(initial_vel, initial_accel, signed_peak, max_jerk,
+                                    min_jerk, max_accel);
+        }
+        return planDecelToSpeed(initial_vel, initial_accel, std::abs(signed_peak),
+                                max_jerk, min_jerk, max_decel);
+    };
+
     auto totalDistNoCruise = [&](const double peak_speed)
     {
         const double signed_peak = direction * peak_speed;
-        const double dist_accel =
-            std::abs(planAccelProfile(initial_vel, initial_accel, signed_peak, max_jerk,
-                                      min_jerk, max_accel)
-                         .total_distance);
+        const double dist_accel  = std::abs(planToPeak(signed_peak).total_distance);
         const double dist_decel =
             std::abs(planDecelToStop(signed_peak, 0.0, max_jerk, min_jerk, max_decel)
                          .total_distance);
@@ -446,12 +557,9 @@ void JerkLimitedTrajectory1D::generateDirect(
     double a = initial_accel;
     double t = time_offset;
 
-    // Acceleration phases
-    if (peak_speed > std::abs(v))
-    {
-        applyPlan(planAccelProfile(v, a, signed_peak, max_jerk, min_jerk, max_accel),
-                  start_pos, p, v, a, t);
-    }
+    // Bring the velocity to signed_peak (accelerating or decelerating as needed). After
+    // this, v == signed_peak, which the cruise and deceleration phases below rely on.
+    applyPlan(planToPeak(signed_peak), start_pos, p, v, a, t);
 
     // Cruise phase (constant velocity)
     if (time_cruise > 0.0)

@@ -55,6 +55,14 @@ class JerkLimitedTrajectory1D : public Trajectory<double, double, double>
     static AccelPlan planDecelToStop(double initial_vel, double initial_accel,
                                      double max_jerk, double min_jerk, double max_decel);
 
+    // Decelerate from the initial speed down to a lower target speed (in the same
+    // direction of travel as initial_vel). This is the mirror of planAccelProfile for the
+    // case where the initial speed already exceeds the desired peak/cruise speed, which
+    // can happen when a 2D axis limit is scaled below the robot's initial speed component.
+    static AccelPlan planDecelToSpeed(double initial_vel, double initial_accel,
+                                      double target_speed, double max_jerk,
+                                      double min_jerk, double max_decel);
+
     static double closestPositionToStop(double initial_pos, double initial_vel,
                                         double initial_accel, double max_jerk,
                                         double min_jerk, double max_decel);
