@@ -353,6 +353,7 @@ Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
                 // it cannot do
                 if (!intersection.empty())
                 {
+                    // so skip it, keeping it in remaining_robots
                     continue;
                 }
 
