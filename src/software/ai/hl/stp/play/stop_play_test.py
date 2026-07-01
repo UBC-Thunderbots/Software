@@ -5,14 +5,14 @@ from proto.import_all_protos import *
 from proto.play_pb2 import PlayName
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.robot_speed_threshold import (
+from software.gameplay_tests.validation.robot_speed_threshold import (
     RobotSpeedAlwaysBelowThreshold,
 )
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotNeverEntersRegion,
 )
-from software.simulated_tests.validation.delay_validation import DelayValidation
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.validation.delay_validation import DelayValidation
+from software.gameplay_tests.simulated_test_fixture import pytest_main
 
 
 @pytest.mark.parametrize(

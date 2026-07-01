@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
@@ -91,10 +91,30 @@ cc_library(
 py_test(
     name = "ball_occlusion_test",
     srcs = ["ball_occlusion_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
+    ],
+)
+
+cc_library(
+    name = "kalman_filter",
+    srcs = [],
+    hdrs = ["kalman_filter.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "kalman_filter_test",
+    srcs = ["kalman_filter_test.cpp"],
+    deps = [
+        ":kalman_filter",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

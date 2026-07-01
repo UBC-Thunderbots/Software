@@ -75,7 +75,7 @@ host_software_packages=(
     libffi-dev # needed to use _ctypes in Python3
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
-    sshpass #used to remotely ssh into robots via Ansible
+    sshpass # used to remotely ssh into robots via Ansible
     unzip # installing tigers autoref
     xvfb # used for CI to run GUI applications
 )
@@ -200,5 +200,9 @@ print_status_msg "Done PlatformIO Setup"
 print_status_msg "Set up ansible-lint"
 /opt/tbotspython/bin/ansible-galaxy collection install ansible.posix
 print_status_msg "Finished setting up ansible-lint"
+
+print_status_msg "Setting up STM32 cross-compiler"
+install_stm32_cross_compiler $g_arch
+print_status_msg "Done setting up STM32 cross-compiler"
 
 print_status_msg "Done Software Setup, please reboot for changes to take place"

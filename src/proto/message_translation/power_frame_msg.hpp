@@ -49,6 +49,11 @@ std::vector<uint8_t> serializeToVector(const T& data)
         fields = TbotsProto_PowerStatus_fields;
         size   = TbotsProto_PowerStatus_size;
     }
+    else if (std::is_same<T, TbotsProto_DribblerControl>::value)
+    {
+        fields = TbotsProto_DribblerControl_fields;
+        size   = TbotsProto_DribblerControl_size;
+    }
     else
     {
         throw std::runtime_error("Unexpected type as argument");
@@ -83,6 +88,13 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
 {
     frame.which_power_msg        = TbotsProto_PowerFrame_power_status_tag;
     frame.power_msg.power_status = status;
+}
+
+void inline setPowerMsg(TbotsProto_PowerFrame& frame,
+                        const TbotsProto_DribblerControl& dribble_control)
+{
+    frame.which_power_msg            = TbotsProto_PowerFrame_dribbler_control_tag;
+    frame.power_msg.dribbler_control = dribble_control;
 }
 
 /**
@@ -315,5 +327,19 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
     auto proto_status = std::make_unique<TbotsProto::PowerStatus>();
     proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
     return proto_status;
+}
+
+/**
+ * Creates a nanopb dribbler control msg with the provided fields
+ *
+ * @param dribbler_speed_rpm The target dribbler speed in RPM
+ * @return a nanopb dribbler control msg with the provided fields
+ */
+TbotsProto_DribblerControl inline createNanoPbDribblerControl(
+    const uint32_t dribbler_speed_rpm)
+{
+    TbotsProto_DribblerControl control = TbotsProto_DribblerControl_init_default;
+    control.dribbler_speed             = dribbler_speed_rpm;
+    return control;
 }
 #endif

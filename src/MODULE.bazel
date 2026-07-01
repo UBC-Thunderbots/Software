@@ -10,7 +10,7 @@ module(
 bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "pybind11_bazel", version = "2.13.6")
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
 bazel_dep(name = "rules_python", version = "1.4.1")
@@ -50,12 +50,12 @@ pip.parse(
 )
 use_repo(pip, "ansible_deps")
 pip.parse(
-    hub_name = "simulated_tests_deps",
+    hub_name = "gameplay_tests_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
-    requirements_lock = "//software/simulated_tests:requirements_lock.txt",
+    requirements_lock = "//software/gameplay_tests:requirements_lock.txt",
 )
-use_repo(pip, "simulated_tests_deps")
+use_repo(pip, "gameplay_tests_deps")
 pip.parse(
     hub_name = "robot_diagnostics_cli_deps",
     python_interpreter = "/opt/tbotspython/bin/python",
@@ -194,6 +194,17 @@ http_archive(
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
 )
 
+# For flashing the motor driver board
+http_archive(
+    name = "bazel_embedded",
+    sha256 = "91a78efbb0f94479fe9ca2912aced712be9e7028325bada9a73e7d325427b404",
+    strip_prefix = "bazel-embedded-cf5b240d510313b3383e0cdb550eb9f32be7244e",
+    url = "https://github.com/bazelembedded/bazel-embedded/archive/cf5b240d510313b3383e0cdb550eb9f32be7244e.zip",
+)
+
+openocd = use_extension("//starlark/firmware:open_ocd.bzl", "openocd_extension")
+use_repo(openocd, "com_openocd")
+
 http_archive(
     name = "LTC4151",
     build_file = "@//extlibs:LTC4151.BUILD",
@@ -202,12 +213,29 @@ http_archive(
     url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
 )
 
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "mdv6_firmware",
+    build_file = "@//extlibs:mdv6_firmware.bzl",
+    # Pinning to the exact commit guarantees Bazel will rebuild when this commit SHA is updated
+    commit = "4341d96e9be1cb01f10d52f7e80326b84dbfb4ea",  # latest commit on master branch
+    remote = "https://github.com/UBC-Thunderbots/MDv6_Firmware.git",
+)
+
 http_archive(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
     sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
     strip_prefix = "TMC-API-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
     url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
+)
+
+http_archive(
+    name = "cppcrc",
+    build_file = "@//extlibs:cppcrc.BUILD",
+    strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
+    url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
 )
 
 ##############################################
@@ -222,9 +250,11 @@ register_toolchains(
 )
 
 register_toolchains(
+    "//toolchains/cc:cc_toolchain_for_macos_robot",
     "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
     "//toolchains/cc:cc_toolchain_for_k8",
     "//toolchains/cc:cc_toolchain_for_aarch64",
+    "//toolchains/cc:cc_toolchain_for_stm32",
 )
 
 ##############################################
@@ -255,6 +285,18 @@ new_local_repository(
     name = "k8_aarch64_linux_gcc",
     build_file = "@//extlibs:k8_aarch64_linux_gcc.BUILD",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+)
+
+new_local_repository(
+    name = "macos_robot_gcc",
+    build_file = "@//extlibs:macos_robot_gcc.BUILD",
+    path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
+)
+
+new_local_repository(
+    name = "motor_board_gcc",
+    build_file = "@//extlibs:motor_board_gcc.BUILD",
+    path = "/opt/tbotspython/arm-none-eabi-gcc/",
 )
 
 new_local_repository(

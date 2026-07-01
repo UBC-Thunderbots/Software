@@ -3,17 +3,17 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import PenaltyKickTactic
 
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.ball_moves_in_direction import (
+from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallAlwaysMovesForward,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 

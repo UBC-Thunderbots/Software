@@ -139,6 +139,7 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/geom:point",
         "//software/geom:vector",
+        "//software/physics:velocity_conversion_util",
         "//software/time:duration",
     ],
 )

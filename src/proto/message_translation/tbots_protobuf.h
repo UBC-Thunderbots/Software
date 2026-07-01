@@ -248,9 +248,9 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const robot_constants::RobotConstants& robot_constants);
 
 /**
- * Generate an angular trajectory Path given angular trajectory proto parameters
+ * Generate an angular trajectory path given angular trajectory proto parameters
  *
- * @param params angular Trajectory Path
+ * @param params Angular trajectory path
  * @param initial_velocity Initial velocity to use for the trajectory
  * @param robot_constants Constants to use for the trajectory
  * @return Generate angular trajectory
