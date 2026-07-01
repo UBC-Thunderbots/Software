@@ -52,9 +52,9 @@ py_library(
     name = "handheld_controller_widget",
     srcs = ["handheld_controller_widget.py"],
     deps = [
-        ":keyboard_controller",
         ":controller_base",
         ":handheld_controller",
+        ":keyboard_controller",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
     ],

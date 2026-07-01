@@ -21,7 +21,8 @@ class ControllerBase(ABC):
 
     def update(self) -> None:
         """Refresh controller input state. Called once per frame before reading inputs.
-        Override for polled backends; push-based controllers can leave this as a no-op."""
+        Override for polled backends; push-based controllers can leave this as a no-op.
+        """
         pass
 
     @abstractmethod
