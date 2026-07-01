@@ -2,6 +2,16 @@
 - name: Setting up the Raspberry Pi
   hosts: THUNDERBOTS_HOSTS
 
+  vars:
+    # WiFi 6E setup. The regulatory country must permit 6 GHz; override with
+    # -e wifi_country=<code> when operating in another country (e.g. at a
+    # competition). The 6 GHz network uses WPA3-SAE; its passphrase defaults to
+    # the SSH/sudo password passed to run_ansible.py so no secret is committed to
+    # the repo. Override any of these with -e if they differ.
+    wifi_country: CA
+    wifi_6e_ssid: tbots_mezz
+    wifi_6e_password: "{{ ansible_sudo_pass }}"
+
   tasks:
     - name: Copy SSH public key
       ansible.builtin.import_tasks: ../tasks/copy_ssh_key.yml
@@ -123,6 +133,10 @@
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
             mode: "0444"
+          # also selected by the standalone setup_wifi_6e run so the
+          # pcie-32bit-dma-pi5 overlay is applied to already-provisioned robots
+          tags:
+            - setup_wifi_6e
 
         - name: Update udev configs to map connected devices
           become: true
@@ -131,6 +145,13 @@
             src: ../../linux_configs/pi/10-local.rules
             dest: /etc/udev/rules.d/
             mode: "0444"
+
+    - name: Set up WiFi 6E (6 GHz) network
+      tags:
+        - configure_pi
+        - setup_wifi_6e
+      ansible.builtin.import_tasks:
+        file: ../tasks/setup_wifi_6e.yml
 
     - name: Change hostname
       tags: update_hostname
@@ -142,6 +163,7 @@
         - dependencies
         - configure_pi
         - update_hostname
+        - setup_wifi_6e
       ansible.builtin.import_tasks:
         file: ../tasks/reboot.yml
 
