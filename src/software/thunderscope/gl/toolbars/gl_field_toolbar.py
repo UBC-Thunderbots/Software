@@ -134,6 +134,9 @@ class GLFieldToolbar(GLToolbar):
         self.sandbox_sidebar_visible = False
         self.sidebar_visibility_callback = None
 
+        # buffer for the sandbox mode enabled state
+        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+
         self.sidebar_button_container = QWidget()
         sidebar_button_layout = QHBoxLayout()
         sidebar_button_layout.setContentsMargins(0, 0, 0, 0)

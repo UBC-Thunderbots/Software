@@ -61,6 +61,11 @@ message SimulationState
     required double simulation_speed = 2 [default = 1.0];
 }
 
+message SandboxModeState
+{
+    required bool is_enabled         = 1 [default = false];
+}
+
 message Pass
 {
     // The location of the passer
