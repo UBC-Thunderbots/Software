@@ -19,6 +19,7 @@ from cli.cli_params import (
     INTERACTIVE_STYLE,
     LAUNCH_MODE_CHOICES,
     PLAYBOOK_CHOICES,
+    THUNDERSCOPE_OPTIONS_MAP,
     TEST_TYPE_CHOICES,
     THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
     ActionArgument,
@@ -401,7 +402,9 @@ def start_interactive_cli(config: BuildConfig):
                 iface = questionary.text(
                     "Network interface?", style=INTERACTIVE_STYLE
                 ).unsafe_ask()
-                extra_args.extend(["--run_diagnostics", "--interface", iface])
+                extra_args.extend(
+                    [f"--{THUNDERSCOPE_OPTIONS_MAP[launch]}", "--interface", iface]
+                )
             elif launch == "Tests":
                 extra_args.append("--test_mode")
                 test_type = questionary.select(
