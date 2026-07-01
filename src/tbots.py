@@ -384,7 +384,7 @@ def start_interactive_cli():
                 iface = questionary.text(
                     "Network interface?", style=INTERACTIVE_STYLE
                 ).unsafe_ask()
-                extra_args.extend(["--run_diagnostics", "--interface", iface])
+                extra_args.extend([f"--{launch.lower()}", "--interface", iface])
 
         case "Test":
             config.action = ActionArgument.test

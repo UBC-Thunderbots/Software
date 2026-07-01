@@ -163,8 +163,16 @@ LAUNCH_MODE_CHOICES = [
         description="Run Thunderscope against the simulated full system",
     ),
     questionary.Choice(
-        title="Diagnostics",
+        title="Run_Diagnostics",
         description="Run Thunderscope in diagnostics mode against real robots",
+    ),
+    questionary.Choice(
+        title="Run_blue",
+        description="run_blue",
+    ),
+    questionary.Choice(
+        title="Run_yellow",
+        description="run_yellow",
     ),
 ]
 
