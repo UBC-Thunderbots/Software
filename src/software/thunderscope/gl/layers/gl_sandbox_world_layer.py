@@ -330,7 +330,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         self.__check_referee_status()
 
-
     @override
     def refresh_graphics(self) -> None:
         """Calls the super class refresh graphics
@@ -840,7 +839,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
     def _should_invert_coordinate_frame(self) -> bool:
         if not self._referee_defined:
             return False
-        
+
         return super()._should_invert_coordinate_frame()
 
     def __invert_robot_if_defending_negative_half(
