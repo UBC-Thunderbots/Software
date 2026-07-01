@@ -19,6 +19,7 @@ from cli.cli_params import (
     INTERACTIVE_STYLE,
     LAUNCH_MODE_CHOICES,
     PLAYBOOK_CHOICES,
+    THUNDERSCOPE_OPTIONS_MAP,
     THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
     ActionArgument,
     AnsiblePlaybook,
@@ -384,7 +385,9 @@ def start_interactive_cli():
                 iface = questionary.text(
                     "Network interface?", style=INTERACTIVE_STYLE
                 ).unsafe_ask()
-                extra_args.extend([f"--{launch.lower()}", "--interface", iface])
+                extra_args.extend(
+                    [f"--{THUNDERSCOPE_OPTIONS_MAP[launch]}", "--interface", iface]
+                )
 
         case "Test":
             config.action = ActionArgument.test
