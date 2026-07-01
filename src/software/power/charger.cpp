@@ -32,7 +32,8 @@ float Charger::getCapacitorVoltage()
 
 bool Charger::isDonePinLOW()
 {
-    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <= DONE_PIN_THRESHOLD_VOLTAGE;
+    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <=
+           DONE_PIN_THRESHOLD_VOLTAGE;
 }
 
 void Charger::update()
@@ -42,13 +43,6 @@ void Charger::update()
         return;
     }
 
-    // DONE is a held level on the LT3750 (low = caps at target), not a one-shot pulse, so
-    // poll the level here rather than wait on a falling-edge ISR. This also stops charging
-    // when the caps are already full at boot, where no fresh falling edge would ever arrive.
-    // if (isDonePinLOW())
-    // {
-    //     setCapacitorPin(LOW);
-    // }
     if (millis() - charge_start_ms >= MAX_CHARGE_DURATION_MILLISECONDS)
     {
         // Charged too long without DONE asserting -> fault: force-discharge and stop.
