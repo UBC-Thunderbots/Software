@@ -1,21 +1,28 @@
 #include "charger.h"
 
 volatile bool Charger::charge_done_pending = false;
+bool Charger::is_charging                  = false;
+unsigned long Charger::charge_start_ms     = 0;
 
 Charger::Charger()
 {
     pinMode(HV_SENSE, INPUT);
-    pinMode(FLYBACK_FAULT, INPUT);
     pinMode(CHRG_DONE, INPUT);
-    attachInterrupt(digitalPinToInterrupt(CHRG_DONE), updateCHRGDoneISR, FALLING);
     pinMode(CHRG, OUTPUT);
-    pinMode(CHRG_SHUTOFF, OUTPUT);
-    digitalWrite(CHRG_SHUTOFF, HIGH);
 }
 
 void Charger::setCapacitorPin(bool pin_state)
 {
     digitalWrite(CHRG, pin_state);
+    if (pin_state)
+    {
+        charge_start_ms = millis();
+        is_charging     = true;
+    }
+    else
+    {
+        is_charging = false;
+    }
 }
 
 float Charger::getCapacitorVoltage()
@@ -23,25 +30,28 @@ float Charger::getCapacitorVoltage()
     return analogRead(HV_SENSE) / RESOLUTION * SCALE_VOLTAGE * VOLTAGE_DIVIDER;
 }
 
-bool Charger::getDonePinState()
+bool Charger::isDonePinLOW()
 {
-    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <=
-           DONE_PIN_THRESHOLD_VOLTAGE;
+    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <= DONE_PIN_THRESHOLD_VOLTAGE;
 }
 
 void Charger::update()
 {
-    if (charge_done_pending)
+    if (!is_charging || isDonePinLOW())
     {
-        charge_done_pending = false;
-        if (getDonePinState())
-        {
-            setCapacitorPin(LOW);
-        }
+        return;
     }
-}
 
-void IRAM_ATTR Charger::updateCHRGDoneISR()
-{
-    charge_done_pending = true;
+    // DONE is a held level on the LT3750 (low = caps at target), not a one-shot pulse, so
+    // poll the level here rather than wait on a falling-edge ISR. This also stops charging
+    // when the caps are already full at boot, where no fresh falling edge would ever arrive.
+    // if (isDonePinLOW())
+    // {
+    //     setCapacitorPin(LOW);
+    // }
+    if (millis() - charge_start_ms >= MAX_CHARGE_DURATION_MILLISECONDS)
+    {
+        // Charged too long without DONE asserting -> fault: force-discharge and stop.
+        setCapacitorPin(LOW);
+    }
 }

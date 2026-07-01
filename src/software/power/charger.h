@@ -36,17 +36,14 @@ class Charger
      *
      * @return True if CHRG_DONE is below threshold (charging done), false otherwise
      */
-    static bool getDonePinState();
-
-    /**
-     * Called on the falling edge of CHRG_DONE.
-     */
-    static void updateCHRGDoneISR();
+    static bool isDonePinLOW();
 
     static volatile bool charge_done_pending;
+    static bool is_charging;
+    static unsigned long charge_start_ms;
     static constexpr float VOLTAGE_DIVIDER                  = 1003.0 / 13.0;
     static constexpr float MAX_CHARGE_DURATION_MILLISECONDS = 2000;
     static constexpr float RESOLUTION                       = 4096.0;
     static constexpr float SCALE_VOLTAGE                    = 3.3;
-    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE       = 1.0;
+    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE       = 0.5;
 };
