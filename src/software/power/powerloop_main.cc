@@ -31,6 +31,7 @@
  * functionality.
  */
 void setup() {}
+
 void loop() {}
 #else
 
@@ -58,7 +59,6 @@ void setup()
     geneva       = std::make_shared<Geneva>();
     executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     dribbler     = std::make_shared<Dribbler>();
-    charger->setCapacitorPin(HIGH);
 }
 
 void loop()
@@ -104,11 +104,19 @@ void loop()
 
     dribbler->update();
 
+    // Release the charger inhibit after a kicker/chipper pulse completes.
+    chicker->update();
+
+    // Update the raw control reading and obtain the EMA-smoothed telemetry value.
+    const float capacitor_voltage = charger->getCapacitorVoltage();
+
+    // Hysteretic charging control uses the fresh non-EMA reading.
+    charger->maintainCharge();
+
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
-        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
-        chicker->getBreakBeamTripped());
+        monitor->getBatteryVoltage(), capacitor_voltage, monitor->getCurrentDrawAmp(),
+        geneva->getCurrentSlot(), sequence_num++, chicker->getBreakBeamTripped());
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);
