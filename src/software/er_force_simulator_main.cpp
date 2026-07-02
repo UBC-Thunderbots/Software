@@ -144,11 +144,8 @@ int main(int argc, char** argv)
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
 
-                std::cout << "ER FORCE SET WORLD STATE" << std::endl;
-
                 if (!has_sent_world_state_trigger)
                 {
-                    std::cout << "ER FORCE sent trigger" << std::endl;
                     auto world_state_received_trigger_msg =
                         *createWorldStateReceivedTrigger();
                     world_state_received_trigger.sendProto(

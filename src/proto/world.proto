@@ -41,14 +41,14 @@ enum FieldType
 
 message RobotStates
 {
-    // Robot ID to RobotState map
+    // Wrapper proto around Robot ID to RobotState map
+    // to distinguish between empty list of robots vs an unset field
     map<uint32, RobotState> robot_states = 1;
 }
 
 message WorldState
 {
     // Robot ID to RobotState map for both teams
-    // Using wrapper messages so that has_ can distinguish unset from empty
     optional RobotStates blue_robots   = 1;
     optional RobotStates yellow_robots = 2;
     optional BallState ball_state      = 3;

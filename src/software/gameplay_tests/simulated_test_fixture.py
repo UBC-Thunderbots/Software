@@ -69,7 +69,6 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         :param worldstate: proto containing the desired worldstate
         """
-        print(worldstate)
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
     def excepthook(self, args):
@@ -106,7 +105,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
 
         while True:
-            print("pre setup")
             setup(param)
 
             try:
@@ -118,7 +116,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                 continue
             else:
                 # Received a response from the simulator
-                print("world state received")
                 break
 
     def runner(
@@ -358,8 +355,6 @@ class InvariantTestRunner(SimulatedTestRunner):
                                 that should eventually be true, before the test ends
         """
         threading.excepthook = self.excepthook
-
-        print("run test")
 
         super().sync_setup(setup, params[0])
 

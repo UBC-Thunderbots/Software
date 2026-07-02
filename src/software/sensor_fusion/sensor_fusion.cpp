@@ -265,9 +265,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
 
     Timestamp capture_timestamp = Timestamp::fromSeconds(ssl_detection_frame.t_capture());
 
-    std::cout << "DETECTED FRIENDLY: " << blue_team.size() << std::endl;
-    std::cout << "TIMESTAMP: " << capture_timestamp << std::endl;
-
     if (friendly_team_is_yellow)
     {
         friendly_team = createFriendlyTeam(yellow_team, capture_timestamp);
