@@ -25,7 +25,6 @@ from software.thunderscope.gl.layers import (
     gl_passing_layer,
     gl_attacker_layer,
     gl_sandbox_world_layer,
-    gl_world_layer,
     gl_debug_shapes_layer,
     gl_simulator_layer,
     gl_tactic_layer,
@@ -60,7 +59,6 @@ def setup_gl_widget(
     full_system_proto_unix_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
     visualization_buffer_size: int,
-    sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
     frame_swap_counter: Optional[FrameTimeCounter] = None,
@@ -72,7 +70,6 @@ def setup_gl_widget(
     :param full_system_proto_unix_io: The proto unix io object for the full system
     :param friendly_colour_yellow: Whether the friendly colour is yellow
     :param visualization_buffer_size: How many packets to buffer while rendering
-    :param sandbox_mode: if sandbox mode should be enabled
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
     :param frame_swap_counter: FrameTimeCounter to keep track of the time between
@@ -89,7 +86,6 @@ def setup_gl_widget(
         friendly_color_yellow=friendly_colour_yellow,
         frame_swap_counter=frame_swap_counter,
         player=player,
-        sandbox_mode=sandbox_mode,
     )
 
     # Create layers
@@ -113,20 +109,11 @@ def setup_gl_widget(
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
     )
-    world_layer = (
-        gl_sandbox_world_layer.GLSandboxWorldLayer(
-            "Vision",
-            sim_proto_unix_io,
-            friendly_colour_yellow,
-            visualization_buffer_size,
-        )
-        if sandbox_mode
-        else gl_world_layer.GLWorldLayer(
-            "Vision",
-            sim_proto_unix_io,
-            friendly_colour_yellow,
-            visualization_buffer_size,
-        )
+    world_layer = gl_sandbox_world_layer.GLSandboxWorldLayer(
+        "Vision",
+        sim_proto_unix_io,
+        friendly_colour_yellow,
+        visualization_buffer_size,
     )
     field_movement_layer = gl_movement_field_test_layer.GLMovementFieldTestLayer(
         "Field Movement Layer", full_system_proto_unix_io
@@ -164,33 +151,36 @@ def setup_gl_widget(
     gl_widget.add_layer(referee_layer)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
+
+    sandbox_sidebar = gl_widget.get_sandbox_sidebar()
+
+    sim_proto_unix_io.register_observer(
+        SimulationState, simulation_control_toolbar.simulation_state_buffer
+    )
+    sim_proto_unix_io.register_observer(
+        SimulationState, world_layer.simulation_state_buffer
+    )
+    sim_proto_unix_io.register_observer(
+        SimulationState, gl_widget.simulation_state_buffer
+    )
+    sim_proto_unix_io.register_observer(
+        SimulationState, sandbox_sidebar.simulation_state_buffer
+    )
+
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
 
-    # connect all sandbox controls if using sandbox mode
-    if sandbox_mode:
-        simulation_control_toolbar.undo_button.clicked.connect(world_layer.undo)
-        simulation_control_toolbar.redo_button.clicked.connect(world_layer.redo)
-        simulation_control_toolbar.reset_button.clicked.connect(
-            world_layer.reset_to_pre_sim
-        )
-        world_layer.undo_toggle_enabled_signal.connect(
-            simulation_control_toolbar.toggle_undo_enabled
-        )
-        world_layer.redo_toggle_enabled_signal.connect(
-            simulation_control_toolbar.toggle_redo_enabled
-        )
-        simulation_control_toolbar.pause_button.clicked.connect(
-            world_layer.toggle_play_state
-        )
-        sim_proto_unix_io.register_observer(
-            SimulationState, simulation_control_toolbar.simulation_state_buffer
-        )
-        sim_proto_unix_io.register_observer(
-            SimulationState, world_layer.simulation_state_buffer
-        )
-        sim_proto_unix_io.register_observer(
-            SimulationState, gl_widget.simulation_state_buffer
-        )
+    # connect all sandbox controls
+    sandbox_sidebar.register_sandbox_mode_callback(
+        simulation_control_toolbar.set_sandbox_mode_enabled
+    )
+    sandbox_sidebar.register_sandbox_mode_callback(world_layer.set_sandbox_enabled)
+    sandbox_sidebar.pause_button.clicked.connect(world_layer.toggle_play_state)
+    sandbox_sidebar.undo_button.clicked.connect(world_layer.undo)
+    sandbox_sidebar.redo_button.clicked.connect(world_layer.redo)
+    sandbox_sidebar.clear_field_button.clicked.connect(world_layer.clear_field)
+    sandbox_sidebar.reset_field_button.clicked.connect(world_layer.reset_field)
+    world_layer.undo_toggle_enabled_signal.connect(sandbox_sidebar.toggle_undo_enabled)
+    world_layer.redo_toggle_enabled_signal.connect(sandbox_sidebar.toggle_redo_enabled)
 
     for arg in [
         (World, world_layer.world_buffer),

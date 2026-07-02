@@ -446,6 +446,8 @@ void Simulator::setTeam(Simulator::RobotMap& robotMap, float side,
     // remove old team
     robotMap.clear();
 
+    std::cout << "Size: " << robotMap.size() << std::endl;
+
     // align robots on a line
     const float x = m_data->geometry.field_width() / 2 - 0.2;
     float y       = m_data->geometry.field_height() / 2 - 0.2;
@@ -469,6 +471,8 @@ void Simulator::setTeam(Simulator::RobotMap& robotMap, float side,
 
         y -= 0.3;
     }
+
+    std::cout << "Size after: " << robotMap.size() << std::endl;
 }
 
 #define FLIP(X, ATTR)                                                                    \
@@ -523,6 +527,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot& robot)
     bool isBlue        = robot.id().team() == gameController::Team::BLUE;
     RobotMap& robotMap = isBlue ? m_data->robotsBlue : m_data->robotsYellow;
     bool isPresent     = robotMap.contains(robot.id().id());
+    std::cout << "IS Present " << robot.id().id() << " " << isPresent << std::endl;
     std::map<uint32_t, robot::Specs>& teamSpecs =
         isBlue ? m_data->specsBlue : m_data->specsYellow;
 
@@ -530,6 +535,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot& robot)
     {
         if (robot.present() && !isPresent)
         {
+            std::cout << "Adding robot: " << robot.id().id() << std::endl;
             // add the requested robot
             if (!teamSpecs.contains(robot.id().id()))
             {
@@ -722,6 +728,7 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
         if (sim.has_set_simulator_state())
         {
+            std::cout << "HERE?? " << std::endl;
             if (sim.set_simulator_state().has_ball())
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());

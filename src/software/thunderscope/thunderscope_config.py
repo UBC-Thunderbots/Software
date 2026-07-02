@@ -124,7 +124,6 @@ def configure_base_fullsystem(
     full_system_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
-    sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
@@ -138,7 +137,6 @@ def configure_base_fullsystem(
     :param full_system_proto_unix_io: the proto unix io to configure widgets with
     :param sim_proto_unix_io: the proto unix io for the simulator
     :param friendly_colour_yellow: if this is Yellow FullSystem (True) or Blue (False)
-    :param sandbox_mode: if sandbox mode should be enabled
     :param replay: True if in replay mode, False if not
     :param replay_log: the file path of the replay protos
     :param visualization_buffer_size: The size of the visualization buffer.
@@ -153,7 +151,6 @@ def configure_base_fullsystem(
         TScopeWidget(
             name="Field",
             widget=setup_gl_widget(
-                sandbox_mode=sandbox_mode,
                 replay=replay,
                 replay_log=replay_log,
                 full_system_proto_unix_io=full_system_proto_unix_io,
@@ -353,7 +350,6 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    sandbox_mode=True,
                     extra_widgets=[],
                     frame_swap_counter=blue_frame_swap_frametime_counter,
                     refresh_counter=blue_refresh_func_frametime_counter,
@@ -369,7 +365,6 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    sandbox_mode=True,
                     extra_widgets=[],
                     frame_swap_counter=yellow_frame_swap_frametime_counter,
                     refresh_counter=yellow_refresh_func_frametime_counter,

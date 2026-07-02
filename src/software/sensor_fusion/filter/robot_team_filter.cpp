@@ -9,7 +9,7 @@ RobotTeamFilter::RobotTeamFilter() {}
 Team RobotTeamFilter::getFilteredData(
     const Team& current_team_state,
     const std::vector<RobotDetection>& new_robot_detections,
-    const std::optional<RobotId> breakbeam_tripped_id)
+    const Timestamp& capture_timestamp, const std::optional<RobotId> breakbeam_tripped_id)
 {
     // Add filters for any robot we haven't seen before
     for (auto detection : new_robot_detections)
@@ -29,13 +29,24 @@ Team RobotTeamFilter::getFilteredData(
     std::vector<Robot> new_filtered_robot_data;
     for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
     {
-        auto data =
-            it->second.getFilteredData(new_robot_detections, breakbeam_tripped_id);
+        auto data = it->second.getFilteredData(new_robot_detections, capture_timestamp,
+                                               breakbeam_tripped_id);
         if (data)
         {
+            if (is_friendly)
+            {
+                std::cout << "DATA FOUND" << std::endl;
+            }
             new_filtered_robot_data.emplace_back(*data);
         }
     }
+
+    if (is_friendly)
+    {
+        std::cout << "FILTERED ROBOTS SIZE: " << new_filtered_robot_data.size()
+                  << std::endl;
+    }
+
 
     Team new_team_state = current_team_state;
     new_team_state.updateRobots(new_filtered_robot_data);

@@ -39,12 +39,19 @@ enum FieldType
     DIV_B = 1;
 }
 
+message RobotStates
+{
+    // Wrapper proto around Robot ID to RobotState map
+    // to distinguish between empty list of robots vs an unset field
+    map<uint32, RobotState> robot_states = 1;
+}
+
 message WorldState
 {
     // Robot ID to RobotState map for both teams
-    map<uint32, RobotState> blue_robots   = 1;
-    map<uint32, RobotState> yellow_robots = 2;
-    optional BallState ball_state         = 3;
+    optional RobotStates blue_robots   = 1;
+    optional RobotStates yellow_robots = 2;
+    optional BallState ball_state      = 3;
 }
 
 message WorldStateReceivedTrigger {}

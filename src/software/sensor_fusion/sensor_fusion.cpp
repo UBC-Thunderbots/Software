@@ -63,20 +63,24 @@ void SensorFusion::processSensorProto(const SensorProto& sensor_msg)
 
     updateWorld(sensor_msg.robot_status_msgs());
 
-    friendly_team.assignGoalie(friendly_goalie_id);
-    enemy_team.assignGoalie(enemy_goalie_id);
+    unsigned int unresolved_friendly_goalie_id = friendly_goalie_id;
+    unsigned int unresolved_enemy_goalie_id    = enemy_goalie_id;
 
     if (sensor_fusion_config.override_game_controller_friendly_goalie_id())
     {
         RobotId friendly_goalie_id_override = sensor_fusion_config.friendly_goalie_id();
-        friendly_team.assignGoalie(friendly_goalie_id_override);
+        unresolved_friendly_goalie_id       = friendly_goalie_id_override;
     }
 
     if (sensor_fusion_config.override_game_controller_enemy_goalie_id())
     {
         RobotId enemy_goalie_id_override = sensor_fusion_config.enemy_goalie_id();
-        enemy_team.assignGoalie(enemy_goalie_id_override);
+        unresolved_enemy_goalie_id       = enemy_goalie_id_override;
     }
+
+    friendly_team.assignGoalie(
+        resolveGoalieId(friendly_team, unresolved_friendly_goalie_id));
+    enemy_team.assignGoalie(resolveGoalieId(enemy_team, unresolved_enemy_goalie_id));
 }
 
 
@@ -263,15 +267,17 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         }
     }
 
+    Timestamp capture_timestamp = Timestamp::fromSeconds(ssl_detection_frame.t_capture());
+
     if (friendly_team_is_yellow)
     {
-        friendly_team = createFriendlyTeam(yellow_team);
-        enemy_team    = createEnemyTeam(blue_team);
+        friendly_team = createFriendlyTeam(yellow_team, capture_timestamp);
+        enemy_team    = createEnemyTeam(blue_team, capture_timestamp);
     }
     else
     {
-        friendly_team = createFriendlyTeam(blue_team);
-        enemy_team    = createEnemyTeam(yellow_team);
+        friendly_team = createFriendlyTeam(blue_team, capture_timestamp);
+        enemy_team    = createEnemyTeam(yellow_team, capture_timestamp);
     }
 
     ball_in_dribbler_timeout--;
@@ -295,8 +301,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
                     .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
             .distance_from_ground = 0,
-            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-            .confidence = 1}};
+            .timestamp            = capture_timestamp,
+            .confidence           = 1}};
 
         std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
 
@@ -360,10 +366,16 @@ std::optional<Ball> SensorFusion::createBall(
     return std::nullopt;
 }
 
-Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections)
+Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections,
+                                      const Timestamp& capture_timestamp)
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
-        friendly_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
+<<<<<<< HEAD
+        friendly_team, robot_detections, true, friendly_robot_id_with_ball_in_dribbler);
+=======
+        friendly_team, robot_detections, capture_timestamp,
+        friendly_robot_id_with_ball_in_dribbler);
+>>>>>>> sauravbanna/enable_zero_robots
     return new_friendly_team;
 }
 
@@ -429,10 +441,16 @@ void SensorFusion::updateDribbleDisplacement()
     }
 }
 
-Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections)
+Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
+                                   const Timestamp& capture_timestamp)
 {
+<<<<<<< HEAD
     Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team, robot_detections, false);
+        enemy_team_filter.getFilteredData(enemy_team, robot_detections, true, false);
+=======
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
+                                                            capture_timestamp, false);
+>>>>>>> sauravbanna/enable_zero_robots
     return new_enemy_team;
 }
 
@@ -468,6 +486,33 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
     return ball_detection;
+}
+
+unsigned int SensorFusion::resolveGoalieId(const Team& team, unsigned int goalie_id)
+{
+    // If the desired goalie exists on the team, use it
+    if (team.getRobotById(goalie_id).has_value())
+    {
+        return goalie_id;
+    }
+
+    // Otherwise, find the lowest robot ID present on the team
+    const auto& all_robots = team.getAllRobots();
+    if (!all_robots.empty())
+    {
+        RobotId lowest_id = all_robots.front().id();
+        for (const auto& robot : all_robots)
+        {
+            if (robot.id() < lowest_id)
+            {
+                lowest_id = robot.id();
+            }
+        }
+        return lowest_id;
+    }
+
+    // If there are no robots on the team yet, fall back to the desired goalie ID
+    return goalie_id;
 }
 
 bool SensorFusion::teamHasBall(const Team& team, const Ball& ball)

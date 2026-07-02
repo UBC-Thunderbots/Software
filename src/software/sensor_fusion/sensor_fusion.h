@@ -104,8 +104,10 @@ class SensorFusion
      *
      * @return team
      */
-    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections);
-    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections);
+    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections,
+                            const Timestamp& capture_timestamp);
+    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
+                         const Timestamp& capture_timestamp);
 
 
     /**
@@ -156,6 +158,18 @@ class SensorFusion
      * @return whether the team has control over the ball
      */
     static bool teamHasBall(const Team& team, const Ball& ball);
+
+    /**
+     * Given a team and a desired goalie ID, returns the desired ID if a robot with
+     * that ID exists on the team. Otherwise, returns the lowest robot ID present on
+     * the team. If the team has no robots, returns the desired goalie ID as a fallback.
+     *
+     * @param team The team to check
+     * @param goalie_id The desired goalie ID
+     *
+     * @return The goalie ID to use
+     */
+    static unsigned int resolveGoalieId(const Team& team, unsigned int goalie_id);
 
     /**
      * This function controls the behavior of how the ball is being updated. If this

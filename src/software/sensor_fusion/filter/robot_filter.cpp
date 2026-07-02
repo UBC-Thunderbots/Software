@@ -16,11 +16,11 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state,
 }
 
 std::optional<Robot> RobotFilter::getFilteredData(
-    const std::vector<RobotDetection>& new_robot_data,
+    const std::vector<RobotDetection>& new_robot_data, const Timestamp& capture_timestamp,
     const std::optional<RobotId> breakbeam_tripped_id)
 {
     int data_num               = 0;
-    Timestamp latest_timestamp = Timestamp().fromSeconds(0);
+    Timestamp latest_timestamp = capture_timestamp;
     FilteredRobotData filtered_data{.id               = this->getRobotId(),
                                     .position         = Point(0, 0),
                                     .velocity         = Vector(0, 0),
@@ -53,6 +53,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
         }
     }
 
+    std::cout << "LATEST TIMESTAMP " << latest_timestamp << std::endl;
+
     if (data_num == 0)
     {
         // if there is no data the duration of expiry_buffer_duration after previously
@@ -65,6 +67,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         }
         else
         {
+            std::cout << "DEFAULT!!" << std::endl;
             return std::make_optional(current_robot_state);
         }
     }

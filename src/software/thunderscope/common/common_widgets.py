@@ -4,6 +4,7 @@ from pyqtgraph.Qt.QtCore import *
 from software.py_constants import *
 from software.thunderscope.util import color_from_gradient
 from typing import override
+import textwrap
 
 
 class FloatSlider(QSlider):
@@ -198,9 +199,24 @@ class ColorProgressBar(QProgressBar):
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
 
+class StyledButton(QPushButton):
+    """A QPushButton with the toolbar button stylesheet pre-applied.
+
+    This button automatically applies the toggle button style used by toolbar
+    buttons, so callers don't need to manually call setStyleSheet with
+    get_toggle_button_style(). StyledButton defaults to the enabled state, with
+    hover highlighting applied.
+    """
+
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        self.setStyleSheet(get_toggle_button_style())
+
+
 class ToggleableButton(QPushButton):
     """A QPushButton which can be enabled or disabled
     Indicates with cursor if it is enabled or disabled
+    Auto-updates the toolbar button stylesheet based on enabled state
     """
 
     def __init__(self, enabled: bool):
@@ -210,12 +226,18 @@ class ToggleableButton(QPushButton):
         """
         super(ToggleableButton, self).__init__()
         self.enabled = enabled
+        self.setStyleSheet(get_toggle_button_style(enabled))
 
     def toggle_enabled(self, enabled: bool):
-        """Toggles the enabled state of the button
+        """Toggles the enabled state of the button and updates the stylesheet
+
         :param enabled: the new enabled state
         """
         self.enabled = enabled
+        self.setStyleSheet(get_toggle_button_style(enabled))
+
+    def is_enabled(self):
+        return self.enabled
 
     @override
     def enterEvent(self, event) -> None:
@@ -498,3 +520,29 @@ def display_tooltip(event, tooltip_text):
         )
     elif str(event.type()) == "Type.Leave":
         QToolTip.hideText()
+
+
+def get_toggle_button_style(is_enabled: bool = True) -> str:
+    """Returns the stylesheet for a QPushButton based on if it's enabled or not
+
+    :param is_enabled: True if button is enabled, False if not
+    :return: the corresponding stylesheet indicating the button state
+    """
+    # the style for each toolbar button
+    return textwrap.dedent(
+        f"""
+        QPushButton {{
+            color: #969696;
+            background-color: transparent;
+            border-color: transparent;
+            icon-size: 22px;
+            border-width: 4px;
+            border-radius: 4px;
+            height: 16px;
+        }}
+        QPushButton:hover {{
+            background-color: {"#363636" if is_enabled else "transparent"};
+            border-color: {"#363636" if is_enabled else "transparent"};
+        }}
+        """
+    )
