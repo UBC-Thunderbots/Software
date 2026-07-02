@@ -207,6 +207,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def_static("half", &Angle::half)
         .def_static("threeQuarter", &Angle::threeQuarter)
         .def("toRadians", &Angle::toRadians)
+        .def("toDegrees", &Angle::toDegrees)
         .def("minDiff", &Angle::minDiff)
         // Overloaded
         .def("__repr__",
@@ -293,6 +294,12 @@ PYBIND11_MODULE(python_bindings, m)
         .def_readwrite("robot_max_acceleration_m_per_s_2",
                        &robot_constants::RobotConstants::robot_max_acceleration_m_per_s_2)
         .def_readwrite(
+            "robot_trajectory_max_acceleration_m_per_s_2",
+            &robot_constants::RobotConstants::robot_trajectory_max_acceleration_m_per_s_2)
+        .def_readwrite(
+            "robot_trajectory_max_deceleration_m_per_s_2",
+            &robot_constants::RobotConstants::robot_trajectory_max_deceleration_m_per_s_2)
+        .def_readwrite(
             "robot_max_ang_acceleration_rad_per_s_2",
             &robot_constants::RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
         .def_readwrite("indefinite_dribbler_speed_rpm",
@@ -308,6 +315,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createPoint", &createPoint);
     m.def("createPolygon", &createPolygon);
     m.def("createCircle", &createCircle);
+    m.def("createAngle", &createAngle);
     m.def("createVector", &createVector);
     m.def("createSegment", &createSegment);
     m.def("createStadium", &createStadium);

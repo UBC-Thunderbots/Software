@@ -9,9 +9,7 @@ from software.gameplay_tests.validation.ball_is_off_ground import (
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.import_all_protos import ChipTactic
 
@@ -48,12 +46,12 @@ from proto.import_all_protos import ChipTactic
         ),
     ],
 )
-def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
+def test_chip(ball_offset_from_robot, angle_to_chip_at, gameplay_test_runner):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -65,7 +63,7 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: ChipTactic(
                     chip_origin=tbots_cpp.createPointProto(ball_position),
@@ -84,10 +82,9 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
         ],
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
     )
 
 

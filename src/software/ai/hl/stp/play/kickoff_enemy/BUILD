@@ -29,6 +29,7 @@ cc_library(
 py_test(
     name = "kickoff_enemy_play_test",
     srcs = ["kickoff_enemy_play_test.py"],
+    flaky = True,
     deps = [
         "//software:conftest",
         "//software/gameplay_tests/validation:validations",

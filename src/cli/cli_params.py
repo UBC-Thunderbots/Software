@@ -90,6 +90,21 @@ TestSuiteOption = Annotated[
 EnableThunderscopeOption = Annotated[bool, Option("-t", "--enable_thunderscope")]
 StopAIOnStartOption = Annotated[bool, Option("-s", "--stop_ai_on_start")]
 
+TestModeOption = Annotated[
+    bool,
+    Option(
+        "--test_mode",
+        help="Launch Thunderscope with a widget to select and run gameplay tests",
+    ),
+]
+RunFieldTestOption = Annotated[
+    bool,
+    Option(
+        "--run_field_test",
+        help="In test mode, run field tests instead of simulated tests",
+    ),
+]
+
 JobsOption = Annotated[str, Option("-j", "--jobs")]
 RunsOption = Annotated[
     int,
@@ -166,6 +181,30 @@ LAUNCH_MODE_CHOICES = [
         title="Diagnostics",
         description="Run Thunderscope in diagnostics mode against real robots",
     ),
+    questionary.Choice(
+        title="Run blue",
+        description="run_blue",
+    ),
+    questionary.Choice(
+        title="Run yellow",
+        description="run_yellow",
+    ),
+    questionary.Choice(
+        title="Tests",
+        description="Launch with a widget to select and run gameplay tests",
+    ),
+]
+
+# Thunderscope test mode "Test type?" menu.
+TEST_TYPE_CHOICES = [
+    questionary.Choice(
+        title="Simulated tests",
+        description="Run gameplay tests against the simulator",
+    ),
+    questionary.Choice(
+        title="Field tests",
+        description="Run gameplay tests against real robots (requires an interface)",
+    ),
 ]
 
 # Thunderscope simulator "Options:" checkbox.
@@ -189,6 +228,20 @@ THUNDERSCOPE_SIMULATOR_OPTION_CHOICES = [
     questionary.Choice(
         title="enable_autogc",
         description="Run the automated game controller alongside the simulator",
+    ),
+]
+
+# Deploy robot software "Options:" checkbox. Each option compiles Thunderloop
+# with a preprocessor flag that disables the corresponding service, letting
+# Thunderloop run on a robot whose powerboard or motorboard is unavailable.
+DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES = [
+    questionary.Choice(
+        title="DISABLE_POWER_SERVICE",
+        description="Compile Thunderloop without the Power Service (no powerboard)",
+    ),
+    questionary.Choice(
+        title="DISABLE_MOTOR_SERVICE",
+        description="Compile Thunderloop without the Motor Service (no motorboard)",
     ),
 ]
 
@@ -222,3 +275,10 @@ PLAYBOOK_CHOICES = [
         description="Flash the motor controller firmware",
     ),
 ]
+
+
+THUNDERSCOPE_OPTIONS_MAP = {
+    "Diagnostics": "run_diagnostics",
+    "Run blue": "run_blue",
+    "Run yellow": "run_yellow",
+}

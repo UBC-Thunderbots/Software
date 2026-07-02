@@ -269,12 +269,78 @@ cc_toolchain_config_k8_aarch64_linux(
 
 toolchain(
     name = "cc_toolchain_for_k8_aarch64_linux",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+    ],
     target_compatible_with = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
         ":glibc_2_27",
     ],
     toolchain = ":cc_toolchain_k8_aarch64_linux",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+MACOS_ROBOT_TC = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain"
+
+cc_toolchain_config_k8_aarch64_linux(
+    name = "gcc_macos_robot",
+    builtin_include_directories = [
+        "/opt/homebrew/opt/aarch64-unknown-linux-gnu",  # symlink-reported (libstdc++ headers)
+        "/opt/homebrew/Cellar/aarch64-unknown-linux-gnu",  # realpath-reported (sysroot headers)
+    ] + make_builtin_include_directories(),
+    tool_paths = {
+        "ar": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ar",
+        "cpp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-cpp",
+        # messense ships no dwp; point at gcc (unused without fission).
+        "dwp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-gcc",
+        "gcc": "wrapper/macos_robot_gcc",
+        "gcov": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-gcov",
+        "ld": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ld",
+        "nm": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-nm",
+        "objcopy": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-objcopy",
+        "objdump": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-objdump",
+        "strip": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-strip",
+    },
+    toolchain_identifier = "gcc-macos-robot",
+)
+
+filegroup(
+    name = "macos_robot_everything",
+    srcs = [
+        "wrapper/macos_robot_gcc",
+        "@macos_robot_gcc//:everything",
+    ],
+)
+
+cc_toolchain(
+    name = "cc_toolchain_macos_robot",
+    all_files = ":macos_robot_everything",
+    ar_files = ":macos_robot_everything",
+    as_files = ":macos_robot_everything",
+    compiler_files = ":macos_robot_everything",
+    dwp_files = ":macos_robot_everything",
+    linker_files = ":macos_robot_everything",
+    objcopy_files = ":macos_robot_everything",
+    strip_files = ":macos_robot_everything",
+    supports_param_files = 0,
+    tags = ["no-ide"],
+    toolchain_config = ":gcc_macos_robot",
+    toolchain_identifier = "gcc-macos-robot",
+)
+
+toolchain(
+    name = "cc_toolchain_for_macos_robot",
+    exec_compatible_with = [
+        "@platforms//os:osx",
+        "@platforms//cpu:aarch64",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+        ":glibc_2_27",
+    ],
+    toolchain = ":cc_toolchain_macos_robot",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 

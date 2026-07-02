@@ -1,9 +1,7 @@
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
@@ -20,42 +18,12 @@ from software.gameplay_tests.validation.ball_enters_region import (
 )
 
 
-def setup_pass_and_robots(
+def calculate_best_pass(
     ball_initial_position,
     ball_initial_velocity,
-    attacker_robot_position,
-    receiver_robot_positions,
-    friendly_orientations,
-    enemy_robot_positions,
-    receive_pass,
-    simulated_test_runner,
+    blue_robot_locations,
+    yellow_robot_locations,
 ):
-    """Sets up a test involving 1 robot passing the ball
-    With any number of friendly and enemy robots on the field
-    Can specify if the first friendly robot should receive the pass or not
-    :param ball_initial_position: the initial position of the ball
-    :param ball_initial_velocity: the initial velocity of the ball
-    :param attacker_robot_position: the position of the robot doing the pass
-    :param receiver_robot_positions: the positions of the friendly robots
-    :param friendly_orientations: the orientations of the friendly robots
-    :param enemy_robot_positions: the positions of the enemy robots
-    :param receive_pass: whether a friendly robot should try to receive the pass
-    :param simulated_test_runner: the test runner
-    :return: the best pass we generate
-    """
-    blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
-
-    # Setup the world state
-    simulated_test_runner.set_world_state(
-        create_world_state(
-            yellow_robot_locations=enemy_robot_positions,
-            blue_robot_locations=blue_robot_locations,
-            ball_location=ball_initial_position,
-            ball_velocity=ball_initial_velocity,
-            blue_robot_orientations=friendly_orientations,
-        ),
-    )
-
     # construct a world object to match the one sent to the test runner
     world = tbots_cpp.World(
         tbots_cpp.Field.createSSLDivisionBField(),
@@ -85,7 +53,7 @@ def setup_pass_and_robots(
                     tbots_cpp.Angle(),
                     tbots_cpp.Timestamp(),
                 )
-                for index, location in enumerate(enemy_robot_positions)
+                for index, location in enumerate(yellow_robot_locations)
             ]
         ),
     )
@@ -104,6 +72,51 @@ def setup_pass_and_robots(
         best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
 
     best_pass = best_pass_with_score.pass_value
+    return best_pass
+
+
+def setup_pass_and_robots(
+    ball_initial_position,
+    ball_initial_velocity,
+    attacker_robot_position,
+    receiver_robot_positions,
+    friendly_orientations,
+    enemy_robot_positions,
+    receive_pass,
+    gameplay_test_runner,
+):
+    """Sets up a test involving 1 robot passing the ball
+    With any number of friendly and enemy robots on the field
+    Can specify if the first friendly robot should receive the pass or not
+    :param ball_initial_position: the initial position of the ball
+    :param ball_initial_velocity: the initial velocity of the ball
+    :param attacker_robot_position: the position of the robot doing the pass
+    :param receiver_robot_positions: the positions of the friendly robots
+    :param friendly_orientations: the orientations of the friendly robots
+    :param enemy_robot_positions: the positions of the enemy robots
+    :param receive_pass: whether a friendly robot should try to receive the pass
+    :param gameplay_test_runner: the test runner
+    :return: the best pass we generate
+    """
+    blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
+
+    # Setup the world state
+    gameplay_test_runner.set_world_state(
+        create_world_state(
+            yellow_robot_locations=enemy_robot_positions,
+            blue_robot_locations=blue_robot_locations,
+            ball_location=ball_initial_position,
+            ball_velocity=ball_initial_velocity,
+            blue_robot_orientations=friendly_orientations,
+        ),
+    )
+
+    best_pass = calculate_best_pass(
+        ball_initial_position,
+        ball_initial_velocity,
+        blue_robot_locations,
+        enemy_robot_positions,
+    )
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
@@ -139,7 +152,7 @@ def setup_pass_and_robots(
 
         blue_tactics[1] = ReceiverTactic(**receiver_args)
 
-    simulated_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
+    gameplay_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
 
     return best_pass
 
@@ -227,7 +240,7 @@ def test_passing_receive_speed(
     receiver_robot_positions,
     friendly_orientations,
     enemy_robot_positions,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     # Eventually Validation
     eventually_validation_sequence_set = [
@@ -245,22 +258,20 @@ def test_passing_receive_speed(
         [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.1)],
     ]
 
-    simulated_test_runner.run_test(
-        setup=lambda param: setup_pass_and_robots(
+    gameplay_test_runner.run_test(
+        setup=lambda: setup_pass_and_robots(
             ball_initial_position=ball_initial_position,
             ball_initial_velocity=ball_initial_velocity,
             attacker_robot_position=attacker_robot_position,
             receiver_robot_positions=receiver_robot_positions,
             friendly_orientations=friendly_orientations,
             enemy_robot_positions=enemy_robot_positions,
-            simulated_test_runner=simulated_test_runner,
+            gameplay_test_runner=gameplay_test_runner,
             receive_pass=True,
         ),
-        params=[0],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        run_till_end=False,
     )
 
 
@@ -342,19 +353,28 @@ def test_passing_no_backwards_passes(
     receiver_robot_positions,
     friendly_orientations,
     enemy_robot_positions,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    field = tbots_cpp.Field.createSSLDivisionBField()
-    best_pass = setup_pass_and_robots(
-        ball_initial_position=ball_initial_position,
-        ball_initial_velocity=ball_initial_velocity,
-        attacker_robot_position=attacker_robot_position,
-        receiver_robot_positions=receiver_robot_positions,
-        friendly_orientations=friendly_orientations,
-        enemy_robot_positions=enemy_robot_positions,
-        receive_pass=True,
-        simulated_test_runner=simulated_test_runner,
+    best_pass = calculate_best_pass(
+        ball_initial_position,
+        ball_initial_velocity,
+        [attacker_robot_position, *receiver_robot_positions],
+        enemy_robot_positions,
     )
+
+    def setup():
+        setup_pass_and_robots(
+            ball_initial_position=ball_initial_position,
+            ball_initial_velocity=ball_initial_velocity,
+            attacker_robot_position=attacker_robot_position,
+            receiver_robot_positions=receiver_robot_positions,
+            friendly_orientations=friendly_orientations,
+            enemy_robot_positions=enemy_robot_positions,
+            receive_pass=True,
+            gameplay_test_runner=gameplay_test_runner,
+        )
+
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Eventually Validation
     eventually_validation_sequence_set = [
@@ -381,11 +401,11 @@ def test_passing_no_backwards_passes(
         ],
     ]
 
-    simulated_test_runner.run_test(
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+    gameplay_test_runner.run_test(
+        setup=setup,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        run_till_end=False,
     )
 
 

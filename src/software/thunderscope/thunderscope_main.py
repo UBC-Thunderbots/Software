@@ -11,7 +11,7 @@ from google.protobuf.internal import api_implementation
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.thunderscope.log.stats.stats import Stats
+from software.stats.loggers.stats_logger import StatsLogger
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
@@ -245,10 +245,34 @@ if __name__ == "__main__":
         help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
 
+    parser.add_argument(
+        "--test_mode",
+        action="store_true",
+        default=False,
+        help="Launch Thunderscope with a widget for selecting and running gameplay tests",
+    )
+    parser.add_argument(
+        "--run_field_test",
+        action="store_true",
+        default=False,
+        help="In test mode, run field tests instead of simulated tests",
+    )
+
     args = parser.parse_args()
 
+    ###########################################################################
+    #                              Test Mode                                  #
+    ###########################################################################
+    #
+    # Launch Thunderscope with the gameplay-test binaries running, plus a
+    # widget to select and run gameplay tests within Thunderscope.
+    if args.test_mode:
+        from software.gameplay_tests import test_mode
+
+        test_mode.launch_test_mode(args)
+
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
-    if not args.run_blue and not args.run_yellow and args.launch_gc:
+    elif not args.run_blue and not args.run_yellow and args.launch_gc:
         parser.error(
             "--launch_gc has to be ran with --run_blue or --run_yellow argument"
         )
@@ -449,17 +473,21 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref, (
-            Stats(
+            StatsLogger(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 record_enemy_stats=True,
+                friendly_colour_yellow=False,
             )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as blue_stats, (
-            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+        ) as blue_stats_logger, (
+            StatsLogger(
+                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                friendly_colour_yellow=True,
+            )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as yellow_stats:
+        ) as yellow_stats_logger:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
@@ -470,9 +498,9 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
 
-            if args.record_stats:
-                tscope.register_refresh_function(blue_stats.refresh)
-                tscope.register_refresh_function(yellow_stats.refresh)
+            if args.record_stats and blue_stats_logger and yellow_stats_logger:
+                tscope.register_refresh_function(blue_stats_logger.refresh)
+                tscope.register_refresh_function(yellow_stats_logger.refresh)
 
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],

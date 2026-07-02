@@ -1,10 +1,15 @@
+import threading
+import time
+
+import pytest
+
 from proto.import_all_protos import *
-from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
 from typing import Any
 
-logger = create_logger(__name__)
+PAUSE_AFTER_FAIL_DELAY_S = 3
+PROCESS_BUFFER_DELAY_S = 0.01
 
 
 class TbotsTestRunner:
@@ -18,6 +23,7 @@ class TbotsTestRunner:
         yellow_full_system_proto_unix_io,
         gamecontroller,
         is_yellow_friendly=False,
+        owns_thunderscope=True,
     ):
         """Initialize the TestRunner.
 
@@ -27,6 +33,10 @@ class TbotsTestRunner:
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
         :param: is_yellow_friendly: if yellow is the friendly team
+        :param owns_thunderscope: Whether this runner controls the Thunderscope
+            lifecycle. True (default) when the runner launched its own
+            Thunderscope; False when binding to an already-open Thunderscope
+            (test mode), in which case the runner must not show or close it.
         """
         self.test_name = test_name
         self.thunderscope = thunderscope
@@ -34,6 +44,8 @@ class TbotsTestRunner:
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
         self.is_yellow_friendly = is_yellow_friendly
+        self.owns_thunderscope = owns_thunderscope
+        self.cancel_event = None
         self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
         self.primitive_set_buffer = ThreadSafeBuffer(
             buffer_size=1, protobuf_type=PrimitiveSet
@@ -47,27 +59,59 @@ class TbotsTestRunner:
             buffer_size=1, protobuf_type=RobotStatus
         )
 
-        self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
+        self._registered_observers = []
+
+        self._register_observer(
+            self.blue_full_system_proto_unix_io,
+            SSL_WrapperPacket,
+            self.ssl_wrapper_buffer,
         )
-        self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
+        self._register_observer(
+            self.blue_full_system_proto_unix_io, RobotStatus, self.robot_status_buffer
         )
         if self.is_yellow_friendly:
-            self.yellow_full_system_proto_unix_io.register_observer(
-                World, self.world_buffer
+            self._register_observer(
+                self.yellow_full_system_proto_unix_io, World, self.world_buffer
             )
-            self.yellow_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_set_buffer
+            self._register_observer(
+                self.yellow_full_system_proto_unix_io,
+                PrimitiveSet,
+                self.primitive_set_buffer,
             )
         # Only validate on the blue worlds
         else:
-            self.blue_full_system_proto_unix_io.register_observer(
-                World, self.world_buffer
+            self._register_observer(
+                self.blue_full_system_proto_unix_io, World, self.world_buffer
             )
-            self.blue_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_set_buffer
+            self._register_observer(
+                self.blue_full_system_proto_unix_io,
+                PrimitiveSet,
+                self.primitive_set_buffer,
             )
+
+    def _register_observer(self, proto_unix_io, proto_class, buffer):
+        """Register an observer buffer and remember it for cleanup().
+
+        :param proto_unix_io: The ProtoUnixIO to register the buffer on
+        :param proto_class: Class of protobuf to consume
+        :param buffer: buffer to register
+        """
+        proto_unix_io.register_observer(proto_class, buffer)
+        self._registered_observers.append((proto_unix_io, proto_class, buffer))
+
+    def cleanup(self):
+        """Deregister all observers this runner placed on the shared ProtoUnixIOs.
+
+        Must be called when binding to long-lived ProtoUnixIOs (test mode) so
+        that buffers from finished runs do not accumulate across runs.
+        """
+        for proto_unix_io, proto_class, buffer in self._registered_observers:
+            proto_unix_io.deregister_observer(proto_class, buffer)
+        self._registered_observers = []
+
+    def _is_cancelled(self):
+        """Returns whether this test run has been asked to stop early."""
+        return self.cancel_event is not None and self.cancel_event.is_set()
 
     def send_gamecontroller_command(
         self,
@@ -120,6 +164,101 @@ class TbotsTestRunner:
         self.blue_full_system_proto_unix_io.send_proto(Play, Play(name=blue_play))
         self.yellow_full_system_proto_unix_io.send_proto(Play, Play(name=yellow_play))
 
+    @abstractmethod
+    def set_world_state(self, world_state: WorldState):
+        """Sets the initial world state of the test.
+
+        :param world_state: The WorldState proto to use
+        """
+        raise NotImplementedError("abstract class method called set_world_state")
+
+    def run_test(
+        self,
+        setup: (lambda: None),
+        always_validation_sequence_set=[],
+        eventually_validation_sequence_set=[],
+        test_timeout_s=3,
+        gc_cmd_with_delay=[],
+    ):
+        """Begins validating a test based on incoming world protos.
+        Runs the test in a background thread if thunderscope is enabled.
+
+        :param setup: Function that sets up the world state
+        :param always_validation_sequence_set: validation set that must always be true
+        :param eventually_validation_sequence_set: validation set that must eventually be true
+        :param test_timeout_s: how long the test will run
+        :param gc_cmd_with_delay: timed GC commands
+        """
+        self._pre_run_setup(setup)
+
+        threading.excepthook = self._excepthook
+
+        args = (
+            always_validation_sequence_set,
+            eventually_validation_sequence_set,
+            test_timeout_s,
+            gc_cmd_with_delay,
+        )
+
+        if self.thunderscope and self.owns_thunderscope:
+            run_test_thread = threading.Thread(
+                target=self._runner, daemon=True, args=args
+            )
+            run_test_thread.start()
+            self.thunderscope.show()
+            run_test_thread.join()
+
+            if self.last_exception:
+                pytest.fail(str(self.last_exception))
+        else:
+            self._runner(*args)
+
+    @abstractmethod
+    def _runner(
+        self,
+        always_validation_sequence_set,
+        eventually_validation_sequence_set,
+        test_timeout_s,
+        gc_cmd_with_delay,
+    ):
+        """Internal test loop; implemented by subclasses.
+
+        See run_test() method for param docs.
+        """
+        raise NotImplementedError("abstract class method called _runner")
+
+    @abstractmethod
+    def _pre_run_setup(self, setup: (lambda: None)):
+        """Hook called before the test loop starts
+
+        :param setup: Function that sets up the world state
+        """
+        raise NotImplementedError("abstract class method called _pre_run_setup")
+
+    def _stopper(self, delay=PROCESS_BUFFER_DELAY_S):
+        """Stop running the test
+
+        :param delay: How long to wait before closing everything, defaults
+                      to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
+        """
+        time.sleep(delay)
+
+        # Only close a Thunderscope that this runner owns. In test mode the
+        # Thunderscope outlives the test, so it must be left open.
+        if self.thunderscope and self.owns_thunderscope:
+            self.thunderscope.close()
+
+    def _excepthook(self, args):
+        """This function is _critical_ for show_thunderscope to work.
+        If the test Thread will raises an exception we won't be able to close
+        the window from the main thread.
+
+        :param args: The args passed in from the hook
+        """
+        self._stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+        self.last_exception = args.exc_value
+        raise self.last_exception
+
     def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
         """Converts dict of tactics to AssignedTacticPlayControlParams message
 
@@ -136,26 +275,3 @@ class TbotsTestRunner:
                     break
 
         return params
-
-    @abstractmethod
-    def set_world_state(self, worldstate: WorldState):
-        """Sets the worldstate for the given team
-
-        :param worldstate: the worldstate proto to use
-        """
-        raise NotImplementedError("abstract class method called set_world_state")
-
-    @abstractmethod
-    def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-    ):
-        """Begins validating a test based on incoming world protos
-
-        :param always_validation_sequence_set: validation set that must always be true
-        :param eventually_validation_sequence_set: validation set that must eventually be true
-        :param test_timeout_s: how long the test will run
-        """
-        raise NotImplementedError("abstract method run_test called from base class")
