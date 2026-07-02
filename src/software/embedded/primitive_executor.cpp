@@ -349,10 +349,14 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
     //                                              {"target_pos_y", target_position.y()},
     //                                              {"target_vel_x", target_v_global.x()},
     //                                              {"target_vel_y", target_v_global.y()},
-    //                                              {"actual_pos_x", state_.position().x()},
-    //                                              {"actual_pos_y", state_.position().y()},
-    //                                              {"actual_vel_x", state_.velocity().x()},
-    //                                              {"actual_vel_y", state_.velocity().y()},
+    //                                              {"actual_pos_x",
+    //                                              state_.position().x()},
+    //                                              {"actual_pos_y",
+    //                                              state_.position().y()},
+    //                                              {"actual_vel_x",
+    //                                              state_.velocity().x()},
+    //                                              {"actual_vel_y",
+    //                                              state_.velocity().y()},
     //                                              {"traj_vel_x", target_velocity.x()},
     //                                              {"traj_vel_y", target_velocity.y()}});
 

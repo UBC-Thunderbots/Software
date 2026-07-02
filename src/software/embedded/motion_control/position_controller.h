@@ -28,7 +28,8 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
      *
      * @param config The PID gains to use for the underlying x/y PID controllers.
      */
-    explicit PositionController(const PositionControllerConfig& config = PositionControllerConfig());
+    explicit PositionController(
+        const PositionControllerConfig& config = PositionControllerConfig());
 
     /**
      * Given a position and target trajectory, returns a target global velocity to

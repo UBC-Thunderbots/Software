@@ -89,7 +89,8 @@ void TomlConfigClient::writeConfig()
     has_pending_changes_ = false;
 }
 
-std::string TomlConfigClient::get(const std::string& key, const std::string& default_value)
+std::string TomlConfigClient::get(const std::string& key,
+                                  const std::string& default_value)
 {
     std::lock_guard<std::mutex> lock(config_mutex_);
 

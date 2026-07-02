@@ -37,19 +37,20 @@ void JerkLimitedTrajectory1D::generate(const double initial_pos, const double fi
         return;
     }
 
-    // Note: if we are already at the target but still moving, we intentionally do not stop
-    // here. Doing so would leave the robot wherever its momentum carries it rather than at
-    // the destination. Instead we fall through to the logic below, which will overshoot the
-    // target and then plan a trajectory back to it.
+    // Note: if we are already at the target but still moving, we intentionally do not
+    // stop here. Doing so would leave the robot wherever its momentum carries it rather
+    // than at the destination. Instead we fall through to the logic below, which will
+    // overshoot the target and then plan a trajectory back to it.
 
     // Ramp the initial acceleration to zero via a preliminary jerk phase, then plan the
     // rest of the trajectory from that zero-acceleration state. The 2D layer feeds the
     // robot's actual (unscaled) initial acceleration into each axis while scaling the
-    // per-axis acceleration/jerk limits, so the initial acceleration can exceed or conflict
-    // with those limits. The planning primitives below (planAccelProfile, planDecelToStop,
-    // planDecelToSpeed) are only well-defined for a zero initial acceleration; feeding them
-    // an out-of-range initial acceleration produces inconsistent profiles (e.g. negative
-    // phase durations) that fail to reach the destination.
+    // per-axis acceleration/jerk limits, so the initial acceleration can exceed or
+    // conflict with those limits. The planning primitives below (planAccelProfile,
+    // planDecelToStop, planDecelToSpeed) are only well-defined for a zero initial
+    // acceleration; feeding them an out-of-range initial acceleration produces
+    // inconsistent profiles (e.g. negative phase durations) that fail to reach the
+    // destination.
     double t = 0.0, p = 0.0, v = initial_vel, a = initial_accel;
     if (std::abs(a) > EPSILON)
     {
@@ -492,12 +493,12 @@ void JerkLimitedTrajectory1D::generateDirect(
 
     // Plan the phase that brings the robot from its initial velocity to signed_peak. We
     // accelerate if the peak is above the initial speed, but decelerate if the initial
-    // speed already exceeds the peak (which happens when a scaled 2D axis velocity limit is
-    // smaller than the robot's initial speed component along that axis). Previously this
-    // always used planAccelProfile, which returns an empty plan when the initial speed is
-    // already above the peak. The robot would then never slow down to the cruise speed, so
-    // the cruise/deceleration distances were computed for the peak speed while the robot
-    // was actually travelling faster, causing it to overshoot the destination.
+    // speed already exceeds the peak (which happens when a scaled 2D axis velocity limit
+    // is smaller than the robot's initial speed component along that axis). Previously
+    // this always used planAccelProfile, which returns an empty plan when the initial
+    // speed is already above the peak. The robot would then never slow down to the cruise
+    // speed, so the cruise/deceleration distances were computed for the peak speed while
+    // the robot was actually travelling faster, causing it to overshoot the destination.
     auto planToPeak = [&](const double signed_peak)
     {
         if (std::abs(signed_peak) >= std::abs(initial_vel))

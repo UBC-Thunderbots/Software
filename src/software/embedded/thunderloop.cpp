@@ -43,56 +43,52 @@ namespace
 robot_constants::RobotConstants applyTomlRobotConstantsOverrides(
     robot_constants::RobotConstants robot_constants, TomlConfigClient& toml_config_client)
 {
-    robot_constants.robot_max_speed_m_per_s =
-        std::stof(toml_config_client.get(ROBOT_MAX_SPEED_M_PER_S_CONFIG_KEY,
-                                         std::to_string(robot_constants.robot_max_speed_m_per_s)));
-    robot_constants.ball_placement_wall_max_speed_m_per_s = std::stof(
-        toml_config_client.get(BALL_PLACEMENT_WALL_MAX_SPEED_M_PER_S_CONFIG_KEY,
-                               std::to_string(
-                                   robot_constants.ball_placement_wall_max_speed_m_per_s)));
-    robot_constants.ball_placement_retreat_max_speed_m_per_s = std::stof(
-        toml_config_client.get(
+    robot_constants.robot_max_speed_m_per_s = std::stof(
+        toml_config_client.get(ROBOT_MAX_SPEED_M_PER_S_CONFIG_KEY,
+                               std::to_string(robot_constants.robot_max_speed_m_per_s)));
+    robot_constants.ball_placement_wall_max_speed_m_per_s =
+        std::stof(toml_config_client.get(
+            BALL_PLACEMENT_WALL_MAX_SPEED_M_PER_S_CONFIG_KEY,
+            std::to_string(robot_constants.ball_placement_wall_max_speed_m_per_s)));
+    robot_constants.ball_placement_retreat_max_speed_m_per_s =
+        std::stof(toml_config_client.get(
             BALL_PLACEMENT_RETREAT_MAX_SPEED_M_PER_S_CONFIG_KEY,
             std::to_string(robot_constants.ball_placement_retreat_max_speed_m_per_s)));
-    robot_constants.dribble_speed_m_per_s =
-        std::stof(toml_config_client.get(DRIBBLE_SPEED_M_PER_S_CONFIG_KEY,
-                                         std::to_string(robot_constants.dribble_speed_m_per_s)));
-    robot_constants.robot_trajectory_max_speed_m_per_s = std::stof(
-        toml_config_client.get(
-            ROBOT_TRAJECTORY_MAX_SPEED_M_PER_S_CONFIG_KEY,
-            std::to_string(robot_constants.robot_trajectory_max_speed_m_per_s)));
-    robot_constants.robot_max_acceleration_m_per_s_2 = std::stof(
-        toml_config_client.get(
-            ROBOT_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY,
-            std::to_string(robot_constants.robot_max_acceleration_m_per_s_2)));
-    robot_constants.robot_max_deceleration_m_per_s_2 = std::stof(
-        toml_config_client.get(
-            ROBOT_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY,
-            std::to_string(robot_constants.robot_max_deceleration_m_per_s_2)));
-    robot_constants.robot_trajectory_max_acceleration_m_per_s_2 = std::stof(
-        toml_config_client.get(
+    robot_constants.dribble_speed_m_per_s = std::stof(
+        toml_config_client.get(DRIBBLE_SPEED_M_PER_S_CONFIG_KEY,
+                               std::to_string(robot_constants.dribble_speed_m_per_s)));
+    robot_constants.robot_trajectory_max_speed_m_per_s = std::stof(toml_config_client.get(
+        ROBOT_TRAJECTORY_MAX_SPEED_M_PER_S_CONFIG_KEY,
+        std::to_string(robot_constants.robot_trajectory_max_speed_m_per_s)));
+    robot_constants.robot_max_acceleration_m_per_s_2   = std::stof(toml_config_client.get(
+          ROBOT_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY,
+          std::to_string(robot_constants.robot_max_acceleration_m_per_s_2)));
+    robot_constants.robot_max_deceleration_m_per_s_2   = std::stof(toml_config_client.get(
+          ROBOT_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY,
+          std::to_string(robot_constants.robot_max_deceleration_m_per_s_2)));
+    robot_constants.robot_trajectory_max_acceleration_m_per_s_2 =
+        std::stof(toml_config_client.get(
             ROBOT_TRAJECTORY_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY,
             std::to_string(robot_constants.robot_trajectory_max_acceleration_m_per_s_2)));
-    robot_constants.robot_trajectory_max_deceleration_m_per_s_2 = std::stof(
-        toml_config_client.get(
+    robot_constants.robot_trajectory_max_deceleration_m_per_s_2 =
+        std::stof(toml_config_client.get(
             ROBOT_TRAJECTORY_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY,
             std::to_string(robot_constants.robot_trajectory_max_deceleration_m_per_s_2)));
-    robot_constants.robot_max_jerk_m_per_s_3 =
-        std::stof(toml_config_client.get(ROBOT_MAX_JERK_M_PER_S_3_CONFIG_KEY,
-                                         std::to_string(robot_constants.robot_max_jerk_m_per_s_3)));
-    robot_constants.robot_min_jerk_m_per_s_3 =
-        std::stof(toml_config_client.get(ROBOT_MIN_JERK_M_PER_S_3_CONFIG_KEY,
-                                         std::to_string(robot_constants.robot_min_jerk_m_per_s_3)));
-    robot_constants.robot_max_ang_speed_rad_per_s = std::stof(
-        toml_config_client.get(
-            ROBOT_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY,
-            std::to_string(robot_constants.robot_max_ang_speed_rad_per_s)));
-    robot_constants.robot_trajectory_max_ang_speed_rad_per_s = std::stof(
-        toml_config_client.get(
+    robot_constants.robot_max_jerk_m_per_s_3 = std::stof(
+        toml_config_client.get(ROBOT_MAX_JERK_M_PER_S_3_CONFIG_KEY,
+                               std::to_string(robot_constants.robot_max_jerk_m_per_s_3)));
+    robot_constants.robot_min_jerk_m_per_s_3 = std::stof(
+        toml_config_client.get(ROBOT_MIN_JERK_M_PER_S_3_CONFIG_KEY,
+                               std::to_string(robot_constants.robot_min_jerk_m_per_s_3)));
+    robot_constants.robot_max_ang_speed_rad_per_s = std::stof(toml_config_client.get(
+        ROBOT_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY,
+        std::to_string(robot_constants.robot_max_ang_speed_rad_per_s)));
+    robot_constants.robot_trajectory_max_ang_speed_rad_per_s =
+        std::stof(toml_config_client.get(
             ROBOT_TRAJECTORY_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY,
             std::to_string(robot_constants.robot_trajectory_max_ang_speed_rad_per_s)));
-    robot_constants.robot_max_ang_acceleration_rad_per_s_2 = std::stof(
-        toml_config_client.get(
+    robot_constants.robot_max_ang_acceleration_rad_per_s_2 =
+        std::stof(toml_config_client.get(
             ROBOT_MAX_ANG_ACCELERATION_RAD_PER_S_2_CONFIG_KEY,
             std::to_string(robot_constants.robot_max_ang_acceleration_rad_per_s_2)));
 
@@ -157,21 +153,21 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
       primitive_executor_(
           robot_constants_,
           PositionControllerConfig{
-              std::stod(toml_config_client_->get(
-                  ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY)),
-              std::stod(toml_config_client_->get(
-                  ROBOT_POSITION_CONTROLLER_KI_CONFIG_KEY)),
-              std::stod(toml_config_client_->get(
-                  ROBOT_POSITION_CONTROLLER_KD_CONFIG_KEY)),
+              std::stod(
+                  toml_config_client_->get(ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY)),
+              std::stod(
+                  toml_config_client_->get(ROBOT_POSITION_CONTROLLER_KI_CONFIG_KEY)),
+              std::stod(
+                  toml_config_client_->get(ROBOT_POSITION_CONTROLLER_KD_CONFIG_KEY)),
               std::stod(toml_config_client_->get(
                   ROBOT_POSITION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY))},
           OrientationControllerConfig{
-              std::stod(toml_config_client_->get(
-                  ROBOT_ORIENTATION_CONTROLLER_KP_CONFIG_KEY)),
-              std::stod(toml_config_client_->get(
-                  ROBOT_ORIENTATION_CONTROLLER_KI_CONFIG_KEY)),
-              std::stod(toml_config_client_->get(
-                  ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY)),
+              std::stod(
+                  toml_config_client_->get(ROBOT_ORIENTATION_CONTROLLER_KP_CONFIG_KEY)),
+              std::stod(
+                  toml_config_client_->get(ROBOT_ORIENTATION_CONTROLLER_KI_CONFIG_KEY)),
+              std::stod(
+                  toml_config_client_->get(ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY)),
               std::stod(toml_config_client_->get(
                   ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY))}),
       robot_localizer_(RobotLocalizer::RobotLocalizerConfig{
