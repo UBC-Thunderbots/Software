@@ -33,20 +33,9 @@ Team RobotTeamFilter::getFilteredData(
                                                breakbeam_tripped_id);
         if (data)
         {
-            if (is_friendly)
-            {
-                std::cout << "DATA FOUND" << std::endl;
-            }
             new_filtered_robot_data.emplace_back(*data);
         }
     }
-
-    if (is_friendly)
-    {
-        std::cout << "FILTERED ROBOTS SIZE: " << new_filtered_robot_data.size()
-                  << std::endl;
-    }
-
 
     Team new_team_state = current_team_state;
     new_team_state.updateRobots(new_filtered_robot_data);
