@@ -5,7 +5,7 @@
 
 #include "software/test_util/equal_within_tolerance.h"
 
-class RobotTeamFilterTest : public ::testing::Test
+class RobotFilterTest : public ::testing::Test
 {
    protected:
     void SetUp() override
