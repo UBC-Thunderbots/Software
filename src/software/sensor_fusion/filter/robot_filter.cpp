@@ -16,8 +16,7 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state,
 }
 
 std::optional<Robot> RobotFilter::getFilteredData(
-    const std::vector<RobotDetection>& new_robot_data,
-    const Timestamp& capture_timestamp,
+    const std::vector<RobotDetection>& new_robot_data, const Timestamp& capture_timestamp,
     const std::optional<RobotId> breakbeam_tripped_id)
 {
     int data_num               = 0;

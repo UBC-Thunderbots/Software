@@ -104,8 +104,10 @@ class SensorFusion
      *
      * @return team
      */
-    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections, const Timestamp& capture_timestamp);
-    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections, const Timestamp& capture_timestamp);
+    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections,
+                            const Timestamp& capture_timestamp);
+    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
+                         const Timestamp& capture_timestamp);
 
 
     /**
