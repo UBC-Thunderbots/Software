@@ -564,14 +564,14 @@ class Gamecontroller:
         )
 
         self.__update_robot_count(
-            world_state.blue_robots,
+            world_state.blue_robots.robot_states,
             self.latest_world.friendly_team,
             referee.blue.max_allowed_bots,
             self.blue_removed_robot_ids,
             field_edge_y_meters,
         )
         self.__update_robot_count(
-            world_state.yellow_robots,
+            world_state.yellow_robots.robot_states,
             self.latest_world.enemy_team,
             referee.yellow.max_allowed_bots,
             self.yellow_removed_robot_ids,
@@ -581,7 +581,8 @@ class Gamecontroller:
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
             for robot in itertools.chain(
-                world_state.blue_robots, world_state.yellow_robots
+                world_state.blue_robots.robot_states,
+                world_state.yellow_robots.robot_states,
             ):
                 robot.current_state.global_position.x_meters *= -1
                 robot.current_state.global_position.y_meters *= -1

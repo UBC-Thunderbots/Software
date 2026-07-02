@@ -265,6 +265,9 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
 
     Timestamp capture_timestamp = Timestamp::fromSeconds(ssl_detection_frame.t_capture());
 
+    std::cout << "DETECTED FRIENDLY: " << blue_team.size() << std::endl;
+    std::cout << "TIMESTAMP: " << capture_timestamp << std::endl;
+
     if (friendly_team_is_yellow)
     {
         friendly_team = createFriendlyTeam(yellow_team, capture_timestamp);
@@ -366,7 +369,8 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_d
                                       const Timestamp& capture_timestamp)
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
-        friendly_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
+        friendly_team, robot_detections, capture_timestamp,
+        friendly_robot_id_with_ball_in_dribbler);
     return new_friendly_team;
 }
 
@@ -435,8 +439,8 @@ void SensorFusion::updateDribbleDisplacement()
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
                                    const Timestamp& capture_timestamp)
 {
-    Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team, robot_detections, false);
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
+                                                            capture_timestamp, false);
     return new_enemy_team;
 }
 

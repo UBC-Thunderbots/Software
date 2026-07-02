@@ -437,9 +437,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         )
 
         if self.friendly_colour_yellow:
-            world_state.yellow_robots[id].CopyFrom(robot_state)
+            world_state.yellow_robots.robot_states[id].CopyFrom(robot_state)
         else:
-            world_state.blue_robots[id].CopyFrom(robot_state)
+            world_state.blue_robots.robot_states[id].CopyFrom(robot_state)
         return world_state
 
     def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
@@ -450,9 +450,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param id: the id of the robot to remove
         """
         if self.friendly_colour_yellow:
-            del world_state.yellow_robots[id]
+            del world_state.yellow_robots.robot_states[id]
         else:
-            del world_state.blue_robots[id]
+            del world_state.blue_robots.robot_states[id]
         return world_state
 
     def __identify_robot(
