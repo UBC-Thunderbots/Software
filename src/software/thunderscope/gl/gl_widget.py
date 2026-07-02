@@ -106,7 +106,9 @@ class GLWidget(QWidget):
 
         # Setup sandbox sidebar
         self.sandbox_sidebar = GLSandboxSidebar(
-            parent=self.gl_view_widget, widget_above=self.simulation_control_toolbar
+            parent=self.gl_view_widget,
+            widget_above=self.simulation_control_toolbar,
+            simulator_io=proto_unix_io,
         )
         # let toolbar update the sidebar visibility
         self.simulation_control_toolbar.set_sidebar_visibility_callback(

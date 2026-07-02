@@ -200,12 +200,13 @@ class GLWorldLayer(GLLayer):
 
         :return: the current play state
         """
-        self.is_playing = not self.is_playing
         simulator_state = SimulationState(
-            is_playing=self.is_playing, simulation_speed=self.simulation_speed
+            is_playing=not self.is_playing, simulation_speed=self.simulation_speed
         )
+        self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
+
         return self.is_playing
 
     def set_simulation_speed(self, speed: float) -> None:

@@ -3,6 +3,7 @@ from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 import qtawesome as qta
 from software.thunderscope.common.common_widgets import ToggleableButton, StyledButton
 from software.thunderscope.constants import SANDBOX_MODE_HELP_TEXT
@@ -21,22 +22,23 @@ class GLSandboxSidebar(QWidget):
     POSITION_PADDING_MULTIPLIER = 0.1
     SIDEBAR_WIDTH_RATIO = 0.2
 
-    def __init__(self, parent: QWidget, widget_above: QWidget):
+    def __init__(self, parent: QWidget, widget_above: QWidget, simulator_io: ProtoUnixIO):
         """Set up the sandbox sidebar
 
         :param parent: the parent widget to attach this sidebar to
         :param widget_above: the widget above the sidebar for placement
+        :param simulator_io: the ProtoUnixIO to send/receive protos on
         """
         super().__init__(parent=parent)
         self.widget_above = widget_above
+        self.simulator_io = simulator_io
 
         # Setup sidebar with a vertical layout
         self.setLayout(QVBoxLayout())
 
         self.sidebar_enabled = False
         self.sidebar_rendered = False
-        self.sandbox_mode_enabled = False
-        self._sandbox_mode_callbacks: list[Callable[[bool], None]] = []
+        self._sandbox_toggle_callback: Callable[[], None] | None = None
 
         # Create a container widget to hold all sidebar contents
         self.sidebar_container = QWidget()
@@ -93,6 +95,8 @@ class GLSandboxSidebar(QWidget):
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
         self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        # buffer for the sandbox mode enabled state
+        self.sandbox_mode_state_buffer = ThreadSafeBuffer(5, SandboxModeState)
 
         # Setup Undo button
         self.undo_button_enabled = False
@@ -136,7 +140,7 @@ class GLSandboxSidebar(QWidget):
         parent.installEventFilter(self)
 
     def refresh(self) -> None:
-        """Refreshes the UI to move the sidebar and update the pause button state"""
+        """Refreshes the UI to move the sidebar and update the pause button and sandbox mode state"""
         if not self.sidebar_rendered:
             if self.sidebar_enabled:
                 self.reposition()
@@ -152,28 +156,36 @@ class GLSandboxSidebar(QWidget):
         if simulation_state:
             self.toggle_pause_button(simulation_state.is_playing)
 
-    def register_sandbox_mode_callback(self, callback: Callable[[bool], None]) -> None:
-        """Register a callback that will be called when sandbox mode is toggled.
+        # update the sandbox mode state
+        sandbox_mode_state = self.sandbox_mode_state_buffer.get(
+            block=False, return_cached=False
+        )
+        if sandbox_mode_state:
+            self.sandbox_mode_checkbox.setChecked(
+                sandbox_mode_state.is_enabled
+            )
+            self.pause_button.toggle_enabled(sandbox_mode_state.is_enabled)
+            self.clear_field_button.toggle_enabled(
+                sandbox_mode_state.is_enabled
+            )
+            self.undo_button.toggle_enabled(
+                self.undo_button_enabled and sandbox_mode_state.is_enabled
+            )
+            self.redo_button.toggle_enabled(
+                self.redo_button_enabled and sandbox_mode_state.is_enabled
+            )
 
-        :param callback: A callable that takes one boolean argument (the new state).
+    def set_sandbox_toggle_callback(self, callback: Callable[[], None]) -> None:
+        """Sets the callback to call when sandbox mode is toggled.
+
+        :param callback: A callable with no arguments that toggles sandbox mode.
         """
-        self._sandbox_mode_callbacks.append(callback)
+        self._sandbox_toggle_callback = callback
 
     def toggle_sandbox_mode(self) -> None:
-        """Toggle sandbox mode on/off and notify all registered callbacks."""
-        self.sandbox_mode_enabled = not self.sandbox_mode_enabled
-        for callback in self._sandbox_mode_callbacks:
-            callback(self.sandbox_mode_enabled)
-
-        self.pause_button.toggle_enabled(self.sandbox_mode_enabled)
-        self.clear_field_button.toggle_enabled(self.sandbox_mode_enabled)
-
-        self.undo_button.toggle_enabled(
-            self.undo_button_enabled and self.sandbox_mode_enabled
-        )
-        self.redo_button.toggle_enabled(
-            self.redo_button_enabled and self.sandbox_mode_enabled
-        )
+        """Toggle sandbox mode on/off by calling the toggle callback."""
+        if self._sandbox_toggle_callback:
+            self._sandbox_toggle_callback()
 
     def toggle_pause_button(self, is_playing: bool) -> None:
         """Toggles the state of the pause button by updating its text and icon

@@ -135,24 +135,27 @@ class GLFieldToolbar(GLToolbar):
         self.sidebar_visibility_callback = None
 
         # buffer for the sandbox mode enabled state
-        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        self.sandbox_mode_state_buffer = ThreadSafeBuffer(5, SandboxModeState)
 
         self.sidebar_button_container = QWidget()
         sidebar_button_layout = QHBoxLayout()
         sidebar_button_layout.setContentsMargins(0, 0, 0, 0)
         sidebar_button_layout.setSpacing(4)
 
-        # button to show sidebar
-        self.sandbox_sidebar_button = StyledButton()
-        self.sandbox_sidebar_button.setText("Sandbox Mode")
-        self.sandbox_sidebar_button.setToolTip("Toggle Sandbox Sidebar")
-        self.sandbox_sidebar_button.clicked.connect(self.toggle_sidebar_visibility)
+        # sandbox mode title
+        sidebar_button_layout.addWidget(QLabel("Sandbox Mode"))
 
         # label to indicate sandbox mode state
         self.sandbox_sidebar_label = QLabel()
-
-        sidebar_button_layout.addWidget(self.sandbox_sidebar_button)
         sidebar_button_layout.addWidget(self.sandbox_sidebar_label)
+
+        # button to show sidebar
+        self.sidebar_open_button = StyledButton()
+        self.sidebar_open_button.setToolTip("Toggle Sandbox Sidebar")
+        self.sidebar_open_button.clicked.connect(self.toggle_sidebar_visibility)
+        self.__update_sidebar_open_button()
+        sidebar_button_layout.addWidget(self.sidebar_open_button)
+
         self.sidebar_button_container.setLayout(sidebar_button_layout)
 
         # turn off sandbox mode as default
@@ -175,12 +178,18 @@ class GLFieldToolbar(GLToolbar):
 
     @override
     def refresh(self) -> None:
-        """Updates the sim speed"""
+        """Updates the sim speed and sandbox mode state"""
         simulation_state = self.simulation_state_buffer.get(
             block=False, return_cached=False
         )
         if simulation_state:
             self.update_simulation_speed(simulation_state.simulation_speed)
+
+        sandbox_mode_state = self.sandbox_mode_state_buffer.get(
+            block=False, return_cached=False
+        )
+        if sandbox_mode_state:
+            self.set_sandbox_mode_enabled(sandbox_mode_state.is_enabled)
 
         self.setGeometry(0, 0, self.parentWidget().width(), self.height())
 
@@ -208,9 +217,35 @@ class GLFieldToolbar(GLToolbar):
         self.sidebar_visibility_callback = callback
 
     def toggle_sidebar_visibility(self) -> None:
+        """Toggles the sandbox sidebar visibility between shown and hidden
+
+        Flips the internal visibility state, updates the sidebar open button
+        icon to reflect the new state, and invokes the sidebar visibility
+        callback if one has been set.
+        """
         self.sandbox_sidebar_visible = not self.sandbox_sidebar_visible
+
+        self.__update_sidebar_open_button()
+
         if self.sidebar_visibility_callback:
             self.sidebar_visibility_callback(self.sandbox_sidebar_visible)
+
+    def __update_sidebar_open_button(self) -> None:
+        """Updates the sidebar open button icon to reflect current visibility
+
+        Shows an up icon when the sidebar is visible, and a
+        down icon when it is hidden.
+        """
+        self.sidebar_open_button.setIcon(
+            qta.icon(
+                (
+                    "fa6s.chevron-up"
+                    if self.sandbox_sidebar_visible
+                    else "fa6s.chevron-down"
+                ),
+                color=self.BUTTON_ICON_COLOR,
+            )
+        )
 
     def set_sandbox_mode_enabled(self, enabled: bool) -> None:
         """Sets the sandbox enabled state and updates the label
