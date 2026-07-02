@@ -43,7 +43,8 @@ Team RobotTeamFilter::getFilteredData(
 
     if (is_friendly)
     {
-        std::cout << "FILTERED ROBOTS SIZE: " << new_filtered_robot_data.size() << std::endl;
+        std::cout << "FILTERED ROBOTS SIZE: " << new_filtered_robot_data.size()
+                  << std::endl;
     }
 
 

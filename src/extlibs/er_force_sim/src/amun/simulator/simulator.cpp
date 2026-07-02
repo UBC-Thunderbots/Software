@@ -527,7 +527,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot& robot)
     bool isBlue        = robot.id().team() == gameController::Team::BLUE;
     RobotMap& robotMap = isBlue ? m_data->robotsBlue : m_data->robotsYellow;
     bool isPresent     = robotMap.contains(robot.id().id());
-    std::cout << "IS Present " << robot.id().id() <<  " " << isPresent << std::endl;
+    std::cout << "IS Present " << robot.id().id() << " " << isPresent << std::endl;
     std::map<uint32_t, robot::Specs>& teamSpecs =
         isBlue ? m_data->specsBlue : m_data->specsYellow;
 
