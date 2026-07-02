@@ -36,13 +36,6 @@ def test_basic_rotation(field_test_runner):
         # Wait for the user to flip the estop to PLAY
         field_test_runner.wait_for_estop_play()
 
-        # Force start the game automatically
-        field_test_runner.gamecontroller.send_gc_command(
-            proto.ssl_gc_state_pb2.Command.FORCE_START,
-            proto.ssl_gc_common_pb2.Team.UNKNOWN,
-            final_ball_placement_point=None,
-        )
-
         for angle in test_angles:
             print(f"Rotating to {angle} degrees")
             move_tactic = MoveTactic()
@@ -150,13 +143,6 @@ def test_one_robots_square(field_test_runner):
     def execute_test():
         # Wait for the user to flip the estop to PLAY
         field_test_runner.wait_for_estop_play()
-
-        # Force start the game automatically
-        field_test_runner.gamecontroller.send_gc_command(
-            proto.ssl_gc_state_pb2.Command.FORCE_START,
-            proto.ssl_gc_common_pb2.Team.UNKNOWN,
-            final_ball_placement_point=None,
-        )
 
         for tactic in tactics:
             print(f"Going to {tactic.destination}")
