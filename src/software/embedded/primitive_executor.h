@@ -130,6 +130,8 @@ class PrimitiveExecutor
     Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
 
+    // TODO(avah): tune constants
+
     // Forward-only mode: whether the robot is currently driving in reverse (facing the
     // opposite way to its travel direction). Persisted across steps to add hysteresis to
     // the forwards-vs-backwards decision so it doesn't chatter near perpendicular.
