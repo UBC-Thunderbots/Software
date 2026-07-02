@@ -1,5 +1,8 @@
 import subprocess
 import logging
+import os
+import sys
+import select
 import typer as Typer
 from typer.main import get_command
 from rich import print
@@ -7,6 +10,7 @@ from rich.live import Live
 from rich.table import Table
 from rich.console import Console
 from rich.logging import RichHandler
+from rich.prompt import Prompt
 from software.py_constants import *
 from typer_shell import make_typer_shell
 from functools import wraps
@@ -23,6 +27,26 @@ from software.embedded.constants.py_constants import (
     MAX_FORCE_DRIBBLER_SPEED_RPM,
 )
 from software.py_constants import WHEEL_ROTATION_MAX_SPEED_M_PER_S
+
+# Raw terminal input (termios/tty) is only available on Unix. It powers the
+# interactive arrow-key config menu; without it we fall back to a numbered prompt.
+try:
+    import termios
+    import tty
+
+    RAW_INPUT_AVAILABLE = True
+except ImportError:
+    RAW_INPUT_AVAILABLE = False
+
+# Keypresses recognized by the interactive config menu
+ARROW_UP = "\x1b[A"
+ARROW_DOWN = "\x1b[B"
+ENTER_KEYS = ("\r", "\n")
+SPACE_KEY = " "
+ESCAPE_KEY = "\x1b"
+CTRL_C_KEY = "\x03"
+# Max time to wait for the rest of an escape sequence (e.g. arrow keys) in seconds
+ESCAPE_SEQUENCE_TIMEOUT_S = 0.1
 
 
 class RobotDiagnosticsCLI:
@@ -50,7 +74,7 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Chips the chipper")(self.chip)
         self.app.command(short_help="Kicks the kicker")(self.kick)
         self.app.command(short_help="Show Robot Status Info")(self.stats)
-        self.app.command(short_help="Shows TOML Config Values")(self.config)
+        self.app.command(short_help="Views & edits TOML Config Values")(self.config)
         self.app.command(short_help="Prints Thunderloop Logs")(self.log)
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
         self.app.command(short_help="Restarts Thunderloop")(self.restart)
@@ -147,47 +171,27 @@ class RobotDiagnosticsCLI:
         )
         return table
 
-    def __generate_config_table(self) -> Table:
-        """Make a new table with embedded_data TOML config value information."""
+    def __generate_config_table(self, numbered: bool = False) -> Table:
+        """Make a new table with embedded_data TOML config value information.
+
+        :param numbered: If True, prepend a selection index column
+        """
         table = Table(show_header=True, header_style="bold blue")
+        if numbered:
+            table.add_column("#", style="bold cyan")
         table.add_column("Config Value Name")
         table.add_column("Key", style="dim")
         table.add_column("Value")
 
-        table.add_row(
-            "Robot ID", f"{ROBOT_ID_CONFIG_KEY}", self.embedded_data.get_robot_id()
-        )
-        table.add_row(
-            "Channel ID",
-            f"{ROBOT_MULTICAST_CHANNEL_CONFIG_KEY}",
-            self.embedded_data.get_channel_id(),
-        )
-        table.add_row(
-            "Network Interface",
-            f"{ROBOT_NETWORK_INTERFACE_CONFIG_KEY}",
-            self.embedded_data.get_network_interface(),
-        )
-        table.add_row(
-            "Kick Constant",
-            f"{ROBOT_KICK_CONSTANT_CONFIG_KEY}",
-            self.embedded_data.get_kick_constant(),
-        )
-        table.add_row(
-            "Kick Coefficient",
-            f"{ROBOT_KICK_EXP_COEFF_CONFIG_KEY}",
-            self.embedded_data.get_kick_coeff(),
-        )
-        table.add_row(
-            "Chip Pulse Width",
-            f"{ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY}",
-            self.embedded_data.get_chip_pulse_width(),
-        )
+        for index, (key, name) in enumerate(
+            self.embedded_data.EDITABLE_CONFIG_OPTIONS.items(), start=1
+        ):
+            row = [name, f"{key}", f"{self.embedded_data._get_value(key)}"]
+            if numbered:
+                row.insert(0, str(index))
+            table.add_row(*row)
         # TODO: #3809
-        # table.add_row(
-        #     "Capacitor Voltage",
-        #     f"{ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY}",
-        #     self.embedded_data.get_cap_volt(),
-        # )
+        # Add "Capacitor Voltage" (ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY) once available
         return table
 
     def stats(self) -> None:
@@ -196,9 +200,202 @@ class RobotDiagnosticsCLI:
             while True:
                 live.update(self.__generate_stats_table())
 
-    def config(self):
-        """CLI Command to generate Onboard TOML config information"""
-        self.console.print(self.__generate_config_table())
+    def __read_key(self) -> str:
+        """Read a single keypress from stdin in raw mode, decoding arrow-key
+        escape sequences (e.g. Up arrow -> "\\x1b[A") into a single string.
+
+        :return: The keypress as a string
+        """
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            char = os.read(fd, 1).decode(errors="ignore")
+            # Escape sequences (arrow keys) send additional bytes; grab them if present
+            if char == ESCAPE_KEY:
+                ready, _, _ = select.select([fd], [], [], ESCAPE_SEQUENCE_TIMEOUT_S)
+                if ready:
+                    char += os.read(fd, 2).decode(errors="ignore")
+            return char
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+    def __render_config_menu(
+        self, options: list, focused: int, editing_value: Optional[str] = None
+    ) -> Table:
+        """Render the interactive config menu, highlighting the focused row.
+
+        When ``editing_value`` is provided, the menu is in edit mode: the focused
+        row's value cell shows the in-progress edit buffer with a cursor.
+
+        :param options: List of (key, friendly name) config option tuples
+        :param focused: Index of the currently highlighted option
+        :param editing_value: In-progress edit buffer for the focused option, or
+            None when navigating
+        :return: A rich Table for the menu
+        """
+        editing = editing_value is not None
+        table = Table(show_header=True, header_style="bold blue")
+        table.add_column(" ", width=1)
+        table.add_column("Config Value Name")
+        table.add_column("Key", style="dim")
+        table.add_column("Value")
+        table.caption = (
+            "type a new value · Enter to save · Esc to cancel"
+            if editing
+            else "↑/↓ move · Enter/Space to select · q/Esc to cancel"
+        )
+        table.caption_style = "dim"
+
+        for index, (key, name) in enumerate(options):
+            is_focused = index == focused
+            if is_focused and editing:
+                pointer, value, style = "✎", f"{editing_value}█", "bold white on blue"
+            elif is_focused:
+                pointer = "▶"
+                value = f"{self.embedded_data._get_value(key)}"
+                style = "bold black on cyan"
+            else:
+                pointer = " "
+                value = f"{self.embedded_data._get_value(key)}"
+                style = None
+            table.add_row(pointer, name, f"{key}", value, style=style)
+        return table
+
+    def config(self) -> None:
+        """CLI Command to interactively view and edit Onboard TOML config options.
+
+        Renders a single live-updating table of all editable options. Arrow keys
+        move the highlight; selecting an option edits its value inline in the same
+        table (Enter saves, Esc cancels), then returns to navigation so more options
+        can be edited. Thunderloop must be restarted (`restart`) for changes to take
+        effect.
+        """
+        options = list(self.embedded_data.EDITABLE_CONFIG_OPTIONS.items())
+        if not (RAW_INPUT_AVAILABLE and sys.stdin.isatty()):
+            self.__config_fallback(options)
+            return
+
+        focused = 0
+        editing_value = None  # None while navigating; the edit buffer while editing
+        changed = False
+        permission_denied = False
+        try:
+            with Live(
+                self.__render_config_menu(options, focused),
+                console=self.console,
+                auto_refresh=False,
+            ) as live:
+                while True:
+                    live.update(
+                        self.__render_config_menu(options, focused, editing_value),
+                        refresh=True,
+                    )
+                    key = self.__read_key()
+
+                    if editing_value is None:
+                        # Navigation mode
+                        if key in (ARROW_UP, "k"):
+                            focused = (focused - 1) % len(options)
+                        elif key in (ARROW_DOWN, "j"):
+                            focused = (focused + 1) % len(options)
+                        elif key in (*ENTER_KEYS, SPACE_KEY):
+                            editing_value = f"{self.embedded_data._get_value(options[focused][0])}"
+                        elif key in (ESCAPE_KEY, CTRL_C_KEY, "q"):
+                            break
+                    else:
+                        # Edit mode for the focused option
+                        option_key = options[focused][0]
+                        if key in ENTER_KEYS:
+                            current = f"{self.embedded_data._get_value(option_key)}"
+                            if editing_value != current:
+                                try:
+                                    self.embedded_data.set_config_value(
+                                        option_key, editing_value
+                                    )
+                                    changed = True
+                                except PermissionError:
+                                    permission_denied = True
+                                    break
+                            editing_value = None
+                        elif key in (ESCAPE_KEY, CTRL_C_KEY):
+                            editing_value = None  # cancel edit, keep old value
+                        elif key in ("\x7f", "\x08"):  # backspace
+                            editing_value = editing_value[:-1]
+                        elif len(key) == 1 and key.isprintable():
+                            editing_value += key
+        except (KeyboardInterrupt, EOFError):
+            pass
+
+        if permission_denied:
+            logging.error(
+                f"[bold red]Permission denied writing "
+                f"{self.embedded_data.config_file_path}. Try running the CLI with "
+                f"sudo.[/bold red]"
+            )
+        elif changed:
+            print(
+                "[yellow]Restart Thunderloop (`restart`) for changes to take "
+                "effect.[/yellow]"
+            )
+
+    def __config_fallback(self, options: list) -> None:
+        """View and edit config via numbered prompts, for when raw terminal input
+        is unavailable (non-Unix platforms or piped/non-interactive stdin).
+
+        :param options: List of (key, friendly name) config option tuples
+        """
+        changed = False
+        while True:
+            self.console.print(self.__generate_config_table(numbered=True))
+            choices = [str(i) for i in range(1, len(options) + 1)]
+            try:
+                selection = Prompt.ask(
+                    "Select an option to edit ('q' to cancel)",
+                    choices=choices + ["q"],
+                    console=self.console,
+                    show_choices=False,
+                )
+            except (KeyboardInterrupt, EOFError):
+                print()
+                break
+            if selection == "q":
+                break
+
+            key, name = options[int(selection) - 1]
+            current_value = f"{self.embedded_data._get_value(key)}"
+            try:
+                new_value = Prompt.ask(
+                    f"New value for [bold]{name}[/bold] ({key})",
+                    default=current_value,
+                    console=self.console,
+                )
+            except (KeyboardInterrupt, EOFError):
+                print()
+                break
+            if new_value == current_value:
+                print(f"[yellow]{name} unchanged.[/yellow]")
+                continue
+            try:
+                self.embedded_data.set_config_value(key, new_value)
+            except PermissionError:
+                logging.error(
+                    f"[bold red]Permission denied writing "
+                    f"{self.embedded_data.config_file_path}. Try running the CLI "
+                    f"with sudo.[/bold red]"
+                )
+                break
+            changed = True
+            print(
+                f"[green]Set [bold]{name}[/bold] ({key}): "
+                f"{current_value!r} -> {new_value!r}[/green]"
+            )
+
+        if changed:
+            print(
+                "[yellow]Restart Thunderloop (`restart`) for changes to take "
+                "effect.[/yellow]"
+            )
 
     def status(self):
         """CLI Command to print Thunderloop service status"""

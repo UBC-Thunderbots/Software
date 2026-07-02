@@ -20,6 +20,18 @@ class EmbeddedData:
     This class manages static data on the robot as well as the operations necessary with mutating data for use
     """
 
+    # Config options a user is allowed to edit via the diagnostics CLI, mapping the
+    # TOML key to a friendly display name. Runtime-only values written by Thunderloop
+    # (e.g. battery_voltage) are intentionally excluded. Order is preserved for display.
+    EDITABLE_CONFIG_OPTIONS = {
+        ROBOT_ID_CONFIG_KEY: "Robot ID",
+        ROBOT_MULTICAST_CHANNEL_CONFIG_KEY: "Channel ID",
+        ROBOT_NETWORK_INTERFACE_CONFIG_KEY: "Network Interface",
+        ROBOT_KICK_CONSTANT_CONFIG_KEY: "Kick Constant",
+        ROBOT_KICK_EXP_COEFF_CONFIG_KEY: "Kick Coefficient",
+        ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY: "Chip Pulse Width",
+    }
+
     def __init__(self) -> None:
         self.config_file_path = "/opt/tbotspython/robot_config.toml"
         self.config = self._load_config()
@@ -67,6 +79,47 @@ class EmbeddedData:
     # TODO: #3809
     # def get_cap_volt(self) -> str:
     #     return self._get_value(ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY)
+
+    def set_config_value(self, key: str, value: str) -> None:
+        """Set a config value and persist it to the TOML file on disk.
+
+        The key is normalized to match TOML keys (no leading '/'). Values are
+        stored as strings, matching how Thunderloop's TomlConfigClient writes the
+        config. Thunderloop must be restarted for changes to take effect.
+
+        :param key: The config key to set (leading '/' is stripped)
+        :param value: The value to store for the key
+        """
+        normalized_key = key.lstrip("/")
+        self.config[normalized_key] = value
+        self._write_config()
+
+    def _write_config(self) -> None:
+        """Serialize the in-memory config to the TOML file on disk.
+
+        The robot config is a flat table of scalar values, matching the format
+        written by Thunderloop's TomlConfigClient.
+        """
+        lines = [
+            f"{key} = {self._format_toml_value(value)}"
+            for key, value in self.config.items()
+        ]
+        with open(self.config_file_path, "w") as f:
+            f.write("\n".join(lines) + "\n")
+
+    @staticmethod
+    def _format_toml_value(value) -> str:
+        """Format a Python value as a TOML scalar literal.
+        :param value: The value to format (str, bool, int, or float)
+        :return: The TOML-formatted string representation
+        """
+        # bool must be checked before int, since bool is a subclass of int
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, (int, float)):
+            return str(value)
+        escaped = str(value).replace("\\", "\\\\").replace('"', '\\"')
+        return f'"{escaped}"'
 
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
         """Simple Math Clamp function (Faster than numpy & fewer dependencies)
