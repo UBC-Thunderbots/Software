@@ -11,3 +11,11 @@ py_library(
         requirement("qtawesome"),
     ],
 )
+
+py_library(
+    name = "local_robot_state_provider",
+    srcs = ["local_robot_state_provider.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)

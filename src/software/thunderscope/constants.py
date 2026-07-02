@@ -209,6 +209,12 @@ SANDBOX_MODE_HELP_TEXT = textwrap.dedent(
     """
 )
 
+
+class TeamToAdd(StrEnum):
+    BLUE = "Blue"
+    YELLOW = "Yellow"
+
+
 THUNDERSCOPE_UI_FONT_NAME = "Roboto"
 
 

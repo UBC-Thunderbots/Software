@@ -92,6 +92,7 @@ py_library(
     srcs = ["gl_sandbox_world_layer.py"],
     deps = [
         ":gl_world_layer",
+        "//software/thunderscope/gl/sandbox:local_robot_state_provider",
         requirement("pyqtgraph"),
     ],
 )

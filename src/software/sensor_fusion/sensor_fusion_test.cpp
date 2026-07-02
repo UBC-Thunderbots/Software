@@ -175,7 +175,8 @@ class SensorFusionTest : public ::testing::Test
         }
         friendly_team.updateRobots(friendly_robots);
         // This must be a robot ID that actually exists on the team, since
-        // SensorFusion::resolveGoalieId validates the goalie ID exists before assigning it
+        // SensorFusion::resolveGoalieId validates the goalie ID exists before assigning
+        // it
         friendly_team.assignGoalie(1);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
@@ -185,7 +186,8 @@ class SensorFusionTest : public ::testing::Test
         }
         enemy_team.updateRobots(enemy_robots);
         // This must be a robot ID that actually exists on the team, since
-        // SensorFusion::resolveGoalieId validates the goalie ID exists before assigning it
+        // SensorFusion::resolveGoalieId validates the goalie ID exists before assigning
+        // it
         enemy_team.assignGoalie(1);
         return World(field, ball, friendly_team, enemy_team);
     }

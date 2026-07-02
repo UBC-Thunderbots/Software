@@ -2,6 +2,7 @@ from typing import Callable, override
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import qtawesome as qta
@@ -22,7 +23,9 @@ class GLSandboxSidebar(QWidget):
     POSITION_PADDING_MULTIPLIER = 0.1
     SIDEBAR_WIDTH_RATIO = 0.2
 
-    def __init__(self, parent: QWidget, widget_above: QWidget, simulator_io: ProtoUnixIO):
+    def __init__(
+        self, parent: QWidget, widget_above: QWidget, simulator_io: ProtoUnixIO
+    ):
         """Set up the sandbox sidebar
 
         :param parent: the parent widget to attach this sidebar to
@@ -39,6 +42,7 @@ class GLSandboxSidebar(QWidget):
         self.sidebar_enabled = False
         self.sidebar_rendered = False
         self._sandbox_toggle_callback: Callable[[], None] | None = None
+        self._toggle_add_team_callback: Callable[[Team], None] | None = None
 
         # Create a container widget to hold all sidebar contents
         self.sidebar_container = QWidget()
@@ -120,6 +124,18 @@ class GLSandboxSidebar(QWidget):
         button_layout.addWidget(self.redo_button)
         self.sidebar_container.layout().addStretch()
         self.sidebar_container.layout().addLayout(button_layout)
+        self.sidebar_container.layout().addStretch()
+
+        # Setup team selector for adding robots
+        self.team_label = QLabel("Add to Team:")
+        self.team_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.sidebar_container.layout().addWidget(self.team_label)
+
+        self.team_combo = QComboBox()
+        self.team_combo.addItem(Team.Name(Team.BLUE), Team.BLUE)
+        self.team_combo.addItem(Team.Name(Team.YELLOW), Team.YELLOW)
+        self.team_combo.currentIndexChanged.connect(self.set_adding_team)
+        self.sidebar_container.layout().addWidget(self.team_combo)
 
         # Setup Clear Field button
         self.clear_field_button = ToggleableButton(False)
@@ -127,8 +143,6 @@ class GLSandboxSidebar(QWidget):
         self.clear_field_button.setText("Clear Field")
         self.sidebar_container.layout().addStretch()
         self.sidebar_container.layout().addWidget(self.clear_field_button)
-
-        self.sidebar_container.layout().addStretch()
 
         # Add the container to the main layout, with stretch underneath
         self.layout().addWidget(self.sidebar_container)
@@ -161,19 +175,31 @@ class GLSandboxSidebar(QWidget):
             block=False, return_cached=False
         )
         if sandbox_mode_state:
-            self.sandbox_mode_checkbox.setChecked(
-                sandbox_mode_state.is_enabled
-            )
+            self.sandbox_mode_checkbox.setChecked(sandbox_mode_state.is_enabled)
             self.pause_button.toggle_enabled(sandbox_mode_state.is_enabled)
-            self.clear_field_button.toggle_enabled(
-                sandbox_mode_state.is_enabled
-            )
+            self.clear_field_button.toggle_enabled(sandbox_mode_state.is_enabled)
             self.undo_button.toggle_enabled(
                 self.undo_button_enabled and sandbox_mode_state.is_enabled
             )
             self.redo_button.toggle_enabled(
                 self.redo_button_enabled and sandbox_mode_state.is_enabled
             )
+
+    def set_adding_team(self, index: int) -> None:
+        """Called when the team combo box selection changes.
+        Invokes the registered callback with the selected Team enum value.
+
+        :param index: the index of the selected team
+        """
+        if self._toggle_add_team_callback:
+            self._toggle_add_team_callback(self.team_combo.currentData())
+
+    def set_add_team_callback(self, callback: Callable[[Team], None]) -> None:
+        """Sets the callback to call when the team selection changes.
+
+        :param callback: A callable that takes the selected Team enum value.
+        """
+        self._toggle_add_team_callback = callback
 
     def set_sandbox_toggle_callback(self, callback: Callable[[], None]) -> None:
         """Sets the callback to call when sandbox mode is toggled.

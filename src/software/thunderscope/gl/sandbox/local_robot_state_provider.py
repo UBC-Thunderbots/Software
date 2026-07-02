@@ -1,3 +1,5 @@
+from typing import Callable
+
 from pyqtgraph.Qt.QtGui import QVector3D
 
 
@@ -12,9 +14,21 @@ class LocalRobotStateProvider:
         """Constructs a LocalRobotStateProvider with empty state"""
         # map of robot id to a tuple with the robot coordinates and orientation
         # or None if the robot has been removed already
-        # (easier to keep track of robots rather than removing the entry entirely)
         self.yellow_robot_states: dict[int, tuple[QVector3D, float] | None] = {}
         self.blue_robot_states: dict[int, tuple[QVector3D, float] | None] = {}
+        self._callbacks: list[Callable[[], None]] = []
+
+    def register_callback(self, callback: Callable[[], None]) -> None:
+        """Register a callback to be invoked when local robot state changes
+
+        :param callback: function to call when robot state changes
+        """
+        self._callbacks.append(callback)
+
+    def _invoke_callbacks(self) -> None:
+        """Invoke all registered callbacks"""
+        for callback in self._callbacks:
+            callback()
 
     def update_robot(
         self,
@@ -35,6 +49,8 @@ class LocalRobotStateProvider:
         else:
             self.blue_robot_states[robot_id] = (position, orientation)
 
+        self._invoke_callbacks()
+
     def remove_robot(self, robot_id: int, is_yellow: bool) -> None:
         """Mark a robot as removed in local state
 
@@ -45,6 +61,8 @@ class LocalRobotStateProvider:
             self.yellow_robot_states[robot_id] = None
         else:
             self.blue_robot_states[robot_id] = None
+
+        self._invoke_callbacks()
 
     def get_team_state(
         self, is_yellow: bool

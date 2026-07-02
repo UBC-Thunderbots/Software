@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Tuple, Optional, override
 from dataclasses import dataclass
 from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
 from pyqtgraph.opengl import *
@@ -114,7 +115,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
             """
             self._proto.ball_state.CopyFrom(ball_state)
 
-        def add_robot(self, robot_id: int, pos: QVector3D, orientation: float) -> None:
+        def add_robot(
+            self, robot_id: int, pos: QVector3D, orientation: float, is_friendly: bool
+        ) -> None:
             """Adds a robot to the world state, automatically inverting the
             position and orientation if the coordinate frame should be inverted
 
@@ -133,17 +136,17 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 ),
                 global_orientation=Angle(radians=converted_orientation),
             )
-            if self._friendly_colour_yellow:
+            if self._friendly_colour_yellow == is_friendly:
                 self._proto.yellow_robots[robot_id].CopyFrom(robot_state)
             else:
                 self._proto.blue_robots[robot_id].CopyFrom(robot_state)
 
-        def remove_robot(self, robot_id: int) -> None:
+        def remove_robot(self, robot_id: int, is_friendly: bool) -> None:
             """Removes a robot from the world state
 
             :param robot_id: the id of the robot to remove
             """
-            if self._friendly_colour_yellow:
+            if self._friendly_colour_yellow == is_friendly:
                 del self._proto.yellow_robots[robot_id]
             else:
                 del self._proto.blue_robots[robot_id]
@@ -177,7 +180,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.robot_remove_double_click = None
 
         # the selected robot for moving
-        self.selected_robot_id = None
+        self.selected_robot: Tuple[int, bool] = None
         self.selected_robot_pos = None
         self.selected_robot_plane = None
         self.move_in_progress = False
@@ -185,7 +188,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # the currently added robots and the next id to add
         self.friendly_next_id = 0
         self.enemy_next_id = 0
-        
+
         self.friendly_curr_robots: set[int] = set()
         self.enemy_curr_robots: set[int] = set()
         self.curr_robot_ids_map: dict[bool, set[int]] = {
@@ -200,8 +203,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_operations = []
 
         self.sandbox_mode_enabled = False
+        self.should_add_friendly = True
 
         self._referee_defined = False
+
+        local_robot_state_provider_instance.register_callback(
+            self._update_robots_graphics
+        )
 
     @override
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
@@ -227,13 +235,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # determine whether a robot was clicked
         robot_id, index, is_friendly = self.__identify_robot(event.multi_plane_points)
 
-        # if an enemy robot is at the mouse position, return
-        if robot_id is not None and not is_friendly:
-            return
-
         if robot_id is None:
             # if no robot was clicked
-            self.__handle_new_robot_event(event, is_friendly)
+            self.__handle_new_robot_event(event)
         else:
             # if a robot was clicked
             try:
@@ -242,11 +246,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 # if the user attempted to remove the last robot
                 # self.__display_last_remove_warning(event)
                 return
-
-        # robots are normally auto-rendered by refresh fn when sim is unpaused
-        # when sim is paused, have to manually render
-        if not self.is_playing:
-            self._update_robots_graphics()
 
     @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
@@ -270,12 +269,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
             return
 
         # if robot is selected
-        if self.selected_robot_id is not None and self.selected_robot_plane is not None:
+        if self.selected_robot is not None and self.selected_robot_plane is not None:
+            selected_robot_id, is_friendly = self.selected_robot
+
             # get the new position on the plane that the robot was initially selected on
             point_on_current_plane = event.multi_plane_points[self.selected_robot_plane]
 
             # check if the mouse position is free or not
-            robot_id, _, is_friendly = self.__identify_robot([point_on_current_plane])
+            robot_id, _, _ = self.__identify_robot([point_on_current_plane])
 
             # skip if new position has a robot already
             if robot_id is not None:
@@ -290,7 +291,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 # add an undo operation to restore the robot to the position before moving
                 self.__add_undo_operation(
                     RobotOperation(
-                        self.selected_robot_id,
+                        selected_robot_id,
                         point_on_current_plane,
                         self.selected_robot_pos,
                         self.friendly_next_id,
@@ -303,16 +304,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
             # update selected robot position
             self.__update_world_state(
-                self.selected_robot_id,
+                selected_robot_id,
                 point_on_current_plane,
                 self.DEFAULT_ROBOT_ANGLE,
                 is_friendly=is_friendly,
             )
-
-            # robots are normally auto-rendered by refresh fn when sim is unpaused
-            # when sim is paused, have to manually render
-            if not self.is_playing:
-                self._update_robots_graphics()
 
     @override
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
@@ -327,7 +323,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             return
 
         # ends the currently happening move
-        self.selected_robot_id = None
+        self.selected_robot = None
         self.selected_robot_pos = None
         self.selected_robot_plane = None
         self.move_in_progress = False
@@ -354,7 +350,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
             for robot in self.cached_world.friendly_team.team_robots:
                 self.friendly_curr_robots.add(robot.id)
 
+            for robot in self.cached_world.enemy_team.team_robots:
+                self.enemy_curr_robots.add(robot.id)
+
             self.friendly_next_id = len(self.friendly_curr_robots)
+            self.enemy_next_id = len(self.enemy_curr_robots)
             self.should_init_curr_robot_ids = False
 
     def __check_referee_status(self) -> None:
@@ -389,11 +389,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
 
-        # robots are normally auto-rendered by refresh fn when sim is unpaused
-        # when sim is paused, have to manually render
-        if not self.is_playing:
-            self._update_robots_graphics()
-
     def redo(self) -> None:
         """Redoes the last undo operation
         Adds a corresponding opposite move to the undo list so we can undo if necessary
@@ -416,11 +411,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # enable / disable the undo and redo buttons
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
         self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
-
-        # robots are normally auto-rendered by refresh fn when sim is unpaused
-        # when sim is paused, have to manually render
-        if not self.is_playing:
-            self._update_robots_graphics()
 
     def clear_field(self) -> None:
         """Removes all robots from the field.
@@ -448,7 +438,12 @@ class GLSandboxWorldLayer(GLWorldLayer):
             )
 
         # then, update with local state
-        for robot_id, pos_and_orient in local_robot_state_provider_instance.get_team_state(self.friendly_colour_yellow).items():
+        for (
+            robot_id,
+            pos_and_orient,
+        ) in local_robot_state_provider_instance.get_team_state(
+            self.friendly_colour_yellow
+        ).items():
             # if the local robot has already been removed, skip it
             if pos_and_orient is None:
                 continue
@@ -481,11 +476,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         world_state = self.__get_empty_world_state()
 
         self.simulator_io.send_proto(WorldState, world_state.proto)
-
-        # robots are normally auto-rendered by refresh fn when sim is unpaused
-        # when sim is paused, have to manually render
-        if not self.is_playing:
-            self._update_robots_graphics()
 
     @override
     def toggle_play_state(self) -> bool:
@@ -522,6 +512,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         return self.sandbox_mode_enabled
 
+    def set_adding_team(self, team: Team) -> None:
+        """Updates which team new robots will be added to based on the
+        selected team and the friendly colour.
+
+        :param team: the Team enum value (Team.Yellow or Team.Blue)
+        """
+        self.should_add_friendly = (team == Team.YELLOW) == self.friendly_colour_yellow
+
     def __add_undo_operation(self, operation: RobotOperation) -> None:
         """Adds an undo operation to the list and emits the toggle enable signal
 
@@ -548,9 +546,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                         min(self.friendly_next_id, inner_op.next_id)
                     )
                 else:
-                    self.enemy_next_id = int(
-                        min(self.enemy_next_id, inner_op.next_id)
-                    )
+                    self.enemy_next_id = int(min(self.enemy_next_id, inner_op.next_id))
                 world_state = self.__update_with_new_position(
                     world_state,
                     inner_op.id,
@@ -591,10 +587,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         center_circle_radius = self.cached_world.field.center_circle_radius
         robot_pos = QVector3D(-center_circle_radius, 0, 0)
 
-        for robot_id in local_robot_state_provider_instance.get_team_state(self.friendly_colour_yellow).keys():
-            local_robot_state_provider_instance.remove_robot(robot_id, self.friendly_colour_yellow)
-        for robot_id in local_robot_state_provider_instance.get_team_state(not self.friendly_colour_yellow).keys():
-            local_robot_state_provider_instance.remove_robot(robot_id, not self.friendly_colour_yellow)
+        local_robot_state_provider_instance.clear_team(self.friendly_colour_yellow)
+        local_robot_state_provider_instance.clear_team(not self.friendly_colour_yellow)
 
         world_state = self.__update_with_new_position(
             world_state,
@@ -631,7 +625,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         # marks the robot as selected along with the plane index that the mouse click intersected with
         # and its current position on that plane
-        self.selected_robot_id = robot_id
+        self.selected_robot = robot_id, is_friendly
         self.selected_robot_pos = event.multi_plane_points[index]
         self.selected_robot_plane = index
 
@@ -685,15 +679,12 @@ class GLSandboxWorldLayer(GLWorldLayer):
             ],
         )
 
-    def __handle_new_robot_event(
-        self, event: MouseInSceneEvent, is_friendly: bool
-    ) -> None:
+    def __handle_new_robot_event(self, event: MouseInSceneEvent) -> None:
         """Handles a mouse event when an empty position is clicked
         If double clicked, adds a new robot at that position
         Else, starts a double click
 
         :param event: the mouse event with the new robot's position
-        :param is_friendly: whether the robot is on the friendly team
         """
         # if the current point is a double click in progress
         if (
@@ -701,7 +692,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
             and self.robot_add_double_click == event.point_in_scene
         ):
             curr_next_id = (
-                self.friendly_next_id if is_friendly else self.enemy_next_id
+                self.friendly_next_id
+                if self.should_add_friendly
+                else self.enemy_next_id
             )
 
             # add an undo operation to remove the robot that is being added
@@ -711,7 +704,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     event.point_in_scene,
                     None,
                     curr_next_id,
-                    is_friendly,
+                    self.should_add_friendly,
                 )
             )
 
@@ -720,14 +713,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 curr_next_id,
                 event.point_in_scene,
                 self.DEFAULT_ROBOT_ANGLE,
-                is_friendly=is_friendly,
+                is_friendly=self.should_add_friendly,
             )
 
             new_next_id = self.__get_next_robot_id(
-                curr_next_id, self.curr_robot_ids_map[is_friendly]
+                curr_next_id, self.curr_robot_ids_map[self.should_add_friendly]
             )
 
-            if is_friendly:
+            if self.should_add_friendly:
                 self.friendly_next_id = new_next_id
             else:
                 self.enemy_next_id = new_next_id
@@ -763,8 +756,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
         if self.robot_remove_double_click:
             self.robot_remove_double_click = None
 
-    def __identify_robot(
-        self, multi_plane_points: list[QVector3D]
+    def __identify_robot_with_locals(
+        self,
+        multi_plane_points: list[QVector3D],
+        team: Team,
+        local_state_map: dict[int, tuple[QVector3D, float] | None],
     ) -> tuple[Optional[int], Optional[int]]:
         """Check local state first, then team robots, for a robot at the given position
 
@@ -812,7 +808,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         robot_id, index = self.__identify_robot_with_locals(
             multi_plane_points,
             self.cached_world.friendly_team,
-            self.friendly_local_robot_positions,
+            local_robot_state_provider_instance.get_team_state(
+                self.friendly_colour_yellow
+            ),
         )
 
         if robot_id is not None:
@@ -822,7 +820,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         robot_id, index = self.__identify_robot_with_locals(
             multi_plane_points,
             self.cached_world.enemy_team,
-            self.enemy_local_robot_positions,
+            local_robot_state_provider_instance.get_team_state(
+                not self.friendly_colour_yellow
+            ),
         )
 
         if robot_id is not None:
@@ -854,27 +854,45 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
         )
 
+        world_state = self.__get_current_world_state_for_team(world_state, True)
+        world_state = self.__get_current_world_state_for_team(world_state, False)
+
+        return world_state
+
+    def __get_current_world_state_for_team(
+        self, world_state: SandboxWorldState, is_friendly: bool
+    ) -> SandboxModeState:
+        team_robots = (
+            self.cached_world.friendly_team.team_robots
+            if is_friendly
+            else self.cached_world.enemy_team.team_robots
+        )
+
         # copy over existing robots for the current team
-        for robot_ in self.cached_world.friendly_team.team_robots:
+        for robot_ in team_robots:
             world_state.add_robot(
                 robot_.id,
-                QVector3D(
+                pos=QVector3D(
                     robot_.current_state.global_position.x_meters,
                     robot_.current_state.global_position.y_meters,
                     0,
                 ),
-                robot_.current_state.global_orientation.radians,
-                is_friendly=True,
+                orientation=robot_.current_state.global_orientation.radians,
+                is_friendly=is_friendly,
             )
 
         # copy over any local state robots if sim is paused
         if not self.is_playing:
-            for robot_id, pos in self.friendly_local_robot_positions.items():
+            for robot_id, pos in local_robot_state_provider_instance.get_team_state(
+                self.friendly_colour_yellow == is_friendly
+            ).items():
                 # if the robot has already been removed, skip it
                 if pos is None:
                     continue
 
-                world_state.add_robot(robot_id, pos[0], pos[1])
+                world_state.add_robot(
+                    robot_id, pos=pos[0], orientation=pos[1], is_friendly=is_friendly
+                )
 
         return world_state
 
@@ -917,7 +935,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         robot_id: int,
         new_pos: Optional[QVector3D],
         new_orientation: float = 0,
-        is_friendly: bool = True
+        is_friendly: bool = True,
     ) -> SandboxWorldState:
         """Updates the world state with the new robot position for the given id
         New position is defined if adding / moving a robot and None if removing one
@@ -931,18 +949,22 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         if new_pos:
             self.curr_robot_ids_map[is_friendly].add(robot_id)
-            world_state.add_robot(robot_id, new_pos, new_orientation)
+            world_state.add_robot(robot_id, new_pos, new_orientation, is_friendly)
 
             # saves the state to local dict
-            self.local_robot_positions_map[is_friendly][robot_id] = (
+            local_robot_state_provider_instance.update_robot(
+                robot_id,
                 new_pos,
                 new_orientation,
+                self.friendly_colour_yellow == is_friendly,
             )
         else:
             # remove an existing robot
             self.curr_robot_ids_map[is_friendly].remove(robot_id)
-            self.local_robot_positions_map[is_friendly][robot_id] = None
-            world_state.remove_robot(robot_id)
+            local_robot_state_provider_instance.remove_robot(
+                robot_id, self.friendly_colour_yellow == is_friendly
+            )
+            world_state.remove_robot(robot_id, is_friendly)
 
         return world_state
 
@@ -1001,10 +1023,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         if not self.is_playing:
             self.__override_cache_with_locals(
-                self.friendly_local_robot_positions, self._cached_friendly_team
+                local_robot_state_provider_instance.get_team_state(
+                    self.friendly_colour_yellow
+                ),
+                self._cached_friendly_team,
             )
             self.__override_cache_with_locals(
-                self.enemy_local_robot_positions, self._cached_enemy_team
+                local_robot_state_provider_instance.get_team_state(
+                    not self.friendly_colour_yellow
+                ),
+                self._cached_enemy_team,
             )
 
         super()._update_robots_graphics()

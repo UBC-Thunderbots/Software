@@ -178,6 +178,7 @@ def setup_gl_widget(
 
     # connect all sandbox controls
     sandbox_sidebar.set_sandbox_toggle_callback(world_layer.toggle_sandbox_mode)
+    sandbox_sidebar.set_add_team_callback(world_layer.set_adding_team)
     sandbox_sidebar.pause_button.clicked.connect(world_layer.toggle_play_state)
     sandbox_sidebar.undo_button.clicked.connect(world_layer.undo)
     sandbox_sidebar.redo_button.clicked.connect(world_layer.redo)

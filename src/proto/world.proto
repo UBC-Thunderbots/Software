@@ -63,7 +63,7 @@ message SimulationState
 
 message SandboxModeState
 {
-    required bool is_enabled         = 1 [default = false];
+    required bool is_enabled = 1 [default = false];
 }
 
 message Pass
