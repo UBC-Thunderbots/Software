@@ -460,25 +460,22 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """Removes all robots from the field.
         Adds a GroupOperation to the undo list that can restore all robots.
         """
-        self.__clear_reset_helper(self.__get_clear_world_state)
+        self.__clear_reset_helper(0)
 
     def reset_field(self) -> None:
         """Resets the robots on field to the default positions
         Adds a GroupOperation to the undo list that can restore all robots to their previous positions.
         """
-        self.__clear_reset_helper(self.__get_empty_world_state)
+        self.__clear_reset_helper(DIV_B_NUM_ROBOTS)
 
-    def __clear_reset_helper(
-        self, world_state_fn: Callable[[], SandboxWorldState]
-    ) -> None:
+    def __clear_reset_helper(self, num_robots: int) -> None:
         """Shared helper for clearing or resetting the field.
         Saves the current robot state as an undo operation, clears internal
         state (robot ids, local positions, and the redo stack), and sends
         an empty world state to the simulator.
 
-        :param world_state_fn: A callable that returns the new
-            SandboxWorldState to send to the simulator after clearing
-            internal state
+        :param num_robots: The number of robots to place on the field
+            in default positions. Pass 0 to clear the field entirely.
         """
         undo_operation = self.__get_current_state_as_operation()
 
@@ -494,7 +491,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.redo_toggle_enabled_signal.emit(False)
 
         # send out empty world state
-        world_state = self.__get_empty_world_state()
+        world_state = self.__get_clear_reset_world_state(num_robots)
 
         self.simulator_io.send_proto(WorldState, world_state.proto)
 
@@ -563,23 +560,36 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
             )
 
-    def __get_clear_world_state(self) -> SandboxWorldState:
-        """Constructs a SandboxWorldState with the default ball position
-            and no robots
+    def __get_clear_reset_world_state(self, num_robots) -> SandboxWorldState:
+        """Constructs a SandboxWorldState from the default world state with the
+        given number of robots, while also adding robots to local state
 
-        :return: the sandbox world state with ball state and no robots
+        :return: the sandbox world state with ball state +
+                 the given number of robots in default positions
         """
-        world_state = tbots_protobuf.create_default_world_state(0)
+        world_state_proto = tbots_protobuf.create_default_world_state(num_robots)
 
-    def __get_reset_world_state(self) -> SandboxWorldState:
-        """Constructs a SandboxWorldState with the default ball position and
-           the default number of robots in DIV B
+        world_state = GLSandboxWorldLayer.SandboxWorldState(
+            self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
+        )
+        world_state.set_ball_state(world_state_proto.ball_state)
 
-            This is the state that simulator always starts with
+        friendly_robots = (
+            world_state_proto.yellow_robots
+            if self.friendly_colour_yellow
+            else world_state_proto.blue_robots
+        )
 
-        :return: the sandbox world state with ball state and DIV_B_NUM_ROBOTS robots
-        """
-        world_state = tbots_protobuf.create_default_world_state(DIV_B_NUM_ROBOTS)
+        for robot_id, robot_state in friendly_robots.items():
+            world_state = self.__update_with_new_abs_position(
+                world_state,
+                robot_id,
+                robot_state.global_position,
+                self.DEFAULT_ROBOT_ANGLE,
+            )
+            self.next_id = max(self.next_id, self.robot_id + 1)
+
+        return world_state
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
     #       ADD / REMOVE / MOVE ROBOT METHODS       #
@@ -823,6 +833,23 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         # send out world state
         self.simulator_io.send_proto(WorldState, world_state.proto)
+
+    def __update_with_new_abs_position(
+        self,
+        world_state: SandboxWorldState,
+        robot_id: int,
+        new_pos: Point,
+        new_orientation: float = 0,
+    ):
+        new_pos_3d = QVector3D(new_pos.x_meters, new_pos.y_meters, 0)
+
+        converted_pos, converted_orientation = (
+            self.__invert_robot_if_defending_negative_half(new_pos_3d, new_orientation)
+        )
+
+        self.__update_with_new_position(
+            world_state, robot_id, converted_pos, converted_orientation
+        )
 
     def __update_with_new_position(
         self,
