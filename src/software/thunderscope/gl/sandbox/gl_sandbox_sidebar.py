@@ -124,6 +124,12 @@ class GLSandboxSidebar(QWidget):
         self.sidebar_container.layout().addStretch()
         self.sidebar_container.layout().addWidget(self.clear_field_button)
 
+        # Setup Reset Field button
+        self.reset_field_button = ToggleableButton(False)
+        self.reset_field_button.setToolTip("Resets all robots to default positions")
+        self.reset_field_button.setText("Reset Field")
+        self.sidebar_container.layout().addWidget(self.reset_field_button)
+
         self.sidebar_container.layout().addStretch()
 
         # Add the container to the main layout, with stretch underneath
@@ -167,6 +173,7 @@ class GLSandboxSidebar(QWidget):
 
         self.pause_button.toggle_enabled(self.sandbox_mode_enabled)
         self.clear_field_button.toggle_enabled(self.sandbox_mode_enabled)
+        self.reset_field_button.toggle_enabled(self.sandbox_mode_enabled)
 
         self.undo_button.toggle_enabled(
             self.undo_button_enabled and self.sandbox_mode_enabled
