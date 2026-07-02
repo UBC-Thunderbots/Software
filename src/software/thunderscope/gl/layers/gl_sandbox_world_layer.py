@@ -11,6 +11,7 @@ from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import Colors, DepthValues
+from software.py_constants import *
 
 
 class Operation(ABC):
@@ -410,11 +411,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
         if not self.is_playing:
             self._update_robots_graphics()
 
-    def clear_field(self) -> None:
-        """Removes all robots from the field.
-        Adds a GroupOperation to the undo list that can restore all robots.
+    def __get_current_state_as_operation(self) -> GroupOperation:
+        """Captures the current positions of all robots as a GroupOperation
+        for undo purposes. Merges positions from both the cached world state and
+        the local state into a single GroupOperation
+        containing one RobotOperation per robot.
+
+        :return: a GroupOperation where each inner RobotOperation represents
+            the current position of a friendly robot on the field
         """
-        # collect current robot positions into a GroupOperation for undo
         operations = {}
 
         # check the cached world state first
@@ -449,9 +454,36 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 next_id=self.next_id,
             )
 
-        if operations:
-            self.undo_operations.append(GroupOperation(operations=operations.values()))
-            self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
+        return GroupOperation(operations=operations.values())
+
+    def clear_field(self) -> None:
+        """Removes all robots from the field.
+        Adds a GroupOperation to the undo list that can restore all robots.
+        """
+        self.__clear_reset_helper(self.__get_clear_world_state)
+
+    def reset_field(self) -> None:
+        """Resets the robots on field to the default positions
+        Adds a GroupOperation to the undo list that can restore all robots to their previous positions.
+        """
+        self.__clear_reset_helper(self.__get_empty_world_state)
+
+    def __clear_reset_helper(
+        self, world_state_fn: Callable[[], SandboxWorldState]
+    ) -> None:
+        """Shared helper for clearing or resetting the field.
+        Saves the current robot state as an undo operation, clears internal
+        state (robot ids, local positions, and the redo stack), and sends
+        an empty world state to the simulator.
+
+        :param world_state_fn: A callable that returns the new
+            SandboxWorldState to send to the simulator after clearing
+            internal state
+        """
+        undo_operation = self.__get_current_state_as_operation()
+
+        self.undo_operations.append(undo_operation)
+        self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
 
         # clear internal state
         self.curr_robot_ids.clear()
@@ -531,33 +563,23 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
             )
 
-    def __get_empty_world_state(self) -> SandboxWorldState:
-        """Constructs a SandboxWorldState with just the ball state filled in
-        from the cached world state and 1 robot placed at
-        the edge of the center circle on the half line
+    def __get_clear_world_state(self) -> SandboxWorldState:
+        """Constructs a SandboxWorldState with the default ball position
+            and no robots
 
-        Replaces all local states as well
-
-        :return: the sandbox world state with ball state and 1 robot
+        :return: the sandbox world state with ball state and no robots
         """
-        world_state = GLSandboxWorldLayer.SandboxWorldState(
-            self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
-        )
-        world_state.set_ball_state(self.cached_world.ball.current_state)
+        world_state = tbots_protobuf.create_default_world_state(0)
 
-        center_circle_radius = self.cached_world.field.center_circle_radius
-        robot_pos = QVector3D(-center_circle_radius, 0, 0)
+    def __get_reset_world_state(self) -> SandboxWorldState:
+        """Constructs a SandboxWorldState with the default ball position and
+           the default number of robots in DIV B
 
-        for robot_id in self.local_robot_positions.keys():
-            self.local_robot_positions[robot_id] = None
+            This is the state that simulator always starts with
 
-        world_state = self.__update_with_new_position(
-            world_state, self.MIN_ROBOT_ID, robot_pos, self.DEFAULT_ROBOT_ANGLE
-        )
-
-        self.next_id = self.MIN_ROBOT_ID + 1
-
-        return world_state
+        :return: the sandbox world state with ball state and DIV_B_NUM_ROBOTS robots
+        """
+        world_state = tbots_protobuf.create_default_world_state(DIV_B_NUM_ROBOTS)
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
     #       ADD / REMOVE / MOVE ROBOT METHODS       #
