@@ -32,12 +32,19 @@ class DribbleTactic : public TacticBase<DribbleFSM>
      * finishing dribbling
      * @param allow_excessive_dribbling Whether to allow excessive dribbling, i.e. more
      * than 1 metre at a time
+     * @param max_speed_dribble The max speed allowed while we are dribbling the ball
+     * @param max_speed_get_possession The max speed allowed while we are moving towards
+     * the ball to get possession
      */
     void updateControlParams(std::optional<Point> dribble_destination,
                              std::optional<Angle> final_dribble_orientation,
-                             bool allow_excessive_dribbling = false);
+                             bool allow_excessive_dribbling = false,
+                             TbotsProto::MaxAllowedSpeedMode max_speed_dribble =
+                                 TbotsProto::MaxAllowedSpeedMode::DRIBBLE,
+                             TbotsProto::MaxAllowedSpeedMode max_speed_get_possession =
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     void accept(TacticVisitor& visitor) const override;
 };
 
-COPY_TACTIC(PlaceBallTactic, DribbleTactic)
+COPY_TACTIC(BallPlacementDribbleTactic, DribbleTactic)

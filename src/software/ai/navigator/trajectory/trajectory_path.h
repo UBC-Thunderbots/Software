@@ -8,7 +8,7 @@
 
 using TrajectoryGenerator = std::function<std::shared_ptr<Trajectory2D>(
     const Point& initial_pos, const Point& final_pos, const Vector& initial_vel,
-    const KinematicConstraints& constraints)>;
+    const Vector& initial_accel, const KinematicConstraints& constraints)>;
 
 /**
  * TrajectoryPath represents a list of 2D trajectories that are connected end-to-end
@@ -25,7 +25,8 @@ class TrajectoryPath : public Trajectory2D
      *
      * @param initial_trajectory The initial trajectory of this trajectory path
      * @param traj_generator A function used to generate new trajectories given the
-     * kinematic constraints, initial position, final position, and initial velocity.
+     * kinematic constraints, initial position, final position, initial velocity, and
+     * initial acceleration.
      */
     TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_trajectory,
                    const TrajectoryGenerator& traj_generator);
