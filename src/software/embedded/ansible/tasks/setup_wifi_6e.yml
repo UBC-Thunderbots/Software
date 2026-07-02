@@ -1,0 +1,57 @@
+---
+# Enable and connect to the 6 GHz WiFi 6E network on the Intel AX210 (iwlwifi).
+#
+# Prerequisites handled elsewhere in the setup:
+#   - iwlwifi firmware copied to /lib/firmware (setup_pi.yml)
+#   - tbotswifi6 interface name rule (setup_wifi_interface.yml)
+#   - dtoverlay=pcie-32bit-dma-pi5 in config.txt (linux_configs/pi/config.txt)
+#
+# IMPORTANT: the WiFi regulatory country must be set to a 6 GHz-permitting country
+# AT BOOT for the AX210 to enable its 6 GHz channels. A runtime `iw reg set` is
+# NOT enough. We set it here; the final reboot in setup_pi.yml applies it, after
+# which the 6 GHz network becomes visible and connectable.
+
+- name: Get current WiFi regulatory country
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.command: raspi-config nonint get_wifi_country
+  register: current_wifi_country
+  changed_when: false
+  failed_when: false
+  tags:
+    - setup_wifi_6e
+
+- name: Set WiFi regulatory country (enables 6 GHz channels at next boot)
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.command: "raspi-config nonint do_wifi_country {{ wifi_country }}"
+  when: current_wifi_country.stdout | trim != wifi_country
+  tags:
+    - setup_wifi_6e
+
+# The 6 GHz network uses WPA3-SAE (mandatory on 6 GHz). We render a NetworkManager
+# keyfile (0600, root) instead of `nmcli ... psk=...` so the passphrase never
+# appears on a command line or in playbook output. A higher autoconnect priority
+# than the imager-provisioned connection makes the robot prefer 6E when available
+# and fall back to the existing network if 6 GHz is ever unreachable.
+- name: Install the WiFi 6E (WPA3-SAE) NetworkManager connection
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.template:
+    src: ../../linux_configs/pi/tbots_mezz.nmconnection.j2
+    dest: "/etc/NetworkManager/system-connections/{{ wifi_6e_ssid }}.nmconnection"
+    owner: root
+    group: root
+    mode: "0600"
+  register: wifi_6e_conn
+  tags:
+    - setup_wifi_6e
+
+- name: Reload NetworkManager connections
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.command: nmcli connection reload
+  when: wifi_6e_conn is changed
+  changed_when: false
+  tags:
+    - setup_wifi_6e
