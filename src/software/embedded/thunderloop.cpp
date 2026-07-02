@@ -28,6 +28,78 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
+namespace
+{
+/**
+ * Returns a copy of robot_constants with its movement limits overridden by any
+ * matching keys present in robot_config.toml. Fields whose key is absent from the
+ * TOML file keep their compiled-in value from createRobotConstants().
+ *
+ * @param robot_constants The compiled-in robot constants to override
+ * @param toml_config_client The TOML config client to read overrides from
+ *
+ * @return robot_constants with movement limits overridden by robot_config.toml
+ */
+robot_constants::RobotConstants applyTomlRobotConstantsOverrides(
+    robot_constants::RobotConstants robot_constants, TomlConfigClient& toml_config_client)
+{
+    robot_constants.robot_max_speed_m_per_s =
+        std::stof(toml_config_client.get(ROBOT_MAX_SPEED_M_PER_S_CONFIG_KEY,
+                                         std::to_string(robot_constants.robot_max_speed_m_per_s)));
+    robot_constants.ball_placement_wall_max_speed_m_per_s = std::stof(
+        toml_config_client.get(BALL_PLACEMENT_WALL_MAX_SPEED_M_PER_S_CONFIG_KEY,
+                               std::to_string(
+                                   robot_constants.ball_placement_wall_max_speed_m_per_s)));
+    robot_constants.ball_placement_retreat_max_speed_m_per_s = std::stof(
+        toml_config_client.get(
+            BALL_PLACEMENT_RETREAT_MAX_SPEED_M_PER_S_CONFIG_KEY,
+            std::to_string(robot_constants.ball_placement_retreat_max_speed_m_per_s)));
+    robot_constants.dribble_speed_m_per_s =
+        std::stof(toml_config_client.get(DRIBBLE_SPEED_M_PER_S_CONFIG_KEY,
+                                         std::to_string(robot_constants.dribble_speed_m_per_s)));
+    robot_constants.robot_trajectory_max_speed_m_per_s = std::stof(
+        toml_config_client.get(
+            ROBOT_TRAJECTORY_MAX_SPEED_M_PER_S_CONFIG_KEY,
+            std::to_string(robot_constants.robot_trajectory_max_speed_m_per_s)));
+    robot_constants.robot_max_acceleration_m_per_s_2 = std::stof(
+        toml_config_client.get(
+            ROBOT_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY,
+            std::to_string(robot_constants.robot_max_acceleration_m_per_s_2)));
+    robot_constants.robot_max_deceleration_m_per_s_2 = std::stof(
+        toml_config_client.get(
+            ROBOT_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY,
+            std::to_string(robot_constants.robot_max_deceleration_m_per_s_2)));
+    robot_constants.robot_trajectory_max_acceleration_m_per_s_2 = std::stof(
+        toml_config_client.get(
+            ROBOT_TRAJECTORY_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY,
+            std::to_string(robot_constants.robot_trajectory_max_acceleration_m_per_s_2)));
+    robot_constants.robot_trajectory_max_deceleration_m_per_s_2 = std::stof(
+        toml_config_client.get(
+            ROBOT_TRAJECTORY_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY,
+            std::to_string(robot_constants.robot_trajectory_max_deceleration_m_per_s_2)));
+    robot_constants.robot_max_jerk_m_per_s_3 =
+        std::stof(toml_config_client.get(ROBOT_MAX_JERK_M_PER_S_3_CONFIG_KEY,
+                                         std::to_string(robot_constants.robot_max_jerk_m_per_s_3)));
+    robot_constants.robot_min_jerk_m_per_s_3 =
+        std::stof(toml_config_client.get(ROBOT_MIN_JERK_M_PER_S_3_CONFIG_KEY,
+                                         std::to_string(robot_constants.robot_min_jerk_m_per_s_3)));
+    robot_constants.robot_max_ang_speed_rad_per_s = std::stof(
+        toml_config_client.get(
+            ROBOT_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY,
+            std::to_string(robot_constants.robot_max_ang_speed_rad_per_s)));
+    robot_constants.robot_trajectory_max_ang_speed_rad_per_s = std::stof(
+        toml_config_client.get(
+            ROBOT_TRAJECTORY_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY,
+            std::to_string(robot_constants.robot_trajectory_max_ang_speed_rad_per_s)));
+    robot_constants.robot_max_ang_acceleration_rad_per_s_2 = std::stof(
+        toml_config_client.get(
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_S_2_CONFIG_KEY,
+            std::to_string(robot_constants.robot_max_ang_acceleration_rad_per_s_2)));
+
+    return robot_constants;
+}
+}  // namespace
+
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
@@ -75,14 +147,15 @@ extern "C"
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
-      robot_constants_(robot_constants),
+      robot_constants_(
+          applyTomlRobotConstantsOverrides(robot_constants, *toml_config_client_)),
       robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
       channel_id_(
           std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
       network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
       primitive_executor_(
-          robot_constants,
+          robot_constants_,
           PositionControllerConfig{
               std::stod(toml_config_client_->get(
                   ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY)),
@@ -102,9 +175,9 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
               std::stod(toml_config_client_->get(
                   ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY))}),
       robot_localizer_(RobotLocalizer::RobotLocalizerConfig{
-          robot_constants.kalman_process_noise_variance_rad_per_s_4,
-          robot_constants.kalman_vision_noise_variance_rad_2,
-          robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2})
+          robot_constants_.kalman_process_noise_variance_rad_per_s_4,
+          robot_constants_.kalman_vision_noise_variance_rad_2,
+          robot_constants_.kalman_motor_sensor_noise_variance_rad_per_s_2})
 {
     waitForNetworkUp();
 
@@ -148,7 +221,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
 #endif
 
 #ifndef DISABLE_MOTOR_SERVICE
-    motor_service_  = std::make_unique<MotorService>(robot_constants);
+    motor_service_  = std::make_unique<MotorService>(robot_constants_);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
 

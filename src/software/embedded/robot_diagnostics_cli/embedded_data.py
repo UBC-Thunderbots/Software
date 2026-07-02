@@ -64,6 +64,30 @@ class EmbeddedData:
     def get_chip_pulse_width(self) -> str:
         return self._get_value(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)
 
+    def get_position_controller_kp(self) -> str:
+        return self._get_value(ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY)
+
+    def get_position_controller_ki(self) -> str:
+        return self._get_value(ROBOT_POSITION_CONTROLLER_KI_CONFIG_KEY)
+
+    def get_position_controller_kd(self) -> str:
+        return self._get_value(ROBOT_POSITION_CONTROLLER_KD_CONFIG_KEY)
+
+    def get_position_controller_max_integral(self) -> str:
+        return self._get_value(ROBOT_POSITION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY)
+
+    def get_orientation_controller_kp(self) -> str:
+        return self._get_value(ROBOT_ORIENTATION_CONTROLLER_KP_CONFIG_KEY)
+
+    def get_orientation_controller_ki(self) -> str:
+        return self._get_value(ROBOT_ORIENTATION_CONTROLLER_KI_CONFIG_KEY)
+
+    def get_orientation_controller_kd(self) -> str:
+        return self._get_value(ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY)
+
+    def get_orientation_controller_max_integral(self) -> str:
+        return self._get_value(ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY)
+
     # TODO: #3809
     # def get_cap_volt(self) -> str:
     #     return self._get_value(ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY)

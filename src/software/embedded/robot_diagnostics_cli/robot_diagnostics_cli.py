@@ -182,6 +182,46 @@ class RobotDiagnosticsCLI:
             f"{ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY}",
             self.embedded_data.get_chip_pulse_width(),
         )
+        table.add_row(
+            "Position Controller Kp",
+            f"{ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY}",
+            self.embedded_data.get_position_controller_kp(),
+        )
+        table.add_row(
+            "Position Controller Ki",
+            f"{ROBOT_POSITION_CONTROLLER_KI_CONFIG_KEY}",
+            self.embedded_data.get_position_controller_ki(),
+        )
+        table.add_row(
+            "Position Controller Kd",
+            f"{ROBOT_POSITION_CONTROLLER_KD_CONFIG_KEY}",
+            self.embedded_data.get_position_controller_kd(),
+        )
+        table.add_row(
+            "Position Controller Max Integral",
+            f"{ROBOT_POSITION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY}",
+            self.embedded_data.get_position_controller_max_integral(),
+        )
+        table.add_row(
+            "Orientation Controller Kp",
+            f"{ROBOT_ORIENTATION_CONTROLLER_KP_CONFIG_KEY}",
+            self.embedded_data.get_orientation_controller_kp(),
+        )
+        table.add_row(
+            "Orientation Controller Ki",
+            f"{ROBOT_ORIENTATION_CONTROLLER_KI_CONFIG_KEY}",
+            self.embedded_data.get_orientation_controller_ki(),
+        )
+        table.add_row(
+            "Orientation Controller Kd",
+            f"{ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY}",
+            self.embedded_data.get_orientation_controller_kd(),
+        )
+        table.add_row(
+            "Orientation Controller Max Integral",
+            f"{ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY}",
+            self.embedded_data.get_orientation_controller_max_integral(),
+        )
         # TODO: #3809
         # table.add_row(
         #     "Capacitor Voltage",

@@ -69,6 +69,33 @@ const std::string ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY =
 const std::string ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY =
     "orientation_controller_max_integral";
 
+// Per-robot overrides for RobotConstants movement limits. If a key is absent from
+// robot_config.toml, the compiled-in value from createRobotConstants() is used instead.
+const std::string ROBOT_MAX_SPEED_M_PER_S_CONFIG_KEY = "robot_max_speed_m_per_s";
+const std::string BALL_PLACEMENT_WALL_MAX_SPEED_M_PER_S_CONFIG_KEY =
+    "ball_placement_wall_max_speed_m_per_s";
+const std::string BALL_PLACEMENT_RETREAT_MAX_SPEED_M_PER_S_CONFIG_KEY =
+    "ball_placement_retreat_max_speed_m_per_s";
+const std::string DRIBBLE_SPEED_M_PER_S_CONFIG_KEY = "dribble_speed_m_per_s";
+const std::string ROBOT_TRAJECTORY_MAX_SPEED_M_PER_S_CONFIG_KEY =
+    "robot_trajectory_max_speed_m_per_s";
+const std::string ROBOT_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY =
+    "robot_max_acceleration_m_per_s_2";
+const std::string ROBOT_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY =
+    "robot_max_deceleration_m_per_s_2";
+const std::string ROBOT_TRAJECTORY_MAX_ACCELERATION_M_PER_S_2_CONFIG_KEY =
+    "robot_trajectory_max_acceleration_m_per_s_2";
+const std::string ROBOT_TRAJECTORY_MAX_DECELERATION_M_PER_S_2_CONFIG_KEY =
+    "robot_trajectory_max_deceleration_m_per_s_2";
+const std::string ROBOT_MAX_JERK_M_PER_S_3_CONFIG_KEY = "robot_max_jerk_m_per_s_3";
+const std::string ROBOT_MIN_JERK_M_PER_S_3_CONFIG_KEY = "robot_min_jerk_m_per_s_3";
+const std::string ROBOT_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY =
+    "robot_max_ang_speed_rad_per_s";
+const std::string ROBOT_TRAJECTORY_MAX_ANG_SPEED_RAD_PER_S_CONFIG_KEY =
+    "robot_trajectory_max_ang_speed_rad_per_s";
+const std::string ROBOT_MAX_ANG_ACCELERATION_RAD_PER_S_2_CONFIG_KEY =
+    "robot_max_ang_acceleration_rad_per_s_2";
+
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10006;
 
