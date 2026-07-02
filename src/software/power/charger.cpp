@@ -1,6 +1,5 @@
 #include "charger.h"
 
-volatile bool Charger::charge_done_pending = false;
 bool Charger::is_charging                  = false;
 unsigned long Charger::charge_start_ms     = 0;
 

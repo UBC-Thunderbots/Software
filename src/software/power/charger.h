@@ -38,7 +38,6 @@ class Charger
      */
     static bool isDonePinLOW();
 
-    static volatile bool charge_done_pending;
     static bool is_charging;
     static unsigned long charge_start_ms;
     static constexpr float VOLTAGE_DIVIDER                  = 1003.0 / 13.0;
