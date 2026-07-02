@@ -142,7 +142,16 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         best_traj_with_cost.traj_path
             .getVelocity(best_traj_with_cost.first_collision_time_s)
             .length();
-    if (best_traj_with_cost.collides() &&
+
+    // If the robot starts inside an obstacle (collision_duration_front_s > 0), never
+    // return nullopt: doing so produces a stop primitive, which leaves the robot stuck
+    // inside the obstacle indefinitely (it can never escape a motion constrained area).
+    // The best trajectory already minimizes the time spent escaping, so return it and
+    // let the robot drive out. The unavoidable-collision stop below is only meant for the
+    // case where the robot is outside all obstacles and is about to drive into one.
+    bool starts_in_obstacle = best_traj_with_cost.collision_duration_front_s > 0.0;
+
+    if (!starts_in_obstacle && best_traj_with_cost.collides() &&
         best_traj_with_cost.first_collision_time_s <
             UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S &&
         collision_velocity > UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S)

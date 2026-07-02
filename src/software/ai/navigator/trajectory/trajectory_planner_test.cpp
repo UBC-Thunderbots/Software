@@ -186,3 +186,55 @@ TEST_F(TrajectoryPlannerTest, test_traj_avoid_enemy_half_and_ball_during_friendl
     verifyNoCollision(traj_path.value(), obstacles);
     verifyTrajectoryIsWithinRectangle(traj_path.value(), valid_traj_rectangle);
 }
+
+TEST_F(TrajectoryPlannerTest, test_traj_escapes_when_starting_inside_obstacle)
+{
+    // Regression test: a robot that starts *inside* an obstacle must be given a
+    // trajectory that drives it out, never a stop primitive (findTrajectory returning
+    // nullopt). Previously, if the robot exited the obstacle it started in but was then
+    // driven into another obstacle within the unavoidable-collision window (<0.2s) while
+    // moving faster than 0.5 m/s, the planner returned nullopt. move_primitive turns that
+    // into a stop, leaving the robot frozen inside the motion-constrained area forever,
+    // unable to escape.
+
+    // The robot starts just inside start_obstacle's +x edge, moving in +x at 2 m/s. Its
+    // momentum makes it exit start_obstacle at ~t=0.05s and reach blocking_obstacle at
+    // ~t=0.15s. The blocker is placed exactly where the robot's (tiny) reachable set
+    // lands at t=0.15s, so no amount of steering avoids that collision within the 0.2s
+    // unavoidable-collision window at >0.5 m/s -- exactly the case that used to make the
+    // planner return nullopt (a stop) and leave the robot stuck.
+    Point start_pos(0.10, 0.0);
+    Point destination(2.0, 0.0);
+    Vector initial_velocity(2.0, 0.0);
+    KinematicConstraints slow_constraints(2.0, 3.0, 3.0);
+
+    ObstaclePtr start_obstacle =
+        obstacle_factory.createStaticObstacleFromRobotPosition(Point(0.0, 0.0));
+    ObstaclePtr blocking_obstacle =
+        obstacle_factory.createStaticObstacleFromRobotPosition(Point(0.45, 0.0));
+    std::vector obstacles = {start_obstacle, blocking_obstacle};
+
+    auto traj_path =
+        traj_planner.findTrajectory(start_pos, destination, initial_velocity,
+                                    slow_constraints, obstacles,
+                                    world->field().fieldBoundary());
+
+    // Must return an escape trajectory rather than a stop primitive.
+    ASSERT_TRUE(traj_path.has_value());
+    EXPECT_EQ(traj_path->getPosition(0.0), start_pos);
+
+    // The trajectory must actually leave the obstacle the robot started inside.
+    bool escapes_starting_obstacle = false;
+    for (int i = 0; i <= NUM_SUB_POINTS; ++i)
+    {
+        double t_sec = i *
+                       std::min(traj_path->getTotalTime(), MAX_COLLISION_CHECK_TIME) /
+                       NUM_SUB_POINTS;
+        if (!start_obstacle->contains(traj_path->getPosition(t_sec)))
+        {
+            escapes_starting_obstacle = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(escapes_starting_obstacle);
+}
