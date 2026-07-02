@@ -848,7 +848,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.__invert_robot_if_defending_negative_half(new_pos_3d, new_orientation)
         )
 
-        self.__update_with_new_position(
+        return self.__update_with_new_position(
             world_state, robot_id, converted_pos, converted_orientation
         )
 
