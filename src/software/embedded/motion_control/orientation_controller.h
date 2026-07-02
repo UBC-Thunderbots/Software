@@ -7,6 +7,18 @@
 #include "software/geom/angular_velocity.h"
 #include "software/time/duration.h"
 
+// TODO(#3737): tune constants
+// PID gains for OrientationController's underlying heading PID controller. Defaults
+// preserve the previously hardcoded tuning; robot_config.toml can override these on a
+// per-robot basis.
+struct OrientationControllerConfig
+{
+    double kp           = 0.4;
+    double ki           = 0.0;
+    double kd           = 0.0;
+    double max_integral = 0.0;
+};
+
 class OrientationController
     : public MotionController<Angle, BangBangTrajectory1DAngular, AngularVelocity>
 {
@@ -14,8 +26,11 @@ class OrientationController
     /**
      * Constructs an orientation controller that uses measurements over multiple
      * time intervals to calculate the target angular velocity to minimize error.
+     *
+     * @param config The PID gains to use for the underlying heading PID controller.
      */
-    OrientationController() = default;
+    explicit OrientationController(
+        const OrientationControllerConfig& config = OrientationControllerConfig());
 
     /**
      * Given an orientation and target orientation, returns a target angular
@@ -36,8 +51,7 @@ class OrientationController
     void reset() override;
 
    private:
-    // TODO(#3737): tune constants
-    PidController<double> w_pid_{0.4, 0.0, 0.0, 0.0};
+    PidController<double> w_pid_;
 
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 5;
 };

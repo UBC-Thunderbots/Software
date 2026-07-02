@@ -47,6 +47,14 @@ void TomlConfigClient::loadConfig()
             {"battery_voltage", "0.0"},
             {"current_draw", "0.0"},
             {"cap_voltage", "0.0"},
+            {"position_controller_kp", "1.2"},
+            {"position_controller_ki", "0.1"},
+            {"position_controller_kd", "0.0"},
+            {"position_controller_max_integral", "10.0"},
+            {"orientation_controller_kp", "0.4"},
+            {"orientation_controller_ki", "0.0"},
+            {"orientation_controller_kd", "0.0"},
+            {"orientation_controller_max_integral", "0.0"},
         };
         writeConfig();
         return;
@@ -81,7 +89,7 @@ void TomlConfigClient::writeConfig()
     has_pending_changes_ = false;
 }
 
-std::string TomlConfigClient::get(const std::string& key)
+std::string TomlConfigClient::get(const std::string& key, const std::string& default_value)
 {
     std::lock_guard<std::mutex> lock(config_mutex_);
 
@@ -106,14 +114,17 @@ std::string TomlConfigClient::get(const std::string& key)
         }
         else
         {
-            LOG(WARNING) << "TOML key '" << key << "' exists but is not a supported type";
-            return "";
+            LOG(WARNING) << "TOML key '" << key
+                         << "' exists but is not a supported type, using default value '"
+                         << default_value << "'";
+            return default_value;
         }
     }
     catch (const std::exception& e)
     {
-        LOG(WARNING) << "TOML key '" << key << "' not found: " << e.what();
-        return "";
+        LOG(WARNING) << "TOML key '" << key << "' not found, using default value '"
+                     << default_value << "': " << e.what();
+        return default_value;
     }
 }
 

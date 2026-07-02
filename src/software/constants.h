@@ -52,6 +52,23 @@ const std::string ROBOT_KICK_CONSTANT_CONFIG_KEY     = "kick_constant";
 const std::string ROBOT_KICK_EXP_COEFF_CONFIG_KEY    = "kick_coeff";
 const std::string ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY  = "chip_pulse_width";
 
+// Position (x/y) controller PID gains
+const std::string ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY = "position_controller_kp";
+const std::string ROBOT_POSITION_CONTROLLER_KI_CONFIG_KEY = "position_controller_ki";
+const std::string ROBOT_POSITION_CONTROLLER_KD_CONFIG_KEY = "position_controller_kd";
+const std::string ROBOT_POSITION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY =
+    "position_controller_max_integral";
+
+// Orientation (heading) controller PID gains
+const std::string ROBOT_ORIENTATION_CONTROLLER_KP_CONFIG_KEY =
+    "orientation_controller_kp";
+const std::string ROBOT_ORIENTATION_CONTROLLER_KI_CONFIG_KEY =
+    "orientation_controller_ki";
+const std::string ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY =
+    "orientation_controller_kd";
+const std::string ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY =
+    "orientation_controller_max_integral";
+
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10006;
 

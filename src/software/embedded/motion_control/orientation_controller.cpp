@@ -1,5 +1,10 @@
 #include "software/embedded/motion_control/orientation_controller.h"
 
+OrientationController::OrientationController(const OrientationControllerConfig& config)
+    : w_pid_(config.kp, config.ki, config.kd, config.max_integral)
+{
+}
+
 AngularVelocity OrientationController::step(
     const Angle& orientation, const BangBangTrajectory1DAngular& target_trajectory,
     Duration elapsed_time, Duration delta_time)

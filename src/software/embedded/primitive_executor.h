@@ -19,8 +19,17 @@ class PrimitiveExecutor
      * Constructor
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
+     * @param position_controller_config The PID gains for the position controller,
+     * typically read from this robot's robot_config.toml
+     * @param orientation_controller_config The PID gains for the orientation
+     * controller, typically read from this robot's robot_config.toml
      */
-    explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
+    explicit PrimitiveExecutor(
+        const robot_constants::RobotConstants& robot_constants,
+        const PositionControllerConfig& position_controller_config =
+            PositionControllerConfig(),
+        const OrientationControllerConfig& orientation_controller_config =
+            OrientationControllerConfig());
 
     /**
      * Update primitive executor with a new Primitive

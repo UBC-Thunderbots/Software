@@ -25,12 +25,15 @@ class TomlConfigClient
 
     /**
      * Gets the value corresponding to the key as a string.
-     * Returns empty string if key doesn't exist.
+     * Returns default_value if the key doesn't exist. This allows config files that
+     * predate the introduction of a key (e.g. an older robot_config.toml already
+     * deployed on a robot) to keep working without needing to be regenerated.
      *
      * @param key The configuration key (e.g., "/robot_id")
-     * @return The value as a string, or empty string if not found
+     * @param default_value The value to return if the key doesn't exist
+     * @return The value as a string, or default_value if not found
      */
-    std::string get(const std::string& key);
+    std::string get(const std::string& key, const std::string& default_value = "");
 
     /**
      * Sets a key-value pair in the TOML file.

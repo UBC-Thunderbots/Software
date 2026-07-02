@@ -2,6 +2,12 @@
 
 #include "software/geom/algorithms/distance.h"
 
+PositionController::PositionController(const PositionControllerConfig& config)
+    : x_pid_(config.kp, config.ki, config.kd, config.max_integral),
+      y_pid_(config.kp, config.ki, config.kd, config.max_integral)
+{
+}
+
 Vector PositionController::step(const Point& position,
                                 const TrajectoryPath& target_trajectory,
                                 Duration elapsed_time, Duration delta_time)

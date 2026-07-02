@@ -81,7 +81,26 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
           std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
       network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
       loop_hz_(loop_hz),
-      primitive_executor_(robot_constants),
+      primitive_executor_(
+          robot_constants,
+          PositionControllerConfig{
+              std::stod(toml_config_client_->get(
+                  ROBOT_POSITION_CONTROLLER_KP_CONFIG_KEY)),
+              std::stod(toml_config_client_->get(
+                  ROBOT_POSITION_CONTROLLER_KI_CONFIG_KEY)),
+              std::stod(toml_config_client_->get(
+                  ROBOT_POSITION_CONTROLLER_KD_CONFIG_KEY)),
+              std::stod(toml_config_client_->get(
+                  ROBOT_POSITION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY))},
+          OrientationControllerConfig{
+              std::stod(toml_config_client_->get(
+                  ROBOT_ORIENTATION_CONTROLLER_KP_CONFIG_KEY)),
+              std::stod(toml_config_client_->get(
+                  ROBOT_ORIENTATION_CONTROLLER_KI_CONFIG_KEY)),
+              std::stod(toml_config_client_->get(
+                  ROBOT_ORIENTATION_CONTROLLER_KD_CONFIG_KEY)),
+              std::stod(toml_config_client_->get(
+                  ROBOT_ORIENTATION_CONTROLLER_MAX_INTEGRAL_CONFIG_KEY))}),
       robot_localizer_(RobotLocalizer::RobotLocalizerConfig{
           robot_constants.kalman_process_noise_variance_rad_per_s_4,
           robot_constants.kalman_vision_noise_variance_rad_2,

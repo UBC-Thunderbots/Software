@@ -7,14 +7,28 @@
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 
+// TODO(#3737): tune constants
+// PID gains for PositionController's underlying x/y PID controllers. Both axes share
+// the same gains. Defaults preserve the previously hardcoded tuning; robot_config.toml
+// can override these on a per-robot basis.
+struct PositionControllerConfig
+{
+    double kp           = 1.2;
+    double ki           = 0.1;
+    double kd           = 0.0;
+    double max_integral = 10.0;
+};
+
 class PositionController : public MotionController<Point, TrajectoryPath, Vector>
 {
    public:
     /**
      * Constructs a position controller that uses measurements over multiple time
      * intervals to calculate the target velocity to minimize error.
+     *
+     * @param config The PID gains to use for the underlying x/y PID controllers.
      */
-    PositionController() = default;
+    explicit PositionController(const PositionControllerConfig& config = PositionControllerConfig());
 
     /**
      * Given a position and target trajectory, returns a target global velocity to
@@ -34,9 +48,8 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
     void reset() override;
 
    private:
-    // TODO(#3737): tune constants
-    PidController<double> x_pid_{1.2, 0.1, 0.0, 10.0};
-    PidController<double> y_pid_{1.2, 0.1, 0.0, 10.0};
+    PidController<double> x_pid_;
+    PidController<double> y_pid_;
 
     static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 };
