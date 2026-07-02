@@ -370,12 +370,8 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_d
                                       const Timestamp& capture_timestamp)
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
-<<<<<<< HEAD
-        friendly_team, robot_detections, true, friendly_robot_id_with_ball_in_dribbler);
-=======
         friendly_team, robot_detections, capture_timestamp,
         friendly_robot_id_with_ball_in_dribbler);
->>>>>>> sauravbanna/enable_zero_robots
     return new_friendly_team;
 }
 
@@ -444,13 +440,8 @@ void SensorFusion::updateDribbleDisplacement()
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
                                    const Timestamp& capture_timestamp)
 {
-<<<<<<< HEAD
-    Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team, robot_detections, true, false);
-=======
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
                                                             capture_timestamp, false);
->>>>>>> sauravbanna/enable_zero_robots
     return new_enemy_team;
 }
 
