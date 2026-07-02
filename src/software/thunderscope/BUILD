@@ -19,6 +19,8 @@ py_binary(
         ":estop_helpers",
         ":thunderscope",
         ":util",
+        "//software/gameplay_tests:test_mode",
+        "//software/gameplay_tests/validation:validations",
         "//software/stats/loggers:stats_logger",
         "//software/gameplay_tests:test_mode",
         "//software/gameplay_tests/validation:validations",

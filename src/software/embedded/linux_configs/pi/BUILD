@@ -6,5 +6,6 @@ filegroup(
         "10-local.rules",
         "config.txt",
         "setup.zip",
+        "tbots_mezz.nmconnection.j2",
     ],
 )

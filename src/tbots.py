@@ -402,7 +402,9 @@ def start_interactive_cli(config: BuildConfig):
                 iface = questionary.text(
                     "Network interface?", style=INTERACTIVE_STYLE
                 ).unsafe_ask()
-                extra_args.extend(["--run_diagnostics", "--interface", iface])
+                extra_args.extend(
+                    [f"--{THUNDERSCOPE_OPTIONS_MAP[launch]}", "--interface", iface]
+                )
             elif launch == "Tests":
                 extra_args.append("--test_mode")
                 test_type = questionary.select(

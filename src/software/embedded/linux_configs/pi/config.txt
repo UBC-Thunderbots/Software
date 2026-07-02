@@ -50,6 +50,11 @@ dtparam=pciex1
 dtoverlay=spi0-5cs
 dtoverlay=uart0-pi5
 
+# Constrain PCIe DMA to 32-bit so the Intel AX210 (iwlwifi) WiFi 6E card probes
+# correctly. Without this, iwlwifi can fail with "probe ... failed with error -12"
+# (ENOMEM) on the Pi 5 PCIe bus. Harmless for cards that don't require it.
+dtoverlay=pcie-32bit-dma-pi5
+
 # Fan config
 dtparam=cooling_fan=on
 dtparam=fan_temp0=45000

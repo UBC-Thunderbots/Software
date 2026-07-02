@@ -1,0 +1,22 @@
+[connection]
+id={{ wifi_6e_ssid }}
+uuid=6e000000-0000-4000-8000-000000000006
+type=wifi
+interface-name=tbotswifi6
+autoconnect=true
+autoconnect-priority=10
+
+[wifi]
+mode=infrastructure
+ssid={{ wifi_6e_ssid }}
+
+[wifi-security]
+key-mgmt=sae
+psk={{ wifi_6e_password }}
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=auto
+addr-gen-mode=default

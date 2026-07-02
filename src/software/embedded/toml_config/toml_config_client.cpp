@@ -40,7 +40,7 @@ void TomlConfigClient::loadConfig()
         config_table_ = toml::table{
             {"robot_id", "1"},
             {"channel_id", "0"},
-            {"network_interface", "tbotswifi5"},
+            {"network_interface", "tbotswifi6"},
             {"kick_constant", "0"},
             {"kick_coeff", "0.0"},
             {"chip_pulse_width", "0"},
