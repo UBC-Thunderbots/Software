@@ -132,14 +132,9 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setBallState(createBallState(world_state.ball_state()));
     }
-    if (world_state.blue_robots().size() > 0)
-    {
-        setRobots(world_state.blue_robots(), gameController::Team::BLUE);
-    }
-    if (world_state.yellow_robots().size() > 0)
-    {
-        setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
-    }
+    
+    setRobots(world_state.blue_robots(), gameController::Team::BLUE);
+    setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
