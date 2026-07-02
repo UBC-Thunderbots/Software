@@ -30,34 +30,8 @@
  * This section of code is reserved for DIRECT testing on the microcontroller/debug
  * functionality.
  */
-void setup()
-{
-    // put your setup code here, to run once:
-    pinMode(26, OUTPUT);  // Set up IO26 for Flyback IC CHARGE
-    pinMode(5, OUTPUT);   // Set up IO27 for auto-discharge (AD) EN
-}
-
-void loop()
-{
-    // put your main code here, to run repeatedly:
-    digitalWrite(5, HIGH);  // Initialize auto-disharge EN pin to HIGH
-
-    delay(5000);  // Initialization delay
-
-    digitalWrite(26, HIGH);  // Enable flyback and charge HV caps
-
-    delay(3000);  // Wait for HV to fully charge
-
-    digitalWrite(26, LOW);  // Toggle CHARGE low to disable flyback
-
-    delay(1000);  // Buffer delay
-
-    digitalWrite(5, LOW);  // Disable AD gate driver to discharge HV caps
-
-    while (1)
-    {
-    }
-}
+void setup() {}
+void loop() {}
 #else
 
 // Used for uart communication
