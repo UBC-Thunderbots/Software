@@ -32,8 +32,11 @@
 # The 6 GHz network uses WPA3-SAE (mandatory on 6 GHz). We render a NetworkManager
 # keyfile (0600, root) instead of `nmcli ... psk=...` so the passphrase never
 # appears on a command line or in playbook output. A higher autoconnect priority
-# than the imager-provisioned connection makes the robot prefer 6E when available
-# and fall back to the existing network if 6 GHz is ever unreachable.
+# than the imager-provisioned connection makes the robot prefer 6E on the AX210.
+# The imager WiFi 5 connection is separately pinned to the built-in radio (see the
+# next task) so it can never autoconnect on the tri-band AX210 and hijack the 6E
+# interface; the robot still falls back to WiFi 5 on the built-in card when 6 GHz
+# is unreachable.
 - name: Install the WiFi 6E (WPA3-SAE) NetworkManager connection
   become: true
   become_method: ansible.builtin.sudo
@@ -47,11 +50,46 @@
   tags:
     - setup_wifi_6e
 
+# The imager-provisioned WiFi 5 connection has no interface binding, so it can
+# autoconnect on the tri-band AX210 (tbotswifi6) and hijack the 6E radio whenever
+# the 6 GHz network is momentarily unavailable, leaving tbotswifi6 associated to
+# the WiFi 5 SSID. Pin every non-mezz WiFi connection to the built-in WiFi 5 radio
+# (tbotswifi5) so the AX210 stays exclusively on the 6E network and WiFi 5 only
+# ever runs on the built-in card. (Connection names containing ':' are not handled
+# - none of ours do.)
+- name: Pin the WiFi 5 connection(s) to the tbotswifi5 interface
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      set -euo pipefail
+      changed=0
+      wifi_conns="$(nmcli -t -f NAME,TYPE connection show \
+        | awk -F: '$2 == "802-11-wireless" { print $1 }')"
+      while IFS= read -r name; do
+        if [ -z "$name" ] || [ "$name" = "{{ wifi_6e_ssid }}" ]; then
+          continue
+        fi
+        current="$(nmcli -g connection.interface-name connection show "$name" || true)"
+        if [ "$current" != "tbotswifi5" ]; then
+          nmcli connection modify "$name" connection.interface-name tbotswifi5
+          changed=1
+        fi
+      done <<< "$wifi_conns"
+      if [ "$changed" -eq 1 ]; then
+        echo CHANGED
+      fi
+  register: wifi5_pin
+  changed_when: "'CHANGED' in wifi5_pin.stdout"
+  tags:
+    - setup_wifi_6e
+
 - name: Reload NetworkManager connections
   become: true
   become_method: ansible.builtin.sudo
   ansible.builtin.command: nmcli connection reload
-  when: wifi_6e_conn is changed
+  when: wifi_6e_conn is changed or wifi5_pin is changed
   changed_when: false
   tags:
     - setup_wifi_6e
