@@ -42,3 +42,15 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+py_test(
+    name = "pivot_kick_tactic_field_test",
+    srcs = [
+        "pivot_kick_tactic_field_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

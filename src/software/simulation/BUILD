@@ -1,3 +1,5 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -33,5 +35,17 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "simulator_ball_test",
+    srcs = [
+        "simulator_ball_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

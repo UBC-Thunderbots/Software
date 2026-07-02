@@ -9,9 +9,7 @@ from software.gameplay_tests.validation.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
 )
 from software.gameplay_tests.validation.delay_validation import DelayValidation
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 @pytest.mark.parametrize(
@@ -31,9 +29,9 @@ from software.gameplay_tests.simulated_test_fixture import (
         ),
     ],
 )
-def test_robot_halt(blue_robot_locations, blue_robot_velocities, simulated_test_runner):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+def test_robot_halt(blue_robot_locations, blue_robot_velocities, gameplay_test_runner):
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_robot_locations,
                 blue_robot_velocities=blue_robot_velocities,
@@ -43,7 +41,7 @@ def test_robot_halt(blue_robot_locations, blue_robot_velocities, simulated_test_
             )
         )
 
-        simulated_test_runner.set_tactics(blue_tactics={1: HaltTactic()})
+        gameplay_test_runner.set_tactics(blue_tactics={1: HaltTactic()})
 
     robot_stopped_validation = RobotSpeedEventuallyBelowThreshold(speed_threshold=0.001)
 
@@ -61,10 +59,9 @@ def test_robot_halt(blue_robot_locations, blue_robot_velocities, simulated_test_
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
     )
 
 
