@@ -588,7 +588,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 robot_state.global_position,
                 self.DEFAULT_ROBOT_ANGLE,
             )
-            self.next_id = max(self.next_id, self.robot_id + 1)
+            self.next_id = max(self.next_id, robot_id + 1)
 
         return world_state
 
