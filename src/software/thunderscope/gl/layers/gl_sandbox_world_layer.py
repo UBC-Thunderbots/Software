@@ -468,9 +468,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         self.__clear_reset_helper(DIV_B_NUM_ROBOTS)
 
-    def __clear_reset_helper(
-        self, num_robots: int
-    ) -> None:
+    def __clear_reset_helper(self, num_robots: int) -> None:
         """Shared helper for clearing or resetting the field.
         Saves the current robot state as an undo operation, clears internal
         state (robot ids, local positions, and the redo stack), and sends
@@ -566,7 +564,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """Constructs a SandboxWorldState from the default world state with the
         given number of robots, while also adding robots to local state
 
-        :return: the sandbox world state with ball state + 
+        :return: the sandbox world state with ball state +
                  the given number of robots in default positions
         """
         world_state_proto = tbots_protobuf.create_default_world_state(num_robots)
@@ -576,11 +574,18 @@ class GLSandboxWorldLayer(GLWorldLayer):
         )
         world_state.set_ball_state(world_state_proto.ball_state)
 
-        friendly_robots = world_state_proto.yellow_robots if self.friendly_colour_yellow else world_state_proto.blue_robots
+        friendly_robots = (
+            world_state_proto.yellow_robots
+            if self.friendly_colour_yellow
+            else world_state_proto.blue_robots
+        )
 
         for robot_id, robot_state in friendly_robots.items():
             world_state = self.__update_with_new_abs_position(
-                world_state, robot_id, robot_state.global_position, self.DEFAULT_ROBOT_ANGLE
+                world_state,
+                robot_id,
+                robot_state.global_position,
+                self.DEFAULT_ROBOT_ANGLE,
             )
             self.next_id = max(self.next_id, self.robot_id + 1)
 
@@ -836,16 +841,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
         new_pos: Point,
         new_orientation: float = 0,
     ):
-        new_pos_3d = QVector3D(
-            new_pos.x_meters, new_pos.y_meters, 0
+        new_pos_3d = QVector3D(new_pos.x_meters, new_pos.y_meters, 0)
+
+        converted_pos, converted_orientation = (
+            self.__invert_robot_if_defending_negative_half(new_pos_3d, new_orientation)
         )
 
-        converted_pos, converted_orientation = self.__invert_robot_if_defending_negative_half(
-            new_pos_3d, new_orientation
+        self.__update_with_new_position(
+            world_state, robot_id, converted_pos, converted_orientation
         )
-
-        self.__update_with_new_position(world_state, robot_id, converted_pos, converted_orientation)
-
 
     def __update_with_new_position(
         self,
