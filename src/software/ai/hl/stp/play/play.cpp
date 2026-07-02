@@ -167,6 +167,51 @@ const std::map<std::shared_ptr<const Tactic>, RobotId>& Play::getTacticRobotIdAs
     return tactic_robot_id_assignment;
 }
 
+void Play::parseAndAddCapability(
+    const std::string& csv_ids, RobotCapability capability,
+    std::map<int, std::set<RobotCapability>>& missing_caps_map)
+{
+    if (csv_ids.empty())
+    {
+        return;
+    }
+
+    std::stringstream ss(csv_ids);
+    std::string item;
+
+    while (std::getline(ss, item, ','))
+    {
+        if (!item.empty())
+        {
+            try
+            {
+                int robot_id = std::stoi(item);
+                missing_caps_map[robot_id].insert(capability);
+            }
+            catch (const std::invalid_argument& e)
+            {
+                // Handle or log potential parsing errors if the string is malformed
+            }
+        }
+    }
+}
+
+std::map<int, std::set<RobotCapability>> Play::getMissingCapabilities()
+{
+    std::map<int, std::set<RobotCapability>> missing_capabilities;
+
+    const auto& config = ai_config_ptr->robot_capabilities_config();
+
+    parseAndAddCapability(config.broken_dribblers(), RobotCapability::Dribble,
+                          missing_capabilities);
+    parseAndAddCapability(config.broken_kickers(), RobotCapability::Kick,
+                          missing_capabilities);
+    parseAndAddCapability(config.broken_chippers(), RobotCapability::Chip,
+                          missing_capabilities);
+
+    return missing_capabilities;
+}
+
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
 Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
@@ -209,6 +254,8 @@ Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
     // "jobs" (the Tactics).
     Matrix<double> matrix(num_rows, num_cols);
 
+    auto missing_capabilities_config_map = getMissingCapabilities();
+
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
     for (size_t row = 0; row < num_rows; row++)
     {
@@ -224,9 +271,21 @@ Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
+            // TODO: use capabilities from ai config
             std::set<RobotCapability> robot_capabilities =
                 robot.getAvailableCapabilities();
             std::set<RobotCapability> missing_capabilities;
+
+            // if any missing capabilities were specified in config
+            if (missing_capabilities_config_map.find(robot.id()) !=
+                missing_capabilities_config_map.end())
+            {
+                std::set<RobotCapability> missing_capabilities_config =
+                    missing_capabilities_config_map[robot.id()];
+                missing_capabilities.insert(missing_capabilities_config.begin(),
+                                            missing_capabilities_config.end());
+            }
+
             std::set_difference(
                 required_capabilities.begin(), required_capabilities.end(),
                 robot_capabilities.begin(), robot_capabilities.end(),
@@ -236,7 +295,7 @@ Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
             {
                 // We arbitrarily increase the cost, so that robots with missing
                 // capabilities are not assigned
-                matrix(row, col) = robot_cost_for_tactic * 10.0 + 10.0;
+                matrix(row, col) = std::numeric_limits<double>::infinity();
             }
             else
             {
@@ -266,9 +325,40 @@ Play::assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
             auto val = matrix(row, col);
             if (val == 0)
             {
+                Robot robot                        = robots_to_assign.at(row);
+                std::shared_ptr<Tactic> tactic_ptr = tactic_vector.at(col);
+
+                // manually exclude robots that have been assigned to tactics
+                // that they are missing capabilities for
+                std::set<RobotCapability> required_capabilities =
+                    tactic_ptr->robotCapabilityRequirements();
+                std::set<RobotCapability> missing_capabilities;
+
+                if (missing_capabilities_config_map.find(robot.id()) !=
+                    missing_capabilities_config_map.end())
+                {
+                    const std::set<RobotCapability>& missing_config =
+                        missing_capabilities_config_map.at(robot.id());
+                    missing_capabilities.insert(missing_config.begin(),
+                                                missing_config.end());
+                }
+
+                std::vector<RobotCapability> intersection;
+                std::set_intersection(
+                    required_capabilities.begin(), required_capabilities.end(),
+                    missing_capabilities.begin(), missing_capabilities.end(),
+                    std::back_inserter(intersection));
+
+                // If the intersection is not empty, this robot was assigned to a tactic
+                // it cannot do
+                if (!intersection.empty())
+                {
+                    // so skip it, keeping it in remaining_robots
+                    continue;
+                }
+
                 RobotId robot_id = robots_to_assign.at(row).id();
-                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
-                                                           robot_id);
+                current_tactic_robot_id_assignment.emplace(tactic_ptr, robot_id);
                 tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
                 auto primitives = primitive_sets.at(col);
