@@ -1,7 +1,7 @@
 #include "charger.h"
 
-bool Charger::is_charging                  = false;
-unsigned long Charger::charge_start_ms     = 0;
+bool Charger::is_charging              = false;
+unsigned long Charger::charge_start_ms = 0;
 
 Charger::Charger()
 {
