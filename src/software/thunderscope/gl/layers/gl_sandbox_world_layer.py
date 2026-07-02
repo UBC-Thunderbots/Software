@@ -494,6 +494,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # send out empty world state
         world_state = self.__get_clear_reset_world_state(num_robots)
 
+        print(world_state)
+        print(self.local_robot_positions)
+
         self.simulator_io.send_proto(WorldState, world_state.proto)
 
         # robots are normally auto-rendered by refresh fn when sim is unpaused

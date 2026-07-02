@@ -87,6 +87,7 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     // has passed, then remove the robot from the team
     for (auto it = team_robots_.begin(); it != team_robots_.end();)
     {
+        std::cout << "FOR ROBOT: " << it->id() << " TIMESTAMP: " << it->timestamp() << " CURR: " << timestamp << std::endl;
         Duration time_diff = timestamp - it->timestamp();
         if (time_diff.toSeconds() < 0)
         {
@@ -95,6 +96,7 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
         }
         if (time_diff > robot_expiry_buffer_duration_)
         {
+            std::cout << "ERASING ROBOT ID: " << it->id() << std::endl;
             it = team_robots_.erase(it);
         }
         else

@@ -53,6 +53,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
         }
     }
 
+    std::cout << "LATEST TIMESTAMP " << latest_timestamp << std::endl;
+
     if (data_num == 0)
     {
         // if there is no data the duration of expiry_buffer_duration after previously
@@ -65,6 +67,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         }
         else
         {
+            std::cout << "DEFAULT!!" << std::endl;
             return std::make_optional(current_robot_state);
         }
     }
