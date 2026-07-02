@@ -7,8 +7,8 @@ from software.thunderscope.robot_diagnostics.chicker_widget import (
     ChickerWidget,
     ChickerCommandMode,
 )
-from software.thunderscope.robot_diagnostics.handheld_controller_widget import (
-    HandheldControllerWidget,
+from software.thunderscope.robot_diagnostics.manual_control_widget import (
+    ManualControlWidget,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
@@ -19,7 +19,7 @@ class DiagnosticsWidget(QScrollArea):
     """The DiagnosticsWidget contains all widgets related to manually
     controlling robots in Robot Diagnostics:
 
-    - HandheldControllerWidget
+    - ManualControlWidget
     - DriveAndDribblerWidget
     - ChickerWidget
 
@@ -38,19 +38,19 @@ class DiagnosticsWidget(QScrollArea):
         self.drive_dribbler_widget = DriveAndDribblerWidget(self.proto_unix_io)
         self.chicker_widget = ChickerWidget(self.proto_unix_io)
 
-        self.handheld_controller_widget = HandheldControllerWidget()
-        self.handheld_controller_widget.kick_button_pressed.connect(
+        self.manual_control_widget = ManualControlWidget()
+        self.manual_control_widget.kick_button_pressed.connect(
             lambda: self.chicker_widget.send_command_and_timeout(
                 ChickerCommandMode.KICK
             )
         )
-        self.handheld_controller_widget.chip_button_pressed.connect(
+        self.manual_control_widget.chip_button_pressed.connect(
             lambda: self.chicker_widget.send_command_and_timeout(
                 ChickerCommandMode.CHIP
             )
         )
 
-        self.handheld_controller_widget.setSizePolicy(
+        self.manual_control_widget.setSizePolicy(
             QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum
         )
         self.drive_dribbler_widget.setSizePolicy(
@@ -61,7 +61,7 @@ class DiagnosticsWidget(QScrollArea):
         )
 
         diagnostics_widget_vbox_layout = QVBoxLayout()
-        diagnostics_widget_vbox_layout.addWidget(self.handheld_controller_widget)
+        diagnostics_widget_vbox_layout.addWidget(self.manual_control_widget)
         diagnostics_widget_vbox_layout.addWidget(self.drive_dribbler_widget)
         diagnostics_widget_vbox_layout.addWidget(self.chicker_widget)
 
@@ -77,22 +77,22 @@ class DiagnosticsWidget(QScrollArea):
     def refresh(self) -> None:
         """Call the refresh function on all sub-widgets.
 
-        If controller input is enabled in the HandheldControllerWidget, visually update the
+        If a manual input source is enabled in the ManualControlWidget, visually update the
         DriveAndDribblerWidget and the ChickerWidget to display the motor and chicker values
-        currently set by the handheld controller.
+        currently set by that input source.
         """
-        self.handheld_controller_widget.refresh()
+        self.manual_control_widget.refresh()
 
-        if self.handheld_controller_widget.controller_input_enabled():
+        if self.manual_control_widget.input_enabled():
             self.chicker_widget.disable()
             self.drive_dribbler_widget.disable()
 
             self.drive_dribbler_widget.override_slider_values(
-                self.handheld_controller_widget.motor_control
+                self.manual_control_widget.motor_control
             )
             self.chicker_widget.override_slider_values(
-                self.handheld_controller_widget.kick_power,
-                self.handheld_controller_widget.chip_distance,
+                self.manual_control_widget.kick_power,
+                self.manual_control_widget.chip_distance,
             )
         else:
             self.chicker_widget.enable()
