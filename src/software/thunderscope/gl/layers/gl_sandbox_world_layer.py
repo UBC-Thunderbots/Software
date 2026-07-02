@@ -12,6 +12,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import Colors, DepthValues
 from software.py_constants import *
+from proto.message_translation import tbots_protobuf
 
 
 class Operation(ABC):
