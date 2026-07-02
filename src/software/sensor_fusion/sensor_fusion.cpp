@@ -267,15 +267,17 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         }
     }
 
+    Timestamp capture_timestamp = Timestamp::fromSeconds(ssl_detection_frame.t_capture());
+
     if (friendly_team_is_yellow)
     {
-        friendly_team = createFriendlyTeam(yellow_team);
-        enemy_team    = createEnemyTeam(blue_team);
+        friendly_team = createFriendlyTeam(yellow_team, capture_timestamp);
+        enemy_team    = createEnemyTeam(blue_team, capture_timestamp);
     }
     else
     {
-        friendly_team = createFriendlyTeam(blue_team);
-        enemy_team    = createEnemyTeam(yellow_team);
+        friendly_team = createFriendlyTeam(blue_team, capture_timestamp);
+        enemy_team    = createEnemyTeam(yellow_team, capture_timestamp);
     }
 
     ball_in_dribbler_timeout--;
@@ -299,8 +301,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
                     .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
             .distance_from_ground = 0,
-            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-            .confidence = 1}};
+            .timestamp            = capture_timestamp,
+            .confidence           = 1}};
 
         std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
 
@@ -364,10 +366,16 @@ std::optional<Ball> SensorFusion::createBall(
     return std::nullopt;
 }
 
-Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections)
+Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections,
+                                      const Timestamp& capture_timestamp)
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
+<<<<<<< HEAD
         friendly_team, robot_detections, true, friendly_robot_id_with_ball_in_dribbler);
+=======
+        friendly_team, robot_detections, capture_timestamp,
+        friendly_robot_id_with_ball_in_dribbler);
+>>>>>>> sauravbanna/enable_zero_robots
     return new_friendly_team;
 }
 
@@ -433,10 +441,16 @@ void SensorFusion::updateDribbleDisplacement()
     }
 }
 
-Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections)
+Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
+                                   const Timestamp& capture_timestamp)
 {
+<<<<<<< HEAD
     Team new_enemy_team =
         enemy_team_filter.getFilteredData(enemy_team, robot_detections, true, false);
+=======
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
+                                                            capture_timestamp, false);
+>>>>>>> sauravbanna/enable_zero_robots
     return new_enemy_team;
 }
 

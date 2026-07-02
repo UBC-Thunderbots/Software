@@ -28,7 +28,7 @@ class RobotTeamFilter
     Team getFilteredData(
         const Team& current_team_state,
         const std::vector<RobotDetection>& new_robot_detections,
-        bool is_friendly,
+        const Timestamp& capture_timestamp,
         const std::optional<RobotId> breakbeam_tripped_id = std::nullopt);
 
 
