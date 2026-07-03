@@ -16,6 +16,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:move_primitive",
+        "//software/ai/hl/stp/tactic:transition_conditions",
         "//software/logger",
     ],
 )
