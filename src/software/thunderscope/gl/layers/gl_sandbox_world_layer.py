@@ -379,30 +379,16 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations.append(operation)
         self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
 
-    def __undo_redo_internal(self, operation: Operation) -> None:
-        """Helper method to apply an Operation
+    def __undo_redo_internal(self, operation: RobotOperation) -> None:
+        """Helper method to apply a RobotOperation
         Updates robot positions and the next id
 
         :param operation: the operation to apply
         """
-        if isinstance(operation, GroupOperation):
-            self.next_id = float("inf")
-
-            world_state = self.__get_curr_world_state()
-
-            for inner_op in operation.operations:
-                self.next_id = int(min(self.next_id, inner_op.next_id))
-                world_state = self.__update_with_new_position(
-                    world_state, inner_op.id, inner_op.pos, self.DEFAULT_ROBOT_ANGLE
-                )
-
-            # send out world state
-            self.simulator_io.send_proto(WorldState, world_state.proto)
-        else:
-            self.next_id = operation.next_id
-            self.__update_world_state(
-                operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
-            )
+        self.next_id = operation.next_id
+        self.__update_world_state(
+            operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
+        )
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
     #       ADD / REMOVE / MOVE ROBOT METHODS       #
