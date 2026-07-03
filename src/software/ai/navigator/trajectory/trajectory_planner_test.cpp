@@ -214,10 +214,9 @@ TEST_F(TrajectoryPlannerTest, test_traj_escapes_when_starting_inside_obstacle)
         obstacle_factory.createStaticObstacleFromRobotPosition(Point(0.45, 0.0));
     std::vector obstacles = {start_obstacle, blocking_obstacle};
 
-    auto traj_path =
-        traj_planner.findTrajectory(start_pos, destination, initial_velocity,
-                                    slow_constraints, obstacles,
-                                    world->field().fieldBoundary());
+    auto traj_path = traj_planner.findTrajectory(start_pos, destination, initial_velocity,
+                                                 slow_constraints, obstacles,
+                                                 world->field().fieldBoundary());
 
     // Must return an escape trajectory rather than a stop primitive.
     ASSERT_TRUE(traj_path.has_value());
@@ -227,8 +226,7 @@ TEST_F(TrajectoryPlannerTest, test_traj_escapes_when_starting_inside_obstacle)
     bool escapes_starting_obstacle = false;
     for (int i = 0; i <= NUM_SUB_POINTS; ++i)
     {
-        double t_sec = i *
-                       std::min(traj_path->getTotalTime(), MAX_COLLISION_CHECK_TIME) /
+        double t_sec = i * std::min(traj_path->getTotalTime(), MAX_COLLISION_CHECK_TIME) /
                        NUM_SUB_POINTS;
         if (!start_obstacle->contains(traj_path->getPosition(t_sec)))
         {

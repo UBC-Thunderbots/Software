@@ -124,8 +124,8 @@ AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const Duration& del
     const double angular_velocity_delta =
         std::clamp((target_w - prev_target_angular_velocity_).toRadians(),
                    -max_angular_velocity_delta, max_angular_velocity_delta);
-    target_w                      = prev_target_angular_velocity_ +
-                                    AngularVelocity::fromRadians(angular_velocity_delta);
+    target_w = prev_target_angular_velocity_ +
+               AngularVelocity::fromRadians(angular_velocity_delta);
     prev_target_angular_velocity_ = target_w;
     return target_w;
 }

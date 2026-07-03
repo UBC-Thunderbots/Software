@@ -300,7 +300,9 @@ class RobotDiagnosticsCLI:
                         elif key in (ARROW_DOWN, "j"):
                             focused = (focused + 1) % len(options)
                         elif key in (*ENTER_KEYS, SPACE_KEY):
-                            editing_value = f"{self.embedded_data._get_value(options[focused][0])}"
+                            editing_value = (
+                                f"{self.embedded_data._get_value(options[focused][0])}"
+                            )
                         elif key in (ESCAPE_KEY, CTRL_C_KEY, "q"):
                             break
                     else:

@@ -58,9 +58,7 @@ class ManualInputWidget(QWidget):
         :param value: the normalized axis value in [-1, 1]
         :return: the value, or 0 if it is within the deadzone
         """
-        return (
-            value if abs(value) >= DiagnosticsConstants.DEADZONE_PERCENTAGE else 0
-        )
+        return value if abs(value) >= DiagnosticsConstants.DEADZONE_PERCENTAGE else 0
 
     def _apply_inputs(
         self,
@@ -96,9 +94,7 @@ class ManualInputWidget(QWidget):
         move_y = self._with_deadzone(move_y)
         move_rot = self._with_deadzone(move_rot)
 
-        speed_factor = (
-            DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR if slow_mode else 1
-        )
+        speed_factor = DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR if slow_mode else 1
 
         self.motor_control.direct_velocity_control.velocity.x_component_meters = (
             -move_x * self.constants.robot_max_speed_m_per_s * speed_factor
