@@ -395,7 +395,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # send out empty world state
         world_state = self.__get_clear_reset_world_state(num_robots)
 
-        self.simulator_io.send_proto(WorldState, world_state.proto)
+        self.simulator_io.send_proto(WorldState, world_state)
 
         # robots are normally auto-rendered by refresh fn when sim is unpaused
         # when sim is paused, have to manually render
@@ -440,19 +440,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
             operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
         )
 
-    def __get_clear_reset_world_state(self, num_robots) -> SandboxWorldState:
-        """Constructs a SandboxWorldState from the default world state with the
+    def __get_clear_reset_world_state(self, num_robots) -> WorldState:
+        """Constructs a WorldState from the default world state with the
         given number of robots, while also adding robots to local state
 
         :return: the sandbox world state with ball state +
                  the given number of robots in default positions
         """
         world_state_proto = tbots_protobuf.create_default_world_state(num_robots)
-
-        world_state = GLSandboxWorldLayer.SandboxWorldState(
-            self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
-        )
-        world_state.set_ball_state(world_state_proto.ball_state)
 
         friendly_robots = (
             world_state_proto.yellow_robots
@@ -461,12 +456,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         )
 
         for robot_id, robot_state in friendly_robots.items():
-            world_state = self.__update_with_new_abs_position(
-                world_state,
-                robot_id,
-                robot_state.global_position,
-                self.DEFAULT_ROBOT_ANGLE,
-            )
             self.next_id = max(self.next_id, robot_id + 1)
 
         return world_state
