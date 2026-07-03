@@ -1,5 +1,7 @@
 import math
 from typing import Optional, override
+from dataclasses import dataclass
+from abc import ABC, abstractmethod
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -8,26 +10,63 @@ from software.py_constants import *
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from proto.message_translation import tbots_protobuf
 
 
-class RobotOperation:
+class Operation(ABC):
+    """Interface for operations that can be undone/redone"""
+
+    @abstractmethod
+    def reverse(self, next_id: int) -> "Operation":
+        """Returns the reverse of this operation
+
+        :param next_id: the next robot id to use in the reversed operation
+        :return: the reverse of this operation
+        """
+        pass
+
+
+@dataclass
+class RobotOperation(Operation):
     """An operation that changes the state of the robots on the field
     Contains the id of the robot to change, its new and previous positions if applicable
     And the id of the next robot to add after this operation completes
     """
 
-    def __init__(
-        self,
-        id: int,
-        prev_pos: Optional[tuple[int, int]],
-        pos: Optional[tuple[int, int]],
-        next_id: int,
-    ):
-        self.type = type
-        self.id = id
-        self.prev_pos = prev_pos
-        self.pos = pos
-        self.next_id = next_id
+    id: int
+    prev_pos: Optional[QVector3D]
+    pos: Optional[QVector3D]
+    next_id: int
+
+    @override
+    def reverse(self, next_id: int) -> Operation:
+        return RobotOperation(
+            id=self.id,
+            prev_pos=self.pos,
+            pos=self.prev_pos,
+            next_id=next_id,
+        )
+
+
+@dataclass
+class GroupOperation(Operation):
+    """A group of RobotOperations that should be applied together"""
+
+    operations: list[RobotOperation]
+
+    @override
+    def reverse(self, next_id: int) -> Operation:
+        return GroupOperation(
+            operations=[
+                RobotOperation(
+                    id=op.id,
+                    prev_pos=op.pos,
+                    pos=op.prev_pos,
+                    next_id=next_id,
+                )
+                for op in self.operations
+            ]
+        )
 
 
 class EnemyAtMousePositionError(Exception):
@@ -274,6 +313,95 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # apply the operation
         self.__undo_redo_internal(operation)
 
+    def __get_current_state_as_operation(self) -> GroupOperation:
+        """Captures the current positions of all robots as a GroupOperation
+        for undo purposes. Merges positions from both the cached world state and
+        the local state into a single GroupOperation
+        containing one RobotOperation per robot.
+
+        :return: a GroupOperation where each inner RobotOperation represents
+            the current position of a friendly robot on the field
+        """
+        operations = {}
+
+        # check the cached world state first
+        for robot_ in self.cached_world.friendly_team.team_robots:
+            # get the coordinates from the robot state
+            pos_x = robot_.current_state.global_position.x_meters
+            pos_y = robot_.current_state.global_position.y_meters
+
+            operations[robot_.id] = RobotOperation(
+                id=robot_.id,
+                prev_pos=None,
+                pos=QVector3D(
+                    robot_.current_state.global_position.x_meters,
+                    robot_.current_state.global_position.y_meters,
+                    0,
+                ),
+                next_id=self.next_id,
+            )
+
+        # then, update with local state
+        for robot_id, pos_and_orient in self.local_robot_positions.items():
+            # if the local robot has already been removed, skip it
+            if pos_and_orient is None:
+                continue
+
+            position, _ = pos_and_orient
+
+            operations[robot_id] = RobotOperation(
+                id=robot_id,
+                prev_pos=None,
+                pos=position,
+                next_id=self.next_id,
+            )
+
+        return GroupOperation(operations=operations.values())
+
+    def clear_field(self) -> None:
+        """Removes all robots from the field.
+        Adds a GroupOperation to the undo list that can restore all robots.
+        """
+        self.__clear_reset_helper(0)
+
+    def reset_field(self) -> None:
+        """Resets the robots on field to the default positions
+        Adds a GroupOperation to the undo list that can restore all robots to their previous positions.
+        """
+        self.__clear_reset_helper(DIV_B_NUM_ROBOTS)
+
+    def __clear_reset_helper(self, num_robots: int) -> None:
+        """Shared helper for clearing or resetting the field.
+        Saves the current robot state as an undo operation, clears internal
+        state (robot ids, local positions, and the redo stack), and sends
+        an empty world state to the simulator.
+
+        :param num_robots: The number of robots to place on the field
+            in default positions. Pass 0 to clear the field entirely.
+        """
+        undo_operation = self.__get_current_state_as_operation()
+
+        self.undo_operations.append(undo_operation)
+        self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
+
+        # clear internal state
+        self.curr_robot_ids.clear()
+        self.local_robot_positions.clear()
+
+        # clear redo list since this is a new action
+        self.redo_operations.clear()
+        self.redo_toggle_enabled_signal.emit(False)
+
+        # send out empty world state
+        world_state = self.__get_clear_reset_world_state(num_robots)
+
+        self.simulator_io.send_proto(WorldState, world_state.proto)
+
+        # robots are normally auto-rendered by refresh fn when sim is unpaused
+        # when sim is paused, have to manually render
+        if not self.is_playing:
+            self._update_robots_graphics()
+
     @override
     def toggle_play_state(self) -> bool:
         """When the simulator is paused / played, reset the local positions
@@ -311,6 +439,37 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.__update_world_state(
             operation.id, operation.pos, self.DEFAULT_ROBOT_ANGLE, clear_redo=False
         )
+
+    def __get_clear_reset_world_state(self, num_robots) -> SandboxWorldState:
+        """Constructs a SandboxWorldState from the default world state with the
+        given number of robots, while also adding robots to local state
+
+        :return: the sandbox world state with ball state +
+                 the given number of robots in default positions
+        """
+        world_state_proto = tbots_protobuf.create_default_world_state(num_robots)
+
+        world_state = GLSandboxWorldLayer.SandboxWorldState(
+            self.__invert_robot_if_defending_negative_half, self.friendly_colour_yellow
+        )
+        world_state.set_ball_state(world_state_proto.ball_state)
+
+        friendly_robots = (
+            world_state_proto.yellow_robots
+            if self.friendly_colour_yellow
+            else world_state_proto.blue_robots
+        )
+
+        for robot_id, robot_state in friendly_robots.items():
+            world_state = self.__update_with_new_abs_position(
+                world_state,
+                robot_id,
+                robot_state.global_position,
+                self.DEFAULT_ROBOT_ANGLE,
+            )
+            self.next_id = max(self.next_id, robot_id + 1)
+
+        return world_state
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
     #       ADD / REMOVE / MOVE ROBOT METHODS       #
