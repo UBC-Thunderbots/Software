@@ -8,8 +8,27 @@ from software.py_constants import *
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.constants import Colors, DepthValues
 from software.py_constants import *
+
+
+class RobotOperation:
+    """An operation that changes the state of the robots on the field
+    Contains the id of the robot to change, its new and previous positions if applicable
+    And the id of the next robot to add after this operation completes
+    """
+
+    def __init__(
+        self,
+        id: int,
+        prev_pos: Optional[tuple[int, int]],
+        pos: Optional[tuple[int, int]],
+        next_id: int,
+    ):
+        self.type = type
+        self.id = id
+        self.prev_pos = prev_pos
+        self.pos = pos
+        self.next_id = next_id
 
 
 class EnemyAtMousePositionError(Exception):
@@ -134,8 +153,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations = []
         self.redo_operations = []
 
-        self.sandbox_enabled = False
-
         self._referee_defined = False
 
     @override
@@ -150,10 +167,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         # forward event to super method for ball placement
         super().mouse_in_scene_pressed(event)
-
-        # if sandbox mode is disabled, don't do anything
-        if not self.sandbox_enabled:
-            return
 
         # only allow robot editing if Ctrl + Shift is pressed to avoid conflicting with the ball placement
         if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
@@ -175,7 +188,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 self.__handle_existing_robot_event(event, robot_id, index)
             except LastRobotRemoveError:
                 # if the user attempted to remove the last robot
-                # self.__display_last_remove_warning(event)
                 return
 
         # robots are normally auto-rendered by refresh fn when sim is unpaused
@@ -195,10 +207,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param event: the event containing the xy-plane and other plane coordinates
         """
         super().mouse_in_scene_dragged(event)
-
-        # if sandbox mode is disabled, don't do anything
-        if not self.sandbox_enabled:
-            return
 
         # only allow robot editing if Ctrl + Shift is pressed to avoid conflicting with the ball placement
         if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
@@ -256,10 +264,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param event: the mouse event
         """
         super().mouse_in_scene_released(event)
-
-        # if sandbox mode is disabled, don't do anything
-        if not self.sandbox_enabled:
-            return
 
         # ends the currently happening move
         self.selected_robot_id = None
@@ -367,19 +371,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         return curr_play_state
 
-    def set_sandbox_enabled(self, enabled: bool) -> None:
-        """Sets the sandbox mode enabled state and syncs undo / redo enable state
-
-        :param enabled: whether sandbox mode is enabled
-        """
-        self.sandbox_enabled = enabled
-
-        # resync undo / redo enabled state once sandbox mode is enabled
-        # as enabling sandbox mode enables the buttons
-        if self.sandbox_enabled:
-            self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
-            self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
-
     def __add_undo_operation(self, operation: RobotOperation) -> None:
         """Adds an undo operation to the list and emits the toggle enable signal
 
@@ -463,18 +454,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # start a remove double click
             self.robot_remove_double_click = event.multi_plane_points[index]
             QTimer.singleShot(500, self.__toggle_robot_remove_double_click)
-
-    def __display_last_remove_warning(self, event: MouseInSceneEvent) -> None:
-        warning = GLTextItem(font=GLWorldLayer.TEXT_GRAPHICS_QFONT, color=Colors.RED)
-        warning.show()
-        warning.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
-        warning.setData(
-            text="Can't remove last robot!",
-            pos=[
-                event.position().x() - int(warning.width() / 2),
-                event.position().y() + int(warning.height() * 1.1),
-            ],
-        )
 
     def __handle_new_robot_event(self, event: MouseInSceneEvent) -> None:
         """Handles a mouse event when an empty position is clicked
