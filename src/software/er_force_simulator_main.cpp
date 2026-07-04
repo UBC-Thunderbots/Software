@@ -85,19 +85,17 @@ int main(int argc, char** argv)
             realism_config = ErForceSimulator::createDefaultRealismConfig();
         }
 
-        constexpr bool ENABLE_WHEEL_RAMPING = true;
-
         if (args.division == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_A, robot_constants::createRobotConstants(),
-                realism_config, ENABLE_WHEEL_RAMPING);
+                realism_config);
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_B, robot_constants::createRobotConstants(),
-                realism_config, ENABLE_WHEEL_RAMPING);
+                realism_config);
         }
 
         std::mutex simulator_mutex;

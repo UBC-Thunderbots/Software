@@ -31,7 +31,7 @@ class ErForceSimulator
     explicit ErForceSimulator(
         const TbotsProto::FieldType& field_type,
         const robot_constants::RobotConstants& robot_constants,
-        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = false,
+        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = true,
         Duration primitive_executor_time_step_s =
             Duration::fromSeconds(DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK));
     ErForceSimulator()  = delete;
