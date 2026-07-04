@@ -29,7 +29,7 @@ float Charger::getCapacitorVoltage()
     return analogRead(HV_SENSE) / RESOLUTION * SCALE_VOLTAGE * VOLTAGE_DIVIDER;
 }
 
-bool Charger::isDonePinLOW()
+bool Charger::isDonePinLow()
 {
     return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <=
            DONE_PIN_THRESHOLD_VOLTAGE;
@@ -37,7 +37,7 @@ bool Charger::isDonePinLOW()
 
 void Charger::update()
 {
-    if (!is_charging || isDonePinLOW())
+    if (!is_charging || isDonePinLow())
     {
         return;
     }

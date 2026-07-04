@@ -12,12 +12,14 @@ class Charger
      * Creates a Charger setting up pins and attaching interrupts.
      */
     Charger();
+
     /**
      * Sets the state of the capacitors and whether we should charge them.
      * @param pin_state HIGH to begin charging the capacitors. Otherwise, sets the charge
      * pin to LOW.
      */
     static void setCapacitorPin(bool pin_state);
+
     /**
      * Returns the voltage of the capacitors
      *
@@ -36,7 +38,7 @@ class Charger
      *
      * @return True if CHRG_DONE is below threshold (charging done), false otherwise
      */
-    static bool isDonePinLOW();
+    static bool isDonePinLow();
 
     static bool is_charging;
     static unsigned long charge_start_ms;
