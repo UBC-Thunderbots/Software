@@ -170,9 +170,6 @@ def setup_gl_widget(
     if sandbox_mode:
         simulation_control_toolbar.undo_button.clicked.connect(world_layer.undo)
         simulation_control_toolbar.redo_button.clicked.connect(world_layer.redo)
-        simulation_control_toolbar.reset_button.clicked.connect(
-            world_layer.reset_to_pre_sim
-        )
         world_layer.undo_toggle_enabled_signal.connect(
             simulation_control_toolbar.toggle_undo_enabled
         )
