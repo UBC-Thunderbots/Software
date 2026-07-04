@@ -166,6 +166,14 @@ LAUNCH_MODE_CHOICES = [
         title="Diagnostics",
         description="Run Thunderscope in diagnostics mode against real robots",
     ),
+    questionary.Choice(
+        title="Run blue",
+        description="run_blue",
+    ),
+    questionary.Choice(
+        title="Run yellow",
+        description="run_yellow",
+    ),
 ]
 
 # Thunderscope simulator "Options:" checkbox.
@@ -236,3 +244,10 @@ PLAYBOOK_CHOICES = [
         description="Flash the motor controller firmware",
     ),
 ]
+
+
+THUNDERSCOPE_OPTIONS_MAP = {
+    "Diagnostics": "run_diagnostics",
+    "Run blue": "run_blue",
+    "Run yellow": "run_yellow",
+}
