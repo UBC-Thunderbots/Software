@@ -265,13 +265,10 @@ class GLWorldLayer(GLLayer):
         if not self.point_in_scene_picked:
             return
 
-        # User picked a point in the 3D scene and is now dragging it across the scene
-        # to apply a velocity on the ball (i.e. kick it).
-        # We create a velocity vector that is proportional to the distance the
-        # mouse has moved away from the ball.
+        # Velocity is in the direction and magnitude of the mouse drag.
         self.ball_velocity_vector = (
-            self.point_in_scene_picked
-            - self._invert_position_if_defending_negative_half(event.point_in_scene)
+            self._invert_position_if_defending_negative_half(event.point_in_scene)
+            - self.point_in_scene_picked
         )
 
         # Cap the maximum kick speed
@@ -291,10 +288,6 @@ class GLWorldLayer(GLLayer):
         if not self.point_in_scene_picked or not self.ball_velocity_vector:
             return
 
-        ball_velocity = self.ball_velocity_vector
-        if self._should_invert_coordinate_frame():
-            ball_velocity = -ball_velocity
-
         # Send a command to the simulator to give the ball the specified
         # velocity (i.e. kick it)
 
@@ -306,8 +299,8 @@ class GLWorldLayer(GLLayer):
                     y_meters=self.point_in_scene_picked.y(),
                 ),
                 global_velocity=Vector(
-                    x_component_meters=ball_velocity.x(),
-                    y_component_meters=ball_velocity.y(),
+                    x_component_meters=self.ball_velocity_vector.x(),
+                    y_component_meters=self.ball_velocity_vector.y(),
                 ),
             )
         )
