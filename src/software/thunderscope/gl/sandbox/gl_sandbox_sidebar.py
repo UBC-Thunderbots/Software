@@ -136,7 +136,7 @@ class GLSandboxSidebar(QWidget):
         team_buttons = []
         for team in [Team.BLUE, Team.YELLOW]:
             radio_button = QRadioButton(Team.Name(team))
-            self.team_group.addButton(radio_button, team)   
+            self.team_group.addButton(radio_button, team)
             self.sidebar_container.layout().addWidget(radio_button)
             team_buttons.append(radio_button)
 
