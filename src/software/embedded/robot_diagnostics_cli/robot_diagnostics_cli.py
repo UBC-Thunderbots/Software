@@ -1,6 +1,7 @@
 import subprocess
 import logging
 import typer as Typer
+from typer.main import get_command
 from rich import print
 from rich.live import Live
 from rich.table import Table
@@ -52,7 +53,9 @@ class RobotDiagnosticsCLI:
         self.app.command(short_help="Shows TOML Config Values")(self.config)
         self.app.command(short_help="Prints Thunderloop Logs")(self.log)
         self.app.command(short_help="Prints Thunderloop Status")(self.status)
-        self.app.command(short_help="Restarts Thunderloop")(self.restart_thunderloop)
+        self.app.command(short_help="Restarts Thunderloop")(self.restart)
+        self.app.command(short_help="Starts Thunderloop")(self.start)
+        self.app.command(short_help="Stops Thunderloop")(self.stop)
         # Communication object responsible for proto execution/transmission
         self.embedded_communication = embedded_communication
         # Data handler responsible for disk information
@@ -100,6 +103,24 @@ class RobotDiagnosticsCLI:
             return wrapper
 
         return decorator
+
+    def requires_estop(func):
+        """Decorator that ensures a physical estop is plugged in before running a
+        command that actuates the robot's electrical/mechanical components.
+        """
+
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if not self.embedded_communication.setup_estop():
+                logging.warning(
+                    "[bold yellow]No estop plugged in: this command controls the "
+                    "robot's electrical/mechanical components and requires an estop. "
+                    "Plug one in and try again. Command not executed.[/bold yellow]"
+                )
+                return
+            return func(self, *args, **kwargs)
+
+        return wrapper
 
     def __generate_stats_table(self) -> Table:
         """Make a new table with robot status information."""
@@ -161,21 +182,12 @@ class RobotDiagnosticsCLI:
             f"{ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY}",
             self.embedded_data.get_chip_pulse_width(),
         )
-        table.add_row(
-            "Battery Voltage",
-            f"{ROBOT_BATTERY_VOLTAGE_CONFIG_KEY}",
-            self.embedded_data.get_battery_volt(),
-        )
-        table.add_row(
-            "Battery Current Draw",
-            f"{ROBOT_CURRENT_DRAW_CONFIG_KEY}",
-            self.embedded_data.get_current_draw(),
-        )
-        table.add_row(
-            "Capacitor Voltage",
-            f"{ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY}",
-            self.embedded_data.get_cap_volt(),
-        )
+        # TODO: #3809
+        # table.add_row(
+        #     "Capacitor Voltage",
+        #     f"{ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY}",
+        #     self.embedded_data.get_cap_volt(),
+        # )
         return table
 
     def stats(self) -> None:
@@ -193,9 +205,19 @@ class RobotDiagnosticsCLI:
         log = subprocess.call(["service", "thunderloop", "status"])
         print(log)
 
-    def restart_thunderloop(self):
+    def restart(self):
         """CLI Command to restart Thunderloop service and print status"""
-        subprocess.run(["service", "thunderloop", "restart"])
+        subprocess.run(["sudo", "service", "thunderloop", "restart"])
+        self.status()
+
+    def start(self):
+        """CLI Command to start Thunderloop service and print status"""
+        subprocess.run(["sudo", "service", "thunderloop", "start"])
+        self.status()
+
+    def stop(self):
+        """CLI Command to stop Thunderloop service and print status"""
+        subprocess.run(["sudo", "service", "thunderloop", "stop"])
         self.status()
 
     def log(self):
@@ -203,6 +225,7 @@ class RobotDiagnosticsCLI:
         log = subprocess.call(["sudo", "journalctl", "-f", "-n", "100"])
         print(log)
 
+    @requires_estop
     @catch_interrupt_exception()
     def rotate(
         self,
@@ -227,6 +250,7 @@ class RobotDiagnosticsCLI:
             description,
         )
 
+    @requires_estop
     @catch_interrupt_exception()
     def move(
         self,
@@ -256,6 +280,7 @@ class RobotDiagnosticsCLI:
             description,
         )
 
+    @requires_estop
     @catch_interrupt_exception()
     def chip(
         self,
@@ -289,6 +314,7 @@ class RobotDiagnosticsCLI:
             self.embedded_communication.run_primitive(primitive)
             print(description)
 
+    @requires_estop
     @catch_interrupt_exception()
     def kick(
         self,
@@ -331,6 +357,7 @@ class RobotDiagnosticsCLI:
                 "Recharging...",
             )
 
+    @requires_estop
     @catch_interrupt_exception()
     def dribble(
         self,
@@ -358,6 +385,7 @@ class RobotDiagnosticsCLI:
             description,
         )
 
+    @requires_estop
     @catch_interrupt_exception()
     def move_wheel(
         self,
@@ -395,7 +423,14 @@ class RobotDiagnosticsCLI:
         # TODO (#3434): Add an emote function!
         return
 
+    def run(self) -> None:
+        """Launch the interactive Diagnostics CLI shell."""
+        self.app._add_completion = False
+        command = get_command(self.app)
+        command.add_help_option = False
+        command()
+
 
 if __name__ == "__main__":
     with EmbeddedCommunication() as embedded_communication:
-        RobotDiagnosticsCLI(embedded_communication).app()
+        RobotDiagnosticsCLI(embedded_communication).run()

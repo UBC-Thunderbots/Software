@@ -1,7 +1,5 @@
 #pragma once
 
-#include "shared/constants.h"
-
 namespace robot_constants
 {
 
@@ -88,14 +86,33 @@ struct RobotConstants
     // The maximum speed achievable by our robots, in metres per second [m/s]
     float robot_max_speed_m_per_s;
 
-    // The maximum acceleration achievable by our robots [m/s^2]
+    // The maximum speed that the trajectory planner is allowed to command the robot to
+    // move at, while still leaving headroom for the PID to apply correction on lag. [m/s]
+    float robot_trajectory_max_speed_m_per_s;
+
+    // The maximum acceleration physically achievable by our robots [m/s^2].
     float robot_max_acceleration_m_per_s_2;
 
-    // The maximum deceleration (break) achievable by our robots [m/s^2]
+    // The maximum deceleration (brake) physically achievable by our robots [m/s^2].
     float robot_max_deceleration_m_per_s_2;
+
+    // The maximum acceleration the trajectory planner is allowed to use when generating
+    // trajectories. May be lower than the physical limit to leave headroom for the PID to
+    // apply correction on lag. [m/s^2]
+    float robot_trajectory_max_acceleration_m_per_s_2;
+
+    // The maximum deceleration the trajectory planner is allowed to use when generating
+    // trajectories. May be lower than the physical limit to leave headroom for the PID to
+    // apply correction on lag. [m/s^2]
+    float robot_trajectory_max_deceleration_m_per_s_2;
 
     // The maximum angular speed achievable by our robots [rad/s]
     float robot_max_ang_speed_rad_per_s;
+
+    // The maximum speed that the trajectory planner is allowed to command the robot to
+    // move at, while still leaving headroom for the PID to apply correction on lag.
+    // [rad/s]
+    float robot_trajectory_max_ang_speed_rad_per_s;
 
     // The maximum angular acceleration achievable by our robots [rad/s^2]
     float robot_max_ang_acceleration_rad_per_s_2;
@@ -107,6 +124,13 @@ struct RobotConstants
     // Found by sqrt(x^2 + y^2) of a wheel.
     // Front wheel arm = Rear wheel arm. See ASCII image above.
     float expected_lever_arm;
+
+    // Various variances for the robot localizer Kalman filter
+    float kalman_process_noise_variance_rad_per_s_4;
+
+    float kalman_vision_noise_variance_rad_2;
+
+    float kalman_motor_sensor_noise_variance_rad_per_s_2;
 };
 
 /**
@@ -114,75 +138,6 @@ struct RobotConstants
  *
  * @return robot constants for the robot
  */
-#if CHECK_VERSION(2026)
-constexpr RobotConstants createRobotConstants()
-{
-    return {
-        .robot_radius_m        = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
-        .front_wheel_angle_deg = 32.0f,
-        .back_wheel_angle_deg  = 44.0f,
-
-        .fr_x_pos_meters = 0.03485f,
-        .fr_y_pos_meters = -0.06632f,
-        .fl_x_pos_meters = 0.03485f,
-        .fl_y_pos_meters = 0.06632f,
-        .bl_x_pos_meters = -0.04985f,
-        .bl_y_pos_meters = 0.05592f,
-        .br_x_pos_meters = -0.04985f,
-        .br_y_pos_meters = -0.05592f,
-
-        .front_of_robot_width_meters = 0.11f,
-        .dribbler_width_meters       = 0.07825f,
-
-        // Dribbler speeds are negative as that is the direction that sucks the ball in
-        .indefinite_dribbler_speed_rpm = -10000,
-        .max_force_dribbler_speed_rpm  = -12000,
-
-        // Motor constant
-        .motor_max_acceleration_m_per_s_2 = 2.0f,
-
-        // Robot's linear movement constants
-        .robot_max_speed_m_per_s          = 3.0f,
-        .robot_max_acceleration_m_per_s_2 = 3.0f,
-        .robot_max_deceleration_m_per_s_2 = 3.0f,
-
-        // Robot's angular movement constants
-        .robot_max_ang_speed_rad_per_s          = 10.0f,
-        .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
-
-        .wheel_radius_meters = 0.03f,
-
-        .expected_lever_arm = 0.0749f};
-}
-#elif CHECK_VERSION(2021)
-constexpr RobotConstants createRobotConstants()
-{
-    return {
-        .robot_radius_m        = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
-        .front_wheel_angle_deg = 32.06f,
-        .back_wheel_angle_deg  = 46.04f,
-
-        .front_of_robot_width_meters = 0.11f,
-        .dribbler_width_meters       = 0.07825f,
-
-        // Dribbler speeds are negative as that is the direction that sucks the ball in
-        .indefinite_dribbler_speed_rpm = -10000,
-        .max_force_dribbler_speed_rpm  = -12000,
-
-        // Motor constant
-        .motor_max_acceleration_m_per_s_2 = 4.5f,
-
-        // Robot's linear movement constants
-        .robot_max_speed_m_per_s          = 3.000f,
-        .robot_max_acceleration_m_per_s_2 = 3.0f,
-        .robot_max_deceleration_m_per_s_2 = 3.0f,
-
-        // Robot's angular movement constants
-        .robot_max_ang_speed_rad_per_s          = 10.0f,
-        .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
-
-        .wheel_radius_meters = 0.03f};
-}
-#endif
+RobotConstants createRobotConstants();
 
 }  // namespace robot_constants

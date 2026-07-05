@@ -4,6 +4,8 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
+#include "software/embedded/motion_control/orientation_controller.h"
+#include "software/embedded/motion_control/position_controller.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
@@ -43,28 +45,63 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
+        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
    private:
     /*
-     * Compute the next target linear _local_ velocity the robot should be at.
+     * Compute the next target linear _local_ velocity the robot should have.
+     * @param delta_time The elapsed time since last time step
+     *
      * @returns Vector The target linear _local_ velocity
      */
-    Vector getTargetLinearVelocity();
+    Vector stepTargetLinearVelocity(const Duration& delta_time);
 
     /*
-     * Returns the next target angular velocity the robot
+     * Compute the next target angular velocity the robot should have.
+     * @param delta_time The elapsed time since last time step
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity();
+    AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
+
+    /**
+     * Sends the position, local velocity, and local acceleration to PlotJuggler.
+     *
+     * @param target_local_velocity The local velocity being sent to the next direct
+     * control primitive
+     * @param delta_time Used to calculate acceleration.
+     */
+    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
+                                       const Duration& delta_time) const;
+
+    /**
+     * Records the velocities commanded this step so the next step can measure the
+     * commanded (tick-to-tick) acceleration. Call on every code path that commands a
+     * velocity without going through stepTargetLinearVelocity/stepTargetAngularVelocity.
+     *
+     * @param local_velocity The local velocity commanded this step
+     * @param angular_velocity The angular velocity commanded this step
+     */
+    void setPrevCommandedVelocity(const Vector& local_velocity,
+                                  const AngularVelocity& angular_velocity);
 
     RobotState state_;
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
     robot_constants::RobotConstants robot_constants_;
+
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
+
+    Duration time_since_linear_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
+
+    PositionController position_controller_;
+    OrientationController orientation_controller_;
+
+    // The velocities commanded on the previous step. Used to measure the commanded
+    // (tick-to-tick) acceleration
+    Vector prev_target_global_velocity_;
+    AngularVelocity prev_target_angular_velocity_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
     static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
@@ -72,4 +109,9 @@ class PrimitiveExecutor
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.
     static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
+
+    // If distance between current linear trajectory destination and new one is larger
+    // than this, we change trajectories.
+    static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
+    static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
 };

@@ -5,11 +5,11 @@ from proto.import_all_protos import (
     HaltTactic,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.robot_speed_threshold import (
+from software.gameplay_tests.validation.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
 )
-from software.simulated_tests.validation.delay_validation import DelayValidation
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.validation.delay_validation import DelayValidation
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 

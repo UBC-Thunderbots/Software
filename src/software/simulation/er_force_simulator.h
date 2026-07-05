@@ -165,11 +165,14 @@ class ErForceSimulator
      * Gets a map from robot id to local and angular velocity from repeated sim robots
      *
      * @param sim_robots Repeated er force sim robot protos
+     * @param side Which team the robots belong to. If team is yellow, inverts position
+     * and linear velocity, and adds 180 degrees to orientation.
      *
      * @return a map from robot id to local velocity and angular velocity
      */
     static std::map<RobotId, RobotState> getRobotIdToRobotStateMap(
-        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots,
+        gameController::Team side);
 
     /**
      * Update Simulator Robot and get the latest robot control

@@ -7,6 +7,8 @@ import random
 import logging
 import os
 import time
+import netifaces
+
 from subprocess import Popen
 from typing import Any
 
@@ -44,15 +46,18 @@ class Gamecontroller:
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
         automate_referee: bool = False,
+        parallelized: bool = False,
     ) -> None:
         """Run Gamecontroller
 
         :param suppress_logs: True if logs should be suppressed
         :param use_conventional_port: True when using static referee port. False for dynamic port assignments.
-        :param automate_referee: True if referee commands should be automated
+        :param automate_referee: True if referee commands should be automated.
+        :param parallelized: True when this is one of many Gamecontrollers running at once.
         """
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
+        self.parallelized = parallelized
 
         self.use_conventional_port = use_conventional_port
         self.referee_port = None
@@ -109,17 +114,20 @@ class Gamecontroller:
 
             command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
             command += ["-ciAddress", f"localhost:{self.ci_port}"]
-            command += [
-                "-address",
-                "localhost:0",
-                "-autorefAddress",
-                "localhost:0",
-                "-remoteControlAddress",
-                "localhost:0",
-                "-teamAddress",
-                "localhost:0",
-                "-backendOnly",
-            ]
+            if self.parallelized:
+                # One of many GCs running at once: no web UI and all-dynamic ports so
+                # instances don't collide on the fixed UI / autoref ports.
+                command += [
+                    "-address",
+                    "localhost:0",
+                    "-autorefAddress",
+                    "localhost:0",
+                    "-remoteControlAddress",
+                    "localhost:0",
+                    "-teamAddress",
+                    "localhost:0",
+                    "-backendOnly",
+                ]
 
             if self.suppress_logs:
                 with open(os.devnull, "w") as fp:
@@ -245,15 +253,10 @@ class Gamecontroller:
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-        if is_current_platform_macos():
-            loopback_iface = "en0"
-        else:
-            loopback_iface = "lo"
-
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             self.referee_port,
-            loopback_iface,
+            self.__get_referee_multicast_interface(),
             __send_referee_command,
             True,
         )
@@ -630,3 +633,19 @@ class Gamecontroller:
                 robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
             except queue.Empty:
                 return
+
+    @staticmethod
+    def __get_referee_multicast_interface() -> str:
+        """Determine the network interface to join the referee multicast group on.
+
+        :return: the name of the interface to receive referee multicast on
+        """
+        if not is_current_platform_macos():
+            return "lo"
+
+        default = netifaces.gateways().get("default", {}).get(netifaces.AF_INET)
+        if default:
+            gateway_ip, interface_name = default
+            return gateway_ip
+
+        raise RuntimeError("Could not determine the default network interface on macOS")

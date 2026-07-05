@@ -4,10 +4,10 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 from proto.import_all_protos import KickTactic
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 

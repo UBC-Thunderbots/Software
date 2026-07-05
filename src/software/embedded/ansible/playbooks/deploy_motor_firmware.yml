@@ -108,10 +108,10 @@
       failed_when: false
       changed_when: false
 
-    - name: Run flashing script for Motor Drivers (A B C D)
+    - name: Run flashing script for Motor Drivers (FL FR BL BR)
       ansible.builtin.shell: >
         set -o pipefail;
-        echo {{ ansible_sudo_pass }} | sudo -S python3 flash_motor_drivers.py A B C D
+        echo {{ ansible_sudo_pass }} | sudo -S python3 flash_motor_drivers.py FL FR BL BR
       args:
         chdir: "{{ remote_dir }}"
         executable: /bin/bash

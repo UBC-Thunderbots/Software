@@ -4,24 +4,24 @@ from software.py_constants import DIST_TO_FRONT_OF_ROBOT_METERS, ROBOT_MAX_RADIU
 
 from proto.import_all_protos import DribbleTactic
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_enters_region import (
+from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
 )
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.excessive_dribbling import (
     EventuallyStartsExcessivelyDribbling,
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.robot_received_ball import (
+from software.gameplay_tests.validation.robot_received_ball import (
     RobotEventuallyReceivedBall,
 )
-from software.simulated_tests.validation.delay_validation import (
+from software.gameplay_tests.validation.delay_validation import (
     DelayValidation,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 
@@ -460,7 +460,7 @@ def test_robot_not_bumping_ball_when_turning(
             )
         )
 
-        dribble_params = DribbleTactic()
+        dribble_params = DribbleTactic(allow_excessive_dribbling=False)
         simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     eventually_validations = [

@@ -43,14 +43,6 @@ class MotorController
     virtual int readThenWriteVelocity(MotorIndex motor, int target_velocity) = 0;
 
     /**
-     * Updates the motor controller with the target local velocity of the robot
-     * in Euclidean space.
-     *
-     * @param target_euclidean_velocity the target local velocity of the robot
-     */
-    virtual void updateEuclideanVelocity(EuclideanSpace_t target_euclidean_velocity) = 0;
-
-    /**
      * Immediately disables all motors.
      */
     virtual void immediatelyDisable() = 0;

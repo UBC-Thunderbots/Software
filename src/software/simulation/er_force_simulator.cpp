@@ -299,7 +299,8 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
 {
     auto sim_state         = getSimulatorState();
     const auto& sim_robots = sim_state.yellow_robots();
-    const auto robot_map   = getRobotIdToRobotStateMap(sim_robots);
+    const auto robot_map =
+        getRobotIdToRobotStateMap(sim_robots, gameController::Team::YELLOW);
 
     yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
@@ -320,7 +321,8 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 {
     auto sim_state         = getSimulatorState();
     const auto& sim_robots = sim_state.blue_robots();
-    const auto robot_map   = getRobotIdToRobotStateMap(sim_robots);
+    const auto robot_map =
+        getRobotIdToRobotStateMap(sim_robots, gameController::Team::BLUE);
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
@@ -349,8 +351,8 @@ void ErForceSimulator::setRobotPrimitive(
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
-        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
         primitive_executor->updateState(robot_state);
+        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
     }
     else
     {
@@ -370,7 +372,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     const auto& sim_robots = (side == gameController::Team::BLUE)
                                  ? sim_state.blue_robots()
                                  : sim_state.yellow_robots();
-    const auto robot_map   = getRobotIdToRobotStateMap(sim_robots);
+    const auto robot_map   = getRobotIdToRobotStateMap(sim_robots, side);
 
     for (auto& [robot_id, primitive_executor] : robot_primitive_executor_map)
     {
@@ -554,15 +556,25 @@ void ErForceSimulator::resetCurrentTime()
 }
 
 std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
-    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots)
+    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots,
+    gameController::Team side)
 {
     std::map<RobotId, RobotState> robot_map;
     for (const auto& sim_robot : sim_robots)
     {
-        const auto position         = Point(sim_robot.p_x(), sim_robot.p_y());
-        const auto velocity         = Vector(sim_robot.v_x(), sim_robot.v_y());
-        const auto orientation      = Angle::fromRadians(sim_robot.angle());
-        const auto angular_velocity = AngularVelocity::fromRadians(sim_robot.r_z());
+        auto position         = Point(sim_robot.p_x(), sim_robot.p_y());
+        auto velocity         = Vector(sim_robot.v_x(), sim_robot.v_y());
+        auto orientation      = Angle::fromRadians(sim_robot.angle());
+        auto angular_velocity = AngularVelocity::fromRadians(sim_robot.r_z());
+
+        if (side == gameController::Team::YELLOW)
+        {
+            position = -position;
+            velocity = -velocity;
+            orientation += Angle::half();
+            // angular_velocity is the same no matter which side
+        }
+
         robot_map[sim_robot.id()] =
             RobotState(position, velocity, orientation, angular_velocity);
     }
