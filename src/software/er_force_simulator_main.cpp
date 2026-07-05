@@ -11,7 +11,7 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {
@@ -88,12 +88,14 @@ int main(int argc, char **argv)
         if (args.division == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
+                TbotsProto::FieldType::DIV_A, robot_constants::createRobotConstants(),
+                realism_config);
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
+                TbotsProto::FieldType::DIV_B, robot_constants::createRobotConstants(),
+                realism_config);
         }
 
         std::mutex simulator_mutex;

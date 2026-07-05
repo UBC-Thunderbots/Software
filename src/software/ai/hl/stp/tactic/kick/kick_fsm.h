@@ -35,7 +35,7 @@ struct KickFSM : TacticFSM<KickFSM>
      *
      * @param event KickFSM::Update event
      */
-    void updateKick(const Update &event);
+    void updateKick(const Update& event);
 
     /**
      * Action that updates the GetBehindBallFSM
@@ -44,7 +44,7 @@ struct KickFSM : TacticFSM<KickFSM>
      * @param processEvent processes the GetBehindBallFSM::Update
      */
     void updateGetBehindBall(
-        const Update &event,
+        const Update& event,
         boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
 
     /**
@@ -54,7 +54,7 @@ struct KickFSM : TacticFSM<KickFSM>
      *
      * @return if the ball has been chicked
      */
-    bool ballChicked(const Update &event);
+    bool ballChicked(const Update& event);
 
     /**
      * Guard that checks if the robot is aligned for the kick
@@ -63,7 +63,7 @@ struct KickFSM : TacticFSM<KickFSM>
      *
      * @return if the robot is aligned for the kick
      */
-    bool shouldRealignWithBall(const Update &event);
+    bool shouldRealignWithBall(const Update& event);
 
 
     auto operator()()

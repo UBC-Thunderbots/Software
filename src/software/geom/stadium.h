@@ -22,7 +22,7 @@ class Stadium : public ConvexShape
      * Stadium
      * @param radius the radius of the two semicircles of the Stadium
      */
-    explicit Stadium(const Segment &segment, double radius);
+    explicit Stadium(const Segment& segment, double radius);
 
     /**
      * Creates a Stadium with line segment between two arbitrary points and radius
@@ -30,7 +30,7 @@ class Stadium : public ConvexShape
      * @param point2 the center of the second semicircle of the Stadium
      * @param radius the radius of the two semicircles of the Stadium
      */
-    explicit Stadium(const Point &point1, const Point &point2, double radius);
+    explicit Stadium(const Point& point1, const Point& point2, double radius);
 
     /**
      * Creates a Stadium with a line segment between arbitrary point and vector
@@ -40,7 +40,7 @@ class Stadium : public ConvexShape
      * the second
      * @param radius the radius of the two semicircles of the Stadium
      */
-    explicit Stadium(const Point &point, const Vector &vector, double radius);
+    explicit Stadium(const Point& point, const Vector& vector, double radius);
 
     /**
      * Returns the line Segment between the centers of the semicircles of this Stadium
@@ -79,7 +79,7 @@ class Stadium : public ConvexShape
  *
  * @return true if the two Stadiums represent the same Stadium, and false otherwise
  */
-bool operator==(const Stadium &s1, const Stadium &s2);
+bool operator==(const Stadium& s1, const Stadium& s2);
 
 /**
  * Compares two Stadiums for inequality
@@ -89,7 +89,7 @@ bool operator==(const Stadium &s1, const Stadium &s2);
  *
  * @return true if the two Stadiums represent different Stadiums, and false otherwise
  */
-bool operator!=(const Stadium &s1, const Stadium &s2);
+bool operator!=(const Stadium& s1, const Stadium& s2);
 
 /**
  * Implements the << operator for printing
@@ -98,4 +98,16 @@ bool operator!=(const Stadium &s1, const Stadium &s2);
  * @param stadium The Stadium to print
  * @return
  */
-std::ostream &operator<<(std::ostream &os, const Stadium &stadium);
+std::ostream& operator<<(std::ostream& os, const Stadium& stadium);
+
+template <>
+struct std::hash<Stadium>
+{
+    std::size_t operator()(const Stadium& stadium)
+    {
+        std::size_t seed = 0;
+        hashCombine(seed, std::hash<Segment>{}(stadium.segment()));
+        hashCombine(seed, std::hash<double>{}(stadium.radius()));
+        return seed;
+    }
+};

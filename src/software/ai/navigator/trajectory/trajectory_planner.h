@@ -29,20 +29,12 @@ class TrajectoryPlanner
      * @return TrajectoryPath which attempts to avoid the obstacles
      */
     std::optional<TrajectoryPath> findTrajectory(
-        const Point &start, const Point &destination, const Vector &initial_velocity,
-        const KinematicConstraints &constraints,
-        const std::vector<ObstaclePtr> &obstacles, const Rectangle &navigable_area,
-        const std::optional<Point> &prev_sub_destination = std::nullopt);
+        const Point& start, const Point& destination, const Vector& initial_velocity,
+        const KinematicConstraints& constraints,
+        const std::vector<ObstaclePtr>& obstacles, const Rectangle& navigable_area,
+        const std::optional<Point>& prev_sub_destination = std::nullopt);
 
    private:
-    /**
-     * Calculate the cost of the given trajectory path with cost
-     *
-     * @param traj_with_cost A complete trajectory path with cost
-     * @return The cost of the trajectory
-     */
-    double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
-
     /**
      * Get a single trajectory with cost that goes directly from the start to the
      * destination.
@@ -55,9 +47,9 @@ class TrajectoryPlanner
      * @return A trajectory path with only a single trajectory + its cost
      */
     TrajectoryPathWithCost getDirectTrajectoryWithCost(
-        const Point &start, const Point &destination, const Vector &initial_velocity,
-        const KinematicConstraints &constraints,
-        const std::vector<ObstaclePtr> &obstacles);
+        const Point& start, const Point& destination, const Vector& initial_velocity,
+        const KinematicConstraints& constraints,
+        const std::vector<ObstaclePtr>& obstacles);
 
     /**
      * Given a trajectory path, calculate its cost
@@ -67,12 +59,13 @@ class TrajectoryPlanner
      * @param sub_traj_with_cost Optional cached trajectory path with cost of the sub
      * trajectory
      * @param sub_traj_duration_s Optional duration of the cached sub_traj_with_cost
+     * @param max_cost Current maximum cost among calculated trajectories
      * @return The trajectory path with its cost
      */
     TrajectoryPathWithCost getTrajectoryWithCost(
-        const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
-        const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        const std::optional<double> sub_traj_duration_s);
+        const TrajectoryPath& trajectory, const std::vector<ObstaclePtr>& obstacles,
+        const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
+        const std::optional<double> sub_traj_duration_s, double max_cost);
 
 
 
@@ -86,8 +79,8 @@ class TrajectoryPlanner
      * @param navigable_area The navigable area of the field
      * @return A list of sub destinations for trajectory paths be sampled through
      */
-    std::vector<Point> getSubDestinations(const Point &start, const Point &destination,
-                                          const Rectangle &navigable_area) const;
+    std::vector<Point> getSubDestinations(const Point& start, const Point& destination,
+                                          const Rectangle& navigable_area) const;
 
     /**
      * Helper function for generating the relative sub destinations
@@ -103,6 +96,10 @@ class TrajectoryPlanner
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
     static constexpr Angle MIN_SUB_DESTINATION_ANGLE = Angle::fromDegrees(20);
     static constexpr Angle MAX_SUB_DESTINATION_ANGLE = Angle::fromDegrees(140);
+
+    // TODO (#3603): Tune collision threshold constants
+    static constexpr double UNAVOIDABLE_COLLISION_TIME_THRESHOLD_S       = 0.2;
+    static constexpr double UNAVOIDABLE_COLLISION_VELOCITY_THRESHOLD_M_S = 0.5;
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
 

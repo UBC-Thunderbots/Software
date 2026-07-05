@@ -21,7 +21,7 @@ class EndInObstacleSampleTest : public testing::Test
     static bool isSamplePointValid(Point point, std::vector<ObstaclePtr> obstacles)
     {
         double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
-        for (auto const &obstacle : obstacles)
+        for (auto const& obstacle : obstacles)
         {
             double point_distance_from_obstacle =
                 distance(point, obstacle->closestPoint(point));
@@ -156,7 +156,7 @@ TEST_F(EndInObstacleSampleTest, test_sampling_performance)
     {
         Point sample_point(dist_x(gen), dist_y(gen));
         bool point_in_obstacle = false;
-        for (auto const &obstacle : obstacles)
+        for (auto const& obstacle : obstacles)
         {
             if (obstacle->contains(sample_point))
             {
@@ -172,7 +172,7 @@ TEST_F(EndInObstacleSampleTest, test_sampling_performance)
     }
 
     // test sampling on each point in the test group
-    for (auto const &point : points_in_obstacles)
+    for (auto const& point : points_in_obstacles)
     {
         std::optional<Point> sample_point =
             endInObstacleSample(obstacles, point, navigable_area, 6);

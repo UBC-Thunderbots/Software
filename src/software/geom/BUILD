@@ -70,6 +70,7 @@ cc_library(
     deps = [
         ":segment",
         ":shape",
+        "//software/util/hash:hash_combine",
     ],
 )
 

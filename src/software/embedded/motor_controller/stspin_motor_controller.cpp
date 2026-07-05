@@ -1,0 +1,484 @@
+#include "software/embedded/motor_controller/stspin_motor_controller.h"
+
+#include <linux/spi/spidev.h>
+
+#include <algorithm>
+#include <chrono>
+#include <iomanip>
+#include <thread>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#include "cppcrc.h"
+#pragma GCC diagnostic pop
+
+#include "proto/message_translation/tbots_protobuf.h"
+#include "software/embedded/gpio/gpio_char_dev.h"
+#include "software/embedded/motor_controller/stspin_types.h"
+#include "software/embedded/spi_utils.h"
+#include "software/logger/logger.h"
+
+// AUTOSAR variant of CRC-8
+// (https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-8-autosar)
+using Crc8Autosar = crc_utils::crc<uint8_t, 0x2F, 0xFF, false, false, 0xFF>;
+
+StSpinMotorController::StSpinMotorController(
+    const robot_constants::RobotConstants& robot_constants)
+    : robot_constants_(robot_constants),
+      reset_gpio_(std::make_unique<GpioCharDev>(RESET_GPIO_PIN, GpioDirection::OUTPUT,
+                                                GpioState::HIGH))
+{
+    for (const MotorIndex motor : driveMotors())
+    {
+        openSpiFileDescriptor(motor);
+    }
+}
+
+void StSpinMotorController::setup()
+{
+    reset();
+
+    for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
+    {
+        motor_status_[motor]         = MotorStatus();
+        motor_status_[motor].enabled = true;
+    }
+
+    for (const MotorIndex motor : driveMotors())
+    {
+        sendAndReceiveMessage(motor,
+                              SetPidSpeedKpKiMessage{.kp = SPEED_PID_PROPORTIONAL_GAIN,
+                                                     .ki = SPEED_PID_INTEGRAL_GAIN});
+        sendAndReceiveMessage(motor,
+                              SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
+                                                      .ki = TORQUE_PID_INTEGRAL_GAIN});
+    }
+}
+
+void StSpinMotorController::reset()
+{
+    reset_gpio_->setValue(GpioState::LOW);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    reset_gpio_->setValue(GpioState::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+const MotorFaultIndicator& StSpinMotorController::checkFaults(const MotorIndex motor)
+{
+    return motor_status_.at(motor).faults;
+}
+
+void StSpinMotorController::updateFaults(const MotorIndex motor,
+                                         const uint16_t fault_flags)
+{
+    MotorStatus& motor_status = motor_status_.at(motor);
+
+    if (motor_status.fault_flags == fault_flags)
+    {
+        // No change in faults
+        return;
+    }
+
+    motor_status.fault_flags          = fault_flags;
+    MotorFaultIndicator& motor_faults = motor_status.faults;
+    motor_faults.drive_enabled        = true;
+    motor_faults.faults.clear();
+
+    if (fault_flags == 0)
+    {
+        // No faults
+        return;
+    }
+
+    // TODO #3748 Use a helper, stop regenerating the stream object.
+    std::ostringstream oss;
+    oss << "======= Faults For Motor " << motor << "=======\n";
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::DURATION))
+    {
+        oss << "DURATION: FOC rate too high\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::DURATION);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVER_VOLT))
+    {
+        oss << "OVER_VOLT: Over voltage\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::OVER_VOLT);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::UNDER_VOLT))
+    {
+        oss << "UNDER_VOLT: Under voltage\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::UNDER_VOLT);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVER_TEMP))
+    {
+        oss << "OVER_TEMP: Over temperature\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::OVER_TEMP);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::START_UP))
+    {
+        oss << "START_UP: Start up failed\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::START_UP);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::SPEED_FDBK))
+    {
+        oss << "SPEED_FDBK: Speed feedback fault\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::SPEED_FDBK);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVER_CURR))
+    {
+        oss << "OVER_CURR: Over current\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::OVER_CURR);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::SW_ERROR))
+    {
+        oss << "SW_ERROR: Software error\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::SW_ERROR);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::SAMPLE_FAULT))
+    {
+        oss << "SAMPLE_FAULT: Sample fault for testing purposes\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::SAMPLE_FAULT);
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::OVERCURR_SW))
+    {
+        oss << "OVERCURR_SW: Software over current\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::OVERCURR_SW);
+        motor_faults.drive_enabled = false;
+    }
+
+    if (fault_flags & static_cast<uint16_t>(StSpinFaultCode::DP_FAULT))
+    {
+        oss << "DP_FAULT: Driver protection fault\n";
+        motor_faults.faults.insert(TbotsProto::MotorFault::DP_FAULT);
+        motor_faults.drive_enabled = false;
+    }
+
+    LOG(WARNING) << oss.str();
+}
+
+int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
+                                                 const int target_velocity)
+{
+    if (motor == MotorIndex::DRIBBLER)
+    {
+        return 0;
+    }
+
+    const auto outgoing_message = SetTargetSpeedMessage{
+        .motor_enabled          = motor_status_.at(motor).enabled,
+        .motor_target_speed_rpm = static_cast<int16_t>(target_velocity),
+    };
+
+    sendAndReceiveMessage(motor, outgoing_message);
+
+    return motor_status_.at(motor).speed;
+}
+
+void StSpinMotorController::immediatelyDisable()
+{
+    for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
+    {
+        motor_status_[motor].enabled = false;
+        readThenWriteVelocity(motor, 0);
+    }
+}
+
+void StSpinMotorController::openSpiFileDescriptor(const MotorIndex motor)
+{
+    spi_fds_[motor] = open(SPI_PATHS.at(motor), O_RDWR);
+    CHECK(spi_fds_[motor] >= 0)
+        << "can't open device: " << motor << "error: " << strerror(errno);
+
+    int ret = ioctl(spi_fds_[motor], SPI_IOC_WR_MODE32, &SPI_MODE);
+    CHECK(ret != -1) << "can't set spi mode for: " << motor
+                     << "error: " << strerror(errno);
+
+    ret = ioctl(spi_fds_[motor], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);
+    CHECK(ret != -1) << "can't set bits_per_word for: " << motor
+                     << "error: " << strerror(errno);
+
+    ret = ioctl(spi_fds_[motor], SPI_IOC_WR_MAX_SPEED_HZ, &MAX_SPI_SPEED_HZ);
+    CHECK(ret != -1) << "can't set spi max speed hz for: " << motor
+                     << "error: " << strerror(errno);
+}
+
+void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
+                                                  const OutgoingMessage& outgoing_message)
+{
+    std::array<uint8_t, MESSAGE_SIZE> tx{};
+    std::array<uint8_t, MESSAGE_SIZE> rx{};
+
+    motor_status_[motor].seq_num++;
+
+    populateTx(motor, outgoing_message, tx);
+
+    std::vector<uint8_t> received_data;
+    for (unsigned int attempt = 0; attempt < MAX_SPI_TRANSFER_ATTEMPTS; ++attempt)
+    {
+        spiTransfer(spi_fds_[motor], tx.data(), rx.data(), MESSAGE_SIZE, SPI_SPEED_HZ);
+        received_data.insert(received_data.end(), rx.begin(), rx.end());
+
+        auto delimiter_pos =
+            std::search(received_data.begin(), received_data.end(),
+                        MESSAGE_DELIMITER.begin(), MESSAGE_DELIMITER.end());
+
+        if (delimiter_pos == received_data.end())
+        {
+            // No delimiter sequence found, discard everything
+            received_data.clear();
+            continue;
+        }
+
+        if (std::distance(delimiter_pos, received_data.end()) < MESSAGE_SIZE)
+        {
+            // Not enough bytes after delimiter sequence for a full message,
+            // wait for more bytes
+            continue;
+        }
+
+        // Message integrity check
+        const uint8_t expected_crc = *std::next(delimiter_pos, MESSAGE_SIZE - 1);
+        const uint8_t actual_crc = Crc8Autosar::calc(&(*delimiter_pos), MESSAGE_SIZE - 1);
+        if (expected_crc == actual_crc)
+        {
+            const uint8_t ack_seq_num =
+                *std::next(delimiter_pos, MESSAGE_DELIMITER.size());
+
+            const uint8_t current_seq = motor_status_.at(motor).seq_num;
+            const uint8_t prev_seq    = current_seq - 1;
+
+            // Accept responses where the sequence number is either the current
+            // sequence number (ACK for the message we just sent) or the
+            // previous sequence number
+            if (ack_seq_num == current_seq || ack_seq_num == prev_seq)
+            {
+                const auto now = std::chrono::steady_clock::now();
+                motor_status_.at(motor).last_message_ack_time = now;
+
+                std::array<uint8_t, MESSAGE_SIZE> message{};
+                std::copy(delimiter_pos, std::next(delimiter_pos, MESSAGE_SIZE),
+                          message.begin());
+                processRx(motor, message);
+
+                return;
+            }
+        }
+
+        // Erase everything up to the start of the delimiter to look for the next
+        // potential message
+        received_data.erase(received_data.begin(), std::next(delimiter_pos));
+    }
+
+    LOG(WARNING) << "Motor " << motor << " did not acknowledge message (seq_num "
+                 << static_cast<int>(motor_status_.at(motor).seq_num) << ") after "
+                 << MAX_SPI_TRANSFER_ATTEMPTS << " SPI attempts; giving up";
+}
+
+void StSpinMotorController::populateTx(const MotorIndex motor,
+                                       const OutgoingMessage& outgoing_message,
+                                       std::array<uint8_t, MESSAGE_SIZE>& tx)
+{
+    std::copy(MESSAGE_DELIMITER.begin(), MESSAGE_DELIMITER.end(), tx.begin());
+
+    constexpr size_t seq_index    = MESSAGE_DELIMITER.size();
+    constexpr size_t opcode_index = seq_index + 1;
+
+    tx[seq_index] = motor_status_.at(motor).seq_num;
+
+    std::visit(
+        [&]<typename TMessage>(TMessage&& message)
+        {
+            using T = std::decay_t<TMessage>;
+            if constexpr (std::is_same_v<T, NoOpMessage>)
+            {
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::NO_OP);
+            }
+            else if constexpr (std::is_same_v<T, SetTargetSpeedMessage>)
+            {
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_SPEED);
+                tx[opcode_index + 1] = static_cast<uint8_t>(message.motor_enabled);
+                tx[opcode_index + 2] =
+                    static_cast<uint8_t>(0xFF & (message.motor_target_speed_rpm >> 8));
+                tx[opcode_index + 3] =
+                    static_cast<uint8_t>(0xFF & message.motor_target_speed_rpm);
+            }
+            else if constexpr (std::is_same_v<T, SetTargetTorqueMessage>)
+            {
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_TARGET_TORQUE);
+                tx[opcode_index + 1] = static_cast<uint8_t>(message.motor_enabled);
+                tx[opcode_index + 2] =
+                    static_cast<uint8_t>(0xFF & (message.motor_target_torque >> 8));
+                tx[opcode_index + 3] =
+                    static_cast<uint8_t>(0xFF & message.motor_target_torque);
+            }
+            else if constexpr (std::is_same_v<T, SetResponseTypeMessage>)
+            {
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_RESPONSE_TYPE);
+                tx[opcode_index + 1] = static_cast<uint8_t>(message.response_type);
+            }
+            else if constexpr (std::is_same_v<T, SetPidTorqueKpKiMessage>)
+            {
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_PID_TORQUE_KP_KI);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.kp);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.ki);
+            }
+            else if constexpr (std::is_same_v<T, SetPidFluxKpKiMessage>)
+            {
+                tx[opcode_index] = static_cast<uint8_t>(StSpinOpcode::SET_PID_FLUX_KP_KI);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.kp);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.ki);
+            }
+            else if constexpr (std::is_same_v<T, SetPidSpeedKpKiMessage>)
+            {
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_PID_SPEED_KP_KI);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.kp >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.kp);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.ki >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.ki);
+            }
+            else if constexpr (std::is_same_v<T, SetSpeedFeedForwardKaKvMessage>)
+            {
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KA_KV);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.ka >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.ka);
+                tx[opcode_index + 3] = static_cast<uint8_t>(0xFF & (message.kv >> 8));
+                tx[opcode_index + 4] = static_cast<uint8_t>(0xFF & message.kv);
+            }
+            else if constexpr (std::is_same_v<T, SetSpeedFeedForwardKsMessage>)
+            {
+                tx[opcode_index] =
+                    static_cast<uint8_t>(StSpinOpcode::SET_SPEED_FEED_FORWARD_KS);
+                tx[opcode_index + 1] = static_cast<uint8_t>(0xFF & (message.ks >> 8));
+                tx[opcode_index + 2] = static_cast<uint8_t>(0xFF & message.ks);
+            }
+        },
+        outgoing_message);
+
+    tx[MESSAGE_SIZE - 1] = Crc8Autosar::calc(tx.data(), MESSAGE_SIZE - 1);
+}
+
+void StSpinMotorController::processRx(const MotorIndex motor,
+                                      const std::array<uint8_t, MESSAGE_SIZE>& rx)
+{
+    const size_t opcode_index = MESSAGE_DELIMITER.size() + 1;
+
+    switch (static_cast<StSpinResponseType>(rx[opcode_index]))
+    {
+        case StSpinResponseType::SPEED_AND_FAULTS:
+        {
+            motor_status_[motor].speed =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            const uint16_t fault_flags =
+                static_cast<uint16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                      rx[opcode_index + 4]);
+            updateFaults(motor, fault_flags);
+            break;
+        }
+        case StSpinResponseType::IQ_AND_ID:
+        {
+            motor_status_[motor].iq =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            motor_status_[motor].id =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
+            break;
+        }
+        case StSpinResponseType::VQ_AND_VD:
+        {
+            motor_status_[motor].vq =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            motor_status_[motor].vd =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
+            break;
+        }
+        case StSpinResponseType::PHASE_CURRENT_AND_VOLTAGE:
+        {
+            motor_status_[motor].phase_current =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            motor_status_[motor].phase_voltage =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
+            break;
+        }
+        case StSpinResponseType::IQ_AND_IQ_REF:
+        {
+            motor_status_[motor].iq =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            motor_status_[motor].iq_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
+            break;
+        }
+        case StSpinResponseType::ID_AND_ID_REF:
+        {
+            motor_status_[motor].id =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            motor_status_[motor].id_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
+            break;
+        }
+        case StSpinResponseType::SPEED_AND_SPEED_REF:
+        {
+            motor_status_[motor].speed =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 1]) << 8) |
+                                     rx[opcode_index + 2]);
+            motor_status_[motor].speed_ref =
+                static_cast<int16_t>((static_cast<uint16_t>(rx[opcode_index + 3]) << 8) |
+                                     rx[opcode_index + 4]);
+            break;
+        }
+    }
+}
+
+void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
+{
+    for (const StSpinResponseType response_type :
+         {StSpinResponseType::SPEED_AND_SPEED_REF, StSpinResponseType::IQ_AND_IQ_REF,
+          StSpinResponseType::ID_AND_ID_REF, StSpinResponseType::SPEED_AND_FAULTS})
+    {
+        sendAndReceiveMessage(motor, SetResponseTypeMessage{response_type});
+    }
+
+    const MotorStatus& motor_status = motor_status_.at(motor);
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"speed_" + motor, motor_status.speed},
+        {"speed_ref_" + motor, motor_status.speed_ref},
+        {"iq_" + motor, motor_status.iq},
+        {"iq_ref_" + motor, motor_status.iq_ref},
+        {"id_" + motor, motor_status.id},
+        {"id_ref_" + motor, motor_status.id_ref},
+    });
+}

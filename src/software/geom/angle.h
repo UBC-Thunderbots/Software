@@ -9,4 +9,5 @@
  * define more methods such as clamp, minDiff, etc. that only apply to a base
  * angle value.
  */
+
 using Angle = GenericAngle<AngleTag>;

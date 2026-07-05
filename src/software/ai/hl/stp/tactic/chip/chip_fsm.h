@@ -32,7 +32,7 @@ struct ChipFSM : TacticFSM<ChipFSM>
      *
      * @param event ChipFSM::Update event
      */
-    void updateChip(const Update &event);
+    void updateChip(const Update& event);
 
     /**
      * Action that updates the GetBehindBallFSM
@@ -41,7 +41,7 @@ struct ChipFSM : TacticFSM<ChipFSM>
      * @param processEvent processes the GetBehindBallFSM::Update
      */
     void updateGetBehindBall(
-        const Update &event,
+        const Update& event,
         boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
 
     /**
@@ -51,7 +51,7 @@ struct ChipFSM : TacticFSM<ChipFSM>
      *
      * @return if the ball has been chicked
      */
-    bool ballChicked(const Update &event);
+    bool ballChicked(const Update& event);
 
     /**
      * Guard that checks if the robot is aligned for the chip
@@ -60,7 +60,7 @@ struct ChipFSM : TacticFSM<ChipFSM>
      *
      * @return if the robot is aligned for the chip
      */
-    bool shouldRealignWithBall(const Update &event);
+    bool shouldRealignWithBall(const Update& event);
 
     auto operator()()
     {

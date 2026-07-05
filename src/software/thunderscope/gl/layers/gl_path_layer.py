@@ -9,7 +9,7 @@ from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
-from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 from typing import override
@@ -57,7 +57,7 @@ class GLPathLayer(GLLayer):
         # Ensure we have the same number of graphics as protos
         self.path_graphics.resize(
             len(paths),
-            lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
+            lambda: GLLineStrip(outline_color=Colors.NAVIGATOR_PATH_COLOR),
         )
         self.destination_graphics.resize(
             len(requested_destinations),

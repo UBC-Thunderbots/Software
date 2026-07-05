@@ -7,6 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#define CHECK_VERSION(v) (CURRENT_ROBOT_VERSION == v)
+
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
@@ -20,10 +22,15 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
+// the name of the loopback network interface, which differs across platforms
+#ifdef __APPLE__
+static const std::string LOOPBACK_INTERFACE = "lo0";
+#else
+static const std::string LOOPBACK_INTERFACE = "lo";
+#endif
+
 // PlotJuggler's default host and port
-// Should be updated to your local machine's IP address if
-// you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // ProtoLogger constants for replay files
@@ -34,10 +41,8 @@ static const unsigned int REPLAY_FILE_VERSION       = 2;
 
 #endif  // PLATFORMIO_BUILD
 
-// Redis default server connections properties
-#define REDIS_HOST_LENGTH 10
-static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
-static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
+// TOML config file path for robot configuration
+static const char TOML_CONFIG_FILE_PATH[] = "/opt/tbotspython/robot_config.toml";
 
 // the UDP port robots are listening to for primitives
 static const short unsigned int PRIMITIVE_PORT = 42070;
@@ -72,7 +77,7 @@ static const double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
-static const double ROBOT_MAX_RADIUS_METERS = 0.09;
+constexpr double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
 static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
 // The approximate radius of the ball according to the SSL rulebook
@@ -155,7 +160,7 @@ static const double SECONDS_PER_MINUTE           = 60.0;
 static const double DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK =
     1.0 / 60.0;  // corresponds to 60 Hz
 static const double DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK =
-    DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK * 1000;
+    DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK * MILLISECONDS_PER_SECOND;
 
 // The total number of robot ids on one team
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
@@ -215,19 +220,30 @@ static const unsigned int NUM_TIMES_SEND_STOP = 10;
 // disconnected
 static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
 
-// product and vendor id for Arduino Uno Rev3 (retrieved from
-// http://www.linux-usb.org/usb.ids )
-#define ARDUINO_ID_LENGTH 5
-static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
-static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
+// Vendor and product id pairs for the USB-to-serial adapters used by the
+// physical estop. Multiple pairs are supported since estop units may use
+// different adapters. IDs retrieved from http://www.linux-usb.org/usb.ids
+struct EstopUsbId
+{
+    const char* vendor_id;
+    const char* product_id;
+};
+
+constexpr EstopUsbId ESTOP_USB_DEVICE_IDS[] = {
+    {"2341", "0043"},  // Arduino Uno Rev3
+    {"1a86", "7523"},  // CH340-based Arduino clones
+};
+
+constexpr int NUM_ESTOP_USB_DEVICE_IDS =
+    sizeof(ESTOP_USB_DEVICE_IDS) / sizeof(ESTOP_USB_DEVICE_IDS[0]);
 
 // Number of times thunderloop should tick per second
 static const unsigned THUNDERLOOP_HZ = 300u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
 
-// Jetson Nano Constants
-static const double MAX_JETSON_TEMP_C = 97;
+
+static constexpr double RTT_S = 0.03;
 
 // Robot diagnostics constants
 constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;

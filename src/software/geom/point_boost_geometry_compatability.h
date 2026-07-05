@@ -37,7 +37,7 @@ struct boost::polygon::point_traits<Point>
 {
     using coordinate_type = double;
 
-    static coordinate_type get(const Point &point, orientation_2d orient)
+    static coordinate_type get(const Point& point, orientation_2d orient)
     {
         return (orient == HORIZONTAL) ? point.x() : point.y();
     }

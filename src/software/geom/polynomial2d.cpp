@@ -7,7 +7,7 @@ Polynomial2d::Polynomial2d(Polynomial1d poly_x, Polynomial1d poly_y)
 {
 }
 
-Polynomial2d::Polynomial2d(const std::vector<Point> &points)
+Polynomial2d::Polynomial2d(const std::vector<Point>& points)
 {
     if (points.size() < 2)
     {
@@ -50,37 +50,37 @@ Point Polynomial2d::getValueAt(double val) const
     return Point(poly_x.valueAt(val), poly_y.valueAt(val));
 }
 
-const Polynomial1d &Polynomial2d::getPolyX() const
+const Polynomial1d& Polynomial2d::getPolyX() const
 {
     return poly_x;
 }
 
-const Polynomial1d &Polynomial2d::getPolyY() const
+const Polynomial1d& Polynomial2d::getPolyY() const
 {
     return poly_y;
 }
 
-Polynomial2d operator+(const Polynomial2d &p1, const Polynomial2d &p2)
+Polynomial2d operator+(const Polynomial2d& p1, const Polynomial2d& p2)
 {
     return Polynomial2d(p1.getPolyX() + p2.getPolyX(), p1.getPolyY() + p2.getPolyY());
 }
 
-Polynomial2d operator-(const Polynomial2d &p1, const Polynomial2d &p2)
+Polynomial2d operator-(const Polynomial2d& p1, const Polynomial2d& p2)
 {
     return Polynomial2d(p1.getPolyX() - p2.getPolyX(), p1.getPolyY() - p2.getPolyY());
 }
 
-Polynomial2d &operator+=(Polynomial2d &p1, const Polynomial2d &p2)
+Polynomial2d& operator+=(Polynomial2d& p1, const Polynomial2d& p2)
 {
     return p1 = p1 + p2;
 }
 
-Polynomial2d &operator-=(Polynomial2d &p1, const Polynomial2d &p2)
+Polynomial2d& operator-=(Polynomial2d& p1, const Polynomial2d& p2)
 {
     return p1 = p1 - p2;
 }
 
-bool operator==(const Polynomial2d &p1, const Polynomial2d &p2)
+bool operator==(const Polynomial2d& p1, const Polynomial2d& p2)
 {
     return (p1.getPolyX() == p2.getPolyX()) && (p1.getPolyY() == p2.getPolyY());
 }

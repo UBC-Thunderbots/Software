@@ -10,23 +10,13 @@ DefensePlay::DefensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_p
 {
 }
 
-void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                 const WorldPtr &world_ptr)
-{
-    // This function doesn't get called so it does nothing
-    while (true)
-    {
-        yield({{}});
-    }
-}
-
 void DefensePlay::updateControlParams(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
-void DefensePlay::updateTactics(const PlayUpdate &play_update)
+void DefensePlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(DefensePlayFSM::Update(control_params, play_update));
 }

@@ -1,6 +1,6 @@
 #include "software/geom/algorithms/closest_point.h"
 
-Point closestPoint(const Point &p, const Line &l)
+Point closestPoint(const Point& p, const Line& l)
 {
     Line::Coeffs coeffs = l.getCoeffs();
     double denominator  = pow(coeffs.a, 2) + pow(coeffs.b, 2);
@@ -11,12 +11,12 @@ Point closestPoint(const Point &p, const Line &l)
     return Point(x, y);
 }
 
-Point closestPoint(const Line &l, const Point &p)
+Point closestPoint(const Line& l, const Point& p)
 {
     return closestPoint(p, l);
 }
 
-Point closestPoint(const Point &p, const Segment &segment)
+Point closestPoint(const Point& p, const Segment& segment)
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
@@ -66,16 +66,16 @@ Point closestPoint(const Point &p, const Segment &segment)
     return segment.getEnd();
 }
 
-Point closestPoint(const Segment &segment, const Point &p)
+Point closestPoint(const Segment& segment, const Point& p)
 {
     return closestPoint(p, segment);
 }
 
-Point closestPoint(const Polygon &polygon, const Point &p)
+Point closestPoint(const Polygon& polygon, const Point& p)
 {
     Point closest_point;
     double closest_point_dist_sq = std::numeric_limits<double>::max();
-    for (const Segment &segment : polygon.getSegments())
+    for (const Segment& segment : polygon.getSegments())
     {
         Point curr_closest_point          = closestPoint(segment, p);
         double curr_closest_point_dist_sq = (curr_closest_point - p).lengthSquared();
@@ -88,30 +88,30 @@ Point closestPoint(const Polygon &polygon, const Point &p)
     return closest_point;
 }
 
-Point closestPoint(const Point &p, const Polygon &polygon)
+Point closestPoint(const Point& p, const Polygon& polygon)
 {
     return closestPoint(polygon, p);
 }
 
-Point closestPoint(const Circle &circle, const Point &p)
+Point closestPoint(const Circle& circle, const Point& p)
 {
     Vector v = p - circle.origin();
     return circle.origin() + v.normalize(circle.radius());
 }
 
-Point closestPoint(const Point &p, const Circle &circle)
+Point closestPoint(const Point& p, const Circle& circle)
 {
     return closestPoint(circle, p);
 }
 
-Point closestPoint(const Stadium &stadium, const Point &p)
+Point closestPoint(const Stadium& stadium, const Point& p)
 {
     Point closest_point = closestPoint(stadium.segment(), p);
     closest_point += (p - closest_point).normalize() * stadium.radius();
     return closest_point;
 }
 
-Point closestPoint(const Point &p, const Stadium &stadium)
+Point closestPoint(const Point& p, const Stadium& stadium)
 {
     return closestPoint(stadium, p);
 }

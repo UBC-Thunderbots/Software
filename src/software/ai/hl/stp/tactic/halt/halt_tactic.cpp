@@ -7,7 +7,7 @@ HaltTactic::HaltTactic(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr
 {
 }
 
-void HaltTactic::accept(TacticVisitor &visitor) const
+void HaltTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

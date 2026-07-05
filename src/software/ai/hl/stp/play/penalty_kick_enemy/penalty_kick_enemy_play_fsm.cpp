@@ -7,7 +7,7 @@ PenaltyKickEnemyPlayFSM::PenaltyKickEnemyPlayFSM(
 {
 }
 
-void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
+void PenaltyKickEnemyPlayFSM::setupPosition(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -39,13 +39,13 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void PenaltyKickEnemyPlayFSM::defendKick(const Update &event)
+void PenaltyKickEnemyPlayFSM::defendKick(const Update& event)
 {
     // Allow goalie to move freely and defend against penalty kick
     event.control_params.goalie_tactic->updateControlParams(false);
 }
 
-bool PenaltyKickEnemyPlayFSM::setupPositionDone(const Update &event)
+bool PenaltyKickEnemyPlayFSM::setupPositionDone(const Update& event)
 {
     return !event.common.world_ptr->gameState().isSetupState();
 }

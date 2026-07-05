@@ -2,8 +2,8 @@
 
 #include "boost/circular_buffer.hpp"
 
-World::World(const Field &field, const Ball &ball, const Team &friendly_team,
-             const Team &enemy_team, unsigned int buffer_size)
+World::World(const Field& field, const Ball& ball, const Team& friendly_team,
+             const Team& enemy_team, unsigned int buffer_size)
     : dribble_displacement_(std::nullopt),
       field_(field),
       ball_(ball),
@@ -21,26 +21,26 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-World::World(const TbotsProto::World &world_proto)
+World::World(const TbotsProto::World& world_proto)
     : World(Field(world_proto.field()), Ball(world_proto.ball()),
             Team(world_proto.friendly_team()), Team(world_proto.enemy_team()))
 {
 }
 
-void World::updateBall(const Ball &new_ball)
+void World::updateBall(const Ball& new_ball)
 {
     ball_ = new_ball;
     updateTimestamp(getMostRecentTimestampFromMembers());
     current_game_state_.updateBall(ball_);
 }
 
-void World::updateFriendlyTeamState(const Team &new_friendly_team_data)
+void World::updateFriendlyTeamState(const Team& new_friendly_team_data)
 {
     friendly_team_.updateState(new_friendly_team_data);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateEnemyTeamState(const Team &new_enemy_team_data)
+void World::updateEnemyTeamState(const Team& new_enemy_team_data)
 {
     enemy_team_.updateState(new_enemy_team_data);
     updateTimestamp(getMostRecentTimestampFromMembers());
@@ -59,27 +59,27 @@ void World::updateTimestamp(Timestamp timestamp)
     }
 }
 
-const Field &World::field() const
+const Field& World::field() const
 {
     return field_;
 }
 
-const Ball &World::ball() const
+const Ball& World::ball() const
 {
     return ball_;
 }
 
-const Team &World::friendlyTeam() const
+const Team& World::friendlyTeam() const
 {
     return friendly_team_;
 }
 
-const Team &World::enemyTeam() const
+const Team& World::enemyTeam() const
 {
     return enemy_team_;
 }
 
-void World::updateRefereeCommand(const RefereeCommand &command)
+void World::updateRefereeCommand(const RefereeCommand& command)
 {
     referee_command_history_.push_back(command);
     // Take the consensus of the previous referee messages
@@ -92,14 +92,14 @@ void World::updateRefereeCommand(const RefereeCommand &command)
     }
 }
 
-void World::updateRefereeCommand(const RefereeCommand &command,
+void World::updateRefereeCommand(const RefereeCommand& command,
                                  Point ball_placement_point)
 {
     updateRefereeCommand(command);
     current_game_state_.setBallPlacementPoint(ball_placement_point);
 }
 
-void World::updateRefereeStage(const RefereeStage &stage)
+void World::updateRefereeStage(const RefereeStage& stage)
 {
     referee_stage_history_.push_back(stage);
     // Take the consensus of the previous referee messages
@@ -131,12 +131,12 @@ const Timestamp World::getMostRecentTimestamp() const
     return last_update_timestamp_;
 }
 
-const GameState &World::gameState() const
+const GameState& World::gameState() const
 {
     return current_game_state_;
 }
 
-bool World::operator==(const World &other) const
+bool World::operator==(const World& other) const
 {
     return this->field() == other.field() && this->ball() == other.ball() &&
            this->friendlyTeam() == other.friendlyTeam() &&
@@ -144,23 +144,23 @@ bool World::operator==(const World &other) const
            this->gameState() == other.gameState();
 }
 
-bool World::operator!=(const World &other) const
+bool World::operator!=(const World& other) const
 {
     return !(*this == other);
 }
 
 
-void World::updateGameStateBall(const Ball &ball)
+void World::updateGameStateBall(const Ball& ball)
 {
     current_game_state_.updateBall(ball);
 }
 
-void World::updateGameState(const GameState &game_state)
+void World::updateGameState(const GameState& game_state)
 {
     current_game_state_ = game_state;
 }
 
-const RefereeStage &World::getRefereeStage() const
+const RefereeStage& World::getRefereeStage() const
 {
     return current_referee_stage_;
 }
@@ -175,7 +175,7 @@ TeamPossession World::getTeamWithPossession() const
     return team_with_possession_;
 }
 
-void World::setVirtualObstacles(const TbotsProto::VirtualObstacles &virtual_obstacles)
+void World::setVirtualObstacles(const TbotsProto::VirtualObstacles& virtual_obstacles)
 {
     virtual_obstacles_ = virtual_obstacles;
 }
@@ -185,12 +185,12 @@ TbotsProto::VirtualObstacles World::getVirtualObstacles() const
     return virtual_obstacles_;
 }
 
-void World::setDribbleDisplacement(const std::optional<Segment> &displacement)
+void World::setDribbleDisplacement(const std::optional<Segment>& displacement)
 {
     dribble_displacement_ = displacement;
 }
 
-const std::optional<Segment> &World::getDribbleDisplacement() const
+const std::optional<Segment>& World::getDribbleDisplacement() const
 {
     return dribble_displacement_;
 }

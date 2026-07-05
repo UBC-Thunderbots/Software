@@ -1,5 +1,5 @@
 ---
-# Example Ansible playbook that can be run on multiple Jetson Nanos
+# Example Ansible playbook that can be run on multiple Raspberry Pis
 
 # plays start by defining basic setup info
 - name: Example Ansible playbook # name of this playbook
