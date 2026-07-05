@@ -646,6 +646,6 @@ class Gamecontroller:
         default = netifaces.gateways().get("default", {}).get(netifaces.AF_INET)
         if default:
             gateway_ip, interface_name = default
-            return gateway_ip
+            return interface_name
 
         raise RuntimeError("Could not determine the default network interface on macOS")
