@@ -38,17 +38,12 @@ load(
 )
 load(
     "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
-    "action_config",
-    "env_entry",
-    "env_set",
     "feature",
-    "feature_set",
     "flag_group",
     "flag_set",
-    "tool",
     "tool_path",
-    "variable_with_value",
 )
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 
 ACTION_NAMES = struct(
     c_compile = C_COMPILE_ACTION_NAME,
@@ -609,7 +604,6 @@ cc_toolchain_config_fullsystem = rule(
         "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
     },
-    provides = [CcToolchainConfigInfo],
     executable = True,
 )
 
@@ -797,7 +791,6 @@ cc_toolchain_config_stm32 = rule(
         "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
     },
-    provides = [CcToolchainConfigInfo],
 )
 
 def _k8_aarch64_linux_impl(ctx):
@@ -926,6 +919,5 @@ cc_toolchain_config_k8_aarch64_linux = rule(
         "toolchain_identifier": attr.string(),
         "extra_features": attr.string_list(),
     },
-    provides = [CcToolchainConfigInfo],
     executable = True,
 )

@@ -3,6 +3,8 @@
 #   https://en.wikipedia.org/wiki/Hungarian_algorithm
 #   https://github.com/saebyn/munkres-cpp
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 cc_library(
     name = "munkres_cpp",
     # This library is entirely header based, even the `.cpp` files are really headers

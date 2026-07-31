@@ -1,0 +1,29 @@
+--- generator/protoc-gen-nanopb
++++ generator/protoc-gen-nanopb
+@@ -4,6 +4,26 @@
+ # Use it like this:
+ # protoc --plugin=protoc-gen-nanopb=..../protoc-gen-nanopb --nanopb_out=dir foo.proto
+
++# Fix sys.path ordering before importing nanopb_generator.
++# rules_python appends Bazel runfiles paths after system site-packages,
++# which causes any system-installed protobuf to shadow the Bazel-managed one.
++import sys
++import os
++
++_found = []
++for _i, _p in reversed(list(enumerate(sys.path))):
++    if "/protobuf+" in _p.replace("\\", "/"):
++        _found.append(sys.path.pop(_i))
++    elif _p.endswith(("-packages",)) and ".runfiles" not in _p:
++        # Remove system site-packages so they don't shadow Bazel runfiles
++        sys.path.pop(_i)
++for _p in _found:
++    sys.path.insert(0, _p)
++
++if not _found:
++    sys.stderr.write("WARNING: nanopb protoc-gen-nanopb: "
++                     "no Bazel protobuf+ paths found in sys.path\n")
++
+ from nanopb_generator import *
+
+ if __name__ == '__main__':

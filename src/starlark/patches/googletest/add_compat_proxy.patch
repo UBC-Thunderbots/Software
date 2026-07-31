@@ -1,0 +1,10 @@
+--- MODULE.bazel
++++ MODULE.bazel
+@@ -73,3 +73,7 @@
+ fuchsia_sdk = use_extension("//:fake_fuchsia_sdk.bzl", "fuchsia_sdk")
+ fuchsia_sdk.create_fake()
+ use_repo(fuchsia_sdk, "fuchsia_sdk")
++
++# Bazel 9 compatibility: register rules_cc compatibility proxy
++cc_compat = use_extension("@rules_cc//cc:extensions.bzl", "compatibility_proxy")
++use_repo(cc_compat, "cc_compatibility_proxy")

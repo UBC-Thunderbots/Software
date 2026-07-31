@@ -44,8 +44,9 @@ common --features=external_include_paths
 # See https://docs.bazel.build/versions/master/remote-caching.html#disk-cache
 build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 
-build --experimental_remote_merkle_tree_cache # partial repo caching optimization
 common --incompatible_enable_proto_toolchain_resolution # protoc caching
+common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
+common --incompatible_default_to_explicit_init_py
 
 # Ensure that we don't accidentally build gRPC
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
@@ -54,6 +55,7 @@ common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUIL
 ################# Build Configurations #################
 # Lock C++ version
 build --cxxopt="-std=c++2a"
+
 # Warn variable length arrays only when compiling cpp
 build --per_file_copt=.*\.cpp@-Wvla
 
@@ -69,7 +71,7 @@ build --incompatible_remove_legacy_whole_archive=False
 
 # Escalate Warnings to fail Compile for Thunderbots code
 build --features=external_include_paths
-build:linux --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+build:linux --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Wno-sign-compare,-Werror,-Wno-deprecated-declarations,-Wno-unused-result,-Wno-missing-field-initializers
 # TODO: #3492
 # build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
 

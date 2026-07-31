@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
@@ -153,6 +154,8 @@ py_library(
     srcs = ["constants.py"],
     deps = [
         requirement("protobuf"),
+        requirement("pyopengl"),
+        requirement("pyqtgraph"),
     ],
 )
 

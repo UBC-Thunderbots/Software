@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 # Description
 # Tracy profiler is a real-time, nanosecond resolution profiler. It is useful to profile our code when using debug
 # symbols would slow down the code too much.

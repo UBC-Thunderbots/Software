@@ -7,17 +7,19 @@ module(
 ##############################################################
 # Import Dependencies available in the Bazel Central Registry
 ##############################################################
-bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "platforms", version = "0.0.11")
-bazel_dep(name = "pybind11_bazel", version = "2.13.6")
-bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "googletest", version = "1.16.0.bcr.2")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "pybind11_bazel", version = "3.0.1")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "rules_cc", version = "0.2.19")
+bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
-bazel_dep(name = "rules_python", version = "1.4.1")
-bazel_dep(name = "eigen", version = "3.4.0.bcr.3")
-bazel_dep(name = "zlib", version = "1.3.1.bcr.6")
-bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.2")
-bazel_dep(name = "protobuf", version = "31.1")
+bazel_dep(name = "rules_python", version = "2.2.0")
+bazel_dep(name = "eigen", version = "5.0.1.bcr.2")
+bazel_dep(name = "zlib", version = "1.3.1.bcr.7")
+bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.3")
+bazel_dep(name = "protobuf", version = "35.1")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
@@ -47,6 +49,10 @@ pip.parse(
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+    ],
 )
 use_repo(pip, "ansible_deps")
 pip.parse(
@@ -61,6 +67,10 @@ pip.parse(
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
     requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+    ],
 )
 use_repo(pip, "robot_diagnostics_cli_deps")
 pip.parse(
@@ -125,10 +135,9 @@ http_archive(
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
 archive_override(
     module_name = "rules_boost",
-    # Made with: shasum -a 256  rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz
-    sha256 = "f3125bbcb4adb5863980562d6092f2c07571cc9b2d4510e3b7f829fd43b44607",
-    strip_prefix = "rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582",
-    url = "https://github.com/nelhage/rules_boost/archive/2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz",
+    sha256 = "722178ab4687ebf48c66229a0fe774759bd836257bcede2ed972b0e32ce92c33",
+    strip_prefix = "rules_boost-2811ec9f1e42f784439a7bbecf68b1c8b5f8b0ae",
+    url = "https://github.com/nelhage/rules_boost/archive/2811ec9f1e42f784439a7bbecf68b1c8b5f8b0ae.tar.gz",
 )
 
 non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
@@ -141,6 +150,11 @@ use_repo(
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 archive_override(
     module_name = "hedron_compile_commands",
+    patches = [
+        "//starlark/patches/hedron_compile_commands:add_rules_python_dep.patch",
+        "//starlark/patches/hedron_compile_commands:fix_py_binary.patch",
+        "//starlark/patches/hedron_compile_commands:fix_cc_binary.patch",
+    ],
     sha256 = "ba3feefdf57b6d4c749e3c4abfa86f3673e7db364cb13acfc3496dce6ea801a3",
     strip_prefix = "bazel-compile-commands-extractor-f5fbd4cee671d8d908f37c83abaf70fba5928fc7",
     url = "https://github.com/mikael-s-persson/bazel-compile-commands-extractor/archive/f5fbd4cee671d8d908f37c83abaf70fba5928fc7.tar.gz",
@@ -149,6 +163,7 @@ archive_override(
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
 archive_override(
     module_name = "platformio_rules",
+    patches = ["//starlark/patches/platformio_rules:add_py_binary_load.patch"],
     sha256 = "a80357230e27b8b57b8deffaa82684d3ee88b2284e4a767a9d8a692e9034e125",
     strip_prefix = "platformio_rules-3cd18c7c7bb2482fe3cbb58898245dd675421234",
     url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",
@@ -314,3 +329,35 @@ new_local_repository(
 ##############################################
 # Workarounds and Fixes Below (hacks)
 ##############################################
+
+# Bazel 9 compatibility: register rules_cc compatibility proxy for
+# transitive dependencies that haven't been updated.
+cc_compat = use_extension("@rules_cc//cc:extensions.bzl", "compatibility_proxy")
+use_repo(cc_compat, "cc_compatibility_proxy")
+
+# googletest 1.16.0.bcr.2 needs compat proxy registration for Bazel 9.
+single_version_override(
+    module_name = "googletest",
+    patches = ["//starlark/patches/googletest:add_compat_proxy.patch"],
+    version = "1.16.0.bcr.2",
+)
+
+# pybind11_protobuf needs Bazel 9 compat and protobuf 35 API fixes.
+single_version_override(
+    module_name = "pybind11_protobuf",
+    patches = [
+        "//starlark/patches/pybind11_protobuf:add_compat_proxy.patch",
+        "//starlark/patches/pybind11_protobuf:protobuf35_compat.patch",
+    ],
+)
+
+# nanopb's protoc-gen-nanopb plugin picks up the system python-protobuf
+# instead of the Bazel-managed one. The patch reorders sys.path so the
+# Bazel-managed protobuf is found first.
+single_version_override(
+    module_name = "nanopb",
+    patches = [
+        "//starlark/patches/nanopb:bazel_protobuf_path.patch",
+    ],
+    version = "0.4.9.1.bcr.3",
+)

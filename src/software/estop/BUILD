@@ -1,10 +1,10 @@
 # https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
 load(
     "@platformio_rules//platformio:platformio.bzl",
-    "platformio_library",
     "platformio_project",
 )
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 package(default_visibility = ["//visibility:public"])
 

@@ -3,6 +3,8 @@
 #   https://github.com/boost-ext/sml
 #   https://boost-ext.github.io/sml/tutorial.html
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 cc_library(
     name = "sml",
     hdrs = ["include/boost/sml.hpp"],
