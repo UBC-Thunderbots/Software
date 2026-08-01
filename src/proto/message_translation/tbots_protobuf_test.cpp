@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "software/ai/navigator/trajectory/jerk_limited_trajectory_2d.h"
 #include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
@@ -166,9 +167,11 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
                                                                    robot_constants);
-    KinematicConstraints constraints(
-        max_speed, robot_constants.robot_trajectory_max_acceleration_m_per_s_2,
-        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    KinematicConstraints constraints(max_speed,
+                                     robot_constants.robot_max_acceleration_m_per_s_2,
+                                     robot_constants.robot_max_deceleration_m_per_s_2,
+                                     robot_constants.robot_max_jerk_m_per_s_3,
+                                     robot_constants.robot_min_jerk_m_per_s_3);
 
     Point initial_destination = destination;
     if (!sub_destinations.empty())
@@ -176,9 +179,9 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         initial_destination = sub_destinations[0];
     }
 
-    auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        start_position, initial_destination, initial_velocity, constraints);
-    TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
+    auto trajectory = std::make_shared<JerkLimitedTrajectory2D>(
+        start_position, initial_destination, initial_velocity, Vector(), constraints);
+    TrajectoryPath trajectory_path(trajectory, JerkLimitedTrajectory2D::generator);
 
     for (std::size_t i = 1; i < sub_destinations.size(); i++)
     {

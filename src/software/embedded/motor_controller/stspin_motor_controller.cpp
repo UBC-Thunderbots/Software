@@ -187,7 +187,7 @@ int StSpinMotorController::readThenWriteVelocity(const MotorIndex motor,
     };
 
     sendAndReceiveMessage(motor, outgoing_message);
-
+    sendMotorStatusToPlotJuggler(motor);
     return motor_status_.at(motor).speed;
 }
 
@@ -474,11 +474,11 @@ void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
     const MotorStatus& motor_status = motor_status_.at(motor);
 
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-        {"speed_" + motor, motor_status.speed},
-        {"speed_ref_" + motor, motor_status.speed_ref},
-        {"iq_" + motor, motor_status.iq},
-        {"iq_ref_" + motor, motor_status.iq_ref},
-        {"id_" + motor, motor_status.id},
-        {"id_ref_" + motor, motor_status.id_ref},
+        {motor + "/speed_ref", motor_status.speed},
+        {motor + "/speed_ref", motor_status.speed_ref},
+        {motor + "/iq", motor_status.iq},
+        {motor + "/iq_ref", motor_status.iq_ref},
+        {motor + "/id", motor_status.id},
+        {motor + "/id_ref", motor_status.id_ref},
     });
 }

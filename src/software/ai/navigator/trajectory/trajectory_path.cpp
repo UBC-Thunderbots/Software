@@ -24,10 +24,12 @@ void TrajectoryPath::append(double connection_time_sec, const Point& destination
             // To have a smooth and continuous trajectory path, we want the start
             // position and velocity of the newly generated trajectory to be
             // the end position and velocity of the last trajectory.
-            Point connection_pos  = getPosition(connection_time_sec);
-            Vector connection_vel = getVelocity(connection_time_sec);
+            Point connection_pos    = getPosition(connection_time_sec);
+            Vector connection_vel   = getVelocity(connection_time_sec);
+            Vector connection_accel = getAcceleration(connection_time_sec);
             traj_path.emplace_back(trajectory_generator(connection_pos, destination,
-                                                        connection_vel, constraints));
+                                                        connection_vel, connection_accel,
+                                                        constraints));
 
             traj_path[i].setTrajectoryEndTime(connection_time_sec);
             return;

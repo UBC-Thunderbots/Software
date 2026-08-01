@@ -15,7 +15,6 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//shared:robot_constants",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
-        "//software/ai/navigator/trajectory:bang_bang_trajectory_2d",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",

@@ -16,6 +16,7 @@ cc_library(
         "//proto:visualization_cc_proto",
         "//software/ai/evaluation:shot",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
+        "//software/ai/navigator/trajectory:jerk_limited_trajectory_2d",
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",

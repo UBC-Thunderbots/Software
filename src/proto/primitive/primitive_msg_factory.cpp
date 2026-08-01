@@ -2,7 +2,6 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
-#include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
 #include "software/logger/logger.h"
 
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitiveProto()

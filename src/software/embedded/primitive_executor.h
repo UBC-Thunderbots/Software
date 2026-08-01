@@ -5,6 +5,7 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/embedded/motion_control/orientation_controller.h"
+#include "software/embedded/motion_control/pid_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
@@ -65,14 +66,47 @@ class PrimitiveExecutor
     AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
 
     /**
-     * Sends the position, local velocity, and local acceleration to PlotJuggler.
+     * Decide whether we should stop following the linear trajectory we're currently
+     * following and start following the newly received one instead.
      *
-     * @param target_local_velocity The local velocity being sent to the next direct
-     * control primitive
-     * @param delta_time Used to calculate acceleration.
+     * We switch to the new trajectory if the destinations or subdestinations have
+     * changed significantly. Otherwise, if we are already tracking the current
+     * trajectory well (low position and velocity error), we keep following it to
+     * avoid unnecessary controller resets.
+     *
+     * @param new_trajectory The newly received linear trajectory
+     * @return true if we should start following new_trajectory
      */
-    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       const Duration& delta_time) const;
+    bool shouldFollowNewLinearTrajectory(const TrajectoryPath& new_trajectory) const;
+
+    /**
+     * Decide whether we should stop following the angular trajectory we're currently
+     * following and start following the newly received one instead. Analogous to
+     * shouldFollowNewLinearTrajectory but in orientation space.
+     *
+     * @param new_trajectory The newly received angular trajectory
+     * @return true if we should start following new_trajectory
+     */
+    bool shouldFollowNewAngularTrajectory(
+        const BangBangTrajectory1DAngular& new_trajectory) const;
+
+    /**
+     * Start following the given linear trajectory, resetting the position controller.
+     * If we were already following a trajectory, set up a short blend so the commanded
+     * velocity setpoint transitions smoothly into the new one.
+     *
+     * @param new_trajectory The linear trajectory to start following
+     */
+    void startFollowingNewLinearTrajectory(const TrajectoryPath& new_trajectory);
+
+    /**
+     * Start following the given angular trajectory, resetting the orientation
+     * controller, and setting up a short blend as above.
+     *
+     * @param new_trajectory The angular trajectory to start following
+     */
+    void startFollowingNewAngularTrajectory(
+        const BangBangTrajectory1DAngular& new_trajectory);
 
     /**
      * Records the velocities commanded this step so the next step can measure the
@@ -92,26 +126,91 @@ class PrimitiveExecutor
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
-    Duration time_since_linear_trajectory_creation_;
-    Duration time_since_angular_trajectory_creation_;
+    // Elapsed time along the trajectory we're currently following. Advanced by delta_time
+    // on every step and used to sample the trajectory's expected state. Reset to zero
+    // when we start following a new trajectory.
+    Duration trajectory_elapsed_time_;
+    Duration angular_trajectory_elapsed_time_;
+
+    // The trajectory we just switched away from, retained only for the duration of the
+    // blend window so we can crossfade its velocity setpoint into the new trajectory's.
+    // Reset (cleared) once the blend completes.
+    std::optional<TrajectoryPath> prev_trajectory_path_;
+    std::optional<BangBangTrajectory1DAngular> prev_angular_trajectory_;
+
+    // Elapsed time along the trajectory we just switched away from, advanced during the
+    // blend window so its velocity setpoint is sampled at the matching point.
+    Duration prev_trajectory_elapsed_time_;
+    Duration prev_angular_trajectory_elapsed_time_;
+
+    // Time remaining in the old->new trajectory blend. Zero when not blending.
+    Duration linear_blend_remaining_;
+    Duration angular_blend_remaining_;
+
+    // How long the robot has been parked at the end (destination) of the trajectory it
+    // is currently following. Advanced each step once the trajectory's elapsed time
+    // reaches its total time, and reset to zero while the robot is still traversing the
+    // trajectory or starts following a new one. Used to time out and switch to a newer
+    // trajectory when the onboard estimate believes the robot has arrived but the AI
+    // still wants it to keep moving.
+    Duration time_at_trajectory_end_;
 
     PositionController position_controller_;
     OrientationController orientation_controller_;
+
+    // Velocity PID controllers that correct for error between the robot's actual
+    // velocity and the trajectory's feedforward velocity. Separate x/y controllers
+    // follow the same pattern as PositionController.
+    PidController<double> velocity_x_pid_{0.5, 0.3, 0.0, 4.0};
+    PidController<double> velocity_y_pid_{0.5, 0.3, 0.0, 4.0};
 
     // The velocities commanded on the previous step. Used to measure the commanded
     // (tick-to-tick) acceleration
     Vector prev_target_global_velocity_;
     AngularVelocity prev_target_angular_velocity_;
 
-    // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+    // How far ahead of the current elapsed time we sample the trajectory. A small
+    // look-ahead keeps the target leading the robot slightly so it makes forward progress
+    // and tracking lag is reduced. The elapsed time itself still advances by delta_time
+    // each step; this offset only shifts where we sample.
+    static constexpr double TRAJECTORY_LOOKAHEAD_TIME_S = 0.15;
 
-    // The distance away from the destination at which we start dampening the velocity
-    // to avoid jittering around the destination.
-    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
+    // If the final destination or any subdestination of the new trajectory differs from
+    // the current one by more than this distance, we switch to the new trajectory.
+    static constexpr double DESTINATION_THRESHOLD_M = 0.1;
 
-    // If distance between current linear trajectory destination and new one is larger
-    // than this, we change trajectories.
-    static constexpr double LINEAR_DESTINATION_THRESHOLD_METERS   = 0.03;
+    // Maximum position error (distance between the robot's actual position and the
+    // trajectory's expected position at the current elapsed time) below which the robot
+    // is considered to be tracking the current trajectory well.
+    static constexpr double POSITION_TRACKING_THRESHOLD_M = 0.3;
+
+    // Maximum velocity error (magnitude of difference between the robot's actual velocity
+    // and the trajectory's expected velocity at the current elapsed time) below which the
+    // robot is considered to be tracking the current trajectory well.
+    static constexpr double VELOCITY_TRACKING_THRESHOLD_M_PER_S = 0.4;
+
+    // If the new angular trajectory's final orientation differs from the current one's
+    // by more than this, we switch to the new angular trajectory.
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 4;
+
+    // If the robot has reached the end of its current trajectory but newly received
+    // trajectories indicate it still hasn't reached the destination (the AI's view
+    // disagrees with the onboard estimate), switch to the new trajectory once the robot
+    // has been parked at the end of the current trajectory for this long. This
+    // resynchronizes the robot with the AI's view when the onboard estimate prematurely
+    // believes the robot has arrived.
+    static constexpr double REACHED_DESTINATION_TIMEOUT_S = 0.5;
+
+    // When deciding whether the newly received trajectory still wants the robot to move,
+    // we compare the AI's view of the robot's current position (the new trajectory's
+    // start) against the new trajectory's destination. This uses a much smaller
+    // threshold than DESTINATION_THRESHOLD_M so that even a small remaining distance to
+    // the destination counts as "not yet arrived" and keeps the robot inching toward it.
+    static constexpr double NEW_TRAJECTORY_REACHED_DESTINATION_THRESHOLD_M = 0.02;
+
+    // Duration over which we blend the velocity setpoint from the old trajectory into
+    // the new one after switching, so the setpoint doesn't change abruptly. Kept short
+    // intentionally - it only smooths the switch, it shouldn't noticeably delay
+    // tracking the new trajectory.
+    static constexpr double TRAJECTORY_BLEND_DURATION_S = 0.04;
 };

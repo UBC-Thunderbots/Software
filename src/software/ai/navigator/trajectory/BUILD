@@ -21,6 +21,7 @@ cc_library(
     deps = [
         ":trajectory",
         "//software/geom:point",
+        "//software/geom:rectangle",
     ],
 )
 
@@ -63,10 +64,35 @@ cc_library(
 )
 
 cc_library(
+    name = "jerk_limited_trajectory_1d",
+    srcs = ["jerk_limited_trajectory_1d.cpp"],
+    hdrs = ["jerk_limited_trajectory_1d.h"],
+    deps = [
+        ":trajectory",
+        "//software/geom/algorithms:is_in_range",
+        "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "jerk_limited_trajectory_2d",
+    srcs = ["jerk_limited_trajectory_2d.cpp"],
+    hdrs = ["jerk_limited_trajectory_2d.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":jerk_limited_trajectory_1d",
+        ":trajectory_2d",
+        "//software/ai/navigator/trajectory:kinematic_constraints",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+    ],
+)
+
+cc_library(
     name = "trajectory_path_node",
     hdrs = ["trajectory_path_node.h"],
     deps = [
-        ":bang_bang_trajectory_2d",
+        ":trajectory_2d",
         "//software/geom:point",
     ],
 )
@@ -98,6 +124,7 @@ cc_library(
     srcs = ["trajectory_planner.cpp"],
     hdrs = ["trajectory_planner.h"],
     deps = [
+        ":jerk_limited_trajectory_2d",
         ":kinematic_constraints",
         ":trajectory_path",
         "//proto/message_translation:tbots_protobuf",
