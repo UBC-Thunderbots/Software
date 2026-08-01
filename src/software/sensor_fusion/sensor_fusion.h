@@ -158,6 +158,18 @@ class SensorFusion
     static bool teamHasBall(const Team& team, const Ball& ball);
 
     /**
+     * Given a team and a desired goalie ID, returns the desired ID if a robot with
+     * that ID exists on the team. Otherwise, returns the lowest robot ID present on
+     * the team. If the team has no robots, returns the desired goalie ID as a fallback.
+     *
+     * @param team The team to check
+     * @param goalie_id The desired goalie ID
+     *
+     * @return The goalie ID to use
+     */
+    static unsigned int resolveGoalieId(const Team& team, unsigned int goalie_id);
+
+    /**
      * This function controls the behavior of how the ball is being updated. If this
      * returns True, we use the position of the robot that triggers the breakbeam instead
      * of the one given by the ssl vision system.

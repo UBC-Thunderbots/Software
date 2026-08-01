@@ -174,7 +174,10 @@ class SensorFusionTest : public ::testing::Test
             friendly_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         friendly_team.updateRobots(friendly_robots);
-        friendly_team.assignGoalie(0);
+        // This must be a robot ID that actually exists on the team, since
+        // SensorFusion::resolveGoalieId validates the goalie ID exists before assigning
+        // it
+        friendly_team.assignGoalie(1);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
         for (const auto& state : initBlueRobotStates())
@@ -182,7 +185,10 @@ class SensorFusionTest : public ::testing::Test
             enemy_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         enemy_team.updateRobots(enemy_robots);
-        enemy_team.assignGoalie(0);
+        // This must be a robot ID that actually exists on the team, since
+        // SensorFusion::resolveGoalieId validates the goalie ID exists before assigning
+        // it
+        enemy_team.assignGoalie(1);
         return World(field, ball, friendly_team, enemy_team);
     }
 
@@ -197,7 +203,9 @@ class SensorFusionTest : public ::testing::Test
             friendly_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         friendly_team.updateRobots(friendly_robots);
-        friendly_team.assignGoalie(0);
+        // This must be a robot ID that actually exists on the team, since
+        // SensorFusion::resolveGoalieId validates the goalie ID before assigning it
+        friendly_team.assignGoalie(1);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
         for (const auto& state : initInvertedBlueRobotStates())
@@ -205,7 +213,9 @@ class SensorFusionTest : public ::testing::Test
             enemy_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         enemy_team.updateRobots(enemy_robots);
-        enemy_team.assignGoalie(0);
+        // This must be a robot ID that actually exists on the team, since
+        // SensorFusion::resolveGoalieId validates the goalie ID before assigning it
+        enemy_team.assignGoalie(1);
         return World(field, ball, friendly_team, enemy_team);
     }
 
@@ -787,8 +797,9 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 {
     config.set_override_game_controller_friendly_goalie_id(true);
     config.set_override_game_controller_enemy_goalie_id(true);
-    config.set_friendly_goalie_id(0);
-    config.set_enemy_goalie_id(0);
+    // Must use a robot ID that exists on both teams (1 is the lowest ID in our test data)
+    config.set_friendly_goalie_id(1);
+    config.set_enemy_goalie_id(1);
     sensor_fusion = SensorFusion(config);
 
     SensorProto sensor_msg;
