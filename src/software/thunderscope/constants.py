@@ -328,15 +328,6 @@ class TrailValues:
 class DiagnosticsConstants:
     """Constants for Robot Diagnostics"""
 
-    # Device names of the controllers supported for controlling robots
-    SUPPORTED_CONTROLLERS = {
-        "Microsoft Xbox One X pad",
-        "Microsoft X-Box One S pad",
-        "Microsoft X-Box 360 pad",
-        "Microsoft Xbox 360 pad",
-        "Generic X-Box pad",
-    }
-
     BUTTON_PRESSED_THRESHOLD = 0.5
     DEADZONE_PERCENTAGE = 0.20
 
