@@ -14,11 +14,11 @@ from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
+from software.thunderscope.gl.toolbars.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
-from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
+from software.thunderscope.gl.toolbars.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -27,6 +27,7 @@ from proto.replay_bookmark_pb2 import ReplayBookmark
 from proto.tbots_timestamp_msg_pb2 import Timestamp
 
 from software.thunderscope.common.toast_msg_helper import success_toast
+from software.thunderscope.gl.sandbox.gl_sandbox_sidebar import GLSandboxSidebar
 from typing import override
 
 
@@ -41,7 +42,6 @@ class GLWidget(QWidget):
         friendly_color_yellow: bool,
         frame_swap_counter: Optional[FrameTimeCounter] = None,
         player: Optional[ProtoPlayer] = None,
-        sandbox_mode: bool = False,
     ) -> None:
         """Initialize the GLWidget
 
@@ -49,7 +49,6 @@ class GLWidget(QWidget):
         :param friendly_color_yellow: Whether the friendly team is yellow (true) or blue (false)
         :param frame_swap_counter: A FrameTimeCounter to track the time between frame swaps
         :param player: The replay player to optionally display media controls for
-        :param sandbox_mode: Whether sandbox mode should be enabled
         """
         super().__init__()
 
@@ -101,9 +100,17 @@ class GLWidget(QWidget):
             on_measure_mode=self.toggle_measure_mode,
             layers_menu=self.layers_menu,
             toolbars_menu=self.toolbars_menu,
-            sandbox_mode=sandbox_mode,
             replay_mode=player is not None,
             on_add_bookmark=self.add_bookmark,
+        )
+
+        # Setup sandbox sidebar
+        self.sandbox_sidebar = GLSandboxSidebar(
+            parent=self.gl_view_widget, widget_above=self.simulation_control_toolbar
+        )
+        # let toolbar update the sidebar visibility
+        self.simulation_control_toolbar.set_sidebar_visibility_callback(
+            self.sandbox_sidebar.toggle_visibility
         )
 
         # Setup gamecontroller toolbar
@@ -135,6 +142,10 @@ class GLWidget(QWidget):
     def get_sim_control_toolbar(self):
         """Returns the simulation control toolbar"""
         return self.simulation_control_toolbar
+
+    def get_sandbox_sidebar(self):
+        """Returns the sandbox mode sidebar"""
+        return self.sandbox_sidebar
 
     @override
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -270,7 +281,12 @@ class GLWidget(QWidget):
 
         if self.simulation_control_toolbar:
             self.simulation_control_toolbar.refresh()
+
+        if self.gamecontroller_toolbar:
             self.gamecontroller_toolbar.refresh()
+
+        if self.sandbox_sidebar:
+            self.sandbox_sidebar.refresh()
 
         simulation_state = self.simulation_state_buffer.get(block=False)
         # Don't refresh the layers if the simulation is paused

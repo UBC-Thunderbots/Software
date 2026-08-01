@@ -92,6 +92,7 @@ py_library(
     srcs = ["gl_sandbox_world_layer.py"],
     deps = [
         ":gl_world_layer",
+        "//proto/message_translation:py_tbots_protobuf",
         requirement("pyqtgraph"),
     ],
 )

@@ -27,39 +27,45 @@ def create_world_state(
     """
     world_state = WorldState()
 
-    for robot_id, robot_location in enumerate(yellow_robot_locations):
-        world_state.yellow_robots[robot_id].CopyFrom(
-            RobotState(
-                global_position=Point(
-                    x_meters=robot_location.x(), y_meters=robot_location.y()
-                ),
-                global_orientation=Angle(radians=math.pi),
+    if yellow_robot_locations:
+        yellow_robot_states = RobotStates()
+        for robot_id, robot_location in enumerate(yellow_robot_locations):
+            yellow_robot_states.robot_states[robot_id].CopyFrom(
+                RobotState(
+                    global_position=Point(
+                        x_meters=robot_location.x(), y_meters=robot_location.y()
+                    ),
+                    global_orientation=Angle(radians=math.pi),
+                )
             )
-        )
+        world_state.yellow_robots.CopyFrom(yellow_robot_states)
 
-    for robot_id, robot_location in enumerate(blue_robot_locations):
+    if blue_robot_locations:
         orientation = tbots_cpp.Angle.zero()
         velocity = tbots_cpp.Vector(0, 0)
 
-        try:
-            orientation = blue_robot_orientations[robot_id]
-        except IndexError:
-            pass
+        blue_robot_states = RobotStates()
+        for robot_id, robot_location in enumerate(blue_robot_locations):
+            try:
+                orientation = blue_robot_orientations[robot_id]
+            except IndexError:
+                pass
 
-        try:
-            velocity = blue_robot_velocities[robot_id]
-        except IndexError:
-            pass
+            try:
+                velocity = blue_robot_velocities[robot_id]
+            except IndexError:
+                pass
 
-        world_state.blue_robots[robot_id].CopyFrom(
-            RobotState(
-                global_position=Point(
-                    x_meters=robot_location.x(), y_meters=robot_location.y()
-                ),
-                global_orientation=tbots_cpp.createAngleProto(orientation),
-                global_velocity=tbots_cpp.createVectorProto(velocity),
+            blue_robot_states.robot_states[robot_id].CopyFrom(
+                RobotState(
+                    global_position=Point(
+                        x_meters=robot_location.x(), y_meters=robot_location.y()
+                    ),
+                    global_orientation=tbots_cpp.createAngleProto(orientation),
+                    global_velocity=tbots_cpp.createVectorProto(velocity),
+                )
             )
-        )
+        world_state.blue_robots.CopyFrom(blue_robot_states)
 
     world_state.ball_state.CopyFrom(
         BallState(
