@@ -16,7 +16,7 @@ TEST(TbotsProtobufTest, point_msg_test)
 
 TEST(TbotsProtobufTest, angular_velocity_msg_test)
 {
-    auto angular_velocity     = Angle::fromRadians(4.20);
+    auto angular_velocity     = AngularVelocity::fromRadians(4.20);
     auto angular_velocity_msg = createAngularVelocityProto(angular_velocity);
 
     EXPECT_EQ(angular_velocity_msg->radians_per_second(), angular_velocity.toRadians());

@@ -217,6 +217,20 @@ PYBIND11_MODULE(python_bindings, m)
                  return stream.str();
              });
 
+    py::class_<AngularVelocity>(m, "AngularVelocity")
+        .def(py::init<>())
+        .def_static("fromRadians", &AngularVelocity::fromRadians)
+        .def_static("fromDegrees", &AngularVelocity::fromDegrees)
+        .def("toRadians", &AngularVelocity::toRadians)
+        // Overloaded
+        .def("__repr__",
+             [](const AngularVelocity& a)
+             {
+                 std::stringstream stream;
+                 stream << a;
+                 return stream.str();
+             });
+
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
@@ -340,7 +354,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("intersection", py::overload_cast<const Ray&, const Segment&>(&intersection));
 
     py::class_<Robot>(m, "Robot")
-        .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
+        .def(py::init<unsigned, Point&, Vector&, Angle&, AngularVelocity&, Timestamp&>())
         .def(py::init<TbotsProto::Robot>())
         .def("timestamp", &Robot::timestamp)
         .def("position", &Robot::position)
