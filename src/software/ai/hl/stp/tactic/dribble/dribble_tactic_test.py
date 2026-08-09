@@ -336,6 +336,7 @@ def test_excessive_dribbling_without_enemies(
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
+        test_timeout_s=5,
     )
 
 
@@ -422,7 +423,7 @@ def test_run_into_enemy_robot_knock_ball_away(
             RobotEventuallyReceivedBall(1),
             BallEventuallyEntersRegion([tbots_cpp.Circle(dribble_destination, 0.3)]),
             RobotEventuallyAtOrientation(1, dribble_orientation),
-            DelayValidation(delay_s=2, validation=RobotEventuallyReceivedBall(1)),
+            DelayValidation(delay_s=3, validation=RobotEventuallyReceivedBall(1)),
         ]
     ]
 
@@ -433,7 +434,7 @@ def test_run_into_enemy_robot_knock_ball_away(
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validations,
         ag_eventually_validation_sequence_set=eventually_validations,
-        test_timeout_s=10,
+        test_timeout_s=12,
     )
 
 

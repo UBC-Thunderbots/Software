@@ -265,13 +265,10 @@ class GLWorldLayer(GLLayer):
         if not self.point_in_scene_picked:
             return
 
-        # User picked a point in the 3D scene and is now dragging it across the scene
-        # to apply a velocity on the ball (i.e. kick it).
-        # We create a velocity vector that is proportional to the distance the
-        # mouse has moved away from the ball.
+        # Velocity is in the direction and magnitude of the mouse drag.
         self.ball_velocity_vector = (
-            self.point_in_scene_picked
-            - self._invert_position_if_defending_negative_half(event.point_in_scene)
+            self._invert_position_if_defending_negative_half(event.point_in_scene)
+            - self.point_in_scene_picked
         )
 
         # Cap the maximum kick speed
@@ -290,9 +287,6 @@ class GLWorldLayer(GLLayer):
 
         if not self.point_in_scene_picked or not self.ball_velocity_vector:
             return
-
-        if self._should_invert_coordinate_frame():
-            self.ball_velocity_vector = -self.ball_velocity_vector
 
         # Send a command to the simulator to give the ball the specified
         # velocity (i.e. kick it)
@@ -681,7 +675,9 @@ class GLWorldLayer(GLLayer):
         # as a speed line
         if self.ball_velocity_vector:
             ball_state = self.cached_world.ball.current_state
-            velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
+            velocity = self._invert_vector_if_defending_negative_half(
+                self.ball_velocity_vector * SPEED_SEGMENT_SCALE
+            )
 
             self.ball_kick_velocity_graphic.show()
             self.ball_kick_velocity_graphic.set_points(
@@ -758,3 +754,15 @@ class GLWorldLayer(GLLayer):
         if self._should_invert_coordinate_frame():
             return QtGui.QVector3D(-point[0], -point[1], point[2])
         return point
+
+    def _invert_vector_if_defending_negative_half(
+        self, vector: QtGui.QVector3D
+    ) -> QtGui.QVector3D:
+        """Convert a simulator-space vector to display-space for rendering.
+
+        :param vector: The vector in simulator coordinates
+        :return: The vector in display coordinates (if needed to be inverted)
+        """
+        if self._should_invert_coordinate_frame():
+            return QtGui.QVector3D(-vector.x(), -vector.y(), vector.z())
+        return vector
