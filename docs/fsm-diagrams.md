@@ -388,6 +388,7 @@ DribbleFSM --> PivotKickFSM : [ballControlled && shouldPivotChip]\n<i>updatePivo
 DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 DribbleFSM --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
 DribbleFSM --> DribbleFSM : [shouldPivotChip]\n<i>controlBallForChip</i>
+DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>controlBallForChip</i>
 DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 Panic --> DribbleFSM : [shouldPivotChip]\n<i>controlBallForChip</i>
