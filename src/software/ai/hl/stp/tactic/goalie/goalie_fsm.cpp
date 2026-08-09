@@ -310,8 +310,7 @@ void GoalieFSM::retrieveFromDeadZone(
 
 bool GoalieFSM::ballControlled(const Update& event)
 {
-    return event.common.robot.isNearDribbler(
-        event.common.world_ptr->ball().position());
+    return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
 }
 
 void GoalieFSM::controlBallForChip(
