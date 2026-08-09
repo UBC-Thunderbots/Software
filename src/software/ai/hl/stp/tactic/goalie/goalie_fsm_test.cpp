@@ -127,16 +127,13 @@ TEST(GoalieFSMTest, test_transitions)
     // goalie should transition to DribbleFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
-    // goalie has ball, at the correct position and orientation to clear the ball
-    ::TestUtil::setBallPosition(world_ptr, clear_ball_origin,
+    // give possession (ball is near dribbler)
+    ::TestUtil::setBallPosition(world_ptr, goalie.position(),
                                 Timestamp::fromSeconds(123));
-    goalie.updateState(RobotState(clear_ball_origin, Vector(0, 0), clear_ball_direction,
-                                  AngularVelocity::zero()),
-                       Timestamp::fromSeconds(123));
 
-    // goalie should stay in PivotKickFSM but be ready to chip
+    // goalie should transition to PivotKickFSM once the ball is controlled
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
@@ -162,10 +159,10 @@ TEST(GoalieFSMTest, test_transitions)
     ::TestUtil::setBallPosition(world_ptr, Point(-3.5, 1), Timestamp::fromSeconds(124));
     ::TestUtil::setBallVelocity(world_ptr, Vector(0, -0.1), Timestamp::fromSeconds(124));
 
-    // goalie should transition to PivotKickFSM
+    // goalie should transition to DribbleFSM to control the ball before chipping
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // ball is stationary at the center of the field
     ::TestUtil::setBallPosition(world_ptr, Point(0, 0), Timestamp::fromSeconds(124));

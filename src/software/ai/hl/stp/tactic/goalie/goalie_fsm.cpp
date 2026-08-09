@@ -307,3 +307,34 @@ void GoalieFSM::retrieveFromDeadZone(
     // update the dribble fsm
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
+
+bool GoalieFSM::ballControlled(const Update& event)
+{
+    return event.common.robot.isNearDribbler(
+        event.common.world_ptr->ball().position());
+}
+
+void GoalieFSM::controlBallForChip(
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+{
+    // Ensure that we start our chip away from the no chip zone in front of
+    // the goal (prevents accidentally scoring an own goal)
+    double clear_origin_x = getNoChipRectangle(event.common.world_ptr->field()).xMax() +
+                            ROBOT_MAX_RADIUS_METERS;
+    double chip_origin_x =
+        std::max(clear_origin_x, event.common.world_ptr->ball().position().x());
+    Point chip_origin =
+        Point(chip_origin_x, event.common.world_ptr->ball().position().y());
+
+    Point chip_target  = findGoodChipTarget(*event.common.world_ptr,
+                                            ai_config_ptr->goalie_tactic_config());
+    Vector chip_vector = chip_target - chip_origin;
+
+    DribbleFSM::ControlParams control_params{
+        .dribble_destination       = chip_origin,
+        .final_dribble_orientation = chip_vector.orientation(),
+        .allow_excessive_dribbling = false,
+    };
+
+    processEvent(DribbleFSM::Update(control_params, event.common));
+}
