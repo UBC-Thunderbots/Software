@@ -248,6 +248,7 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
                 MoveToGoalLine_S,
             DribbleFSM_S + Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A,
             DribbleFSM_S + Update_E[shouldPivotChip_G] / controlBallForChip_A,
+            DribbleFSM_S + Update_E[ballInInflatedDefenseArea_G] / controlBallForChip_A,
             DribbleFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
                 PositionToBlock_S,
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
