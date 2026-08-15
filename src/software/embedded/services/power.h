@@ -63,6 +63,23 @@ class PowerService
      */
     void writePowerFrame(const TbotsProto_PowerFrame& frame) const;
 
+    void updatePowerControlAndStatus(
+        const TbotsProto::DirectControlPrimitive& direct_control,
+        TbotsProto::RobotStatus& robot_status);
+
+    void updateErrorCodes(const TbotsProto::DirectControlPrimitive& direct_control,
+                          TbotsProto::RobotStatus& robot_status);
+
+    void updateChickerStatus(const TbotsProto::DirectControlPrimitive& direct_control,
+                             TbotsProto::RobotStatus& robot_status);
+
+    void updateDribblerStatus(const TbotsProto::DirectControlPrimitive& direct_control,
+                              TbotsProto::RobotStatus& robot_status);
+
+    bool isPowerSupplyStable();
+
+    double getCpuTemperature();
+
     const double kick_coefficient_;
     const int kick_constant_;
     const int chip_constant_;
@@ -73,10 +90,18 @@ class PowerService
     std::atomic<TbotsProto_DribblerControl> dribbler_command_;
     std::unique_ptr<BoostUartCommunication> uart_;
 
+    std::ifstream dmesg_file_;
+    std::ifstream cpu_temp_file_;
+
+    std::chrono::time_point<std::chrono::steady_clock> last_time_kicker_fired_;
+    std::chrono::time_point<std::chrono::steady_clock> last_time_chipper_fired_;
+
     // Constants
     const size_t READ_BUFFER_SIZE =
         getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
-    const std::string DEVICE_SERIAL_PORT    = "/dev/ttyAMA0";
+    const std::string DEVICE_SERIAL_PORT          = "/dev/ttyAMA0";
+    const std::string KERNEL_RING_BUFFER_LOG_PATH = "/usr/bin/dmesg";
+    const std::string CPU_TEMP_FILE_PATH    = "/sys/class/thermal/thermal_zone0/temp";
     static constexpr unsigned int BAUD_RATE = 460800;
 
     // Required flag to exit power service cleanly

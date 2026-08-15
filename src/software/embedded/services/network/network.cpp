@@ -1,32 +1,37 @@
 #include "software/embedded/services/network/network.h"
 
+#include <Tracy.hpp>
+
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 
-NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_address,
+NetworkService::NetworkService(const RobotId& robot_id, const std::string& multicast_ip,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port,
                                unsigned short full_system_to_robot_ip_notification_port,
                                unsigned short robot_to_full_system_ip_notification_port,
                                unsigned short robot_logs_port,
                                const std::string& interface)
-    : interface(interface),
+    : multicast_ip(multicast_ip),
+      interface(interface),
       robot_status_sender_port(robot_status_sender_port),
       primitive_tracker(ProtoTracker("primitive set"))
 {
+    waitForNetworkUp();
+
     try
     {
         fullsystem_to_robot_ip_listener =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
-                ip_address, full_system_to_robot_ip_notification_port, interface,
+                multicast_ip, full_system_to_robot_ip_notification_port, interface,
                 std::bind(&NetworkService::onFullSystemIpNotification, this,
                           std::placeholders::_1),
                 true);
 
         robot_to_fullsystem_ip_sender =
             std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
-                ip_address, robot_to_full_system_ip_notification_port, interface, false);
-
+                multicast_ip, robot_to_full_system_ip_notification_port, interface,
+                false);
 
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
@@ -48,6 +53,40 @@ NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_ad
     {
         LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
     }
+}
+
+void NetworkService::waitForNetworkUp()
+{
+    std::unique_ptr<ThreadedUdpSender> network_tester;
+    try
+    {
+        network_tester = std::make_unique<ThreadedUdpSender>(
+            multicast_ip, NETWORK_COMM_TEST_PORT, interface, true);
+    }
+    catch (TbotsNetworkException& e)
+    {
+        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
+    }
+
+    // Send an empty packet on the specific network interface to
+    // ensure wifi is connected. Keeps trying until successful
+    while (true)
+    {
+        try
+        {
+            network_tester->sendString("");
+            break;
+        }
+        catch (std::exception& e)
+        {
+            // Resend the message after a delay
+            LOG(WARNING) << "Thunderloop cannot connect to network!"
+                         << "Waiting for connection...";
+            sleep(PING_RETRY_DELAY_S);
+        }
+    }
+
+    LOG(INFO) << "Thunderloop connected to network!";
 }
 
 void NetworkService::onFullSystemIpNotification(
@@ -88,8 +127,13 @@ void NetworkService::onFullSystemIpNotification(
     }
 }
 
-TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status)
+std::optional<TbotsProto::Primitive> NetworkService::poll(
+    TbotsProto::RobotStatus& robot_status)
 {
+    ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
+
+    const auto poll_start = std::chrono::steady_clock::now();
+
     std::scoped_lock lock{primitive_mutex};
 
     robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
@@ -112,7 +156,28 @@ TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status
         (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
 
     thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
-    return primitive_msg;
+
+    const auto now = std::chrono::steady_clock::now();
+
+    std::optional<TbotsProto::Primitive> primitive_to_return;
+    if (new_primitive_msg_received)
+    {
+        new_primitive_msg_received    = false;
+        last_primitive_received_time_ = std::chrono::steady_clock::now();
+        primitive_to_return           = primitive_msg;
+    }
+
+    using Millis = std::chrono::duration<double, std::milli>;
+    robot_status.mutable_network_status()->set_ms_since_last_primitive_received(
+        std::chrono::duration_cast<Millis>(now - last_primitive_received_time_).count());
+
+    const auto poll_end    = std::chrono::steady_clock::now();
+    const Millis poll_time = std::chrono::duration_cast<Millis>(poll_end - poll_start);
+
+    robot_status.mutable_thunderloop_status()->set_network_service_poll_time_ms(
+        poll_time.count());
+
+    return primitive_to_return;
 }
 
 bool NetworkService::shouldSendNewRobotStatus(
@@ -135,8 +200,12 @@ bool NetworkService::shouldSendNewRobotStatus(
            require_heartbeat_status_update;
 }
 
-void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status)
+void NetworkService::sendRobotStatus(TbotsProto::RobotStatus& robot_status)
 {
+    const auto epoch_time = std::chrono::steady_clock::now().time_since_epoch();
+    robot_status.mutable_time_sent()->set_epoch_timestamp_seconds(
+        std::chrono::duration_cast<std::chrono::duration<double>>(epoch_time).count());
+
     std::scoped_lock lock(robot_status_sender_mutex);
 
     if (robot_status_sender)
@@ -155,7 +224,8 @@ void NetworkService::primitiveCallback(const TbotsProto::Primitive& input)
     primitive_tracker.send(seq_num);
     if (primitive_tracker.isLastValid())
     {
-        primitive_msg = input;
+        primitive_msg              = input;
+        new_primitive_msg_received = true;
     }
 }
 

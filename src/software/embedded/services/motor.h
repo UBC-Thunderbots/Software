@@ -50,6 +50,10 @@ class MotorService
     void reset();
 
    private:
+    void execute(const TbotsProto::DirectControlPrimitive& primitive,
+                 TbotsProto::RobotStatus& robot_status,
+                 double time_elapsed_since_last_poll_s);
+
     /**
      * Creates a motor controller based on the motor board type specified at compile time.
      *

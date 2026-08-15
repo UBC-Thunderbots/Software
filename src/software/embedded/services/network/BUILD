@@ -15,6 +15,7 @@ cc_library(
         "//software/time:timestamp",
         "//software/world:robot_state",
         "@boost//:asio",
+        "@tracy",
     ],
 )
 

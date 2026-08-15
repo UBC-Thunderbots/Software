@@ -6,6 +6,7 @@
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/embedded/motion_control/orientation_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
@@ -25,14 +26,8 @@ class PrimitiveExecutor
      * Update primitive executor with a new Primitive
      * @param primitive_msg The primitive to start
      */
-    void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
-
-    /**
-     * Update primitive executor with the state of the robot
-     *
-     * @param state The current robot state
-     */
-    void updateState(const RobotState& state);
+    void updatePrimitive(const TbotsProto::Primitive& primitive_msg,
+                         TbotsProto::RobotStatus& robot_status);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
@@ -44,8 +39,8 @@ class PrimitiveExecutor
      *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
+    TbotsProto::DirectControlPrimitive stepPrimitive(TbotsProto::RobotStatus& status,
+                                                     const Duration& delta_time);
 
    private:
     /*
@@ -85,7 +80,7 @@ class PrimitiveExecutor
     void setPrevCommandedVelocity(const Vector& local_velocity,
                                   const AngularVelocity& angular_velocity);
 
-    RobotState state_;
+    RobotLocalizer robot_localizer_;
     TbotsProto::Primitive current_primitive_;
     robot_constants::RobotConstants robot_constants_;
 

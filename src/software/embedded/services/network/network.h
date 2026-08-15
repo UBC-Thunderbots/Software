@@ -24,7 +24,8 @@ class NetworkService
      * Opens all the required ports and maintains them until destroyed.
      *
      * @param robot_id The robot id of the robot
-     * @param ip_address The IP Address the service should connect to
+     * @param multicast_ip The IP address of the multicast group used for IP discovery
+     * notifications
      * @param primitive_listener_port The port to listen for primitive protos
      * @param robot_status_sender_port The port to send robot status
      * @param full_system_to_robot_ip_notification_port The port to listen for full system
@@ -34,7 +35,7 @@ class NetworkService
      * @param robot_logs_port The port to send logs from
      * @param interface the interface to listen and send on
      */
-    NetworkService(const RobotId& robot_id, const std::string& ip_address,
+    NetworkService(const RobotId& robot_id, const std::string& multicast_ip,
                    unsigned short primitive_listener_port,
                    unsigned short robot_status_sender_port,
                    unsigned short full_system_to_robot_ip_notification_port,
@@ -47,9 +48,14 @@ class NetworkService
      *
      * @returns a tuple of the stored primitive
      */
-    TbotsProto::Primitive poll(TbotsProto::RobotStatus& robot_status);
+    std::optional<TbotsProto::Primitive> poll(TbotsProto::RobotStatus& robot_status);
 
    private:
+    /**
+     * Wait for networking communication to be established. This function is blocking.
+     */
+    void waitForNetworkUp();
+
     /**
      * Return true if a robot status message should be sent over the network.
      *
@@ -104,7 +110,7 @@ class NetworkService
      *
      * @param robot_status The robot status message to send
      */
-    void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
+    void sendRobotStatus(TbotsProto::RobotStatus& robot_status);
 
     // Constants
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
@@ -116,11 +122,17 @@ class NetworkService
     static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
         static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
-    // Variables
+    // 500 millisecond timeout on receiving primitives before we stop the robots
+    static constexpr double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
+
+    // Timeout after a failed ping request
+    static constexpr int PING_RETRY_DELAY_S = 1;
 
     // Mutex protects the primitive message
     std::mutex primitive_mutex;
     TbotsProto::Primitive primitive_msg;
+    bool new_primitive_msg_received;
+    std::chrono::time_point<std::chrono::steady_clock> last_primitive_received_time_;
 
     // Mutex protects the fullsystem IP address
     std::mutex fullsystem_ip_mutex;
@@ -137,6 +149,9 @@ class NetworkService
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Primitive>>
         udp_listener_primitive;
     std::shared_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> robot_log_sender;
+
+    // The IP address of the multicast group used for IP discovery notifications
+    std::string multicast_ip;
 
     // The network interface to listen and send messages on
     std::string interface;

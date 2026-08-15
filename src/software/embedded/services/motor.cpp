@@ -1,5 +1,7 @@
 #include "software/embedded/services/motor.h"
 
+#include <Tracy.hpp>
+
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/embedded/motor_controller/motor_board.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
@@ -14,6 +16,24 @@ MotorService::MotorService(const robot_constants::RobotConstants& robot_constant
       drive_motor_mps_per_rpm_(2 * M_PI * robot_constants.wheel_radius_meters / 60),
       num_tracked_motor_resets_(0)
 {
+}
+
+void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
+                        TbotsProto::RobotStatus& robot_status,
+                        const double time_elapsed_since_last_poll_s)
+{
+    ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
+
+    const auto poll_start = std::chrono::steady_clock::now();
+
+    execute(primitive, robot_status, time_elapsed_since_last_poll_s);
+
+    const auto poll_end    = std::chrono::steady_clock::now();
+    using Millis           = std::chrono::duration<double, std::milli>;
+    const Millis poll_time = std::chrono::duration_cast<Millis>(poll_end - poll_start);
+
+    robot_status.mutable_thunderloop_status()->set_motor_service_poll_time_ms(
+        poll_time.count());
 }
 
 void MotorService::setup()
@@ -104,9 +124,9 @@ TbotsProto::MotorStatus MotorService::createMotorStatus(
     return motor_status;
 }
 
-void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
-                        TbotsProto::RobotStatus& robot_status,
-                        const double time_elapsed_since_last_poll_s)
+void MotorService::execute(const TbotsProto::DirectControlPrimitive& primitive,
+                           TbotsProto::RobotStatus& robot_status,
+                           const double time_elapsed_since_last_poll_s)
 {
     if (anyMotorRequiresReset())
     {
