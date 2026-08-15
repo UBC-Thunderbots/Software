@@ -192,6 +192,5 @@ py_library(
     data = ["//software:py_constants.so"],
     deps = [
         "//software/thunderscope:constants",
-        requirement("pyserial"),
     ],
 )
