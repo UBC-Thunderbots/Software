@@ -5,7 +5,6 @@
 #include "software/embedded/motion_control/pid_controller.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/time/duration.h"
 
 class PositionController : public MotionController<Point, TrajectoryPath, Vector>
 {
@@ -22,11 +21,11 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
      *
      * @param position The actual position.
      * @param target_trajectory The target 2D trajectory path.
-     * @param elapsed_time The elapsed time since the trajectory was created.
-     * @param delta_time The time passed since last time step.
+     * @param elapsed_time_s The elapsed time since the trajectory was created in seconds.
+     * @param delta_time_s The time passed since last time step in seconds.
      */
     Vector step(const Point& position, const TrajectoryPath& target_trajectory,
-                Duration elapsed_time, Duration delta_time) override;
+                double elapsed_time_s, double delta_time_s) override;
 
     /**
      * Resets the state of this position controller.

@@ -66,7 +66,7 @@ extern "C"
 }
 
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
-                         bool enable_log_merging, const int loop_hz)
+                         const bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       robot_constants_(robot_constants),
       robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
@@ -152,8 +152,8 @@ void Thunderloop::runLoop()
     const auto interval = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::duration<double>(1.0 / static_cast<double>(loop_hz_)));
 
-    auto next_shot            = std::chrono::steady_clock::now();
     auto prev_iter_start_time = std::chrono::steady_clock::now();
+    auto next_shot            = prev_iter_start_time;
 
     // Initial version setup
     std::string thunderloop_hash, thunderloop_date_flashed;
@@ -170,54 +170,55 @@ void Thunderloop::runLoop()
 
     for (;;)
     {
+        std::this_thread::sleep_until(next_shot);
+
+        const auto iter_start_time      = std::chrono::steady_clock::now();
+        const auto time_since_prev_iter = iter_start_time - prev_iter_start_time;
+        const double time_since_prev_iter_s =
+            std::chrono::duration<double>(time_since_prev_iter).count();
+
+        FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+
         robot_status_.clear_error_code();
 
-        const auto current_time         = std::chrono::steady_clock::now();
-        const auto time_since_prev_iter = current_time - prev_iter_start_time;
-        prev_iter_start_time            = current_time;
+        const std::optional<TbotsProto::Primitive> primitive =
+            network_service_->poll(robot_status_);
 
+        if (primitive.has_value())
         {
-            std::this_thread::sleep_until(next_shot);
+            primitive_executor_.updatePrimitive(primitive.value(), robot_status_);
+        }
 
-            FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+        const TbotsProto::DirectControlPrimitive direct_control_primitive =
+            primitive_executor_.stepPrimitive(robot_status_, time_since_prev_iter_s);
 
-            const auto iteration_start = std::chrono::steady_clock::now();
-
-            const Duration delta_time = Duration::fromSeconds(
-                std::chrono::duration<double>(time_since_prev_iter).count());
-
-            const std::optional<TbotsProto::Primitive> primitive =
-                network_service_->poll(robot_status_);
-
-            if (primitive.has_value())
-            {
-                primitive_executor_.updatePrimitive(primitive.value(), robot_status_);
-            }
-
-            const TbotsProto::DirectControlPrimitive direct_control_primitive =
-                primitive_executor_.stepPrimitive(robot_status_, delta_time);
-
-            imu_service_->poll(robot_status_);
+        imu_service_->poll(robot_status_);
 
 #ifndef DISABLE_MOTOR_SERVICE
-            motor_service_->poll(
-                direct_control_primitive, robot_status_,
-                std::chrono::duration_cast<std::chrono::seconds>(time_since_prev_iter)
-                    .count());
+        motor_service_->poll(direct_control_primitive, robot_status_,
+                             time_since_prev_iter_s);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
-            power_service_->poll(direct_control_primitive, robot_status_);
+        power_service_->poll(direct_control_primitive, robot_status_);
 #endif
 
-            const auto iteration_time =
-                std::chrono::steady_clock::now() - iteration_start;
-            robot_status_.mutable_thunderloop_status()->set_iteration_time_ms(
-                std::chrono::duration<double, std::milli>(iteration_time).count());
-        }
+        FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
+        const auto iter_end_time = std::chrono::steady_clock::now();
+        const auto iter_duration = iter_end_time - iter_start_time;
+        robot_status_.mutable_thunderloop_status()->set_iteration_time_ms(
+            std::chrono::duration<double, std::milli>(iter_duration).count());
+
+        prev_iter_start_time = iter_start_time;
         next_shot += interval;
 
-        FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+        if (next_shot < iter_end_time)
+        {
+            LOG(WARNING) << "Thunderloop iteration overran its "
+                         << std::chrono::duration<double, std::milli>(interval).count()
+                         << " ms interval, resetting loop schedule";
+            next_shot = iter_end_time;
+        }
     }
 }

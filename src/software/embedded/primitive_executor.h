@@ -1,16 +1,14 @@
 #pragma once
+
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/embedded/motion_control/orientation_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
 #include "software/embedded/robot_localizer.h"
 #include "software/geom/vector.h"
-#include "software/time/duration.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_types.h"
 
 class PrimitiveExecutor
 {
@@ -40,7 +38,7 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     TbotsProto::DirectControlPrimitive stepPrimitive(TbotsProto::RobotStatus& status,
-                                                     const Duration& delta_time);
+                                                     double delta_time_s);
 
    private:
     /*
@@ -49,7 +47,7 @@ class PrimitiveExecutor
      *
      * @returns Vector The target linear _local_ velocity
      */
-    Vector stepTargetLinearVelocity(const Duration& delta_time);
+    Vector stepTargetLinearVelocity(double delta_time_s);
 
     /*
      * Compute the next target angular velocity the robot should have.
@@ -57,7 +55,7 @@ class PrimitiveExecutor
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
+    AngularVelocity stepTargetAngularVelocity(double delta_time_s);
 
     /**
      * Sends the position, local velocity, and local acceleration to PlotJuggler.
@@ -67,7 +65,7 @@ class PrimitiveExecutor
      * @param delta_time Used to calculate acceleration.
      */
     void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       const Duration& delta_time) const;
+                                       double delta_time_s) const;
 
     /**
      * Records the velocities commanded this step so the next step can measure the
@@ -87,8 +85,8 @@ class PrimitiveExecutor
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
-    Duration time_since_linear_trajectory_creation_;
-    Duration time_since_angular_trajectory_creation_;
+    double time_since_linear_trajectory_creation_s_  = 0.0;
+    double time_since_angular_trajectory_creation_s_ = 0.0;
 
     PositionController position_controller_;
     OrientationController orientation_controller_;

@@ -4,18 +4,17 @@
 
 Vector PositionController::step(const Point& position,
                                 const TrajectoryPath& target_trajectory,
-                                Duration elapsed_time, Duration delta_time)
+                                const double elapsed_time_s, const double delta_time_s)
 {
     // feedforward trajectory velocity with small pid control effort
-    const Vector error =
-        target_trajectory.getPosition(elapsed_time.toSeconds()) - position;
-    const Vector control_effort{x_pid_.step(error.x(), delta_time.toSeconds()),
-                                y_pid_.step(error.y(), delta_time.toSeconds())};
+    const Vector error = target_trajectory.getPosition(elapsed_time_s) - position;
+    const Vector control_effort{x_pid_.step(error.x(), delta_time_s),
+                                y_pid_.step(error.y(), delta_time_s)};
     double distance_to_destination =
         distance(position, target_trajectory.getDestination());
 
     Vector global_velocity =
-        target_trajectory.getVelocity(elapsed_time.toSeconds()) + control_effort;
+        target_trajectory.getVelocity(elapsed_time_s) + control_effort;
 
     // Dampen velocity as we get closer to the destination to reduce jittering
     if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
