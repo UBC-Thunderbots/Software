@@ -30,8 +30,7 @@ NetworkService::NetworkService(const NetworkConfig& config)
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
                 config.primitive_listener_port,
-                [&](const TbotsProto::Primitive& primitive)
-                { primitiveCallback(primitive); });
+                [&](const TbotsProto::Primitive& prim) { primitiveCallback(prim); });
     }
     catch (const TbotsNetworkException& e)
     {
@@ -62,8 +61,8 @@ void NetworkService::waitForNetworkUp()
         LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
     }
 
-    // Send an empty packet on the specific network interface to
-    // ensure wifi is connected. Keeps trying until successful
+    // Send an empty packet on the specific network interface to ensure that
+    // we're connected to the network. Keep trying until successful
     while (true)
     {
         try
@@ -122,66 +121,103 @@ void NetworkService::onFullSystemIpNotification(
 }
 
 std::optional<TbotsProto::Primitive> NetworkService::poll(
-    TbotsProto::RobotStatus& robot_status)
+    TbotsProto::RobotStatus& robot_status, const double time_elapsed_since_last_poll_s)
 {
     ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
 
     const auto poll_start = std::chrono::steady_clock::now();
 
-    std::scoped_lock lock{primitive_mutex};
+    const std::optional<TbotsProto::Primitive> primitive_to_return =
+        getPrimitiveToExecute(time_elapsed_since_last_poll_s);
 
-    robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
-        static_cast<unsigned int>(primitive_tracker.getPacketLoss() * 100));
-
-    // Rate limit sending of proto based on thunderloop freq
-    if (shouldSendNewRobotStatus(robot_status))
-    {
-        last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
-        primitive_tracker.updatePrimitiveLog(robot_status);
-        sendRobotStatus(robot_status);
-        network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
-    }
-
-    if (ip_notification_ticks == 0)
-    {
-        robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
-    }
-    ip_notification_ticks =
-        (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
-
-    thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
-
-    const auto now = std::chrono::steady_clock::now();
-    const auto time_since_last_primitive =
-        now - primitive_tracker.getLastPrimitiveReceivedTime();
-
-    std::optional<TbotsProto::Primitive> primitive_to_return;
-    if (new_primitive_msg_received)
-    {
-        new_primitive_msg_received = false;
-        primitive_to_return        = primitive_msg;
-    }
-
-    // If we haven't received a primitive recently, stop the robot
-    if (time_since_last_primitive >=
-        std::chrono::nanoseconds(static_cast<long long>(PACKET_TIMEOUT_NS)))
-    {
-        TbotsProto::Primitive stop_primitive;
-        stop_primitive.mutable_stop();
-        primitive_to_return = stop_primitive;
-    }
-
-    using Millis = std::chrono::duration<double, std::milli>;
-    robot_status.mutable_network_status()->set_ms_since_last_primitive_received(
-        std::chrono::duration_cast<Millis>(time_since_last_primitive).count());
+    updateNetworkStatus(robot_status);
+    sendRobotStatusIfNeeded(robot_status, time_elapsed_since_last_poll_s);
+    sendIpNotificationIfNeeded(time_elapsed_since_last_poll_s);
 
     const auto poll_end    = std::chrono::steady_clock::now();
+    using Millis           = std::chrono::duration<double, std::milli>;
     const Millis poll_time = std::chrono::duration_cast<Millis>(poll_end - poll_start);
 
     robot_status.mutable_thunderloop_status()->set_network_service_poll_time_ms(
         poll_time.count());
 
     return primitive_to_return;
+}
+
+void NetworkService::updateNetworkStatus(TbotsProto::RobotStatus& robot_status)
+{
+    float packet_loss;
+    {
+        std::scoped_lock lock(primitive_tracker_mutex);
+        packet_loss = primitive_tracker.getPrimitiveLossRate();
+    }
+
+    robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
+        static_cast<unsigned int>(packet_loss * 100));
+
+    robot_status.mutable_network_status()->set_ms_since_last_primitive_received(
+        time_since_last_primitive_received_s_ * MILLISECONDS_PER_SECOND);
+}
+
+void NetworkService::sendRobotStatusIfNeeded(TbotsProto::RobotStatus& robot_status,
+                                             const double time_elapsed_since_last_poll_s)
+{
+    time_since_last_robot_status_sent_s_ += time_elapsed_since_last_poll_s;
+
+    if (!shouldSendNewRobotStatus(robot_status))
+    {
+        return;
+    }
+
+    time_since_last_robot_status_sent_s_ = 0.0;
+    last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
+    {
+        std::scoped_lock lock(primitive_tracker_mutex);
+        primitive_tracker.updatePrimitiveLog(robot_status);
+    }
+    sendRobotStatus(robot_status);
+}
+
+void NetworkService::sendIpNotificationIfNeeded(
+    const double time_elapsed_since_last_poll_s)
+{
+    time_since_last_ip_notification_sent_s_ += time_elapsed_since_last_poll_s;
+
+    if (time_since_last_ip_notification_sent_s_ < IP_NOTIFICATION_SEND_INTERVAL_S)
+    {
+        return;
+    }
+
+    time_since_last_ip_notification_sent_s_ = 0.0;
+    robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
+}
+
+std::optional<TbotsProto::Primitive> NetworkService::getPrimitiveToExecute(
+    const double time_elapsed_since_last_poll_s)
+{
+    std::optional<TbotsProto::Primitive> latest_primitive;
+    {
+        std::scoped_lock lock(primitive_tracker_mutex);
+        latest_primitive = primitive_tracker.getLatestPrimitive();
+    }
+
+    if (latest_primitive.has_value())
+    {
+        time_since_last_primitive_received_s_ = 0.0;
+        return latest_primitive;
+    }
+
+    time_since_last_primitive_received_s_ += time_elapsed_since_last_poll_s;
+
+    // If we haven't received a primitive recently, stop the robot
+    if (time_since_last_primitive_received_s_ >= PRIMITIVE_RECEIVE_TIMEOUT_S)
+    {
+        TbotsProto::Primitive stop_primitive;
+        stop_primitive.mutable_stop();
+        return stop_primitive;
+    }
+
+    return std::nullopt;
 }
 
 bool NetworkService::shouldSendNewRobotStatus(
@@ -198,8 +234,7 @@ bool NetworkService::shouldSendNewRobotStatus(
         robot_status.power_status().breakbeam_tripped() != last_breakbeam_state_sent;
 
     const bool require_heartbeat_status_update =
-        (network_ticks / (thunderloop_ticks + 1.0)) <=
-        ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO;
+        time_since_last_robot_status_sent_s_ >= ROBOT_STATUS_SEND_INTERVAL_S;
 
     return has_motor_fault || has_breakbeam_status_changed ||
            require_heartbeat_status_update;
@@ -221,11 +256,6 @@ void NetworkService::sendRobotStatus(TbotsProto::RobotStatus& robot_status)
 
 void NetworkService::primitiveCallback(const TbotsProto::Primitive& input)
 {
-    std::scoped_lock lock(primitive_mutex);
-
-    if (primitive_tracker.track(input))
-    {
-        primitive_msg              = input;
-        new_primitive_msg_received = true;
-    }
+    std::scoped_lock lock(primitive_tracker_mutex);
+    primitive_tracker.track(input);
 }

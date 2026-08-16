@@ -1,19 +1,17 @@
 #pragma once
 
+#include <memory>
 #include <mutex>
-#include <queue>
+#include <optional>
+#include <string>
 
 #include "proto/ip_notification.pb.h"
 #include "proto/primitive.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "shared/constants.h"
-#include "shared/robot_constants.h"
 #include "software/embedded/services/network/primitive_tracker.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
-#include "software/time/duration.h"
-#include "software/time/timestamp.h"
 #include "software/world/robot_state.h"
 
 class NetworkService
@@ -42,7 +40,7 @@ class NetworkService
         // The port to send robot IP discovery notification
         unsigned short robot_to_full_system_ip_notification_port;
 
-        // The interface to listen and send on
+        // The network interface to listen and send on
         std::string interface;
     };
 
@@ -60,13 +58,48 @@ class NetworkService
      *
      * @returns a tuple of the stored primitive
      */
-    std::optional<TbotsProto::Primitive> poll(TbotsProto::RobotStatus& robot_status);
+    std::optional<TbotsProto::Primitive> poll(TbotsProto::RobotStatus& robot_status,
+                                              double time_elapsed_since_last_poll_s);
 
    private:
     /**
      * Wait for networking communication to be established. This function is blocking.
      */
     void waitForNetworkUp();
+
+    /**
+     * Updates the network status fields of robot_status from the primitive tracker.
+     *
+     * @param robot_status the current robot status containing all the feedback
+     */
+    void updateNetworkStatus(TbotsProto::RobotStatus& robot_status);
+
+    /**
+     * Sends the robot status over the network if it is time to do so.
+     *
+     * @param robot_status the current robot status containing all the feedback
+     * @param time_elapsed_since_last_poll_s the time in seconds since the last poll
+     */
+    void sendRobotStatusIfNeeded(TbotsProto::RobotStatus& robot_status,
+                                 double time_elapsed_since_last_poll_s);
+
+    /**
+     * Sends an IP discovery notification if it is time to do so.
+     *
+     * @param time_elapsed_since_last_poll_s the time in seconds since the last poll
+     */
+    void sendIpNotificationIfNeeded(double time_elapsed_since_last_poll_s);
+
+    /**
+     * Returns the primitive to execute this iteration: the latest received primitive,
+     * or a StopPrimitive if we have not received a primitive recently.
+     *
+     * @param time_elapsed_since_last_poll_s the time in seconds since the last poll
+     *
+     * @returns the primitive to execute, if any
+     */
+    std::optional<TbotsProto::Primitive> getPrimitiveToExecute(
+        double time_elapsed_since_last_poll_s);
 
     /**
      * Return true if a robot status message should be sent over the network.
@@ -104,21 +137,14 @@ class NetworkService
     void sendRobotStatus(TbotsProto::RobotStatus& robot_status);
 
     // Constants
-    static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
-    static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
-        ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
-    static constexpr int IP_DISCOVERY_NOTIFICATION_RATE_HZ = 1 * THUNDERLOOP_HZ;
+    static constexpr double ROBOT_STATUS_SEND_INTERVAL_S    = 0.3;
+    static constexpr double IP_NOTIFICATION_SEND_INTERVAL_S = 1.0;
 
-    // 500 millisecond timeout on receiving primitives before we stop the robots
-    static constexpr double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
+    // Timeout on receiving primitives before we stop the robots
+    static constexpr double PRIMITIVE_RECEIVE_TIMEOUT_S = 0.5;
 
     // Timeout after a failed ping request
     static constexpr int PING_RETRY_DELAY_S = 1;
-
-    // Mutex protects the primitive message
-    std::mutex primitive_mutex;
-    TbotsProto::Primitive primitive_msg;
-    bool new_primitive_msg_received;
 
     // Mutex protects the fullsystem IP address
     std::mutex fullsystem_ip_mutex;
@@ -146,11 +172,12 @@ class NetworkService
     unsigned short robot_status_sender_port;
 
     // Counters for tracking rate-limited events
-    unsigned int ip_notification_ticks = 0;
-    unsigned int network_ticks         = 0;
-    unsigned int thunderloop_ticks     = 0;
+    double time_since_last_robot_status_sent_s_    = 0.0;
+    double time_since_last_ip_notification_sent_s_ = 0.0;
+    double time_since_last_primitive_received_s_   = 0.0;
 
-    // Tracks packet loss, round-trip time, and last-received time of primitives
+    // Mutex protects the primitive tracker
+    std::mutex primitive_tracker_mutex;
     PrimitiveTracker primitive_tracker;
 
     // track last breakbeam state for sending RobotStatus outside of specified rate

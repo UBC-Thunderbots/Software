@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <deque>
+#include <optional>
 #include <queue>
 
 #include "proto/primitive.pb.h"
@@ -11,7 +12,8 @@
 #include "software/logger/logger.h"
 
 /**
- * Tracks received primitives and reports packet loss and average round-trip time.
+ * Tracks received primitives: packet loss, the latest received primitive, and the
+ * round-trip-time data that Thunderscope needs.
  */
 class PrimitiveTracker
 {
@@ -19,30 +21,25 @@ class PrimitiveTracker
     explicit PrimitiveTracker();
 
     /**
-     * Records a newly received primitive, updating packet loss, round-trip time, and
-     * last-received-time tracking.
+     * Records a newly received primitive. Out-of-order (older or duplicate) primitives
+     * are ignored.
      *
      * @param primitive The newly received primitive.
-     *
-     * @return true if the primitive is newer than the last received one.
      */
-    bool track(const TbotsProto::Primitive& primitive);
+    void track(const TbotsProto::Primitive& primitive);
 
     /**
      * @return the packet loss rate (0.0 to 1.0) of recent primitives.
      */
-    float getPacketLoss() const;
+    float getPrimitiveLossRate() const;
 
     /**
-     * @return the average one-way round-trip time (Thunderscope -> robot delivery
-     * latency) in seconds over the tracked primitives, or 0.0 if none are tracked.
+     * Returns the latest valid primitive, at most once. Subsequent calls return
+     * std::nullopt until a newer primitive is received.
+     *
+     * @return the latest valid primitive, or std::nullopt.
      */
-    double getAverageRoundTripTime() const;
-
-    /**
-     * @return the time the last primitive was received.
-     */
-    std::chrono::steady_clock::time_point getLastPrimitiveReceivedTime() const;
+    std::optional<TbotsProto::Primitive> getLatestPrimitive();
 
     /**
      * Matches the robot status's last handled primitive set against the tracked
@@ -71,7 +68,7 @@ class PrimitiveTracker
      * @param seq_num The sequence number of the newly received protobuf
      * @return a float equal to the proto loss rate
      */
-    float calculateProtoLossRate(uint64_t seq_num) const;
+    float calculateLossRate(uint64_t seq_num) const;
 
     /**
      * Getter for the current epoch time in seconds as a double
@@ -81,23 +78,20 @@ class PrimitiveTracker
     static double getCurrentEpochTimeInSeconds();
 
     // Constants
-    static constexpr uint8_t RECENT_PROTO_LOSS_PERIOD = 100;
+    static constexpr uint8_t RECENT_PRIMITIVE_LOSS_PERIOD = 100;
 
     // Maximum number of primitives to keep for round-trip-time calculations. Sized to
     // cover ~1.5 seconds of primitives at a 30 Hz robot status broadcast rate.
     static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE = 50;
 
-    // Packet loss tracking
-    bool last_valid       = false;
+    // Packet loss tracking: sequence numbers of the most recent primitives
+    std::queue<uint64_t> recent_proto_seq_nums;
     float proto_loss_rate = 0;
 
-    // Queue of the sequence numbers of received protos in the past
-    // RECENT_PROTO_LOSS_PERIOD protos
-    std::queue<uint64_t> recent_proto_seq_nums;
-
-    // Stores the most recent primitives for calculating round-trip time
+    // Round-trip time tracking: the most recent primitives used to compute
+    // adjusted_time_sent for Thunderscope
     std::deque<RoundTripTime> primitive_rtt;
 
-    // The time the last valid primitive was received
-    std::chrono::steady_clock::time_point last_primitive_received_time_;
+    // The latest valid primitive, consumed once by getLatestPrimitive
+    std::optional<TbotsProto::Primitive> latest_primitive;
 };

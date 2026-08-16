@@ -182,7 +182,7 @@ void Thunderloop::runLoop()
         robot_status_.clear_error_code();
 
         const std::optional<TbotsProto::Primitive> primitive =
-            network_service_->poll(robot_status_);
+            network_service_->poll(robot_status_, time_since_prev_iter_s);
 
         if (primitive.has_value())
         {

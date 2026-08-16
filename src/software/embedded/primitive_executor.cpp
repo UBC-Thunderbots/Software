@@ -63,7 +63,7 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
     const Millis update_time =
         std::chrono::duration_cast<Millis>(update_end - update_start);
 
-    robot_status.mutable_thunderloop_status()->set_primitive_executor_start_time_ms(
+    robot_status.mutable_thunderloop_status()->set_primitive_executor_update_time_ms(
         update_time.count());
 }
 
@@ -223,7 +223,7 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
         }
     }
 
-    robot_status.set_last_handled_primitive_set(current_primitive_.sequence_number());
+    robot_status.set_last_handled_primitive_seq_num(current_primitive_.sequence_number());
 
     const auto step_end    = std::chrono::steady_clock::now();
     using Millis           = std::chrono::duration<double, std::milli>;
