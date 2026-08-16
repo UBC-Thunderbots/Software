@@ -9,7 +9,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
-#include "software/embedded/services/network/proto_tracker.h"
+#include "software/embedded/services/network/primitive_tracker.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/time/duration.h"
@@ -20,27 +20,39 @@ class NetworkService
 {
    public:
     /**
+     * Configuration for the NetworkService.
+     */
+    struct NetworkConfig
+    {
+        // The robot id of the robot
+        RobotId robot_id;
+
+        // The IP address of the multicast group used for IP discovery notifications
+        std::string multicast_ip;
+
+        // The port to listen for primitive protos
+        unsigned short primitive_listener_port;
+
+        // The port to send robot status
+        unsigned short robot_status_sender_port;
+
+        // The port to listen for full system IP discovery notification
+        unsigned short full_system_to_robot_ip_notification_port;
+
+        // The port to send robot IP discovery notification
+        unsigned short robot_to_full_system_ip_notification_port;
+
+        // The interface to listen and send on
+        std::string interface;
+    };
+
+    /**
      * Service that communicates with our AI
      * Opens all the required ports and maintains them until destroyed.
      *
-     * @param robot_id The robot id of the robot
-     * @param multicast_ip The IP address of the multicast group used for IP discovery
-     * notifications
-     * @param primitive_listener_port The port to listen for primitive protos
-     * @param robot_status_sender_port The port to send robot status
-     * @param full_system_to_robot_ip_notification_port The port to listen for full system
-     * IP discovery notification
-     * @param robot_to_full_system_ip_notification_port The port to send robot IP
-     * discovery notification
-     * @param robot_logs_port The port to send logs from
-     * @param interface the interface to listen and send on
+     * @param config The configuration for the network service
      */
-    NetworkService(const RobotId& robot_id, const std::string& multicast_ip,
-                   unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port,
-                   unsigned short full_system_to_robot_ip_notification_port,
-                   unsigned short robot_to_full_system_ip_notification_port,
-                   unsigned short robot_logs_port, const std::string& interface);
+    explicit NetworkService(const NetworkConfig& config);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
@@ -71,27 +83,6 @@ class NetworkService
     bool shouldSendNewRobotStatus(const TbotsProto::RobotStatus& robot_status) const;
 
     /**
-     * Tracks the given primitive for calculating round-trip time if valid
-     *
-     * @param input A potential primitive to be logged
-     */
-    void logNewPrimitive(const TbotsProto::Primitive& new_primitive);
-
-    /**
-     * Updates the cached primitive for Thunderscope to calculate round-trip time
-     *
-     * @param robot_status The robot status to compare to within the cache
-     */
-    void updatePrimitiveLog(TbotsProto::RobotStatus& robot_status);
-
-    /**
-     * Getter for the current epoch time in seconds as a double
-     *
-     * @return current epoch time in seconds as a double
-     */
-    double getCurrentEpochTimeInSeconds();
-
-    /**
      * Handler for received primitive packets
      *
      * @param input The primitive packet received
@@ -118,10 +109,6 @@ class NetworkService
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
     static constexpr int IP_DISCOVERY_NOTIFICATION_RATE_HZ = 1 * THUNDERLOOP_HZ;
 
-    // increases size of deque when robot status messages are sent less frequently
-    static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
-        static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
-
     // 500 millisecond timeout on receiving primitives before we stop the robots
     static constexpr double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
@@ -132,7 +119,6 @@ class NetworkService
     std::mutex primitive_mutex;
     TbotsProto::Primitive primitive_msg;
     bool new_primitive_msg_received;
-    std::chrono::time_point<std::chrono::steady_clock> last_primitive_received_time_;
 
     // Mutex protects the fullsystem IP address
     std::mutex fullsystem_ip_mutex;
@@ -164,24 +150,11 @@ class NetworkService
     unsigned int network_ticks         = 0;
     unsigned int thunderloop_ticks     = 0;
 
-    // ProtoTrackers for tracking recent primitive_set packet loss
-    ProtoTracker primitive_tracker;
+    // Tracks packet loss, round-trip time, and last-received time of primitives
+    PrimitiveTracker primitive_tracker;
 
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
-
-    struct RoundTripTime
-    {
-        // Primitive Sequence Number
-        uint64_t primitive_sequence_num = 0;
-        // Epoch time of primitive set sent time from Thunderscope in seconds
-        double thunderscope_sent_time_seconds = 0;
-        // System time for when primitive set was received by Thunderloop in seconds
-        double thunderloop_recieved_time_seconds = 0;
-    };
-
-    // Stores the most recent primitives for calculating round-trip time
-    std::deque<RoundTripTime> primitive_rtt;
 
     // IP discovery message to send on the network
     TbotsProto::IpNotification robot_ip_notification_msg;

@@ -94,10 +94,19 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging,
                                              network_interface_);
 
-    network_service_ = std::make_unique<NetworkService>(
-        robot_id, std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
-        ROBOT_STATUS_PORT, FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
-        ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, ROBOT_LOGS_PORT, network_interface);
+    const NetworkService::NetworkConfig network_config{
+        .robot_id                 = static_cast<RobotId>(robot_id),
+        .multicast_ip             = std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
+        .primitive_listener_port  = PRIMITIVE_PORT,
+        .robot_status_sender_port = ROBOT_STATUS_PORT,
+        .full_system_to_robot_ip_notification_port =
+            FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+        .robot_to_full_system_ip_notification_port =
+            ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
+        .interface = network_interface,
+    };
+
+    network_service_ = std::make_unique<NetworkService>(network_config);
     LOG(INFO) << "THUNDERLOOP: Network Service initialized!";
 
 #ifndef DISABLE_POWER_SERVICE
