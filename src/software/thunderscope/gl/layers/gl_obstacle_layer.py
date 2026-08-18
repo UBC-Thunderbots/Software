@@ -1,5 +1,3 @@
-from pyqtgraph.opengl import *
-
 from proto.visualization_pb2 import ObstacleList
 
 from software.thunderscope.constants import Colors, DepthValues

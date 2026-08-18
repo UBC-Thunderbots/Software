@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 
 import math
 
@@ -473,14 +473,14 @@ class GLWorldLayer(GLLayer):
         robot_graphics.resize(len(robots), lambda: GLRobot(color=color))
         robot_id_graphics.resize(
             len(robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
         robot_name_graphics.resize(
             len(robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
@@ -525,7 +525,7 @@ class GLWorldLayer(GLLayer):
     def __update_robot_label_graphic(
         self,
         toggle: bool,
-        label: GLTextItem,
+        label: gl.GLTextItem,
         text: str,
         pos: tuple[float, float, float],
     ) -> None:

@@ -1,5 +1,3 @@
-from pyqtgraph.opengl import *
-
 import time
 
 
