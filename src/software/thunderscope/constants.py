@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui
-from OpenGL.GL import *
+from OpenGL import GL
 from proto.import_all_protos import *
 from enum import Enum, IntEnum, StrEnum
 from proto.robot_log_msg_pb2 import LogLevel
@@ -372,10 +372,10 @@ class CustomGLOptions:
     # This is useful when the graphics are overlaid on top of (e.g.) a
     # yellow robot where the blended colors would not be easily visible.
     OPAQUE_WITH_OUT_DEPTH_TEST = {
-        GL_DEPTH_TEST: False,
-        GL_BLEND: False,
-        GL_ALPHA_TEST: False,
-        GL_CULL_FACE: False,
+        GL.GL_DEPTH_TEST: False,
+        GL.GL_BLEND: False,
+        GL.GL_ALPHA_TEST: False,
+        GL.GL_CULL_FACE: False,
     }
 
 

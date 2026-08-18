@@ -2,7 +2,6 @@ from software.thunderscope.binary_context_managers.full_system import ProtoUnixI
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtCore import QTimer, Qt
-from pyqtgraph.opengl import *
 
 from proto.import_all_protos import *
 from software.py_constants import *

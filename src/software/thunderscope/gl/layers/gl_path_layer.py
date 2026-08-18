@@ -1,5 +1,3 @@
-from pyqtgraph.opengl import *
-
 import math
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet

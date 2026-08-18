@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 
 import math
 import numpy as np
@@ -36,7 +36,7 @@ class GLMeasureLayer(GLLayer):
 
         # GLTextItem must be initialized later, outside of this constructor
         # Avoid pyqtgraph bug: 'NoneType' object has no attribute 'width'
-        self.cursor_coords_graphic: GLTextItem = None
+        self.cursor_coords_graphic: gl.GLTextItem = None
 
         self.measurement_text_graphics = ObservableList(self._graphics_changed)
         self.measurement_line_graphics = ObservableList(self._graphics_changed)
@@ -85,7 +85,7 @@ class GLMeasureLayer(GLLayer):
             midpoint = (first_point + second_point) / 2
 
             self.measurement_text_graphics.append(
-                GLTextItem(
+                gl.GLTextItem(
                     font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                     color=Colors.PRIMARY_TEXT_COLOR,
                     text=f"{distance:.2f} m",
@@ -116,7 +116,7 @@ class GLMeasureLayer(GLLayer):
             placement_point = b + 0.5 * bisector.normalized()
 
             self.measurement_text_graphics.append(
-                GLTextItem(
+                gl.GLTextItem(
                     font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                     color=Colors.PRIMARY_TEXT_COLOR,
                     text=f"{angle:.1f}°",
@@ -148,7 +148,7 @@ class GLMeasureLayer(GLLayer):
         # Display coordinates of point at mouse cursor
 
         if not self.cursor_coords_graphic:
-            self.cursor_coords_graphic = GLTextItem(
+            self.cursor_coords_graphic = gl.GLTextItem(
                 parentItem=self,
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 10),
                 color=Colors.PRIMARY_TEXT_COLOR,
