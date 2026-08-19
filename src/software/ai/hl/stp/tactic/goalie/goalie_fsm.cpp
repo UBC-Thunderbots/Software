@@ -95,6 +95,13 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field& field)
         field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 }
 
+Point GoalieFSM::getChipOrigin(const Field& field, const Point& ball_position)
+{
+    double clear_origin_x = getNoChipRectangle(field).xMax() + ROBOT_MAX_RADIUS_METERS;
+    double chip_origin_x  = std::max(clear_origin_x, ball_position.x());
+    return Point(chip_origin_x, ball_position.y());
+}
+
 Point GoalieFSM::findGoodChipTarget(
     const World& world, const TbotsProto::GoalieTacticConfig& goalie_tactic_config)
 {
@@ -219,14 +226,8 @@ void GoalieFSM::panic(const Update& event)
 void GoalieFSM::updatePivotKick(
     const Update& event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
-    // Ensure that we start our chip away from the no chip zone in front of
-    // the goal (prevents accidentally scoring an own goal)
-    double clear_origin_x = getNoChipRectangle(event.common.world_ptr->field()).xMax() +
-                            ROBOT_MAX_RADIUS_METERS;
-    double chip_origin_x =
-        std::max(clear_origin_x, event.common.world_ptr->ball().position().x());
-    Point chip_origin =
-        Point(chip_origin_x, event.common.world_ptr->ball().position().y());
+    Point chip_origin = getChipOrigin(event.common.world_ptr->field(),
+                                      event.common.world_ptr->ball().position());
 
     Point chip_target  = findGoodChipTarget(*event.common.world_ptr,
                                             ai_config_ptr->goalie_tactic_config());
@@ -310,20 +311,22 @@ void GoalieFSM::retrieveFromDeadZone(
 
 bool GoalieFSM::ballControlled(const Update& event)
 {
-    return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
+    Point ball_position = event.common.world_ptr->ball().position();
+    if (!event.common.robot.isNearDribbler(ball_position))
+    {
+        return false;
+    }
+
+    Point chip_origin =
+        getChipOrigin(event.common.world_ptr->field(), ball_position);
+    return comparePoints(ball_position, chip_origin, BALL_RETRIEVED_THRESHOLD);
 }
 
 void GoalieFSM::controlBallForChip(
     const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    // Ensure that we start our chip away from the no chip zone in front of
-    // the goal (prevents accidentally scoring an own goal)
-    double clear_origin_x = getNoChipRectangle(event.common.world_ptr->field()).xMax() +
-                            ROBOT_MAX_RADIUS_METERS;
-    double chip_origin_x =
-        std::max(clear_origin_x, event.common.world_ptr->ball().position().x());
-    Point chip_origin =
-        Point(chip_origin_x, event.common.world_ptr->ball().position().y());
+    Point chip_origin = getChipOrigin(event.common.world_ptr->field(),
+                                      event.common.world_ptr->ball().position());
 
     Point chip_target  = findGoodChipTarget(*event.common.world_ptr,
                                             ai_config_ptr->goalie_tactic_config());

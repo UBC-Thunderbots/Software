@@ -75,6 +75,16 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
     static Rectangle getNoChipRectangle(const Field& field);
 
     /**
+     * Gets the point the goalie should dribble to before chipping the ball
+     *
+     * @param field the field
+     * @param ball_position the current ball position
+     *
+     * @return the point the goalie should chip from
+     */
+    static Point getChipOrigin(const Field& field, const Point& ball_position);
+
+    /**
      * Finds a good point to chip the ball to from its current position
      *
      * @param world the world
