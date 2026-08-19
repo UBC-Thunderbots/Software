@@ -27,6 +27,8 @@ cc_library(
         "stspin_motor_controller.h",
         "tmc_motor_controller.h",
     ],
+    # Uses Linux kernel headers (linux/spi/spidev.h); robot-only.
+    target_compatible_with = ["@platforms//os:linux"],
     deps = [
         ":motor_board",
         ":motor_fault_indicator",

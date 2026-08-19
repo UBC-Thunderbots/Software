@@ -10,6 +10,8 @@ cc_library(
         "gpio.h",
         "gpio_char_dev.h",
     ],
+    # Uses Linux kernel headers (linux/gpio.h); robot-only.
+    target_compatible_with = ["@platforms//os:linux"],
     deps = [
         "//software/logger",
         "//software/logger:network_logger",

@@ -235,6 +235,7 @@ def test_receiver(
     gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
+        test_timeout_s=4,
     )
 
 

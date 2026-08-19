@@ -45,7 +45,7 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status, Duration delta_time);
+        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
 
    private:
     /*
@@ -54,7 +54,7 @@ class PrimitiveExecutor
      *
      * @returns Vector The target linear _local_ velocity
      */
-    Vector stepTargetLinearVelocity(Duration delta_time);
+    Vector stepTargetLinearVelocity(const Duration& delta_time);
 
     /*
      * Compute the next target angular velocity the robot should have.
@@ -62,7 +62,7 @@ class PrimitiveExecutor
      *
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity stepTargetAngularVelocity(Duration delta_time);
+    AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
 
     /**
      * Sends the position, local velocity, and local acceleration to PlotJuggler.
@@ -72,7 +72,18 @@ class PrimitiveExecutor
      * @param delta_time Used to calculate acceleration.
      */
     void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       Duration delta_time);
+                                       const Duration& delta_time) const;
+
+    /**
+     * Records the velocities commanded this step so the next step can measure the
+     * commanded (tick-to-tick) acceleration. Call on every code path that commands a
+     * velocity without going through stepTargetLinearVelocity/stepTargetAngularVelocity.
+     *
+     * @param local_velocity The local velocity commanded this step
+     * @param angular_velocity The angular velocity commanded this step
+     */
+    void setPrevCommandedVelocity(const Vector& local_velocity,
+                                  const AngularVelocity& angular_velocity);
 
     RobotState state_;
     TbotsProto::Primitive current_primitive_;
@@ -86,6 +97,11 @@ class PrimitiveExecutor
 
     PositionController position_controller_;
     OrientationController orientation_controller_;
+
+    // The velocities commanded on the previous step. Used to measure the commanded
+    // (tick-to-tick) acceleration
+    Vector prev_target_global_velocity_;
+    AngularVelocity prev_target_angular_velocity_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
     static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
