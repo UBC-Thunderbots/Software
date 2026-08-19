@@ -37,7 +37,7 @@ install_clang_format() {
 }
 
 install_cross_compiler() {
-    commit_hash="5e3cc7c38cf7979da630cf8c9176ac799a95b224"
+    commit_hash="759381231e80613168d96ef437a0aeac1f97466c"
 
     file_name=aarch64-tbots-linux-gnu-for-aarch64
     if is_x86 $1; then
