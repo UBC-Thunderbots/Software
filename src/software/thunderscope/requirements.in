@@ -2,6 +2,7 @@ colorama==0.4.6
 netifaces==0.11.0
 numpy==1.26.4
 protobuf==6.31.1
+pyserial==3.5
 pygame==2.6.1
 pyqtgraph==0.13.7
 pyqtdarktheme-fork==2.3.2
