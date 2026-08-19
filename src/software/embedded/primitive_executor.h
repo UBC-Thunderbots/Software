@@ -10,50 +10,70 @@
 #include "software/geom/vector.h"
 #include "software/world/robot_state.h"
 
+/**
+ * "Executes" primitives, turning them into the direct control commands that
+ * drive the robot's motors and actuate the kicker/chipper.
+ *
+ * For a MovePrimitive, "execution" is done by planning a trajectory to the destination
+ * and, on each step, tracking that trajectory to compute the target velocities.
+ */
 class PrimitiveExecutor
 {
    public:
     /**
-     * Constructor
-     * @param robot_constants The robot constants for the robot which uses this primitive
+     * Constructs a new PrimitiveExecutor.
+     *
+     * @param robot_constants The robot constants for the robot that uses this primitive
      * executor
      */
     explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
 
     /**
-     * Update primitive executor with a new Primitive
-     * @param primitive_msg The primitive to start
+     * Starts executing a new primitive.
+     *
+     * For a Move primitive, this plans the trajectory the robot will follow to
+     * reach its destination.
+     *
+     * @param primitive_msg The primitive to execute
+     * @param robot_status The robot status to update
      */
     void updatePrimitive(const TbotsProto::Primitive& primitive_msg,
                          TbotsProto::RobotStatus& robot_status);
 
     /**
-     * Steps the current primitive and returns a direct control primitive with the
-     * target wheel velocities
+     * Advances the current primitive's execution by one step and returns the direct
+     * control command to drive the motors.
      *
-     * @param status The status of the primitive executor, set to false if current
-     * primitive is a Stop primitive
-     * @param delta_time The elapsed time since the last primitive step
+     * For a Move primitive, this tracks the planned trajectory against the latest robot
+     * state estimate to compute the target velocities. A Stop primitive produces zero
+     * velocities, and a DirectControl primitive is passed through unchanged.
      *
-     * @returns DirectControlPrimitive The direct control primitive msg
+     * @param status The current robot status, updated with the primitive executor status
+     * @param delta_time_s The elapsed time since the last primitive step
+     *
+     * @return The direct control command to send to the motors
      */
     TbotsProto::DirectControlPrimitive stepPrimitive(TbotsProto::RobotStatus& status,
                                                      double delta_time_s);
 
    private:
-    /*
-     * Compute the next target linear _local_ velocity the robot should have.
-     * @param delta_time The elapsed time since last time step
+    /**
+     * Tracks the planned trajectory to compute the robot's next target local linear
+     * velocity, respecting the robot's speed and acceleration limits.
      *
-     * @returns Vector The target linear _local_ velocity
+     * @param delta_time_s The elapsed time since the last step
+     *
+     * @return The target local linear velocity
      */
     Vector stepTargetLinearVelocity(double delta_time_s);
 
-    /*
-     * Compute the next target angular velocity the robot should have.
-     * @param delta_time The elapsed time since last time step
+    /**
+     * Tracks the planned angular trajectory to compute the robot's next target angular
+     * velocity, respecting the robot's angular speed and acceleration limits.
      *
-     * @returns AngularVelocity The target angular velocity
+     * @param delta_time_s The elapsed time since the last step
+     *
+     * @return The target angular velocity
      */
     AngularVelocity stepTargetAngularVelocity(double delta_time_s);
 
@@ -62,7 +82,7 @@ class PrimitiveExecutor
      *
      * @param target_local_velocity The local velocity being sent to the next direct
      * control primitive
-     * @param delta_time Used to calculate acceleration.
+     * @param delta_time_s The elapsed time since the last step
      */
     void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
                                        double delta_time_s) const;

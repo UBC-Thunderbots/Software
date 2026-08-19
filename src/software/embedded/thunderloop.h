@@ -15,8 +15,8 @@ class Thunderloop
    public:
     /**
      * Thunderloop is a giant loop that runs at THUNDERLOOP_HZ.
-     * It receives Primitives from AI, executes the Primitives with
-     * the most recent vison data, and polls the services to interact
+     * It receives Primitives from Fullsystem, executes the Primitives
+     * based on robot localization data, and polls the services to interact
      * with the hardware peripherals.
      *
      * High Level Diagram: Service order in loop not shown
@@ -44,7 +44,7 @@ class Thunderloop
      * @param loop_hz The rate to run the loop
      */
     Thunderloop(const robot_constants::RobotConstants& robot_constants,
-                bool enable_log_merging, const int loop_hz);
+                bool enable_log_merging, int loop_hz);
 
     [[noreturn]] void runLoop();
 
@@ -58,9 +58,6 @@ class Thunderloop
     // TOML config client
     std::unique_ptr<TomlConfigClient> toml_config_client_;
 
-    // The outgoing robot status.
-    TbotsProto::RobotStatus robot_status_;
-
     // Current State
     robot_constants::RobotConstants robot_constants_;
     int robot_id_;
@@ -70,4 +67,8 @@ class Thunderloop
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
+
+    // This robot status message is updated by each service and then sent
+    // to fullsystem over the network.
+    TbotsProto::RobotStatus robot_status_;
 };

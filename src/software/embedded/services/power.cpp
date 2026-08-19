@@ -2,9 +2,9 @@
 
 #include <Tracy.hpp>
 #include <boost/filesystem.hpp>
-#include <cstdint>
 
 #include "proto/power_frame_msg.pb.h"
+#include "software/logger/logger.h"
 
 PowerService::PowerService(const double kick_coefficient, const int kick_constant,
                            const int chip_constant)

@@ -10,18 +10,19 @@
 #include "software/physics/euclidean_to_wheel.h"
 
 /**
- * A service that interacts with the motors.
+ * A service that drives the robot's four wheel motors (and dribbler depending
+ * on the robot model).
  *
  * It is responsible for:
  * - Converting Euclidean velocities to wheel velocities
- * - Communicating with the motor
+ * - Communicating with the motor driver boards
  * - Detecting and handling faults
  */
 class MotorService
 {
    public:
     /**
-     * Service that interacts with the motors.
+     * Constructs a new MotorService.
      *
      * @param robot_constants The robot constants
      */
@@ -50,6 +51,13 @@ class MotorService
     void reset();
 
    private:
+    /**
+     * Executes the given direct control primitive and updates the motor status.
+     *
+     * @param primitive DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with the current motor status
+     * @param time_elapsed_since_last_poll_s The time since the last poll in seconds
+     */
     void execute(const TbotsProto::DirectControlPrimitive& primitive,
                  TbotsProto::RobotStatus& robot_status,
                  double time_elapsed_since_last_poll_s);
@@ -63,7 +71,7 @@ class MotorService
     std::unique_ptr<MotorController> setupMotorController();
 
     /**
-     * Return a MotorStatus proto filled with motor velocities and faults.
+     * Returns a MotorStatus proto filled with motor velocities and faults.
      *
      * @param current_wheel_velocities  the current wheel velocities in m/s
      * @param dribbler_rpm             the dribbler motor's rotations per minute

@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "software/logger/logger.h"
+
 PrimitiveTracker::PrimitiveTracker() {}
 
 void PrimitiveTracker::track(const TbotsProto::Primitive& primitive)

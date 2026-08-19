@@ -14,6 +14,10 @@
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/world/robot_state.h"
 
+/**
+ * A service that handles communication with fullsystem over the network.
+ * We receive primitives from fullsystem and send back the robot status.
+ */
 class NetworkService
 {
    public:
@@ -45,18 +49,23 @@ class NetworkService
     };
 
     /**
-     * Service that communicates with our AI
-     * Opens all the required ports and maintains them until destroyed.
+     * Constructs a NetworkService and opens all the required network ports.
      *
      * @param config The configuration for the network service
      */
     explicit NetworkService(const NetworkConfig& config);
 
     /**
-     * When the network service is polled, it sends the robot_status and returns
-     * a tuple of the most recent Primitive
+     * Polls the network service: sends the robot status to fullsystem, and,
+     * if a new primitive has been received, returns it.
      *
-     * @returns a tuple of the stored primitive
+     * Note that each received primitive is returned at most once by this method;
+     * subsequent calls will return std::nullopt until a newer primitive is received.
+     *
+     * @param robot_status the current robot status to send over the network
+     * @param time_elapsed_since_last_poll_s the time in seconds since the last poll
+     *
+     * @returns the primitive to execute, if there is a new one
      */
     std::optional<TbotsProto::Primitive> poll(TbotsProto::RobotStatus& robot_status,
                                               double time_elapsed_since_last_poll_s);
@@ -68,7 +77,7 @@ class NetworkService
     void waitForNetworkUp();
 
     /**
-     * Updates the network status fields of robot_status from the primitive tracker.
+     * Updates the network status fields of robot status from the primitive tracker.
      *
      * @param robot_status the current robot status containing all the feedback
      */
@@ -91,12 +100,16 @@ class NetworkService
     void sendIpNotificationIfNeeded(double time_elapsed_since_last_poll_s);
 
     /**
-     * Returns the primitive to execute this iteration: the latest received primitive,
-     * or a StopPrimitive if we have not received a primitive recently.
+     * Returns the latest received primitive, if it is new. If no new primitive has
+     * been received since the last time this method was called (i.e. the primitive
+     * to execute has not changed), std::nullopt is returned.
+     *
+     * If we have not received a primitive in a while, StopPrimitive is returned
+     * as a safety precaution.
      *
      * @param time_elapsed_since_last_poll_s the time in seconds since the last poll
      *
-     * @returns the primitive to execute, if any
+     * @returns the primitive to execute, if there is a new one
      */
     std::optional<TbotsProto::Primitive> getPrimitiveToExecute(
         double time_elapsed_since_last_poll_s);
@@ -136,7 +149,7 @@ class NetworkService
      */
     void sendRobotStatus(TbotsProto::RobotStatus& robot_status);
 
-    // Constants
+    // The rate at which to send out robot status / IP notification messages
     static constexpr double ROBOT_STATUS_SEND_INTERVAL_S    = 0.3;
     static constexpr double IP_NOTIFICATION_SEND_INTERVAL_S = 1.0;
 
