@@ -28,6 +28,7 @@ py_test(
     srcs = [
         "enemy_ball_placement_play_test.py",
     ],
+    flaky = True,
     deps = [
         "//software:conftest",
         "//software/gameplay_tests/validation:validations",

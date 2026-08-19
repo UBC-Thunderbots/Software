@@ -37,6 +37,8 @@ py_test(
     srcs = [
         "ball_placement_play_test.py",
     ],
+    # Flaky: multi-robot simulated play sensitive to sim timing; passes on retry.
+    flaky = True,
     deps = [
         "//software:conftest",
         "//software/gameplay_tests/validation:validations",

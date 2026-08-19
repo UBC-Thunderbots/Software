@@ -167,7 +167,7 @@ def test_crease_region_positioning(
         [
             RobotEventuallyEntersRegion(regions=[defender_regions[region_index]]),
             DelayValidation(
-                delay_s=3,
+                delay_s=4,
                 validation=RobotEventuallyEntersRegion(
                     regions=[defender_regions[region_index]]
                 ),

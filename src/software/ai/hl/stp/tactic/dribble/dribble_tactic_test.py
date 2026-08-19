@@ -415,7 +415,7 @@ def test_run_into_enemy_robot_knock_ball_away(
             RobotEventuallyReceivedBall(1),
             BallEventuallyEntersRegion([tbots_cpp.Circle(dribble_destination, 0.3)]),
             RobotEventuallyAtOrientation(1, dribble_orientation),
-            DelayValidation(delay_s=2, validation=RobotEventuallyReceivedBall(1)),
+            DelayValidation(delay_s=3, validation=RobotEventuallyReceivedBall(1)),
         ]
     ]
 

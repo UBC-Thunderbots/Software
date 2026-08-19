@@ -42,6 +42,8 @@ cc_library(
     name = "imu",
     srcs = ["imu.cpp"],
     hdrs = ["imu.h"],
+    # Uses Linux kernel headers (linux/i2c-dev.h); robot-only.
+    target_compatible_with = ["@platforms//os:linux"],
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:constants",
