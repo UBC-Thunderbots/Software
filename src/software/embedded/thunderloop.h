@@ -58,15 +58,10 @@ class Thunderloop
     // TOML config client
     std::unique_ptr<TomlConfigClient> toml_config_client_;
 
-    // Current State
-    robot_constants::RobotConstants robot_constants_;
-    int robot_id_;
-    int channel_id_;
-    std::string network_interface_;
-    int loop_hz_;
-
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
+
+    int loop_hz_;
 
     // This robot status message is updated by each service and then sent
     // to fullsystem over the network.
