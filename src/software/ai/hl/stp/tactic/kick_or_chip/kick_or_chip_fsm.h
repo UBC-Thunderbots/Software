@@ -40,7 +40,7 @@ struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
      *
      * @param event KickFSM::Update event
      */
-    void kickOrChipBall(const Update &event);
+    void kickOrChipBall(const Update& event);
 
     /**
      * Action that updates the GetBehindBallFSM

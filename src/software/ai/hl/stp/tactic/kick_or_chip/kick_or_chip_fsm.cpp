@@ -8,7 +8,7 @@ KickOrChipFSM::KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_conf
 {
 }
 
-void KickOrChipFSM::kickOrChipBall(const Update &event)
+void KickOrChipFSM::kickOrChipBall(const Update& event)
 {
     Vector direction =
         Vector::createFromAngle(event.control_params.kick_or_chip_direction);
@@ -24,7 +24,7 @@ void KickOrChipFSM::kickOrChipBall(const Update &event)
 }
 
 void KickOrChipFSM::updateGetBehindBall(
-    const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
 {
     GetBehindBallFSM::ControlParams control_params{
         .ball_location   = event.control_params.kick_or_chip_origin,
@@ -34,15 +34,15 @@ void KickOrChipFSM::updateGetBehindBall(
     processEvent(GetBehindBallFSM::Update(control_params, event.common));
 }
 
-bool KickOrChipFSM::ballChicked(const Update &event)
+bool KickOrChipFSM::ballChicked(const Update& event)
 {
     return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.kick_or_chip_direction);
 }
 
-bool KickOrChipFSM::shouldRealignWithBall(const Update &event)
+bool KickOrChipFSM::shouldRealignWithBall(const Update& event)
 {
-    const Robot &robot = event.common.robot;
+    const Robot& robot = event.common.robot;
 
     // First check to see if it's too late to realign with the ball
     if (robot.isNearDribbler(event.control_params.kick_or_chip_origin, 0.05))

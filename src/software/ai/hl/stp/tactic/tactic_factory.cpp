@@ -59,7 +59,7 @@ std::shared_ptr<Tactic> createTactic(
 }
 
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::CreaseDefenderTactic &tactic_proto,
+    const TbotsProto::CreaseDefenderTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config_ptr);
@@ -113,7 +113,7 @@ std::shared_ptr<Tactic> createTactic(
 }
 
 std::shared_ptr<Tactic> createTactic(
-    const TbotsProto::KickOrChipTactic &tactic_proto,
+    const TbotsProto::KickOrChipTactic& tactic_proto,
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
     auto tactic = std::make_shared<KickOrChipTactic>(ai_config_ptr);
