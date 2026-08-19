@@ -317,8 +317,7 @@ bool GoalieFSM::ballControlled(const Update& event)
         return false;
     }
 
-    Point chip_origin =
-        getChipOrigin(event.common.world_ptr->field(), ball_position);
+    Point chip_origin = getChipOrigin(event.common.world_ptr->field(), ball_position);
     return comparePoints(ball_position, chip_origin, BALL_RETRIEVED_THRESHOLD);
 }
 
