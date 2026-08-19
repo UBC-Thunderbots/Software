@@ -41,7 +41,7 @@ void logFromNetworking(TbotsProto::RobotLog log)
                << log.log_msg();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {

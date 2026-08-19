@@ -37,7 +37,7 @@ class SensorFusion
      *
      * @param new data
      */
-    void processSensorProto(const SensorProto &sensor_msg);
+    void processSensorProto(const SensorProto& sensor_msg);
 
     /**
      * Returns the most up-to-date world if enough data has been received
@@ -74,12 +74,12 @@ class SensorFusion
      *
      * @param new data
      */
-    void updateWorld(const SSLProto::SSL_WrapperPacket &packet);
-    void updateWorld(const SSLProto::Referee &packet);
-    void updateWorld(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
-                         &robot_status_msgs);
-    void updateWorld(const SSLProto::SSL_GeometryData &geometry_packet);
-    void updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame);
+    void updateWorld(const SSLProto::SSL_WrapperPacket& packet);
+    void updateWorld(const SSLProto::Referee& packet);
+    void updateWorld(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>&
+                         robot_status_msgs);
+    void updateWorld(const SSLProto::SSL_GeometryData& geometry_packet);
+    void updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection_frame);
 
     /**
      * Updates relevant components with a new ball
@@ -95,7 +95,7 @@ class SensorFusion
      *
      * @return Ball if filtered from ball detections
      */
-    std::optional<Ball> createBall(const std::vector<BallDetection> &ball_detections);
+    std::optional<Ball> createBall(const std::vector<BallDetection>& ball_detections);
 
     /**
      * Create team from a list of robot detections
@@ -104,8 +104,8 @@ class SensorFusion
      *
      * @return team
      */
-    Team createFriendlyTeam(const std::vector<RobotDetection> &robot_detections);
-    Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
+    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections);
+    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections);
 
 
     /**
@@ -116,7 +116,7 @@ class SensorFusion
      * @returns ball placement point in the team's reference frame, nothing if the packet
      * does not contain a valid point
      */
-    std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
+    std::optional<Point> getBallPlacementPoint(const SSLProto::Referee& packet);
 
     /**
      *Inverts all positions and orientations across the x and y axis
@@ -155,7 +155,7 @@ class SensorFusion
      *
      * @return whether the team has control over the ball
      */
-    static bool teamHasBall(const Team &team, const Ball &ball);
+    static bool teamHasBall(const Team& team, const Ball& ball);
 
     /**
      * This function controls the behavior of how the ball is being updated. If this

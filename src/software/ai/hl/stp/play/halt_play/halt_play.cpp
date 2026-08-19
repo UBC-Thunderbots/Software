@@ -8,14 +8,7 @@ HaltPlay::HaltPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
 {
 }
 
-void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                              const WorldPtr &world_ptr)
-{
-    // This function doesn't get called and will be removed when coroutines are phased
-    // out.
-}
-
-void HaltPlay::updateTactics(const PlayUpdate &play_update)
+void HaltPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(HaltPlayFSM::Update(control_params, play_update));
 }

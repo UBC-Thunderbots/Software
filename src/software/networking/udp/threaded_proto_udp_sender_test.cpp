@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "google/protobuf/empty.pb.h"
+#include "shared/constants.h"
 #include "software/networking/tbots_network_exception.h"
 
 TEST(ThreadedProtoUdpSenderTest, error_finding_local_ip_address)
@@ -14,5 +15,6 @@ TEST(ThreadedProtoUdpSenderTest, error_finding_local_ip_address)
 
 TEST(ThreadedProtoUdpSenderTest, no_error_creating_socket)
 {
-    ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000, "lo", true);
+    ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000,
+                                                    LOOPBACK_INTERFACE, true);
 }

@@ -1,9 +1,9 @@
 #include "software/physics/physics.h"
 
-Point calculateFuturePosition(const Point &initial_position,
-                              const Vector &initial_velocity,
-                              const Vector &constant_acceleration,
-                              const Duration &duration_in_future)
+Point calculateFuturePosition(const Point& initial_position,
+                              const Vector& initial_velocity,
+                              const Vector& constant_acceleration,
+                              const Duration& duration_in_future)
 {
     double seconds_in_future = duration_in_future.toSeconds();
     // Using second equation of motion from https://physics.info/motion-equations/
@@ -16,9 +16,9 @@ Point calculateFuturePosition(const Point &initial_position,
     return Point(x1, y1);
 }
 
-Vector calculateFutureVelocity(const Vector &initial_velocity,
-                               const Vector &constant_acceleration,
-                               const Duration &duration_in_future)
+Vector calculateFutureVelocity(const Vector& initial_velocity,
+                               const Vector& constant_acceleration,
+                               const Duration& duration_in_future)
 {
     double seconds_in_future = duration_in_future.toSeconds();
     double vx1 = initial_velocity.x() + seconds_in_future * constant_acceleration.x();

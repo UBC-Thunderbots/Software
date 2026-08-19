@@ -22,7 +22,7 @@ void GoalieTactic::updateControlParams(bool should_move_to_goal_line)
     control_params.should_move_to_goal_line = should_move_to_goal_line;
 }
 
-void GoalieTactic::accept(TacticVisitor &visitor) const
+void GoalieTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

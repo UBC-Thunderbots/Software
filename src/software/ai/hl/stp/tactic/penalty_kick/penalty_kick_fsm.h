@@ -67,7 +67,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      * @param event          PenaltyKickFSM::Update event
      * @param processEvent   processes the DribbleFSM::Update
      */
-    void updateApproachKeeper(const Update &event,
+    void updateApproachKeeper(const Update& event,
                               boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
@@ -77,7 +77,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      * @param processEvent   processes the DribbleFSM::Update
      */
     void adjustOrientationForShot(
-        const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent);
+        const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
      * Guard that returns true if the shooter has a good shot on goal or if it is
@@ -87,7 +87,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      *
      * @param event  PenaltyKickFSM::Update
      */
-    bool takePenaltyShot(const Update &event);
+    bool takePenaltyShot(const Update& event);
 
     /**
      * Returns true if we pass the timeout for completing the approach play towards
@@ -97,7 +97,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      *
      * @param event PenaltyKickFSM::Update
      */
-    bool timeOutApproach(const Update &event);
+    bool timeOutApproach(const Update& event);
 
 
     auto operator()()

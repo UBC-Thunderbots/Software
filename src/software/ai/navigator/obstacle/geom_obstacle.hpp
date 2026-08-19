@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
@@ -30,6 +32,7 @@ class GeomObstacle : public Obstacle
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
     std::vector<Point> rasterize(const double resolution_size) const override;
+    std::size_t hash() const override;
 
     /**
      * Gets the underlying GEOM_TYPE
@@ -115,4 +118,10 @@ template <typename GEOM_TYPE>
 void GeomObstacle<GEOM_TYPE>::accept(ObstacleVisitor& visitor) const
 {
     visitor.visit(*this);
+}
+
+template <typename GEOM_TYPE>
+std::size_t GeomObstacle<GEOM_TYPE>::hash() const
+{
+    return std::hash<GEOM_TYPE>{}(geom_);
 }

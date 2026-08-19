@@ -5,7 +5,7 @@
 namespace ssl_referee
 {
 
-RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
+RefereeCommand createRefereeCommand(const SSLProto::Referee& packet,
                                     TeamColour team_colour)
 {
     if (team_colour == TeamColour::YELLOW)
@@ -18,12 +18,12 @@ RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
     }
 }
 
-RefereeStage createRefereeStage(const SSLProto::Referee &packet)
+RefereeStage createRefereeStage(const SSLProto::Referee& packet)
 {
     return referee_stage_map.at(packet.stage());
 }
 
-std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet)
+std::optional<Point> getBallPlacementPoint(const SSLProto::Referee& packet)
 {
     if (packet.has_designated_position())
     {

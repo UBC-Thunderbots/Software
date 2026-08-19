@@ -6,9 +6,9 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
 
-bool intersects(const Polygon &first, const Segment &second)
+bool intersects(const Polygon& first, const Segment& second)
 {
-    for (const auto &seg : first.getSegments())
+    for (const auto& seg : first.getSegments())
     {
         if (intersects(seg, second))
         {
@@ -22,14 +22,14 @@ bool intersects(const Polygon &first, const Segment &second)
     return false;
 }
 
-bool intersects(const Segment &first, const Polygon &second)
+bool intersects(const Segment& first, const Polygon& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Polygon &first, const Ray &second)
+bool intersects(const Polygon& first, const Ray& second)
 {
-    for (const auto &seg : first.getSegments())
+    for (const auto& seg : first.getSegments())
     {
         if (intersects(seg, second))
         {
@@ -39,18 +39,18 @@ bool intersects(const Polygon &first, const Ray &second)
     return false;
 }
 
-bool intersects(const Ray &first, const Polygon &second)
+bool intersects(const Ray& first, const Polygon& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Polygon &first, const Circle &second)
+bool intersects(const Polygon& first, const Circle& second)
 {
     if (contains(first, second.origin()))
     {
         return true;
     }
-    for (const auto &seg : first.getSegments())
+    for (const auto& seg : first.getSegments())
     {
         if (distance(seg, second.origin()) < second.radius())
         {
@@ -60,18 +60,18 @@ bool intersects(const Polygon &first, const Circle &second)
     return false;
 }
 
-bool intersects(const Circle &first, const Polygon &second)
+bool intersects(const Circle& first, const Polygon& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Circle &first, const Circle &second)
+bool intersects(const Circle& first, const Circle& second)
 {
     return (first.origin() - second.origin()).lengthSquared() <
            std::pow(first.radius() + second.radius(), 2);
 }
 
-bool intersects(const Segment &first, const Circle &second)
+bool intersects(const Segment& first, const Circle& second)
 {
     if (distance(first, second.origin()) <= second.radius())
     {
@@ -81,12 +81,12 @@ bool intersects(const Segment &first, const Circle &second)
     return false;
 }
 
-bool intersects(const Circle &first, const Segment &second)
+bool intersects(const Circle& first, const Segment& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Segment &first, const Segment &second)
+bool intersects(const Segment& first, const Segment& second)
 {
     // Using the FASTER LINE SEGMENT INTERSECTION algorithm from p.199 of Graphics Gems
     // III (IBM Version)
@@ -146,7 +146,7 @@ bool intersects(const Segment &first, const Segment &second)
     return true;
 }
 
-bool intersects(const Ray &first, const Segment &second)
+bool intersects(const Ray& first, const Segment& second)
 {
     auto intersectionValue =
         intersection(first.getStart(), first.getStart() + first.toUnitVector(),
@@ -163,12 +163,12 @@ bool intersects(const Ray &first, const Segment &second)
     return contains(first, second.getStart()) || contains(first, second.getEnd());
 }
 
-bool intersects(const Segment &first, const Ray &second)
+bool intersects(const Segment& first, const Ray& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Stadium &first, const Ray &second)
+bool intersects(const Stadium& first, const Ray& second)
 {
     auto start  = first.segment().getStart();
     auto end    = first.segment().getEnd();
@@ -203,23 +203,23 @@ bool intersects(const Stadium &first, const Ray &second)
            intersects(second, s2);
 }
 
-bool intersects(const Ray &first, const Stadium &second)
+bool intersects(const Ray& first, const Stadium& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Stadium &first, const Circle &second)
+bool intersects(const Stadium& first, const Circle& second)
 {
     auto dist = distanceSquared(first.segment(), second.origin());
 
     return dist <= std::pow(first.radius() + second.radius(), 2);
 }
-bool intersects(const Circle &first, const Stadium &second)
+bool intersects(const Circle& first, const Stadium& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Stadium &first, const Segment &second)
+bool intersects(const Stadium& first, const Segment& second)
 {
     auto start_distance     = distanceSquared(first.segment(), second.getStart());
     auto end_distance       = distanceSquared(first.segment(), second.getEnd());
@@ -233,14 +233,14 @@ bool intersects(const Stadium &first, const Segment &second)
     return shortest_distance <= std::pow(first.radius(), 2) ||
            intersects(first.segment(), second);
 }
-bool intersects(const Segment &first, const Stadium &second)
+bool intersects(const Segment& first, const Stadium& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Stadium &first, const Polygon &second)
+bool intersects(const Stadium& first, const Polygon& second)
 {
-    for (const auto &seg : second.getSegments())
+    for (const auto& seg : second.getSegments())
     {
         if (intersects(first, seg))
         {
@@ -249,12 +249,12 @@ bool intersects(const Stadium &first, const Polygon &second)
     }
     return false;
 }
-bool intersects(const Polygon &first, const Stadium &second)
+bool intersects(const Polygon& first, const Stadium& second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Stadium &first, const Stadium &second)
+bool intersects(const Stadium& first, const Stadium& second)
 {
     auto start_distance = distanceSquared(first.segment(), second.segment().getStart());
     auto end_distance   = distanceSquared(first.segment(), second.segment().getEnd());

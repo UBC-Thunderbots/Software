@@ -107,7 +107,7 @@ LOG_LEVEL_STR_MAP = {
     LogLevel.CONTRACT: "CONTRACT",
 }
 
-# Paths to check for estop when running diagnostics
+# Paths to check for estop when running diagnostics, used as a fallback for Linux.
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
 
@@ -264,6 +264,7 @@ class Colors:
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
+    SELECTED_ROBOT_OUTLINE = QtGui.QColor(0, 255, 255, 200)
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
@@ -331,7 +332,9 @@ class DiagnosticsConstants:
     SUPPORTED_CONTROLLERS = {
         "Microsoft Xbox One X pad",
         "Microsoft X-Box One S pad",
+        "Microsoft X-Box 360 pad",
         "Microsoft Xbox 360 pad",
+        "Generic X-Box pad",
     }
 
     BUTTON_PRESSED_THRESHOLD = 0.5
@@ -348,6 +351,10 @@ class DiagnosticsConstants:
     CHIP_DISTANCE_STEPPER = 0.5
     MIN_CHIP_POWER = 0.5
     MAX_CHIP_POWER = 5.0
+
+    PULSE_WIDTH_STEPPER = 1
+    MIN_PULSE_WIDTH = 1
+    MAX_PULSE_WIDTH = 20000
 
 
 class ProtoConfigurationConstant:
@@ -397,6 +404,10 @@ class RuntimeManagerConstants:
     DEFAULT_BINARY_NAME = "Current Fullsystem"
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
+
+    RUNTIME_EVENTS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_EVENTS_FILE = "game_events.csv"
+
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"
     MAX_RELEASES_FETCHED = 5

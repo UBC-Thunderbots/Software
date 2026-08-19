@@ -54,14 +54,14 @@ class AngleMap
      *
      * @return the AngleSegment that this AngleMap occupies
      */
-    const AngleSegment &getAngleSegment() const;
+    const AngleSegment& getAngleSegment() const;
 
     /**
      * Adds an AngleSegment to this map and marks it as occupied
      *
      * @param angleSegment the AngleSegment to mark as occupied
      */
-    void addNonViableAngleSegment(AngleSegment &obstacle_angle_seg);
+    void addNonViableAngleSegment(AngleSegment& obstacle_angle_seg);
 
     /**
      * Gets the biggest AngleSegment within the map that isn't occupied
