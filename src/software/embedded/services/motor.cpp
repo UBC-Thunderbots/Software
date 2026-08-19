@@ -26,7 +26,15 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
 
     const auto poll_start = std::chrono::steady_clock::now();
 
-    execute(primitive, robot_status, time_elapsed_since_last_poll_s);
+    resetMotorsIfNeeded();
+
+    const auto [current_wheel_velocities, dribbler_rpm] = driveMotors();
+
+    checkForMotorRunaway(current_wheel_velocities);
+
+    updateTargetVelocities(primitive, time_elapsed_since_last_poll_s);
+
+    updateMotorStatus(robot_status, current_wheel_velocities, dribbler_rpm);
 
     const auto poll_end    = std::chrono::steady_clock::now();
     using Millis           = std::chrono::duration<double, std::milli>;
@@ -61,11 +69,143 @@ std::unique_ptr<MotorController> MotorService::setupMotorController()
     }
 }
 
-TbotsProto::MotorStatus MotorService::createMotorStatus(
-    const WheelSpace_t& current_wheel_velocities, const double dribbler_rpm) const
+void MotorService::resetMotorsIfNeeded()
+{
+    if (anyMotorRequiresReset())
+    {
+        LOG(INFO) << "Resetting motors due to fault indicators requiring reset";
+        trackMotorReset();
+        setup();
+    }
+}
+
+std::pair<WheelSpace_t, double> MotorService::driveMotors()
+{
+    const Eigen::Vector4<int> target_wheel_rpms =
+        (target_wheel_velocities_ / drive_motor_mps_per_rpm_).cast<int>();
+
+    const Eigen::Vector4<int> current_wheel_rpms = {
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::FRONT_RIGHT, target_wheel_rpms[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::FRONT_LEFT, target_wheel_rpms[FRONT_LEFT_WHEEL_SPACE_INDEX]),
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::BACK_LEFT, target_wheel_rpms[BACK_LEFT_WHEEL_SPACE_INDEX]),
+        motor_controller_->readThenWriteVelocity(
+            MotorIndex::BACK_RIGHT, target_wheel_rpms[BACK_RIGHT_WHEEL_SPACE_INDEX]),
+    };
+
+    const double dribbler_rpm = motor_controller_->readThenWriteVelocity(
+        MotorIndex::DRIBBLER, dribbler_target_rpm_);
+
+    const WheelSpace_t current_wheel_velocities =
+        current_wheel_rpms.cast<double>() * drive_motor_mps_per_rpm_;
+
+    return {current_wheel_velocities, dribbler_rpm};
+}
+
+void MotorService::checkForMotorRunaway(const WheelSpace_t& current_wheel_velocities)
+{
+    if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
+                 prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
+        RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Front right motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Front left motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Back left motor runaway";
+    }
+    else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
+                      prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
+             RUNAWAY_PROTECTION_THRESHOLD_MPS)
+    {
+        motor_controller_->immediatelyDisable();
+        LOG(FATAL) << "Back right motor runaway";
+    }
+}
+
+void MotorService::updateTargetVelocities(
+    const TbotsProto::DirectControlPrimitive& primitive,
+    const double time_elapsed_since_last_poll_s)
+{
+    const TbotsProto::MotorControl& motor_control = primitive.motor_control();
+
+    // Get target wheel velocities from the primitive
+    if (motor_control.has_direct_per_wheel_control())
+    {
+        const auto& direct_per_wheel = motor_control.direct_per_wheel_control();
+
+        target_wheel_velocities_ = {
+            direct_per_wheel.front_right_wheel_velocity(),
+            direct_per_wheel.front_left_wheel_velocity(),
+            direct_per_wheel.back_left_wheel_velocity(),
+            direct_per_wheel.back_right_wheel_velocity(),
+        };
+    }
+    else if (motor_control.has_direct_velocity_control())
+    {
+        const auto& direct_velocity = motor_control.direct_velocity_control();
+
+        const EuclideanSpace_t target_euclidean_velocity = {
+            direct_velocity.velocity().x_component_meters(),
+            direct_velocity.velocity().y_component_meters(),
+            direct_velocity.angular_velocity().radians_per_second()};
+
+        target_wheel_velocities_ =
+            euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
+    }
+
+    // Ramp the target velocities to keep acceleration compared to current velocities
+    // within safe bounds
+    target_wheel_velocities_ = euclidean_to_four_wheel_.rampWheelVelocity(
+        prev_wheel_velocities_, target_wheel_velocities_, time_elapsed_since_last_poll_s);
+
+    prev_wheel_velocities_ = target_wheel_velocities_;
+
+    // Get target dribbler rpm from the primitive
+    int target_dribbler_rpm;
+    if (motor_control.drive_control_case() ==
+        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
+    {
+        target_dribbler_rpm = 0;
+    }
+    else
+    {
+        target_dribbler_rpm = motor_control.dribbler_speed_rpm();
+    }
+
+    // Ramp the dribbler velocity, clamping the max acceleration
+    int max_dribbler_delta_rpm = static_cast<int>(
+        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
+    int delta_rpm = std::clamp(target_dribbler_rpm - dribbler_target_rpm_,
+                               -max_dribbler_delta_rpm, max_dribbler_delta_rpm);
+    dribbler_target_rpm_ += delta_rpm;
+
+    // Clamp to the max rpm
+    int max_dribbler_rpm = std::abs(robot_constants_.max_force_dribbler_speed_rpm);
+    dribbler_target_rpm_ =
+        std::clamp(dribbler_target_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
+}
+
+void MotorService::updateMotorStatus(TbotsProto::RobotStatus& robot_status,
+                                     const WheelSpace_t& current_wheel_velocities,
+                                     const double dribbler_rpm)
 {
     TbotsProto::MotorStatus motor_status;
 
+    // Populate motor faults and current velocities
     for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
     {
         const MotorFaultIndicator& motor_faults = motor_controller_->checkFaults(motor);
@@ -121,73 +261,7 @@ TbotsProto::MotorStatus MotorService::createMotorStatus(
     motor_status.mutable_back_right()->set_wheel_velocity(
         static_cast<float>(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX]));
 
-    return motor_status;
-}
-
-void MotorService::execute(const TbotsProto::DirectControlPrimitive& primitive,
-                           TbotsProto::RobotStatus& robot_status,
-                           const double time_elapsed_since_last_poll_s)
-{
-    if (anyMotorRequiresReset())
-    {
-        LOG(INFO) << "Resetting motors due to fault indicators requiring reset";
-        trackMotorReset();
-        setup();
-    }
-
-    const Eigen::Vector4<int> target_wheel_rpms =
-        (target_wheel_velocities_ / drive_motor_mps_per_rpm_).cast<int>();
-
-    const Eigen::Vector4<int> current_wheel_rpms = {
-        motor_controller_->readThenWriteVelocity(
-            MotorIndex::FRONT_RIGHT, target_wheel_rpms[FRONT_RIGHT_WHEEL_SPACE_INDEX]),
-        motor_controller_->readThenWriteVelocity(
-            MotorIndex::FRONT_LEFT, target_wheel_rpms[FRONT_LEFT_WHEEL_SPACE_INDEX]),
-        motor_controller_->readThenWriteVelocity(
-            MotorIndex::BACK_LEFT, target_wheel_rpms[BACK_LEFT_WHEEL_SPACE_INDEX]),
-        motor_controller_->readThenWriteVelocity(
-            MotorIndex::BACK_RIGHT, target_wheel_rpms[BACK_RIGHT_WHEEL_SPACE_INDEX]),
-    };
-
-    const double dribbler_rpm = motor_controller_->readThenWriteVelocity(
-        MotorIndex::DRIBBLER, dribbler_target_rpm_);
-
-    const WheelSpace_t current_wheel_velocities =
-        current_wheel_rpms.cast<double>() * drive_motor_mps_per_rpm_;
-
-    TbotsProto::MotorStatus motor_status =
-        createMotorStatus(current_wheel_velocities, dribbler_rpm);
-
-    if (std::abs(current_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] -
-                 prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
-        RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Front right motor runaway";
-    }
-    else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Front left motor runaway";
-    }
-    else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Back left motor runaway";
-    }
-    else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
-                      prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
-             RUNAWAY_PROTECTION_THRESHOLD_MPS)
-    {
-        motor_controller_->immediatelyDisable();
-        LOG(FATAL) << "Back right motor runaway";
-    }
-
-    // Convert to Euclidean velocity_delta
+    // Convert to Euclidean velocity
     const EuclideanSpace_t current_euclidean_velocity =
         euclidean_to_four_wheel_.getEuclideanVelocity(current_wheel_velocities);
 
@@ -198,38 +272,6 @@ void MotorService::execute(const TbotsProto::DirectControlPrimitive& primitive,
     motor_status.mutable_angular_velocity()->set_radians_per_second(
         current_euclidean_velocity[2]);
 
-    const TbotsProto::MotorControl& motor_control = primitive.motor_control();
-
-    // Get target wheel velocities from the primitive
-    if (motor_control.has_direct_per_wheel_control())
-    {
-        const auto& direct_per_wheel = motor_control.direct_per_wheel_control();
-
-        target_wheel_velocities_ = {
-            direct_per_wheel.front_right_wheel_velocity(),
-            direct_per_wheel.front_left_wheel_velocity(),
-            direct_per_wheel.back_left_wheel_velocity(),
-            direct_per_wheel.back_right_wheel_velocity(),
-        };
-    }
-    else if (motor_control.has_direct_velocity_control())
-    {
-        const auto& direct_velocity = motor_control.direct_velocity_control();
-
-        const EuclideanSpace_t target_euclidean_velocity = {
-            direct_velocity.velocity().x_component_meters(),
-            direct_velocity.velocity().y_component_meters(),
-            direct_velocity.angular_velocity().radians_per_second()};
-
-        target_wheel_velocities_ =
-            euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
-    }
-
-    // Ramp the target velocities to keep acceleration compared to current velocities
-    // within safe bounds
-    target_wheel_velocities_ = euclidean_to_four_wheel_.rampWheelVelocity(
-        prev_wheel_velocities_, target_wheel_velocities_, time_elapsed_since_last_poll_s);
-
     const EuclideanSpace_t target_euclidean_velocity =
         euclidean_to_four_wheel_.getEuclideanVelocity(target_wheel_velocities_);
 
@@ -239,33 +281,6 @@ void MotorService::execute(const TbotsProto::DirectControlPrimitive& primitive,
         target_euclidean_velocity[1]);
     motor_status.mutable_target_angular_velocity()->set_radians_per_second(
         target_euclidean_velocity[2]);
-
-    prev_wheel_velocities_ = target_wheel_velocities_;
-
-    // Get target dribbler rpm from the primitive
-    int target_dribbler_rpm;
-    if (motor_control.drive_control_case() ==
-        TbotsProto::MotorControl::DriveControlCase::DRIVE_CONTROL_NOT_SET)
-    {
-        target_dribbler_rpm = 0;
-    }
-    else
-    {
-        target_dribbler_rpm = motor_control.dribbler_speed_rpm();
-    }
-
-    // Ramp the dribbler velocity
-    // Clamp the max acceleration
-    int max_dribbler_delta_rpm = static_cast<int>(
-        DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 * time_elapsed_since_last_poll_s);
-    int delta_rpm = std::clamp(target_dribbler_rpm - dribbler_target_rpm_,
-                               -max_dribbler_delta_rpm, max_dribbler_delta_rpm);
-    dribbler_target_rpm_ += delta_rpm;
-
-    // Clamp to the max rpm
-    int max_dribbler_rpm = std::abs(robot_constants_.max_force_dribbler_speed_rpm);
-    dribbler_target_rpm_ =
-        std::clamp(dribbler_target_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
 
     motor_status.mutable_dribbler()->set_dribbler_rpm(
         static_cast<float>(dribbler_target_rpm_));
