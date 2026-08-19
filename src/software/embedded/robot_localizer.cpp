@@ -23,7 +23,7 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
 void RobotLocalizer::step(const Vector& linear_acceleration)
 {
     FilterStep step{
-        .prediction       = FilterStep::Predict{},
+        .prediction       = std::make_optional<FilterStep::Predict>(),
         .update           = std::nullopt,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,

@@ -37,19 +37,29 @@ class EmbeddedCommunication:
             True,
         )
 
-        # initialising the estop
         self.estop_reader = None
         self.should_send_stop = False
-        self.estop_mode, self.estop_path = get_estop_config(
-            keyboard_estop=False, disable_communication=False
-        )
+        self.estop_mode = EstopMode.PHYSICAL_ESTOP
+        self.estop_path = None
 
-        # Always in PHYSICAL_ESTOP mode within CLI
+    def setup_estop(self) -> bool:
+        """Lazily sets up the physical estop reader the first time a command
+        that actuates the robot's electrical/mechanical components is run.
+
+        :return: True if a physical estop is connected and ready, False otherwise
+        """
+        if self.estop_reader is not None:
+            return True
+
         try:
+            self.estop_mode, self.estop_path = get_estop_config(
+                keyboard_estop=False, disable_communication=False
+            )
             self.estop_reader = tbots_cpp.ThreadedEstopReader(self.estop_path, 115200)
             self.__update_estop_state()
-        except Exception as e:
-            raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
+            return True
+        except Exception:
+            return False
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Updates the dynamic information with the new RobotStatus message.
