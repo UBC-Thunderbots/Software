@@ -6,25 +6,33 @@ import queue
 import random
 import logging
 import os
+import socket
+import math
 import time
 import netifaces
 
 from subprocess import Popen
-from typing import Any
+from typing import Any, Final
 
 import proto.import_all_protos as protos
+import proto.ssl_gc_state_pb2
+import proto.ssl_gc_common_pb2
+import proto.ssl_gc_ci_pb2
+import proto.ssl_gc_engine_config_pb2
 from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.networking.ssl_proto_communication import *
+from software.networking.ssl_proto_communication import (
+    SslSocket,
+    SslSocketProtoParseException,
+)
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.python_bindings import *
 from software.py_constants import (
     DIV_B_NUM_ROBOTS,
     SECONDS_PER_NANOSECOND,
     SSL_REFEREE_PORT,
 )
-from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
