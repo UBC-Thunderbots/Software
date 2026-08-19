@@ -9,10 +9,21 @@ from software.gameplay_tests.validation.friendly_has_ball_possession import *
 from software.gameplay_tests.validation.ball_speed_threshold import *
 from software.gameplay_tests.validation.robot_speed_threshold import *
 from software.gameplay_tests.validation.excessive_dribbling import *
+from software.gameplay_tests.validation.ball_is_off_ground import (
+    BallIsEventuallyOffGround,
+)
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
+
+
+def get_no_chip_rectangle(field):
+    return tbots_cpp.Rectangle(
+        field.friendlyGoalpostNeg(),
+        field.friendlyGoalpostPos() + tbots_cpp.Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),
+    )
 
 
 @pytest.mark.parametrize(
@@ -237,6 +248,68 @@ def test_goalie_clears_from_dead_zone(
                 ),
             ]
         ]
+
+    simulated_test_runner.run_test(
+        setup=setup,
+        test_timeout_s=8,
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=always_validation_sequence_set,
+    )
+
+
+@pytest.mark.parametrize(
+    "ball_offset_from_goal_center,robot_initial_position",
+    [
+        # ball stationary in no-chip rectangle, goalie far from ball
+        (
+            tbots_cpp.Vector(0.1, 0.1),
+            tbots_cpp.Point(-4, -1),
+        ),
+    ],
+)
+def test_goalie_controls_ball_before_chip(
+    ball_offset_from_goal_center,
+    robot_initial_position,
+    simulated_test_runner,
+):
+    field = tbots_cpp.Field.createSSLDivisionBField()
+    ball_initial_position = field.friendlyGoalCenter() + ball_offset_from_goal_center
+    no_chip_rectangle = get_no_chip_rectangle(field)
+
+    def setup(*args):
+        simulated_test_runner.set_world_state(
+            create_world_state(
+                [],
+                blue_robot_locations=[robot_initial_position],
+                ball_location=ball_initial_position,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            )
+        )
+
+        simulated_test_runner.set_tactics(
+            blue_tactics={
+                0: GoalieTactic(
+                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                )
+            }
+        )
+
+    always_validation_sequence_set = [
+        [
+            BallNeverEntersRegion(regions=[field.friendlyGoal()]),
+            NeverExcessivelyDribbles(),
+        ]
+    ]
+
+    eventually_validation_sequence_set = [
+        [
+            FriendlyEventuallyHasBallPossession(robot_id=0, tolerance=0.05),
+            BallEventuallyExitsRegion(regions=[no_chip_rectangle]),
+            BallIsEventuallyOffGround(),
+        ]
+    ]
 
     simulated_test_runner.run_test(
         setup=setup,
