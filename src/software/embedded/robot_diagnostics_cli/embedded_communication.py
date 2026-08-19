@@ -5,7 +5,12 @@ from software.embedded.constants.py_constants import get_estop_config, EstopMode
 from rich.progress import track
 from threading import Thread
 import software.python_bindings as tbots_cpp
-from software.py_constants import *
+from software.py_constants import (
+    FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+    PRIMITIVE_PORT,
+    ROBOT_STATUS_PORT,
+    getRobotMulticastChannel,
+)
 import time
 
 

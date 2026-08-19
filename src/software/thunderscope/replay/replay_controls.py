@@ -7,7 +7,7 @@ from functools import partial
 from software.thunderscope.replay.bookmark_marker import BookmarkMarker
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.common import common_widgets
-from software.py_constants import *
+from software.py_constants import MILLISECONDS_PER_SECOND
 from typing import override
 
 

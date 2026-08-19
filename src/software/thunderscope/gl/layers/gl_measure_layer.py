@@ -4,7 +4,6 @@ import pyqtgraph.opengl as gl
 import math
 import numpy as np
 
-from software.py_constants import *
 from software.thunderscope.constants import (
     Colors,
     DepthValues,

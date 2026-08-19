@@ -1,17 +1,22 @@
 import math
 import os
 import tomllib
-from software.py_constants import *
+from software.py_constants import (
+    AUTO_CHIP_DISTANCE_DEFAULT_M,
+    AUTO_KICK_SPEED_DEFAULT_M_PER_S,
+    ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY,
+    ROBOT_ID_CONFIG_KEY,
+    ROBOT_KICK_CONSTANT_CONFIG_KEY,
+    ROBOT_KICK_EXP_COEFF_CONFIG_KEY,
+    ROBOT_MULTICAST_CHANNEL_CONFIG_KEY,
+    ROBOT_NETWORK_INTERFACE_CONFIG_KEY,
+    WHEEL_ROTATION_MAX_SPEED_M_PER_S,
+)
 from proto.import_all_protos import *
 from software.embedded.constants.py_constants import (
     ROBOT_MAX_ANG_SPEED_RAD_PER_S,
     ROBOT_MAX_SPEED_M_PER_S,
     MAX_FORCE_DRIBBLER_SPEED_RPM,
-)
-from software.py_constants import (
-    AUTO_CHIP_DISTANCE_DEFAULT_M,
-    AUTO_KICK_SPEED_DEFAULT_M_PER_S,
-    WHEEL_ROTATION_MAX_SPEED_M_PER_S,
 )
 
 

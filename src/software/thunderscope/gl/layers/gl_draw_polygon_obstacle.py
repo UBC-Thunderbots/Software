@@ -4,7 +4,6 @@ from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtCore import QTimer, Qt
 
 from proto.import_all_protos import *
-from software.py_constants import *
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 

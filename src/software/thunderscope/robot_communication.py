@@ -10,7 +10,10 @@ from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.py_constants import *
+from software.py_constants import (
+    MAX_ROBOT_IDS_PER_SIDE,
+    NUM_TIMES_SEND_STOP,
+)
 from software.thunderscope.constants import (
     ROBOT_COMMUNICATIONS_TIMEOUT_S,
     IndividualRobotMode,

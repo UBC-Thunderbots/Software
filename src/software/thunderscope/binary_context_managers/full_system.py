@@ -8,11 +8,26 @@ import time
 from subprocess import Popen, TimeoutExpired
 import re
 
-from software.py_constants import *
+from software.py_constants import (
+    DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
+    MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC,
+    PLAY_OVERRIDE_PATH,
+    PRIMITIVE_PATH,
+    REPLAY_BOOKMARK_PATH,
+    ROBOT_CRASH_PATH,
+    ROBOT_LOG_PATH,
+    ROBOT_STATUS_PATH,
+    SENSOR_PROTO_PATH,
+    SSL_REFEREE_PATH,
+    SSL_WRAPPER_PATH,
+    TACTIC_OVERRIDE_PATH,
+    VALIDATION_PROTO_SET_PATH,
+    VIRTUAL_OBSTACLES_UNIX_PATH,
+    WORLD_PATH,
+)
 from software.python_bindings import *
 
 from proto.import_all_protos import *
-from software.py_constants import *
 from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList

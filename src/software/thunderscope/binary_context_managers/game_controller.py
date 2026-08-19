@@ -19,7 +19,11 @@ from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
-from software.py_constants import *
+from software.py_constants import (
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_NANOSECOND,
+    SSL_REFEREE_PORT,
+)
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (

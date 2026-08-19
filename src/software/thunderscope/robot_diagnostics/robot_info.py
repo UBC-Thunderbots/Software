@@ -2,7 +2,13 @@ from __future__ import annotations
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt import QtWidgets
-from software.py_constants import *
+from software.py_constants import (
+    DISCONNECT_DURATION_MS,
+    MAX_BATTERY_VOLTAGE,
+    MILLISECONDS_PER_SECOND,
+    MIN_BATTERY_VOLTAGE,
+    SECONDS_PER_MILLISECOND,
+)
 from proto.import_all_protos import *
 from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import *

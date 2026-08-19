@@ -1,4 +1,4 @@
-from software.py_constants import *
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 import software.python_bindings as tbots
 from proto.import_all_protos import *
 from software.gameplay_tests.validation.validation import (

@@ -1,5 +1,4 @@
 import math
-from software.py_constants import *
 from proto.import_all_protos import *
 
 from software.gameplay_tests.validation.validation import (
