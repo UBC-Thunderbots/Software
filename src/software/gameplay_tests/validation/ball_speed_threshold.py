@@ -1,6 +1,12 @@
 import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from software.gameplay_tests.validation.speed_threshold_helpers import *
+from software.gameplay_tests.validation.speed_threshold_helpers import (
+    get_ball_speed,
+    get_current_ball_angle,
+    get_current_ball_position,
+    get_validation_centre_position,
+    get_validation_line_endpoints,
+)
 
 from software.gameplay_tests.validation.validation import (
     Validation,
