@@ -119,8 +119,12 @@ class TbotsTestRunner:
         :param blue_play: the play name for the blue team to use
         :param yellow_play: the play name for the yellow team to use
         """
-        self.blue_full_system_proto_unix_io.send_proto(protos.Play, protos.Play(name=blue_play))
-        self.yellow_full_system_proto_unix_io.send_proto(protos.Play, protos.Play(name=yellow_play))
+        self.blue_full_system_proto_unix_io.send_proto(
+            protos.Play, protos.Play(name=blue_play)
+        )
+        self.yellow_full_system_proto_unix_io.send_proto(
+            protos.Play, protos.Play(name=yellow_play)
+        )
 
     def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
         """Converts dict of tactics to AssignedTacticPlayControlParams message

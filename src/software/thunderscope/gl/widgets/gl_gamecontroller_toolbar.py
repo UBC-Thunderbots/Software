@@ -262,7 +262,9 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.plays_menu_button.setText("Plays")
             self.plays_menu_button.setIcon(QtGui.QIcon())
 
-    def __send_gc_command(self, command: protos.Command.Type, team: protos.Team) -> None:
+    def __send_gc_command(
+        self, command: protos.Command.Type, team: protos.Team
+    ) -> None:
         """Sends the given command to the gamecontroller for the given Team
         If ball_pos is defined, sets the ball position
 
@@ -270,7 +272,9 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param team the team the command should be sent for (BLUE, YELLOW, or UNKNOWN)
         :param ball_pos if defined, sets the position of the ball on field
         """
-        command = protos.ManualGCCommand(manual_command=protos.Command(type=command, for_team=team))
+        command = protos.ManualGCCommand(
+            manual_command=protos.Command(type=command, for_team=team)
+        )
         self.proto_unix_io.send_proto(protos.ManualGCCommand, command)
 
     def __open_runtime_installer_dialog(self) -> None:

@@ -68,7 +68,9 @@ def async_sim_ticker(
     )
 
     blue_proto_unix_io.register_observer(protos.PrimitiveSet, blue_primitive_set_buffer)
-    yellow_proto_unix_io.register_observer(protos.PrimitiveSet, yellow_primitive_set_buffer)
+    yellow_proto_unix_io.register_observer(
+        protos.PrimitiveSet, yellow_primitive_set_buffer
+    )
 
     while tscope.is_open():
         # flush primitive set buffers before sending the next tick

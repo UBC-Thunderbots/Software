@@ -69,7 +69,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             print("Cannot push polygon to stack as there are less than two points.")
             return
 
-        self.obstacles.append(protos.Obstacle(polygon=protos.Polygon(points=self.points.copy())))
+        self.obstacles.append(
+            protos.Obstacle(polygon=protos.Polygon(points=self.points.copy()))
+        )
         self.points.clear()
 
         self.rendering_polygons.append(self.current_polygon)
@@ -116,7 +118,9 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             # as a single click.
             if self.can_double_click:
                 point = event.point_in_scene
-                self.__add_one_point(protos.Point(x_meters=point.x(), y_meters=point.y()))
+                self.__add_one_point(
+                    protos.Point(x_meters=point.x(), y_meters=point.y())
+                )
 
             self.can_double_click = False
 

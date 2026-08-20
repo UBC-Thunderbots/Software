@@ -419,7 +419,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_remove_double_click = None
 
     def __add_robot_to_state(
-        self, world_state: protos.WorldState, id: int, pos: QtGui.QVector3D, orientation: float
+        self,
+        world_state: protos.WorldState,
+        id: int,
+        pos: QtGui.QVector3D,
+        orientation: float,
     ) -> protos.WorldState:
         """Adds a robot with the given state and id to the given world state
         To the right team based on current team color
@@ -450,7 +454,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
             world_state.blue_robots.robot_states[id].CopyFrom(robot_state)
         return world_state
 
-    def __remove_robot_from_state(self, world_state: protos.WorldState, id: int) -> protos.WorldState:
+    def __remove_robot_from_state(
+        self, world_state: protos.WorldState, id: int
+    ) -> protos.WorldState:
         """Removes a robot with the given id from the right team in the given world state
         Based on current team color
 

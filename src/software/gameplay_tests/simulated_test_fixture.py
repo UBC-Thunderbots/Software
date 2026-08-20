@@ -99,7 +99,9 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param setup: Function that sets up the world state
         :param param: Parameter passed into setup
         """
-        world_state_received_buffer = ThreadSafeBuffer(1, protos.WorldStateReceivedTrigger)
+        world_state_received_buffer = ThreadSafeBuffer(
+            1, protos.WorldStateReceivedTrigger
+        )
         self.simulator_proto_unix_io.register_observer(
             protos.WorldStateReceivedTrigger, world_state_received_buffer
         )
@@ -162,7 +164,9 @@ class SimulatedTestRunner(TbotsTestRunner):
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
-            tick = protos.SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
+            tick = protos.SimulatorTick(
+                milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
+            )
             self.simulator_proto_unix_io.send_proto(protos.SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 

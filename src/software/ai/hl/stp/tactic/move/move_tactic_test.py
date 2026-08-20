@@ -116,7 +116,9 @@ def test_autochip_move(simulated_test_runner):
                     ),
                     dribbler_mode=protos.DribblerMode.OFF,
                     ball_collision_type=protos.BallCollisionType.ALLOW,
-                    auto_chip_or_kick=protos.AutoChipOrKick(autochip_distance_meters=2.0),
+                    auto_chip_or_kick=protos.AutoChipOrKick(
+                        autochip_distance_meters=2.0
+                    ),
                     max_allowed_speed_mode=protos.MaxAllowedSpeedMode.COLLISIONS_ALLOWED,
                     obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
                 )

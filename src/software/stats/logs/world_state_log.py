@@ -54,12 +54,16 @@ class RobotLog(IEvalLog):
             return None
 
         state = protos.RobotState(
-            global_position=protos.Point(x_meters=float(data[0]), y_meters=float(data[1])),
+            global_position=protos.Point(
+                x_meters=float(data[0]), y_meters=float(data[1])
+            ),
             global_orientation=protos.Angle(radians=float(data[2])),
             global_velocity=protos.Vector(
                 x_component_meters=float(data[3]), y_component_meters=float(data[4])
             ),
-            global_angular_velocity=protos.AngularVelocity(radians_per_second=float(data[5])),
+            global_angular_velocity=protos.AngularVelocity(
+                radians_per_second=float(data[5])
+            ),
         )
 
         return RobotLog(id=id, state=state)
@@ -101,7 +105,9 @@ class BallLog(IEvalLog):
         data = [next(row_iter) for _ in range(BallLog.num_cols)]
 
         state = protos.BallState(
-            global_position=protos.Point(x_meters=float(data[0]), y_meters=float(data[1])),
+            global_position=protos.Point(
+                x_meters=float(data[0]), y_meters=float(data[1])
+            ),
             global_velocity=protos.Vector(
                 x_component_meters=float(data[2]), y_component_meters=float(data[3])
             ),

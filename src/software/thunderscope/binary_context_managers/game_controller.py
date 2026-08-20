@@ -333,7 +333,9 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput) -> list[protos.CiOutput]:
+    def send_ci_input(
+        self, ci_input: proto.ssl_gc_ci_pb2.CiInput
+    ) -> list[protos.CiOutput]:
         """Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
         :param CiInput proto to send to the Gamecontroller
@@ -365,7 +367,9 @@ class Gamecontroller:
         input_reset_match.reset_match = True
 
         input_set_match_config = protos.Input()
-        input_set_match_config.change.update_config_change.division = protos.Division.DIV_B
+        input_set_match_config.change.update_config_change.division = (
+            protos.Division.DIV_B
+        )
         input_set_match_config.change.update_config_change.match_type = (
             protos.MatchType.FRIENDLY
         )

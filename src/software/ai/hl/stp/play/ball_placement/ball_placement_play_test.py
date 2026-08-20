@@ -135,7 +135,8 @@ def ball_placement_play_setup(
 
     # Force play override here
     simulated_test_runner.set_plays(
-        blue_play=protos.PlayName.BallPlacementPlay, yellow_play=protos.PlayName.HaltPlay
+        blue_play=protos.PlayName.BallPlacementPlay,
+        yellow_play=protos.PlayName.HaltPlay,
     )
 
 

@@ -138,7 +138,8 @@ class EmbeddedCommunication:
     def __broadcast_fullsystem_ip(self) -> None:
         while self.running:
             self.fullsystem_ip_broadcaster.send_proto(
-                protos.IpNotification(ip_address=EmbeddedCommunication.LOCALHOST_IP), True
+                protos.IpNotification(ip_address=EmbeddedCommunication.LOCALHOST_IP),
+                True,
             )
             time.sleep(1.0 / EmbeddedCommunication.BROADCAST_HZ)
 

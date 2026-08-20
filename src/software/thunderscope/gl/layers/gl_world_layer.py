@@ -71,7 +71,9 @@ class GLWorldLayer(GLLayer):
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, protos.PrimitiveSet)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, protos.RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, protos.Referee, False)
-        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, protos.SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(
+            buffer_size, protos.SimulationState
+        )
         self.cached_world = protos.World()
         # fields to store the team from the cached world state as a dict
         self._cached_friendly_team = {}

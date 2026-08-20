@@ -179,7 +179,9 @@ class GLRefereeInfoLayer(GLLayer):
             )
             self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 
-    def __display_ball_placement_visuals(self, new_placement_point: protos.Point) -> None:
+    def __display_ball_placement_visuals(
+        self, new_placement_point: protos.Point
+    ) -> None:
         """Display ball placement visuals
         :param new_placement_point: ball placement point
         """

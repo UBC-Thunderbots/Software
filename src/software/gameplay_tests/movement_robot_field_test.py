@@ -55,7 +55,9 @@ def test_basic_rotation(field_test_runner):
             move_tactic.auto_chip_or_kick.CopyFrom(
                 protos.AutoChipOrKick(autokick_speed_m_per_s=0.0)
             )
-            move_tactic.max_allowed_speed_mode = protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
+            move_tactic.max_allowed_speed_mode = (
+                protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
+            )
             move_tactic.obstacle_avoidance_mode = protos.ObstacleAvoidanceMode.SAFE
 
             # Setup Tactic

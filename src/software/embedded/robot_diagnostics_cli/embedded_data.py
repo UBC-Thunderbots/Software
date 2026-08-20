@@ -181,7 +181,9 @@ class EmbeddedData:
         )
         return protos.Primitive(direct_control=direct_control_primitive)
 
-    def get_move_wheel_primitive(self, wheels: list[int], velocity: float) -> protos.Primitive:
+    def get_move_wheel_primitive(
+        self, wheels: list[int], velocity: float
+    ) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a velocity mapped to
         wheel_velocity_map = {1: 0, 2: 0, 3: 0, 4: 0} where {1:"NE", 2:"SE", 3:"SW", 4:"NW"}
         :param wheels: The wheels to rotate

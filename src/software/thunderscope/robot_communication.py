@@ -243,7 +243,9 @@ class RobotCommunication:
                 self.robot_stop_primitive_send_count
             ):
                 if num_times_to_send_stop > 0:
-                    robot_primitives_map[robot_id] = protos.Primitive(stop=protos.StopPrimitive())
+                    robot_primitives_map[robot_id] = protos.Primitive(
+                        stop=protos.StopPrimitive()
+                    )
                     self.robot_stop_primitive_send_count[robot_id] = (
                         num_times_to_send_stop - 1
                     )

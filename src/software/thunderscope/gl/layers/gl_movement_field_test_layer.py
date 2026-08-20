@@ -33,7 +33,9 @@ class GLMovementFieldTestLayer(GLLayer):
         """
         super().__init__(name)
 
-        self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, protos.World)
+        self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(
+            buffer_size, protos.World
+        )
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
         self.selected_robot_id = 0
         self.cached_world: protos.World | None = None
@@ -57,7 +59,9 @@ class GLMovementFieldTestLayer(GLLayer):
         self.preview_robot_graphic.hide()
         self.preview_orientation_graphic.hide()
 
-    def _get_selected_robot(self, cached_world: protos.World | None, selected_robot_id: int):
+    def _get_selected_robot(
+        self, cached_world: protos.World | None, selected_robot_id: int
+    ):
         """Return the proto robot matching the selected robot ID, or None.
 
         :param cached_world: The world snapshot to search
@@ -153,7 +157,9 @@ class GLMovementFieldTestLayer(GLLayer):
         assign_tactic = protos.AssignedTacticPlayControlParams()
         assign_tactic.assigned_tactics[robot_id].move.CopyFrom(move_tactic)
 
-        self.fullsystem_io.send_proto(protos.AssignedTacticPlayControlParams, assign_tactic)
+        self.fullsystem_io.send_proto(
+            protos.AssignedTacticPlayControlParams, assign_tactic
+        )
 
     @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:

@@ -95,7 +95,11 @@ class RobotsDoNotCollide(Validation):
         return False
 
     def check_fouled_robots(
-        self, robot1_id: int, robot1_vel: protos.Vector, robot2_id: int, robot2_vel: protos.Vector
+        self,
+        robot1_id: int,
+        robot1_vel: protos.Vector,
+        robot2_id: int,
+        robot2_vel: protos.Vector,
     ):
         """Determines which of the 2 robots have fouled based on their speed
         and adds them to the fouled robots list

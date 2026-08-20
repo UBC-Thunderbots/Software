@@ -236,7 +236,8 @@ def setup_parameter_widget(
     ) -> None:
         proto_unix_io.send_proto(protos.ThunderbotsConfig, updated_proto)
         proto_unix_io.send_proto(
-            protos.NetworkConfig, updated_proto.ai_config.ai_control_config.network_config
+            protos.NetworkConfig,
+            updated_proto.ai_config.ai_control_config.network_config,
         )
 
     return ProtoConfigurationWidget(
@@ -278,7 +279,9 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
     )
 
     # Register observer
-    proto_unix_io.register_observer(protos.NamedValue, proto_plotter.buffers[protos.NamedValue])
+    proto_unix_io.register_observer(
+        protos.NamedValue, proto_plotter.buffers[protos.NamedValue]
+    )
     return proto_plotter
 
 
@@ -363,7 +366,9 @@ def setup_robot_view(
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(protos.RobotStatus, robot_view.robot_status_buffer)
-    proto_unix_io.register_observer(protos.RobotStatistic, robot_view.robot_statistic_buffer)
+    proto_unix_io.register_observer(
+        protos.RobotStatistic, robot_view.robot_statistic_buffer
+    )
     return robot_view
 
 
@@ -374,8 +379,12 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     :return: The robot error log widget
     """
     robot_error_log = RobotErrorLog()
-    proto_unix_io.register_observer(protos.RobotStatus, robot_error_log.robot_status_buffer)
-    proto_unix_io.register_observer(protos.RobotCrash, robot_error_log.robot_crash_buffer)
+    proto_unix_io.register_observer(
+        protos.RobotStatus, robot_error_log.robot_status_buffer
+    )
+    proto_unix_io.register_observer(
+        protos.RobotCrash, robot_error_log.robot_crash_buffer
+    )
     proto_unix_io.register_observer(RobotLog, robot_error_log.robot_log_buffer)
     return robot_error_log
 

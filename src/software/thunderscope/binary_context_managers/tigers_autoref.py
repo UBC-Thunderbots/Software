@@ -248,7 +248,9 @@ class TigersAutoref:
 
         :param autoref_proto_unix_io: the proto unix io for the Autoref to receive SSLWrapperPackets
         """
-        autoref_proto_unix_io.register_observer(protos.SSL_WrapperPacket, self.wrapper_buffer)
+        autoref_proto_unix_io.register_observer(
+            protos.SSL_WrapperPacket, self.wrapper_buffer
+        )
         autoref_proto_unix_io.register_observer(protos.Referee, self.referee_buffer)
 
     def __exit__(self, type, value, traceback) -> None:

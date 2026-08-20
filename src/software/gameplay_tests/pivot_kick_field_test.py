@@ -40,7 +40,9 @@ def test_pivot_kick(field_test_runner):
     )
 
     # Send a halt tactic after the test finishes
-    field_test_runner.set_tactics(blue_tactics={id: protos.HaltTactic()}, yellow_tactics=None)
+    field_test_runner.set_tactics(
+        blue_tactics={id: protos.HaltTactic()}, yellow_tactics=None
+    )
 
 
 if __name__ == "__main__":
