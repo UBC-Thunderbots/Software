@@ -12,7 +12,6 @@ from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
     GLDrawPolygonObstacleLayer,
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.dock_style import *
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget

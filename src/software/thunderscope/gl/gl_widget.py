@@ -9,14 +9,21 @@ import numpy as np
 from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
-from software.thunderscope.constants import *
+from software.thunderscope.constants import (
+    CameraView,
+    DEFAULT_EMPTY_FIELD_WORLD,
+    ORTHOGRAPHIC_FOV_DEGREES,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.extended_gl_view_widget import *
+from software.thunderscope.gl.helpers.extended_gl_view_widget import (
+    ExtendedGLViewWidget,
+    MouseInSceneEvent,
+)
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )

@@ -25,11 +25,12 @@ from software.py_constants import (
     VIRTUAL_OBSTACLES_UNIX_PATH,
     WORLD_PATH,
 )
-from software.python_bindings import *
-
 import proto.import_all_protos as protos
 from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.binary_context_managers.util import (
+    is_cmd_running,
+    kill_cmd_if_running,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
