@@ -121,7 +121,7 @@ const Point PenaltyKickFSM::evaluateNextShotPosition(std::optional<Robot> enemy_
     }
 }
 
-void PenaltyKickFSM::shoot(const Update &event,
+void PenaltyKickFSM::shoot(const Update& event,
                            boost::sml::back::process<KickOrChipFSM::Update> processEvent)
 {
     AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK,

@@ -24,7 +24,6 @@ cc_library(
     ],
 )
 
-
 cc_test(
     name = "kick_or_chip_fsm_test",
     srcs = ["kick_or_chip_fsm_test.cpp"],

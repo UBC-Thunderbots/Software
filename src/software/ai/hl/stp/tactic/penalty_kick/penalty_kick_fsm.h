@@ -58,7 +58,7 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
      * @param event          PenaltyKickFSM::Update event
      * @param processEvent   processes the KickFSM::Update
      */
-    void shoot(const Update &event,
+    void shoot(const Update& event,
                boost::sml::back::process<KickOrChipFSM::Update> processEvent);
 
     /**
