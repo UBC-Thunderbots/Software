@@ -29,7 +29,7 @@ void MotorService::reset()
 
 std::unique_ptr<MotorController> MotorService::setupMotorController()
 {
-        return std::make_unique<StSpinMotorController>(robot_constants_);
+    return std::make_unique<StSpinMotorController>(robot_constants_);
 }
 
 TbotsProto::MotorStatus MotorService::createMotorStatus(

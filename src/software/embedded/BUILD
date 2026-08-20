@@ -1,4 +1,4 @@
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,8 +25,6 @@ config_setting(
         ":disable_motor_service": "True",
     },
 )
-
-
 
 cc_library(
     name = "primitive_executor",
