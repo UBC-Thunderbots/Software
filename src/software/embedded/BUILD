@@ -26,28 +26,7 @@ config_setting(
     },
 )
 
-config_setting(
-    name = "build_trinamic",
-    flag_values = {
-        ":motor_board": "TRINAMIC",
-    },
-)
 
-config_setting(
-    name = "build_stspin",
-    flag_values = {
-        ":motor_board": "STSPIN",
-    },
-)
-
-string_flag(
-    name = "motor_board",
-    build_setting_default = "STSPIN",
-    values = [
-        "TRINAMIC",
-        "STSPIN",
-    ],
-)
 
 cc_library(
     name = "primitive_executor",

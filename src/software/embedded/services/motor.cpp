@@ -1,9 +1,7 @@
 #include "software/embedded/services/motor.h"
 
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/embedded/motor_controller/motor_board.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
-#include "software/embedded/motor_controller/tmc_motor_controller.h"
 #include "software/logger/logger.h"
 
 MotorService::MotorService(const robot_constants::RobotConstants& robot_constants)
@@ -31,14 +29,7 @@ void MotorService::reset()
 
 std::unique_ptr<MotorController> MotorService::setupMotorController()
 {
-    if constexpr (MOTOR_BOARD == MotorBoard::TRINAMIC)
-    {
-        return std::make_unique<TmcMotorController>();
-    }
-    else
-    {
         return std::make_unique<StSpinMotorController>(robot_constants_);
-    }
 }
 
 TbotsProto::MotorStatus MotorService::createMotorStatus(
