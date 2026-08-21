@@ -22,9 +22,11 @@ cc_library(
     deps = [
         ":kalman_filter",
         ":vision_detection",
+        "//shared:constants",
         "//software/geom/algorithms",
         "//software/world:ball",
         "//software/world:field",
+        "//software/world:robot",
         "@eigen",
     ],
 )

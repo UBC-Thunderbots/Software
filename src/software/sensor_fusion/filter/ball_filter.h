@@ -9,6 +9,7 @@
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
+#include "software/world/robot.h"
 
 /**
  * Given ball data from SSL Vision, filters and returns the position/velocity of the
@@ -19,19 +20,24 @@
  * term to account for the ball decelerating due to friction. Each frame it takes the
  * highest confidence detection inside the filter area as the measurement.
  *
- * The data we receive isn't perfect, which is why we have a filter. Detections that
- * disagree too strongly with the current estimate (measured by Mahalanobis distance,
- * which accounts for how confident the filter currently is) are rejected as outliers
- * rather than dragging the estimate off the ball's real trajectory. This keeps the
- * output steady, which matters because small deviations in velocity orientation have
- * large effects when the AI predicts the ball's future position. For example,
- * consistently receiving a pass relies on the ball's velocity being stable, otherwise
- * the robot would "jiggle" back and forth as the estimated receiver position kept
- * changing.
+ * The data we receive isn't perfect, which is why we have a filter. A detection is
+ * rejected as an outlier if it fails either of two gates: a physical one, asking whether
+ * the ball could have travelled that far since the last accepted detection at all, and a
+ * statistical one (Mahalanobis distance, which accounts for how confident the filter
+ * currently is). The physical gate does not depend on the covariance being well tuned,
+ * so it still catches nonsense while the statistical gate is what keeps the output
+ * steady. Steadiness matters because small deviations in velocity orientation have large
+ * effects when the AI predicts the ball's future position. For example, consistently
+ * receiving a pass relies on the ball's velocity being stable, otherwise the robot would
+ * "jiggle" back and forth as the estimated receiver position kept changing.
  *
  * Rejecting outliers forever would leave the filter stuck if the ball genuinely
  * teleports (a ball placement, or a detection we had wrongly locked onto), so after
  * enough consecutive rejections the filter resets onto the newest detection.
+ *
+ * A ball that runs into a robot stops following the motion model entirely, so before
+ * considering the new detection the filter checks for robots overlapping its estimate
+ * and reflects the velocity off any it finds.
  */
 class BallFilter
 {
@@ -48,6 +54,7 @@ class BallFilter
      * @param new_ball_detections A list of new Ball detections
      * @param filter_area The area within which the ball filter will work. Any detections
      * outside of this area will be ignored.
+     * @param robots The robots currently on the field, which the ball may bounce off
      * @param current_time The time to estimate the ball's state at
      *
      * @return The new ball based on the estimated state of the ball given the new data.
@@ -55,7 +62,8 @@ class BallFilter
      */
     std::optional<Ball> estimateBallState(
         const std::vector<BallDetection>& new_ball_detections,
-        const Rectangle& filter_area, const Timestamp& current_time);
+        const Rectangle& filter_area, const std::vector<Robot>& robots,
+        const Timestamp& current_time);
 
    private:
     // The dimensions of the Kalman filter this ball filter is built on.
@@ -87,9 +95,37 @@ class BallFilter
      * Advances the Kalman filter's estimate forward to the given time using a constant
      * velocity motion model with damping.
      *
+     * Both the motion model and the process noise depend on how much time is being
+     * advanced over, so both are rebuilt here rather than being fixed at construction.
+     *
      * @param delta_t The amount of time to advance the estimate by, in seconds
      */
     void predict(double delta_t);
+
+    /**
+     * Reflects the estimated velocity off any robot the estimated position has run into,
+     * and widens the covariance to reflect how little we know about the ball immediately
+     * after a bounce.
+     *
+     * @param robots The robots currently on the field
+     */
+    void handleRobotCollisions(const std::vector<Robot>& robots);
+
+    /**
+     * Returns whether the ball could physically have reached the given position since
+     * the last accepted detection, assuming it cannot exceed the maximum ball speed.
+     *
+     * Unlike the Mahalanobis gate this does not depend on the covariance being well
+     * tuned, so it still rejects impossible detections when the filter's own sense of
+     * its uncertainty is wrong.
+     *
+     * @param detection_position The position of the detection to check
+     * @param current_time The time the detection was taken at
+     *
+     * @return whether the detection is within reach of the current estimate
+     */
+    bool isWithinMaxBallSpeed(const Point& detection_position,
+                              const Timestamp& current_time) const;
 
     /**
      * Discards the filter's current estimate and reinitializes it on the given
@@ -107,4 +143,9 @@ class BallFilter
     // the filter has seen its first usable detection.
     std::optional<Timestamp> prev_detection_timestamp;
     std::optional<Measurement> prev_measurement;
+    // The time the estimate has already been advanced to. This tracks every predict,
+    // including the ones on frames where no detection was accepted, so that coasting
+    // through a gap in the detections advances the estimate by the elapsed time exactly
+    // once rather than re-integrating the whole gap on every frame.
+    std::optional<Timestamp> last_predict_timestamp;
 };

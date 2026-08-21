@@ -202,7 +202,7 @@ class BallFilterTest : public ::testing::Test
             // Get the filtered result given the new detection information
             auto filtered_ball =
                 ball_filter.estimateBallState(ball_detections, field.fieldBoundary(),
-                                              current_timestamp);
+                                              {}, current_timestamp);
             if (i < num_steps_to_ignore)
             {
                 continue;
