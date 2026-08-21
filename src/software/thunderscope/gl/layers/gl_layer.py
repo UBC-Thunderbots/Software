@@ -13,6 +13,7 @@ GLViewMixin.addItem = gl_patches.GLViewMixin_addItem_patched
 GLViewMixin.removeItem = gl_patches.GLViewMixin_removeItem_patched
 ShaderProgram.program = gl_patches.ShaderProgram_program_patched(ShaderProgram.program)
 
+
 class GLLayer(GLGraphicsItem):
     """Represents a layer in the 3D visualization.
 
