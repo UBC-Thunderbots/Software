@@ -33,3 +33,13 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+py_test(
+    name = "kick_or_chip_tactic_test",
+    srcs = ["kick_or_chip_tactic_test.py"],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

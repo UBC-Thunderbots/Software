@@ -1,19 +1,31 @@
 import pytest
-import software.python_bindings as tbots_cpp
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
-from proto.import_all_protos import KickTactic
-from proto.message_translation.tbots_protobuf import create_world_state
+import software.python_bindings as tbots_cpp
+
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from software.gameplay_tests.validation.ball_is_off_ground import (
+    BallIsEventuallyOffGround,
+)
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.import_all_protos import AutoChipOrKick, KickOrChipTactic
 
 
 @pytest.mark.parametrize(
-    "ball_offset_from_robot, angle_to_kick_at",
+    "auto_chip_or_kick",
+    [
+        AutoChipOrKick(autokick_speed_m_per_s=5.0),
+        AutoChipOrKick(autochip_distance_meters=2.0),
+    ],
+    ids=["autokick", "autochip"],
+)
+@pytest.mark.parametrize(
+    "ball_offset_from_robot, angle_to_kick_or_chip_at",
     [
         # place the ball directly to the left of the robot
         (tbots_cpp.Vector(0, 0.5), tbots_cpp.Angle.zero()),
@@ -24,8 +36,11 @@ from software.gameplay_tests.simulated_test_fixture import (
         # place the ball directly behind the robot
         (tbots_cpp.Vector(-0.5, 0), tbots_cpp.Angle.zero()),
         # place the ball in the robots dribbler
-        (tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0), tbots_cpp.Angle.zero()),
-        # Repeat the same tests but kick in the opposite direction
+        (
+            tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0),
+            tbots_cpp.Angle.zero(),
+        ),
+        # Repeat the same tests but kick or chip in the opposite direction
         # place the ball directly to the left of the robot
         (tbots_cpp.Vector(0, 0.5), tbots_cpp.Angle.half()),
         # place the ball directly to the right of the robot
@@ -35,10 +50,18 @@ from software.gameplay_tests.simulated_test_fixture import (
         # place the ball directly behind the robot
         (tbots_cpp.Vector(-0.5, 0), tbots_cpp.Angle.half()),
         # place the ball in the robots dribbler
-        (tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0), tbots_cpp.Angle.zero()),
+        (
+            tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0),
+            tbots_cpp.Angle.zero(),
+        ),
     ],
 )
-def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
+def test_kick_or_chip(
+    ball_offset_from_robot,
+    angle_to_kick_or_chip_at,
+    auto_chip_or_kick,
+    simulated_test_runner,
+):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
@@ -57,19 +80,29 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: KickTactic(
-                    kick_origin=tbots_cpp.createPointProto(ball_position),
-                    kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
-                    kick_speed_meters_per_second=5.0,
+                1: KickOrChipTactic(
+                    kick_or_chip_origin=tbots_cpp.createPointProto(ball_position),
+                    kick_or_chip_direction=tbots_cpp.createAngleProto(
+                        angle_to_kick_or_chip_at
+                    ),
+                    auto_chip_or_kick=auto_chip_or_kick,
                 )
             }
         )
 
     eventually_validations = [
         [
-            BallEventuallyKickedInDirection(angle_to_kick_at),
-        ]
+            BallEventuallyKickedInDirection(angle_to_kick_or_chip_at),
+        ],
     ]
+
+    # only a chip should send the ball off the ground
+    if auto_chip_or_kick.HasField("autochip_distance_meters"):
+        eventually_validations.append(
+            [
+                BallIsEventuallyOffGround(),
+            ]
+        )
 
     simulated_test_runner.run_test(
         setup=setup,
