@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-Rectangle::Rectangle(const Point &point1, const Point &point2)
+Rectangle::Rectangle(const Point& point1, const Point& point2)
     : ConvexPolygon({Point(point1.x() < point2.x() ? point1.x() : point2.x(),
                            point1.y() < point2.y() ? point1.y() : point2.y()),
                      Point(point1.x() < point2.x() ? point1.x() : point2.x(),
@@ -39,22 +39,22 @@ Point Rectangle::centre() const
     return Point(negXNegYCorner() + (diagonal() / 2));
 }
 
-const Point &Rectangle::posXPosYCorner() const
+const Point& Rectangle::posXPosYCorner() const
 {
     return points_[2];
 }
 
-const Point &Rectangle::negXPosYCorner() const
+const Point& Rectangle::negXPosYCorner() const
 {
     return points_[1];
 }
 
-const Point &Rectangle::negXNegYCorner() const
+const Point& Rectangle::negXNegYCorner() const
 {
     return points_[0];
 }
 
-const Point &Rectangle::posXNegYCorner() const
+const Point& Rectangle::posXNegYCorner() const
 {
     return points_[3];
 }
@@ -82,7 +82,7 @@ Rectangle Rectangle::expand(double expansion_amount) const
     return Rectangle(points[0], points[2]);
 }
 
-bool Rectangle::operator==(const Rectangle &p) const
+bool Rectangle::operator==(const Rectangle& p) const
 {
     return negXNegYCorner() == p.negXNegYCorner() && diagonal() == p.diagonal();
 }

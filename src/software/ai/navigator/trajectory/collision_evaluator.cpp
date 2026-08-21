@@ -1,13 +1,13 @@
 #include "software/ai/navigator/trajectory/collision_evaluator.h"
 
-CollisionEvaluator::CollisionEvaluator(const std::vector<ObstaclePtr> &obstacles)
+CollisionEvaluator::CollisionEvaluator(const std::vector<ObstaclePtr>& obstacles)
     : obstacles(obstacles)
 {
 }
 
 TrajectoryPathWithCost CollisionEvaluator::evaluate(
-    const TrajectoryPath &trajectory,
-    const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
+    const TrajectoryPath& trajectory,
+    const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_s, const double max_cost)
 {
     TrajectoryPathWithCost traj_with_cost(trajectory);
@@ -101,7 +101,7 @@ TrajectoryPathWithCost CollisionEvaluator::evaluate(
 }
 
 
-double CollisionEvaluator::getFirstNonCollisionTime(const TrajectoryPath &traj_path,
+double CollisionEvaluator::getFirstNonCollisionTime(const TrajectoryPath& traj_path,
                                                     const double search_end_time_s) const
 {
     double path_duration = traj_path.getTotalTime();
@@ -110,7 +110,7 @@ double CollisionEvaluator::getFirstNonCollisionTime(const TrajectoryPath &traj_p
     {
         Point position       = traj_path.getPosition(time);
         bool collision_found = false;
-        for (const ObstaclePtr &obstacle : obstacles)
+        for (const ObstaclePtr& obstacle : obstacles)
         {
             if (obstacle->contains(position, time))
             {
@@ -128,14 +128,14 @@ double CollisionEvaluator::getFirstNonCollisionTime(const TrajectoryPath &traj_p
 }
 
 std::pair<double, ObstaclePtr> CollisionEvaluator::getFirstCollisionTime(
-    const TrajectoryPath &traj_path, const double start_time_s,
+    const TrajectoryPath& traj_path, const double start_time_s,
     const double search_end_time_s) const
 {
     for (double time = start_time_s; time <= search_end_time_s;
          time += COLLISION_CHECK_STEP_INTERVAL_SEC)
     {
         Point position = traj_path.getPosition(time);
-        for (const ObstaclePtr &obstacle : obstacles)
+        for (const ObstaclePtr& obstacle : obstacles)
         {
             if (obstacle->contains(position, time))
             {
@@ -148,7 +148,7 @@ std::pair<double, ObstaclePtr> CollisionEvaluator::getFirstCollisionTime(
     return std::make_pair(std::numeric_limits<double>::max(), nullptr);
 }
 
-double CollisionEvaluator::getLastNonCollisionTime(const TrajectoryPath &traj_path,
+double CollisionEvaluator::getLastNonCollisionTime(const TrajectoryPath& traj_path,
                                                    const double search_end_time_s) const
 {
     for (double time = search_end_time_s; time >= 0.0;
@@ -156,7 +156,7 @@ double CollisionEvaluator::getLastNonCollisionTime(const TrajectoryPath &traj_pa
     {
         Point position       = traj_path.getPosition(time);
         bool collision_found = false;
-        for (const ObstaclePtr &obstacle : obstacles)
+        for (const ObstaclePtr& obstacle : obstacles)
         {
             if (obstacle->contains(position, time))
             {

@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play_fsm.h"
 
 KickoffEnemyPlayFSM::KickoffEnemyPlayFSM(
-    const std::shared_ptr<const TbotsProto::AiConfig> &ai_config_ptr)
+    const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr)
     : PlayFSM(ai_config_ptr),
       shadow_enemy_tactics{std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
                            std::make_shared<ShadowEnemyTactic>(ai_config_ptr),
@@ -16,7 +16,7 @@ KickoffEnemyPlayFSM::KickoffEnemyPlayFSM(
 }
 
 
-void KickoffEnemyPlayFSM::createKickoffSetupPositions(const WorldPtr &world_ptr)
+void KickoffEnemyPlayFSM::createKickoffSetupPositions(const WorldPtr& world_ptr)
 {
     // these positions are picked according to the following:
     // createKickoffSetupPositions(); slide
@@ -67,9 +67,9 @@ void KickoffEnemyPlayFSM::createKickoffSetupPositions(const WorldPtr &world_ptr)
     };
 }
 
-void KickoffEnemyPlayFSM::assignShadowing(const std::vector<EnemyThreat> &enemy_threats,
-                                          PriorityTacticVector &tactics_to_run,
-                                          size_t &defense_position_index)
+void KickoffEnemyPlayFSM::assignShadowing(const std::vector<EnemyThreat>& enemy_threats,
+                                          PriorityTacticVector& tactics_to_run,
+                                          size_t& defense_position_index)
 {
     const auto shadower_count = std::min<size_t>(2, enemy_threats.size());
 
@@ -91,9 +91,9 @@ void KickoffEnemyPlayFSM::assignShadowing(const std::vector<EnemyThreat> &enemy_
     }
 }
 
-void KickoffEnemyPlayFSM::assignDefenders(PriorityTacticVector &tactics_to_run,
-                                          size_t &defense_position_index,
-                                          size_t &shadower_count)
+void KickoffEnemyPlayFSM::assignDefenders(PriorityTacticVector& tactics_to_run,
+                                          size_t& defense_position_index,
+                                          size_t& shadower_count)
 {
     // The total combined shadowers + defenders should be 4
     // (kickoff_setup_positions.size() - 1)
@@ -110,9 +110,9 @@ void KickoffEnemyPlayFSM::assignDefenders(PriorityTacticVector &tactics_to_run,
     }
 }
 
-void KickoffEnemyPlayFSM::assignGoalBlocker(const WorldPtr &world_ptr,
-                                            PriorityTacticVector &tactics_to_run,
-                                            size_t &defense_position_index)
+void KickoffEnemyPlayFSM::assignGoalBlocker(const WorldPtr& world_ptr,
+                                            PriorityTacticVector& tactics_to_run,
+                                            size_t& defense_position_index)
 {
     move_tactics.at(defense_position_index)
         ->updateControlParams(
@@ -126,7 +126,7 @@ void KickoffEnemyPlayFSM::assignGoalBlocker(const WorldPtr &world_ptr,
     defense_position_index++;
 }
 
-void KickoffEnemyPlayFSM::kickoff(const Update &event)
+void KickoffEnemyPlayFSM::kickoff(const Update& event)
 {
     createKickoffSetupPositions(event.common.world_ptr);
     WorldPtr world_ptr                  = event.common.world_ptr;

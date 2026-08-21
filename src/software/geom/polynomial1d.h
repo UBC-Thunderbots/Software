@@ -28,7 +28,7 @@ class Polynomial1d
      *
      * @param coeffs coefficients of the polynomial
      */
-    explicit Polynomial1d(const std::vector<double> &coeffs);
+    explicit Polynomial1d(const std::vector<double>& coeffs);
 
     /**
      * Construct a polynomial from coefficients of the form
@@ -36,7 +36,7 @@ class Polynomial1d
      *
      * @param coeffs coefficients of the polynomial
      */
-    explicit Polynomial1d(const std::initializer_list<double> &coeffs);
+    explicit Polynomial1d(const std::initializer_list<double>& coeffs);
 
     /**
      * Construct a polynomial from a series of constraints (input/output pairs)
@@ -99,7 +99,7 @@ class Polynomial1d
  *
  * @return the sum of the Polynomials
  */
-Polynomial1d operator+(const Polynomial1d &p1, const Polynomial1d &p2);
+Polynomial1d operator+(const Polynomial1d& p1, const Polynomial1d& p2);
 
 /**
  * Subtracts two Polynomials
@@ -109,7 +109,7 @@ Polynomial1d operator+(const Polynomial1d &p1, const Polynomial1d &p2);
  *
  * @return the difference of the Polynomials
  */
-Polynomial1d operator-(const Polynomial1d &p1, const Polynomial1d &p2);
+Polynomial1d operator-(const Polynomial1d& p1, const Polynomial1d& p2);
 
 /**
  * Multiplies two Polynomials
@@ -119,7 +119,7 @@ Polynomial1d operator-(const Polynomial1d &p1, const Polynomial1d &p2);
  *
  * @return the product of the Polynomials
  */
-Polynomial1d operator*(const Polynomial1d &p1, const Polynomial1d &p2);
+Polynomial1d operator*(const Polynomial1d& p1, const Polynomial1d& p2);
 
 /**
  * Adds a Polynomial1d to another Polynomial1d
@@ -129,7 +129,7 @@ Polynomial1d operator*(const Polynomial1d &p1, const Polynomial1d &p2);
  *
  * @return the new Polynomial1d
  */
-Polynomial1d &operator+=(Polynomial1d &p1, const Polynomial1d &p2);
+Polynomial1d& operator+=(Polynomial1d& p1, const Polynomial1d& p2);
 
 /**
  * Subtracts a Polynomial1d from a Polynomial1d
@@ -139,7 +139,7 @@ Polynomial1d &operator+=(Polynomial1d &p1, const Polynomial1d &p2);
  *
  * @return the new Polynomial1d
  */
-Polynomial1d &operator-=(Polynomial1d &p1, const Polynomial1d &p2);
+Polynomial1d& operator-=(Polynomial1d& p1, const Polynomial1d& p2);
 
 /**
  * Multiplies a Polynomial1d to another Polynomial1d
@@ -149,7 +149,7 @@ Polynomial1d &operator-=(Polynomial1d &p1, const Polynomial1d &p2);
  *
  * @return the new Polynomial1d
  */
-Polynomial1d &operator*=(Polynomial1d &p1, const Polynomial1d &p2);
+Polynomial1d& operator*=(Polynomial1d& p1, const Polynomial1d& p2);
 
 /**
  * Compares two Polynomials for equality
@@ -159,4 +159,4 @@ Polynomial1d &operator*=(Polynomial1d &p1, const Polynomial1d &p2);
  *
  * @return true if p1 is equal to p2, and false otherwise.
  */
-bool operator==(const Polynomial1d &p1, const Polynomial1d &p2);
+bool operator==(const Polynomial1d& p1, const Polynomial1d& p2);

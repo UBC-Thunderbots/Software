@@ -11,7 +11,7 @@ KickoffFriendlyPlay::KickoffFriendlyPlay(
 {
 }
 
-void KickoffFriendlyPlay::updateTactics(const PlayUpdate &play_update)
+void KickoffFriendlyPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(KickoffFriendlyPlayFSM::Update(control_params, play_update));
 }

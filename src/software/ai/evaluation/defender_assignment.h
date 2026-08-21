@@ -30,7 +30,7 @@ struct DefenderAssignment
     double coverage_rating;
 
     // Equality operator for unit testing.
-    bool operator==(const DefenderAssignment &other) const
+    bool operator==(const DefenderAssignment& other) const
     {
         return this->type == other.type && this->target == other.target &&
                this->coverage_rating == other.coverage_rating;
@@ -53,7 +53,7 @@ struct ShootingLane
     double threat_rating;
 
     // Equality operator for unit testing.
-    bool operator==(const ShootingLane &other) const
+    bool operator==(const ShootingLane& other) const
     {
         return this->lane == other.lane && this->threat_rating == other.threat_rating;
     }
@@ -66,7 +66,7 @@ struct GoalLane : ShootingLane
     Angle angle_to_goal;
 
     // Equality operator for unit testing.
-    bool operator==(const GoalLane &other) const
+    bool operator==(const GoalLane& other) const
     {
         return this->lane == other.lane && this->threat_rating == other.threat_rating &&
                this->angle_to_goal == other.angle_to_goal;
@@ -87,8 +87,8 @@ struct GoalLane : ShootingLane
  * coverage rating
  */
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
-    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config);
+    const std::vector<EnemyThreat>& threats, const Field& field, const Ball& ball,
+    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig& config);
 
 /**
  * Filters out enemy threats with similar positioning/angle to the primary threat
@@ -115,9 +115,9 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
 
  * @return a copy of the threats list with similarly positioned threats removed
  */
-std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats,
+std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat>& threats,
                                                  double min_distance,
-                                                 const Angle &min_angle);
+                                                 const Angle& min_angle);
 
 /**
  * Groups together goal lanes that are densely clustered (i.e. have similar angles
@@ -130,4 +130,4 @@ std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> 
  * @return a list of lists which represent groupings of densely clustered goal lanes
  */
 std::vector<std::vector<GoalLane>> groupGoalLanesByDensity(
-    std::vector<GoalLane> &goal_lanes, double density_threshold);
+    std::vector<GoalLane>& goal_lanes, double density_threshold);

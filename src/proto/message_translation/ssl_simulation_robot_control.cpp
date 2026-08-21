@@ -52,7 +52,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(
     unsigned int robot_id,
     std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
-    RobotConstants_t& robot_constants)
+    robot_constants::RobotConstants& robot_constants)
 {
     auto move_command = createRobotMoveCommand(
         *direct_control, robot_constants.front_wheel_angle_deg,

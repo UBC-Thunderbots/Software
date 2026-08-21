@@ -21,16 +21,16 @@ class UartCommunication
 
     virtual ~UartCommunication() = default;
 
-    UartCommunication(const UartCommunication &) = delete;
+    UartCommunication(const UartCommunication&) = delete;
 
-    UartCommunication &operator=(const UartCommunication &) = delete;
+    UartCommunication& operator=(const UartCommunication&) = delete;
 
     /**
      * writes write_val into UART transmit buffer
      * @param write_val values to be written
      * @return true upon success, false otherwise
      */
-    virtual bool serialWrite(const std::vector<unsigned char> &write_val) = 0;
+    virtual bool serialWrite(const std::vector<unsigned char>& write_val) = 0;
 
     /**
      * reads a given number of bytes from UART receive buffer

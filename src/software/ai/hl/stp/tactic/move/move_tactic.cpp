@@ -38,7 +38,7 @@ void MoveTactic::updateControlParams(
     control_params.obstacle_avoidance_mode = obstacle_avoidance_mode;
 }
 
-void MoveTactic::accept(TacticVisitor &visitor) const
+void MoveTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

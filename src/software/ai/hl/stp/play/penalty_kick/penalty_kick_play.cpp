@@ -10,7 +10,7 @@ PenaltyKickPlay::PenaltyKickPlay(
 {
 }
 
-void PenaltyKickPlay::updateTactics(const PlayUpdate &play_update)
+void PenaltyKickPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(PenaltyKickPlayFSM::Update(control_params, play_update));
 }

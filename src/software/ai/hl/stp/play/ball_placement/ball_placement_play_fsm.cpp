@@ -11,7 +11,7 @@ BallPlacementPlayFSM::BallPlacementPlayFSM(
 {
 }
 
-void BallPlacementPlayFSM::kickOffWall(const Update &event)
+void BallPlacementPlayFSM::kickOffWall(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -33,7 +33,7 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::alignPlacement(const Update &event)
+void BallPlacementPlayFSM::alignPlacement(const Update& event)
 {
     std::optional<Point> placement_point =
         event.common.world_ptr->gameState().getBallPlacementPoint();
@@ -68,7 +68,7 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
     }
 }
 
-void BallPlacementPlayFSM::placeBall(const Update &event)
+void BallPlacementPlayFSM::placeBall(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -97,12 +97,12 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::startWait(const Update &event)
+void BallPlacementPlayFSM::startWait(const Update& event)
 {
     start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
 
-void BallPlacementPlayFSM::retreat(const Update &event)
+void BallPlacementPlayFSM::retreat(const Update& event)
 {
     WorldPtr world_ptr = event.common.world_ptr;
     std::optional<Robot> nearest_robot =
@@ -154,7 +154,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     }
 }
 
-bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
+bool BallPlacementPlayFSM::shouldKickOffWall(const Update& event)
 {
     // check if ball is too close to border
     Point ball_pos        = event.common.world_ptr->ball().position();
@@ -162,7 +162,7 @@ bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
     return !contains(field_lines, ball_pos);
 }
 
-bool BallPlacementPlayFSM::alignDone(const Update &event)
+bool BallPlacementPlayFSM::alignDone(const Update& event)
 {
     std::optional<Robot> nearest_robot =
         event.common.world_ptr->friendlyTeam().getNearestRobot(
@@ -177,7 +177,7 @@ bool BallPlacementPlayFSM::alignDone(const Update &event)
     }
 }
 
-bool BallPlacementPlayFSM::kickDone(const Update &event)
+bool BallPlacementPlayFSM::kickDone(const Update& event)
 {
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_is_kicked_m_per_s_threshold =
@@ -185,7 +185,7 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
     return ball_velocity > ball_is_kicked_m_per_s_threshold;
 }
 
-bool BallPlacementPlayFSM::ballPlaced(const Update &event)
+bool BallPlacementPlayFSM::ballPlaced(const Update& event)
 {
     Point ball_pos = event.common.world_ptr->ball().position();
     std::optional<Point> placement_point =
@@ -207,13 +207,13 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     }
 }
 
-bool BallPlacementPlayFSM::waitDone(const Update &event)
+bool BallPlacementPlayFSM::waitDone(const Update& event)
 {
     Timestamp current_time = event.common.world_ptr->getMostRecentTimestamp();
     return (current_time - start_time) > Duration::fromSeconds(BALL_IS_PLACED_WAIT_S);
 }
 
-bool BallPlacementPlayFSM::retreatDone(const Update &event)
+bool BallPlacementPlayFSM::retreatDone(const Update& event)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     return distance(ball_position, event.common.world_ptr->friendlyTeam()
@@ -221,8 +221,8 @@ bool BallPlacementPlayFSM::retreatDone(const Update &event)
                                        ->position()) > RETREAT_DISTANCE_METERS;
 }
 
-Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,
-                                                      const Rectangle &field_lines)
+Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point& ball_pos,
+                                                      const Rectangle& field_lines)
 {
     Angle kick_angle;
     if (ball_pos.x() > field_lines.xMax())
@@ -272,7 +272,7 @@ Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,
     return kick_angle;
 }
 
-void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
+void BallPlacementPlayFSM::setupMoveTactics(const Update& event)
 {
     // assign all but one of the robots to line up away from the ball placing robot
     int num_move_tactics = event.common.num_tactics - 1;

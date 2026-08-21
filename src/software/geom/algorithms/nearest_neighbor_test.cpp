@@ -33,7 +33,7 @@ class NearestNeighborSearchTest : public ::testing::TestWithParam<double>
     Robot candidate = TestUtil::createRobotAtPos(Point(0, 0));
 };
 
-double compare(const Robot &r1, const Robot &r2)
+double compare(const Robot& r1, const Robot& r2)
 {
     return distanceSquared(r1.position(), r2.position());
 }

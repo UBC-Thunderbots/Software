@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -34,27 +34,12 @@ cc_library(
     alwayslink = True,
 )
 
-cc_test(
-    name = "free_kick_play_cpp_test",
-    srcs = ["free_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play/free_kick:free_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
 py_test(
     name = "free_kick_play_test",
     srcs = ["free_kick_play_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

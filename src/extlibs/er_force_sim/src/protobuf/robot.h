@@ -24,6 +24,6 @@
 #include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
 
 // used for replay of vision logs
-void robotSetDefault(robot::Specs *specs);
+void robotSetDefault(robot::Specs* specs);
 
 #endif  // ROBOT_H

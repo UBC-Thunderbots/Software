@@ -11,12 +11,12 @@ PassDefenderTactic::PassDefenderTactic(
 {
 }
 
-void PassDefenderTactic::accept(TacticVisitor &visitor) const
+void PassDefenderTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void PassDefenderTactic::updateControlParams(const Point &position_to_block_from,
+void PassDefenderTactic::updateControlParams(const Point& position_to_block_from,
                                              TbotsProto::BallStealMode ball_steal_mode)
 {
     control_params.position_to_block_from = position_to_block_from;

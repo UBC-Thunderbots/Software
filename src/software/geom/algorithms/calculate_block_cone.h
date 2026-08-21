@@ -19,7 +19,7 @@
  *
  * @return the blocking position.
  */
-Point calculateBlockCone(const Vector &a, const Vector &b, const double radius);
+Point calculateBlockCone(const Vector& a, const Vector& b, const double radius);
 
 /**
  * Given a cone shooting from a point P, determines the furthest location from
@@ -40,5 +40,5 @@ Point calculateBlockCone(const Vector &a, const Vector &b, const double radius);
  *
  * @return the blocking position.
  */
-Point calculateBlockCone(const Point &a, const Point &b, const Point &p,
+Point calculateBlockCone(const Point& a, const Point& b, const Point& p,
                          const double radius);

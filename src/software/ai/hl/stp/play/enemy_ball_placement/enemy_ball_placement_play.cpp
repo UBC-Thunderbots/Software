@@ -8,7 +8,7 @@ EnemyBallPlacementPlay::EnemyBallPlacementPlay(
 {
 }
 
-void EnemyBallPlacementPlay::updateTactics(const PlayUpdate &play_update)
+void EnemyBallPlacementPlay::updateTactics(const PlayUpdate& play_update)
 {
     fsm.process_event(EnemyBallPlacementPlayFSM::Update(control_params, play_update));
 }

@@ -8,14 +8,14 @@ PenaltyKickPlayFSM::PenaltyKickPlayFSM(
 {
 }
 
-void PenaltyKickPlayFSM::performKick(const Update &event)
+void PenaltyKickPlayFSM::performKick(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
     tactics_to_run[0].emplace_back(penalty_kick_tactic);
     event.common.set_tactics(tactics_to_run);
 }
 
-void PenaltyKickPlayFSM::setupPosition(const Update &event)
+void PenaltyKickPlayFSM::setupPosition(const Update& event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -61,12 +61,12 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
     event.common.set_tactics(tactics_to_run);
 }
 
-bool PenaltyKickPlayFSM::setupPositionDone(const Update &event)
+bool PenaltyKickPlayFSM::setupPositionDone(const Update& event)
 {
     return !event.common.world_ptr->gameState().isSetupState();
 }
 
-bool PenaltyKickPlayFSM::kickDone(const Update &event)
+bool PenaltyKickPlayFSM::kickDone(const Update& event)
 {
     return event.common.world_ptr->gameState().isStopped();
 }

@@ -241,6 +241,8 @@ class GLWidget(QWidget):
         layer_checkbox.stateChanged.connect(
             lambda: layer.setVisible(layer_checkbox.isChecked())
         )
+        if layer.needs_mouse_movement_tracking:
+            layer_checkbox.stateChanged.connect(self._update_mouse_tracking)
 
     def remove_layer(self, layer: GLLayer) -> None:
         """Remove a layer from this GLWidget
@@ -304,17 +306,23 @@ class GLWidget(QWidget):
                 pos=pg.Vector(2.5, 0, 0), distance=10, elevation=45, azimuth=0
             )
 
+    def _update_mouse_tracking(self) -> None:
+        """Enable detect_mouse_movement_in_scene if measure mode or any layer that
+        requires mouse movement tracking is active; disable it when both are off.
+        """
+        movement_layer_active = any(
+            layer.needs_mouse_movement_tracking and layer.visible()
+            for layer in self.layers
+        )
+        self.gl_view_widget.detect_mouse_movement_in_scene = (
+            self.measure_mode_enabled or movement_layer_active
+        )
+
     def toggle_measure_mode(self) -> None:
         """Toggles measure mode in the 3D visualizer"""
         self.measure_mode_enabled = not self.measure_mode_enabled
 
-        # Enable/disable detect_mouse_movement_in_scene in ExtendedGLViewWidget
-        # so that the mouse_in_scene_moved_signal is emitted if measure mode is on.
-        #
-        # Normally we want to disable detect_mouse_movement_in_scene so that we
-        # don't do unnecessary calculations every tick to find the point in the scene
-        # that the mouse is pointing at.
-        self.gl_view_widget.detect_mouse_movement_in_scene = self.measure_mode_enabled
+        self._update_mouse_tracking()
 
         if self.measure_mode_enabled:
             self.measure_layer = GLMeasureLayer("Measure")

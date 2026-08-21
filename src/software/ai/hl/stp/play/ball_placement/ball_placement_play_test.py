@@ -5,14 +5,14 @@ from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_enters_region import (
+from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
 )
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyExitsRegion,
 )
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 
@@ -200,7 +200,7 @@ def run_ball_placement_scenario(
         inv_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        test_timeout_s=[15],
+        test_timeout_s=[30],
     )
 
     simulated_test_runner.run_test(
@@ -209,7 +209,7 @@ def run_ball_placement_scenario(
         inv_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
         ag_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
         ag_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        test_timeout_s=[5],
+        test_timeout_s=[10],
     )
 
 

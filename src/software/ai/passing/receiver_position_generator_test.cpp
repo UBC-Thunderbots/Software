@@ -24,12 +24,12 @@ class ReceiverPositionGeneratorTest : public testing::Test
      * Verify that the receiving position is open and not blocked by any enemy robots
      * @param receiving_positions A list of receiving positions to verify
      */
-    void verifyReceivingPositionIsOpen(const std::vector<Point> &receiving_positions)
+    void verifyReceivingPositionIsOpen(const std::vector<Point>& receiving_positions)
     {
-        for (const Point &receiving_position : receiving_positions)
+        for (const Point& receiving_position : receiving_positions)
         {
             Segment pass_segment(world->ball().position(), receiving_position);
-            for (const Robot &robot : world->enemyTeam().getAllRobots())
+            for (const Robot& robot : world->enemyTeam().getAllRobots())
             {
                 EXPECT_FALSE(intersects(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS),
                                         pass_segment))
@@ -117,7 +117,7 @@ TEST_F(ReceiverPositionGeneratorTest, test_half_of_field_blocked)
         getConvergedBestReceivingPositions(num_positions);
 
     ASSERT_EQ(best_receiving_positions.size(), num_positions);
-    for (const Point &receiving_position : best_receiving_positions)
+    for (const Point& receiving_position : best_receiving_positions)
     {
         EXPECT_LT(receiving_position.y(), 0)
             << "Receiving position " << receiving_position

@@ -49,7 +49,7 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
+void SensorFusion::processSensorProto(const SensorProto& sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
@@ -80,7 +80,7 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 }
 
 
-void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
+void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket& packet)
 {
     if (packet.has_geometry())
     {
@@ -109,7 +109,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
     }
 }
 
-void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet)
+void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData& geometry_packet)
 {
     field = createField(geometry_packet);
     if (!field)
@@ -120,7 +120,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
     }
 }
 
-void SensorFusion::updateWorld(const SSLProto::Referee &packet)
+void SensorFusion::updateWorld(const SSLProto::Referee& packet)
 {
     if (sensor_fusion_config.friendly_color_yellow())
     {
@@ -167,14 +167,14 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 }
 
 void SensorFusion::updateWorld(
-    const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
+    const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>& robot_status_msgs)
 {
-    for (auto &robot_status_msg : robot_status_msgs)
+    for (auto& robot_status_msg : robot_status_msgs)
     {
         RobotId robot_id = robot_status_msg.robot_id();
         std::set<RobotCapability> unavailableCapabilities;
 
-        for (const auto &error_code_msg : robot_status_msg.error_code())
+        for (const auto& error_code_msg : robot_status_msg.error_code())
         {
             if (error_code_msg == TbotsProto::ErrorCode::HIGH_CAP)
             {
@@ -229,7 +229,7 @@ bool SensorFusion::shouldTrustRobotStatus()
 
 
 
-void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
+void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection_frame)
 {
     double min_valid_x              = sensor_fusion_config.min_valid_x();
     double max_valid_x              = sensor_fusion_config.max_valid_x();
@@ -249,15 +249,15 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     if (defending_positive_side)
     {
-        for (auto &detection : ball_detections)
+        for (auto& detection : ball_detections)
         {
             detection = invert(detection);
         }
-        for (auto &detection : yellow_team)
+        for (auto& detection : yellow_team)
         {
             detection = invert(detection);
         }
-        for (auto &detection : blue_team)
+        for (auto& detection : blue_team)
         {
             detection = invert(detection);
         }
@@ -298,9 +298,9 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
             .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
             .confidence = 1}};
 
-		
-
-        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
+        std::optional<Ball> new_ball =
+            createBall(dribbler_in_ball_detection,
+                       Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
 
         if (new_ball)
         {
@@ -309,7 +309,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     else
     {
-        std::optional<Ball> new_ball = createBall(ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
+        std::optional<Ball> new_ball = createBall(
+            ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
         if (new_ball)
         {
             // If vision detected a new ball, then use that one
@@ -351,18 +352,18 @@ void SensorFusion::updateBall(Ball new_ball)
 }
 
 std::optional<Ball> SensorFusion::createBall(
-    const std::vector<BallDetection> &ball_detections, const Timestamp& current_time)
+    const std::vector<BallDetection>& ball_detections, const Timestamp& current_time)
 {
     if (field)
     {
-        std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary(), current_time);
+        std::optional<Ball> new_ball = ball_filter.estimateBallState(
+            ball_detections, field.value().fieldBoundary(), current_time);
         return new_ball;
     }
     return std::nullopt;
 }
 
-Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
+Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections)
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
         friendly_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
@@ -380,7 +381,7 @@ void SensorFusion::updateDribbleDisplacement()
     }
 
     // Add new touching robots and remove non-touching robots
-    for (const Robot &robot : friendly_team.getAllRobots())
+    for (const Robot& robot : friendly_team.getAllRobots())
     {
         if (robot.isNearDribbler(ball->position(),
                                  sensor_fusion_config.touching_ball_threshold_meters()))
@@ -396,11 +397,11 @@ void SensorFusion::updateDribbleDisplacement()
         }
     }
     // Remove touching robots that have vanished
-    for (const auto &[robot_id, contact_point] : ball_contacts_by_friendly_robots)
+    for (const auto& [robot_id, contact_point] : ball_contacts_by_friendly_robots)
     {
         if (std::none_of(friendly_team.getAllRobots().begin(),
                          friendly_team.getAllRobots().end(),
-                         [&](const Robot &robot) { return robot.id() == robot_id; }))
+                         [&](const Robot& robot) { return robot.id() == robot_id; }))
         {
             ball_contacts_by_friendly_robots.erase(robot_id);
         }
@@ -412,7 +413,7 @@ void SensorFusion::updateDribbleDisplacement()
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
                    std::back_inserter(dribble_displacements),
-                   [&](const auto &kv_pair)
+                   [&](const auto& kv_pair)
                    {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
@@ -427,18 +428,18 @@ void SensorFusion::updateDribbleDisplacement()
     {
         dribble_displacement = *std::max_element(
             dribble_displacements.begin(), dribble_displacements.end(),
-            [](const Segment &a, const Segment &b) { return a.length() < b.length(); });
+            [](const Segment& a, const Segment& b) { return a.length() < b.length(); });
     }
 }
 
-Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
+Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections)
 {
     Team new_enemy_team =
         enemy_team_filter.getFilteredData(enemy_team, robot_detections, false);
     return new_enemy_team;
 }
 
-std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee &packet)
+std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee& packet)
 {
     std::optional<Point> point_opt = ssl_referee::getBallPlacementPoint(packet);
 
@@ -472,9 +473,9 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     return ball_detection;
 }
 
-bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
+bool SensorFusion::teamHasBall(const Team& team, const Ball& ball)
 {
-    for (const auto &robot : team.getAllRobots())
+    for (const auto& robot : team.getAllRobots())
     {
         if (robot.isNearDribbler(ball.position()))
         {

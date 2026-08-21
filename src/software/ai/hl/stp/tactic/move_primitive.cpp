@@ -10,12 +10,12 @@
 
 
 MovePrimitive::MovePrimitive(
-    const Robot &robot, const Point &destination, const Angle &final_angle,
-    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
-    const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
-    const TbotsProto::DribblerMode &dribbler_mode,
-    const TbotsProto::BallCollisionType &ball_collision_type,
-    const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
+    const Robot& robot, const Point& destination, const Angle& final_angle,
+    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
+    const TbotsProto::ObstacleAvoidanceMode& obstacle_avoidance_mode,
+    const TbotsProto::DribblerMode& dribbler_mode,
+    const TbotsProto::BallCollisionType& ball_collision_type,
+    const AutoChipOrKick& auto_chip_or_kick, std::optional<double> cost_override)
     : robot(robot),
       destination(destination),
       final_angle(final_angle),
@@ -33,9 +33,10 @@ MovePrimitive::MovePrimitive(
     {
         double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot.robotConstants());
-        trajectory.generate(robot.position(), destination, robot.velocity(), max_speed,
-                            robot.robotConstants().robot_max_acceleration_m_per_s_2,
-                            robot.robotConstants().robot_max_deceleration_m_per_s_2);
+        trajectory.generate(
+            robot.position(), destination, robot.velocity(), max_speed,
+            robot.robotConstants().robot_trajectory_max_acceleration_m_per_s_2,
+            robot.robotConstants().robot_trajectory_max_deceleration_m_per_s_2);
 
         angular_trajectory.generate(
             robot.orientation(), final_angle, robot.angularVelocity(),
@@ -53,9 +54,9 @@ MovePrimitive::MovePrimitive(
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 MovePrimitive::generatePrimitiveProtoMessage(
-    const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-    const RobotNavigationObstacleFactory &obstacle_factory)
+    const World& world, const std::set<TbotsProto::MotionConstraint>& motion_constraints,
+    const std::map<RobotId, TrajectoryPath>& robot_trajectories,
+    const RobotNavigationObstacleFactory& obstacle_factory)
 {
     // Generate obstacle avoiding trajectory
     updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
@@ -63,8 +64,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         max_allowed_speed_mode, robot.robotConstants());
     KinematicConstraints constraints(
-        max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
-        robot.robotConstants().robot_max_deceleration_m_per_s_2);
+        max_speed, robot.robotConstants().robot_trajectory_max_acceleration_m_per_s_2,
+        robot.robotConstants().robot_trajectory_max_deceleration_m_per_s_2);
 
     // Shrink the field by the radius of robot to ensure robot don't go out of bounds, if
     // we are in a game Return normal field boundaries if not in a game
@@ -109,7 +110,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
     auto prev_trajectory_it = robot_trajectories.find(robot.id());
     if (prev_trajectory_it != robot_trajectories.end())
     {
-        const auto &prev_trajectory_path_nodes =
+        const auto& prev_trajectory_path_nodes =
             prev_trajectory_it->second.getTrajectoryPathNodes();
         if (!prev_trajectory_path_nodes.empty())
         {
@@ -139,7 +140,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
     xy_traj_params.set_max_speed_mode(max_allowed_speed_mode);
     *(primitive_proto->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
 
-    const auto &path_nodes = traj_path->getTrajectoryPathNodes();
+    const auto& path_nodes = traj_path->getTrajectoryPathNodes();
     // Populate the sub-destinations if there are any
     if (path_nodes.size() >= 2)
     {
@@ -187,9 +188,9 @@ MovePrimitive::generatePrimitiveProtoMessage(
 }
 
 void MovePrimitive::updateObstacles(
-    const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-    const RobotNavigationObstacleFactory &obstacle_factory)
+    const World& world, const std::set<TbotsProto::MotionConstraint>& motion_constraints,
+    const std::map<RobotId, TrajectoryPath>& robot_trajectories,
+    const RobotNavigationObstacleFactory& obstacle_factory)
 {
     // Separately store the non-robot + non-ball obstacles
     field_obstacles =
@@ -198,7 +199,7 @@ void MovePrimitive::updateObstacles(
 
     // Adding virtual obstacles
     auto virtual_obstacles = world.getVirtualObstacles().obstacles();
-    for (TbotsProto::Obstacle &obstacle : virtual_obstacles)
+    for (TbotsProto::Obstacle& obstacle : virtual_obstacles)
     {
         if (!obstacle.has_polygon())
         {
@@ -214,7 +215,7 @@ void MovePrimitive::updateObstacles(
     }
 
 
-    for (const Robot &enemy : world.enemyTeam().getAllRobots())
+    for (const Robot& enemy : world.enemyTeam().getAllRobots())
     {
         if (obstacle_avoidance_mode == TbotsProto::SAFE)
         {
@@ -234,7 +235,7 @@ void MovePrimitive::updateObstacles(
         }
     }
 
-    for (const Robot &friendly : world.friendlyTeam().getAllRobots())
+    for (const Robot& friendly : world.friendlyTeam().getAllRobots())
     {
         if (friendly.id() != robot.id())
         {
@@ -261,8 +262,8 @@ void MovePrimitive::updateObstacles(
 }
 
 void MovePrimitive::getVisualizationProtos(
-    TbotsProto::ObstacleList &obstacle_list_out,
-    TbotsProto::PathVisualization &path_visualization_out) const
+    TbotsProto::ObstacleList& obstacle_list_out,
+    TbotsProto::PathVisualization& path_visualization_out) const
 {
     // If we are sending lots of duplicated obstacles, then it will cause the system
     // network buffer overflow. Therefore, we selectively populate some of the obstacles.

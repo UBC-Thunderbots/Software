@@ -31,6 +31,7 @@ cc_test(
         "//proto/message_translation:er_force_world",
         "//proto/primitive:primitive_msg_factory",
         "//shared/test_util:tbots_gtest_main",
+        "//software/physics:euclidean_to_wheel",
         "//software/test_util",
         "//software/world",
     ],
