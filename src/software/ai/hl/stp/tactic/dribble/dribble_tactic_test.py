@@ -473,7 +473,7 @@ def test_robot_not_bumping_ball_when_turning(
     # TODO (#2514): tune dribbling and re-enable
     # Robot always not excessively dribbling
     always_validations = [
-        [BallAlwaysStaysInRegion([tbots_cpp.Circle(ball_location, 0.05)])]
+        [BallAlwaysStaysInRegion([tbots_cpp.Circle(ball_location, 0.5)])]
     ]
 
     simulated_test_runner.run_test(

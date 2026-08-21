@@ -11,6 +11,10 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
+// CSV file that the filtered ball state is logged to, alongside the ground truth
+// ball state from the simulator, for evaluating the ball filter
+static const std::string BALL_FILTER_CSV_FILE_NAME = "realistic_ball_filter_v1.csv";
+
 int main(int argc, char** argv)
 {
     struct CommandLineArgs
@@ -48,6 +52,9 @@ int main(int argc, char** argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
+        LOG(CSV, BALL_FILTER_CSV_FILE_NAME)
+            << "timestamp_s,fused_x,fused_y,fused_vel_x,fused_vel_y,truth_x,truth_y,"
+               "true_vel_x,true_vel_y,is_occluded\n";
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -103,6 +110,10 @@ int main(int argc, char** argv)
         // World Buffer
         TbotsProto::World blue_vision;
         TbotsProto::World yellow_vision;
+
+        // Timestamp of the first vision message received, so that logged timestamps
+        // start at 0
+        double start_timestamp_s = 0.0;
 
         // Outputs
         // SSL Wrapper Output
@@ -222,7 +233,28 @@ int main(int argc, char** argv)
                     yellow_robot_status_output.sendProto(packet);
                 }
 
-                simulator_state_output.sendProto(er_force_sim->getSimulatorState());
+                auto simulator_state = er_force_sim->getSimulatorState();
+
+                double current_timestamp_s =
+                    yellow_vision.time_sent().epoch_timestamp_seconds();
+                if (start_timestamp_s == 0.0)
+                {
+                    start_timestamp_s = current_timestamp_s;
+                }
+
+                const auto& fused_ball = yellow_vision.ball().current_state();
+                LOG(CSV, BALL_FILTER_CSV_FILE_NAME)
+                    << (current_timestamp_s - start_timestamp_s) << ","
+                    << fused_ball.global_position().x_meters() << ","
+                    << fused_ball.global_position().y_meters() << ","
+                    << fused_ball.global_velocity().x_component_meters() << ","
+                    << fused_ball.global_velocity().y_component_meters() << ","
+                    << simulator_state.ball().p_x() << "," << simulator_state.ball().p_y()
+                    << "," << simulator_state.ball().v_x() << ","
+                    << simulator_state.ball().v_y() << ","
+                    << !er_force_sim->isBallVisible() << "\n";
+
+                simulator_state_output.sendProto(simulator_state);
             });
 
         // This blocks forever without using the CPU
