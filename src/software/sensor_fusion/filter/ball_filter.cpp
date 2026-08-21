@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <utility>
 #include <vector>
 
@@ -175,8 +176,10 @@ std::optional<BallDetection> BallFilter::getBestBallDetection(
 
 void BallFilter::predict(double delta_t)
 {
-   kalman_filter.process_model << 1, 0, delta_t, 0, 0, 1, 0, delta_t, 0, 0, DAMPING, 0,
-        0, 0, 0, DAMPING;
+    const double velocity_retained = std::pow(DAMPING, delta_t);
+
+    kalman_filter.process_model << 1, 0, delta_t, 0, 0, 1, 0, delta_t, 0, 0,
+        velocity_retained, 0, 0, 0, 0, velocity_retained;
 
    // We compute the process covariance with the Discrete White Noise Acceleration model.
    // It depends on delta_t, so we compute it dynamically based on time passed since last prediction
