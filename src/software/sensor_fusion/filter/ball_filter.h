@@ -112,7 +112,7 @@ class BallFilter
 
     /**
      * Discards the filter's current estimate and reinitializes it on the given
-     * measurement, seeding the velocity from the previous measurement if we have one.
+     * measurement, at rest and with the covariance widened back out.
      *
      * @param measurement The measurement to reinitialize the estimate on
      * @param current_time The time the measurement was taken at
