@@ -7,6 +7,7 @@ from software.thunderscope.gl.helpers import gl_patches
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 
+# monkey patches for pyqtgraph's OpenGL classes to fix scenegraph bugs
 GLGraphicsItem.setParentItem = gl_patches.GLGraphicsItem_setParentItem_patched
 GLViewMixin.addItem = gl_patches.GLViewMixin_addItem_patched
 GLViewMixin.removeItem = gl_patches.GLViewMixin_removeItem_patched
