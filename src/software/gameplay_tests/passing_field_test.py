@@ -39,20 +39,18 @@ def test_passing(field_test_runner):
     )
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[passer_robot_id].kick_or_chip.CopyFrom(
-        KickTactic(
-            kick_or_chip_origin=Point(
-                x_meters=pass_to_test.passerPoint().x(),
-                y_meters=pass_to_test.passerPoint().y(),
-            ),
-            kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
-            auto_chip_or_kick=AutoChipOrKick(
-                autokick_speed_m_per_s=pass_to_test.speed(),
-            ),
-        )
+    # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
+    # open. KickOrChipTactic just does the kick we want
+    blue_tactics = {}
+    blue_tactics[passer_robot_id] = KickOrChipTactic(
+        kick_or_chip_origin=Point(
+            x_meters=pass_to_test.passerPoint().x(),
+            y_meters=pass_to_test.passerPoint().y(),
+        ),
+        kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=AutoChipOrKick(
+            autokick_speed_m_per_s=pass_to_test.speed(),
+        ),
     )
 
     # if we want a friendly robot to receive the pass
