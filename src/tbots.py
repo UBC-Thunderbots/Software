@@ -93,6 +93,7 @@ class BazelFlag(tuple, Enum):
     TRACY = ("--cxxopt=-DTRACY_ENABLE",)
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)
+    SERIAL_TESTS = ("--local_test_jobs=1",)
     DEBUG_POWERLOOP = ("--//software/power:debug_powerloop",)
     DISABLE_POWER_SERVICE = ("--//software/embedded:disable_power_service",)
     DISABLE_MOTOR_SERVICE = ("--//software/embedded:disable_motor_service",)
@@ -145,7 +146,8 @@ def main(
     :param test_suite: run the entire test suite instead of a single target
     :param enable_thunderscope: launch with Thunderscope enabled
     :param stop_ai_on_start: start the binary with the AI paused
-    :param jobs_option: value passed to Bazel's --jobs flag
+    :param jobs_option: value passed to Bazel's --jobs flag. Also opts tests back
+        into running in parallel, which they do not do by default
     :param runs: value passed to Bazel's --runs_per_test flag
     :param robot_name: hostname of the robot targeted by an Ansible playbook
     :param ansible_playbook: name of the Ansible playbook to run
@@ -233,6 +235,12 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
+        # Tests run one at a time unless asked otherwise. Simulated tests each spawn a
+        # full system and stream their logs to the same terminal, so running several at
+        # once interleaves the output of unrelated tests with nothing marking which line
+        # came from which. Only test execution is serialized; the build stays parallel.
+        BazelFlag.SERIAL_TESTS: config.action == ActionArgument.test
+        and not config.jobs_option,
         BazelFlag.DEBUG_POWERLOOP: config.debug_powerloop,
         BazelFlag.DISABLE_POWER_SERVICE: config.disable_power_service,
         BazelFlag.DISABLE_MOTOR_SERVICE: config.disable_motor_service,

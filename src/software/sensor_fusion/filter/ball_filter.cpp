@@ -1,11 +1,18 @@
 #include "software/sensor_fusion/filter/ball_filter.h"
 
 #include <algorithm>
+#include <array>
+#include <utility>
 #include <vector>
 
 #include "shared/constants.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
+#include "software/geom/circle.h"
 #include "software/geom/geom_constants.h"
+#include "software/logger/logger.h"
 
 namespace
 {
@@ -58,8 +65,8 @@ namespace
     // sitting still cannot by itself push a detection out of reach of the estimate
     constexpr double MAX_BALL_SPEED_GATE_TOLERANCE_M = 0.05;
 
-    // The fraction of its speed the ball retains when it bounces off a robot
-    constexpr double ROBOT_COLLISION_RESTITUTION = 0.6;
+    // The fraction of its speed the ball retains when it bounces off something
+    constexpr double COLLISION_RESTITUTION = 0.6;
 
     // How many detections in a row may be rejected as outliers before we conclude the
     // estimate itself is wrong and reset onto the newest detection
@@ -79,11 +86,11 @@ BallFilter::BallFilter()
 }
 
 std::optional<Ball> BallFilter::estimateBallState(
-    const std::vector<BallDetection>& new_ball_detections, const Rectangle& filter_area,
+    const std::vector<BallDetection>& new_ball_detections, const Field& field,
     const std::vector<Robot>& robots, const Timestamp& current_time)
 {
     const std::optional<BallDetection> best_ball_detection =
-        getBestBallDetection(new_ball_detections, filter_area);
+        getBestBallDetection(new_ball_detections, field.fieldBoundary());
 
     // Coast the estimate forward to the current time. Doing this before considering the
     // new detection means the filter keeps producing a sensible ball even on frames
@@ -92,15 +99,18 @@ std::optional<Ball> BallFilter::estimateBallState(
     // This advances from the last time we predicted rather than from the last accepted
     // detection, so that a run of frames without one coasts the estimate forward by the
     // elapsed time once rather than re-integrating the whole gap on every frame.
+    const Point position_before_predict(kalman_filter.state_estimate(0),
+                                        kalman_filter.state_estimate(1));
+
     if (last_predict_timestamp)
     {
         predict((current_time - *last_predict_timestamp).toSeconds());
     }
     last_predict_timestamp = current_time;
 
-    // A ball that has run into a robot is not following the motion model any more, so
-    // correct for the bounce before comparing the prediction against the new detection
-    handleRobotCollisions(robots);
+    // A ball touching anything is not following the motion model any more, so correct for
+    // the contact before comparing the prediction against the new detection
+    handleCollisions(position_before_predict, robots, field);
 
     if (best_ball_detection)
     {
@@ -195,55 +205,143 @@ void BallFilter::predict(double delta_t)
     kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
 }
 
-void BallFilter::handleRobotCollisions(const std::vector<Robot>& robots)
+void BallFilter::handleCollisions(const Point& previous_position,
+                                  const std::vector<Robot>& robots, const Field& field)
 {
     const Point ball_position(kalman_filter.state_estimate(0),
                               kalman_filter.state_estimate(1));
     const Vector ball_velocity(kalman_filter.state_estimate(2),
                                kalman_filter.state_estimate(3));
 
-    // BALL_MAX_RADIUS_METERS is not constexpr, so neither is this
-    const double collision_distance = ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS;
+    const std::optional<Collision> collision =
+        getCollision(Segment(previous_position, ball_position), robots, field);
 
+    if (!collision)
+    {
+        return;
+    }
+
+    // The ball is touching something, so the motion model no longer describes what it is
+    // about to do and the covariance we have built up is not justified. Widen it back out
+    // and let the next few detections pin the ball down again. This happens on any
+    // contact, including the ones we cannot usefully reflect off below.
+    kalman_filter.state_covariance = INITIAL_COVARIANCE;
+
+    const double approach_speed = ball_velocity.dot(collision->normal);
+
+    // The ball is already moving away from the surface, so it has either bounced already
+    // or is rolling out of the contact under its own momentum. There is nothing to
+    // reflect, but the widened covariance above still stands.
+    if (approach_speed >= 0)
+    {
+        return;
+    }
+
+    const Vector reflected_velocity =
+        (ball_velocity - collision->normal * (2 * approach_speed)) *
+        COLLISION_RESTITUTION;
+
+    kalman_filter.state_estimate(2) = reflected_velocity.x();
+    kalman_filter.state_estimate(3) = reflected_velocity.y();
+
+}
+
+std::vector<std::pair<Segment, std::string_view>> BallFilter::getBarriers(
+    const Field& field)
+{
+    std::vector<std::pair<Segment, std::string_view>> barriers;
+
+    // A goal is a frame, not a box. Its mouth is an opening the ball travels through, so
+    // only the back of the net and the two posts can be bounced off; treating the mouth
+    // as a surface would reflect every shot straight back out of the goal it just entered.
+    const auto add_goal = [&barriers](const Rectangle& goal, double back_x,
+                                      std::string_view name)
+    {
+        barriers.emplace_back(
+            Segment(Point(back_x, goal.yMin()), Point(back_x, goal.yMax())), name);
+        barriers.emplace_back(
+            Segment(Point(goal.xMin(), goal.yMax()), Point(goal.xMax(), goal.yMax())),
+            name);
+        barriers.emplace_back(
+            Segment(Point(goal.xMin(), goal.yMin()), Point(goal.xMax(), goal.yMin())),
+            name);
+    };
+
+    // Each goal sits outside the field lines, so the back of the net is the edge further
+    // from the centre of the field
+    add_goal(field.friendlyGoal(), field.friendlyGoal().xMin(), "the friendly goal");
+    add_goal(field.enemyGoal(), field.enemyGoal().xMax(), "the enemy goal");
+
+    for (const Segment& wall : field.fieldBoundary().getSegments())
+    {
+        barriers.emplace_back(wall, "the field boundary");
+    }
+
+    return barriers;
+}
+
+std::optional<BallFilter::Collision> BallFilter::getCollision(
+    const Segment& ball_path, const std::vector<Robot>& robots, const Field& field)
+{
+    // BALL_MAX_RADIUS_METERS is not constexpr, so neither is this
+    const double robot_collision_distance =
+        ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS;
+
+    // Robots are the one obstacle we treat as round, so the surface normal points
+    // straight out from the robot's centre through the point of contact
     for (const Robot& robot : robots)
     {
-        const Vector robot_to_ball = ball_position - robot.position();
-
-        // The ball is not touching this robot, or it is sitting exactly on top of the
-        // robot's centre and there is no direction to bounce it in
-        if (robot_to_ball.length() > collision_distance ||
-            robot_to_ball.length() < FIXED_EPSILON)
+        if (!intersects(ball_path, Circle(robot.position(), robot_collision_distance)))
         {
             continue;
         }
 
-        // The surface we are bouncing off points from the robot out towards the ball
-        const Vector collision_normal = robot_to_ball.normalize();
-        const double approach_speed   = ball_velocity.dot(collision_normal);
+        const Point contact_point   = closestPoint(robot.position(), ball_path);
+        const Vector robot_to_ball  = contact_point - robot.position();
 
-        // The ball is already moving away from the robot, so it has either bounced
-        // already or is rolling out of the collision under its own momentum
-        if (approach_speed >= 0)
+        // The ball passed exactly over the robot's centre, so there is no direction to
+        // bounce it in
+        if (robot_to_ball.length() < FIXED_EPSILON)
         {
             continue;
         }
 
-        const Vector reflected_velocity =
-            (ball_velocity - collision_normal * (2 * approach_speed)) *
-            ROBOT_COLLISION_RESTITUTION;
-
-        kalman_filter.state_estimate(2) = reflected_velocity.x();
-        kalman_filter.state_estimate(3) = reflected_velocity.y();
-
-        // How the ball really came off the robot depends on the spin it had and where on
-        // the hull it hit, neither of which we know, so widen the estimate back out and
-        // let the next few detections pin it down again
-        kalman_filter.state_covariance = INITIAL_COVARIANCE;
-
-        // One bounce per frame. A ball wedged between two robots would otherwise have its
-        // velocity reflected twice and come back out pointing the way it came in.
-        break;
+        return Collision{.normal = robot_to_ball.normalize(), .object = "a robot"};
     }
+
+    for (const auto& [barrier, name] : getBarriers(field))
+    {
+        // Either the ball crossed the barrier this frame, or it is sitting against it
+        // with too little speed for the path to reach across
+        if (!intersects(ball_path, barrier) &&
+            distance(ball_path.getEnd(), barrier) > BALL_MAX_RADIUS_METERS)
+        {
+            continue;
+        }
+
+        const Vector barrier_direction = barrier.getEnd() - barrier.getStart();
+
+        if (barrier_direction.length() < FIXED_EPSILON)
+        {
+            continue;
+        }
+
+        Vector normal = barrier_direction.perpendicular().normalize();
+
+        // A segment has two perpendiculars; we want the one pointing back towards the
+        // side the ball approached from
+        const Vector barrier_to_ball =
+            ball_path.getStart() - closestPoint(ball_path.getStart(), barrier);
+
+        if (normal.dot(barrier_to_ball) < 0)
+        {
+            normal = -normal;
+        }
+
+        return Collision{.normal = normal, .object = name};
+    }
+
+    return std::nullopt;
 }
 
 bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,

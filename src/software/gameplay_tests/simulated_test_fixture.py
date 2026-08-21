@@ -574,7 +574,7 @@ def simulated_test_runner():
     with Simulator(
         f"{args.simulator_runtime_dir}/test/{test_name}",
         args.debug_simulator,
-        args.enable_realism,
+        args.enable_realism
     ) as simulator, FullSystem(
         "software/unix_full_system",
         f"{args.blue_full_system_runtime_dir}/test/{test_name}",

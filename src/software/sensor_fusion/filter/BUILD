@@ -24,6 +24,7 @@ cc_library(
         ":vision_detection",
         "//shared:constants",
         "//software/geom/algorithms",
+        "//software/logger",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",

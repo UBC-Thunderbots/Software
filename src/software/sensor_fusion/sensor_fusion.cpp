@@ -363,7 +363,7 @@ std::optional<Ball> SensorFusion::createBall(
         robots.insert(robots.end(), enemy_robots.begin(), enemy_robots.end());
 
         std::optional<Ball> new_ball = ball_filter.estimateBallState(
-            ball_detections, field.value().fieldBoundary(), robots, current_time);
+            ball_detections, field.value(), robots, current_time);
         return new_ball;
     }
     return std::nullopt;

@@ -2,9 +2,13 @@
 
 #include <Eigen/Dense>
 #include <optional>
+#include <string_view>
+#include <utility>
 
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
+#include "software/world/field.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
@@ -35,9 +39,11 @@
  * teleports (a ball placement, or a detection we had wrongly locked onto), so after
  * enough consecutive rejections the filter resets onto the newest detection.
  *
- * A ball that runs into a robot stops following the motion model entirely, so before
- * considering the new detection the filter checks for robots overlapping its estimate
- * and reflects the velocity off any it finds.
+ * A ball in contact with anything -- a robot, a goalpost, the back of a net, the walls
+ * around the field -- has stopped following the motion model, and we no longer have
+ * grounds for the confidence the covariance claims. So before considering the new
+ * detection the filter looks for contact, widens the covariance back out when it finds
+ * any, and reflects the velocity off the surface that was hit.
  */
 class BallFilter
 {
@@ -52,8 +58,8 @@ class BallFilter
      * estimated state of the ball given the new data
      *
      * @param new_ball_detections A list of new Ball detections
-     * @param filter_area The area within which the ball filter will work. Any detections
-     * outside of this area will be ignored.
+     * @param field The field being played on. Detections outside its boundary are
+     * ignored, and its goals are obstacles the ball may bounce off.
      * @param robots The robots currently on the field, which the ball may bounce off
      * @param current_time The time to estimate the ball's state at
      *
@@ -61,9 +67,8 @@ class BallFilter
      * If a filtered result cannot be calculated, returns std::nullopt
      */
     std::optional<Ball> estimateBallState(
-        const std::vector<BallDetection>& new_ball_detections,
-        const Rectangle& filter_area, const std::vector<Robot>& robots,
-        const Timestamp& current_time);
+        const std::vector<BallDetection>& new_ball_detections, const Field& field,
+        const std::vector<Robot>& robots, const Timestamp& current_time);
 
    private:
     // The dimensions of the Kalman filter this ball filter is built on.
@@ -103,13 +108,61 @@ class BallFilter
     void predict(double delta_t);
 
     /**
-     * Reflects the estimated velocity off any robot the estimated position has run into,
-     * and widens the covariance to reflect how little we know about the ball immediately
-     * after a bounce.
+     * Widens the covariance if the estimated position is in contact with anything, and
+     * reflects the estimated velocity off whatever it hit.
      *
+     * The covariance is widened on any contact, including one we cannot usefully reflect
+     * off, because a ball touching another object is no longer described by the motion
+     * model and the filter has no business staying as confident as it was.
+     *
+     * @param previous_position Where the estimate was before it was advanced this frame
      * @param robots The robots currently on the field
+     * @param field The field being played on
      */
-    void handleRobotCollisions(const std::vector<Robot>& robots);
+    void handleCollisions(const Point& previous_position,
+                          const std::vector<Robot>& robots, const Field& field);
+
+    // A contact between the ball and something else on the field
+    struct Collision
+    {
+        // The outward normal of the surface that was hit
+        Vector normal;
+        // What was hit, for logging
+        std::string_view object;
+    };
+
+    /**
+     * Returns the contact between the ball and the field, if the ball hit anything over
+     * the given path or has come to rest against it.
+     *
+     * The test is against the whole path the ball travelled this frame rather than only
+     * where it ended up. A ball moving at 5 m/s covers over 8 cm between frames at 60 Hz,
+     * so a test that only asked whether the ball was currently within its own radius of a
+     * surface would step straight over anything thin, and a goalpost is thin.
+     *
+     * @param ball_path The path the ball travelled over this timestep
+     * @param robots The robots currently on the field
+     * @param field The field being played on
+     *
+     * @return The contact, or std::nullopt if the ball did not hit anything
+     */
+    static std::optional<Collision> getCollision(const Segment& ball_path,
+                                                 const std::vector<Robot>& robots,
+                                                 const Field& field);
+
+    /**
+     * Returns every surface on the field the ball can bounce off, paired with a name for
+     * logging.
+     *
+     * A goal is a frame rather than a box: its mouth is an opening the ball travels
+     * through, so only the back of the net and the two posts are barriers.
+     *
+     * @param field The field being played on
+     *
+     * @return The barrier segments and their names
+     */
+    static std::vector<std::pair<Segment, std::string_view>> getBarriers(
+        const Field& field);
 
     /**
      * Returns whether the ball could physically have reached the given position since
