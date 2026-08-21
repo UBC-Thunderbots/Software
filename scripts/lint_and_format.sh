@@ -70,6 +70,14 @@ function run_ruff() {
         printf "\n***Failed to lint/format Python files!***\n\n"
         exit 1
     fi
+
+    # F403 flags wildcard imports, F405 flags names resolved through wildcard imports.
+    /opt/tbotspython/bin/python3 -m ruff check $BAZEL_ROOT_DIR --select F403,F405
+
+    if [[ "$?" != 0 ]]; then
+        printf "\n***Wildcard imports should not be used (F403/F405)!***\n\n"
+        exit 1
+    fi
 }
 
 function run_code_spell(){
