@@ -79,24 +79,25 @@ class BallFilter
 
     /**
      * Widens the covariance if the ball is in contact with anything on the field -- a
-     * robot, a goalpost, the back of a net, or the walls around the field -- and reflects
-     * the estimated velocity off whatever it hit.
+     * robot, a goalpost, the back of a net, or the walls around the field.
      *
      * The check is against the whole path the ball travelled this frame rather than only
      * where it ended up. A ball moving at 5 m/s covers over 8 cm between frames at 60 Hz,
      * so a test that only asked whether the ball was currently within its own radius of a
      * surface would step straight over anything thin, and a goalpost is thin.
      *
-     * The covariance is widened on any contact, including one we cannot usefully reflect
-     * off, because a ball touching another object is no longer described by the motion
-     * model and the filter has no business staying as confident as it was.
+     * Widening is the whole response. A ball touching another object is no longer
+     * described by the motion model, and the filter has no business staying as confident
+     * as it was -- but what the contact did to the velocity is not knowable from geometry,
+     * so we let the following detections settle it rather than asserting a bounce.
      *
      * @param previous_position Where the estimate was before it was advanced this frame
      * @param robots The robots currently on the field
      * @param field The field being played on
      */
-    void handleCollisions(const Point& previous_position,
-                          const std::vector<Robot>& robots, const Field& field);
+    void widenCovarianceOnContact(const Point& previous_position,
+                                  const std::vector<Robot>& robots,
+                                  const Field& field);
 
     /**
      * Returns whether the ball could physically have reached the given position since

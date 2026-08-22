@@ -70,9 +70,6 @@ namespace
     // sitting still cannot by itself push a detection out of reach of the estimate
     constexpr double MAX_BALL_SPEED_GATE_TOLERANCE_M = 0.05;
 
-    // The fraction of its speed the ball retains when it bounces off something
-    constexpr double COLLISION_RESTITUTION = 0.6;
-
     // How many detections in a row may be rejected as outliers before we conclude the
     // estimate itself is wrong and reset onto the newest detection
     constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
@@ -105,7 +102,7 @@ std::optional<Ball> BallFilter::estimateBallState(
         predict((current_time - *last_predict_timestamp).toSeconds());
     }
     last_predict_timestamp = current_time;
-    handleCollisions(position_before_predict, robots, field);
+    widenCovarianceOnContact(position_before_predict, robots, field);
 
 	// We use the detection if there is any
     if (best_ball_detection)
@@ -200,14 +197,12 @@ void BallFilter::predict(double delta_t)
     kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
 }
 
-void BallFilter::handleCollisions(const Point& previous_position,
-                                  const std::vector<Robot>& robots, const Field& field)
+void BallFilter::widenCovarianceOnContact(const Point& previous_position,
+                                          const std::vector<Robot>& robots,
+                                          const Field& field)
 {
     const Point ball_position(kalman_filter.state_estimate(0),
                               kalman_filter.state_estimate(1));
-    const Vector ball_velocity(kalman_filter.state_estimate(2),
-                               kalman_filter.state_estimate(3));
-
 	// Using the position before and after the model prediction step, we construct a segment
     const Segment ball_path(previous_position, ball_position);
 
@@ -305,26 +300,17 @@ void BallFilter::handleCollisions(const Point& previous_position,
         return;
     }
 
-	// If the function hasn't returned by now, the ball is in contact we something. We widen 
-	// the covaiance as we can't trust the physics model anymore; We must trust the measurement 
-	// as the ball is being moved by an external entirty
+    // If the function hasn't returned by now, the ball is in contact with something. We
+    // widen the covariance as we can't trust the physics model anymore; we must trust the
+    // measurement as the ball is being moved by an external entity.
+    //
+    // Widening is all we do. We deliberately do not reflect the velocity: what a contact
+    // does to the ball is not something we can know from geometry alone. A ball meeting a
+    // dribbler stops dead, one clipping a robot's hull glances off, one hitting a kicker
+    // plate leaves faster than it arrived -- and specular reflection would assert one
+    // confident answer for all three. Saying "we no longer know the velocity" is the
+    // honest statement, and the next detection or two re-establishes it from data.
     kalman_filter.state_covariance = INITIAL_COVARIANCE;
-
-    const double approach_speed = ball_velocity.dot(*contact_normal);
-
-    // The ball is already moving away from the surface, so it has either bounced already
-    // or is rolling out of the contact under its own momentum. There is nothing to
-    // reflect, but the widened covariance above still stands.
-    if (approach_speed >= 0)
-    {
-        return;
-    }
-
-    const Vector reflected_velocity =
-        (ball_velocity - *contact_normal * (2 * approach_speed)) * COLLISION_RESTITUTION;
-
-    kalman_filter.state_estimate(2) = reflected_velocity.x();
-    kalman_filter.state_estimate(3) = reflected_velocity.y();
 }
 
 bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,
