@@ -169,12 +169,11 @@ archive_override(
     url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",
 )
 
-# This is overridden despite being in BCR since it contains protoc v31.1. We can remove this once BCR updates
 archive_override(
-    module_name = "toolchains_protoc",
-    sha256 = "a694e39b16064011c11ce8719207736d1cd2ed5f56a4c73534174da7eea0dd2e",
-    strip_prefix = "toolchains_protoc-ea1a220e47b4c9c654f3bd198107c605ae27cf06",
-    url = "https://github.com/aspect-build/toolchains_protoc/archive/ea1a220e47b4c9c654f3bd198107c605ae27cf06.tar.gz",
+    module_name = "nanopb",
+    sha256 = "1ae1c26cee315dc8840d6e436d3306c43f8fe41c4326d00dbc193b334658bb82",
+    strip_prefix = "nanopb-d21fa5084287ab67da2f166f4def045bedcb535e",
+    url = "https://github.com/nanopb/nanopb/archive/d21fa5084287ab67da2f166f4def045bedcb535e.tar.gz",
 )
 
 http_archive(
@@ -349,15 +348,4 @@ single_version_override(
         "//starlark/patches/pybind11_protobuf:add_compat_proxy.patch",
         "//starlark/patches/pybind11_protobuf:protobuf35_compat.patch",
     ],
-)
-
-# nanopb's protoc-gen-nanopb plugin picks up the system python-protobuf
-# instead of the Bazel-managed one. The patch reorders sys.path so the
-# Bazel-managed protobuf is found first.
-single_version_override(
-    module_name = "nanopb",
-    patches = [
-        "//starlark/patches/nanopb:bazel_protobuf_path.patch",
-    ],
-    version = "0.4.9.1.bcr.3",
 )
