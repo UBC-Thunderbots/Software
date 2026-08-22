@@ -1,0 +1,29 @@
+--- python/build_targets.bzl
++++ python/build_targets.bzl
+@@ -97,7 +97,7 @@
+             # https://docs.bazel.build/versions/master/be/common-definitions.html#common-attributes
+             "manual",
+         ],
+-        deps = ["@system_python//:python_headers"],
++        deps = ["@rules_python//python/cc:current_py_cc_headers"],
+     )
+ 
+     native.config_setting(
+@@ -150,7 +150,7 @@
+             "@abseil-cpp//absl/status:statusor",
+             "@abseil-cpp//absl/strings",
+             "@abseil-cpp//absl/synchronization",
+-            "@system_python//:python_headers",
++            "@rules_python//python/cc:current_py_cc_headers",
+         ],
+     )
+ 
+@@ -471,7 +471,7 @@
+             "//src/google/protobuf/io",
+             "@abseil-cpp//absl/log:absl_check",
+             "@abseil-cpp//absl/status",
+-            "@system_python//:python_headers",
++            "@rules_python//python/cc:current_py_cc_headers",
+         ],
+     )
+ 

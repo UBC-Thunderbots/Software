@@ -352,6 +352,17 @@ single_version_override(
     ],
 )
 
+# protobuf's Python extensions pull host headers via @system_python, which
+# breaks aarch64 cross-compilation. Use @rules_python's py_cc_toolchain
+# headers (@rules_python//python/cc:current_py_cc_headers) instead.
+single_version_override(
+    module_name = "protobuf",
+    patches = [
+        "//starlark/patches/protobuf:use_py_cc_toolchain_headers.patch",
+        "//starlark/patches/protobuf:use_py_cc_toolchain_headers_py_extension.patch",
+    ],
+)
+
 # nanopb's protoc-gen-nanopb plugin picks up the system python-protobuf
 # instead of the Bazel-managed one. The patch reorders sys.path so the
 # Bazel-managed protobuf is found first.
