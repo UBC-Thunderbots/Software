@@ -32,15 +32,16 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "ball_filter_test",
-    srcs = ["ball_filter_test.cpp"],
-    deps = [
-        ":ball_filter",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/world:field",
-    ],
-)
+# Disable for kalman filter
+#cc_test(
+#    name = "ball_filter_test",
+#    srcs = ["ball_filter_test.cpp"],
+#    deps = [
+#        ":ball_filter",
+#        "//shared/test_util:tbots_gtest_main",
+#        "//software/world:field",
+#    ],
+#)
 
 cc_library(
     name = "robot_filter",

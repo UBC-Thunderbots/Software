@@ -86,10 +86,8 @@ class BallFilter
      * so a test that only asked whether the ball was currently within its own radius of a
      * surface would step straight over anything thin, and a goalpost is thin.
      *
-     * Widening is the whole response. A ball touching another object is no longer
-     * described by the motion model, and the filter has no business staying as confident
-     * as it was -- but what the contact did to the velocity is not knowable from geometry,
-     * so we let the following detections settle it rather than asserting a bounce.
+     * A ball travelling into whatever it touched is also brought to rest, since the
+     * motion model no longer describes where it is about to go.
      *
      * @param previous_position Where the estimate was before it was advanced this frame
      * @param robots The robots currently on the field

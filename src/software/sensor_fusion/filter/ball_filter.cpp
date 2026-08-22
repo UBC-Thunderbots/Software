@@ -52,13 +52,7 @@ namespace
     // for friction. Empirically measured.
     constexpr double DAMPING = 0.9889;
 
-    // Detections whose squared Mahalanobis distance from the current estimate exceeds
-    // this are treated as outliers and not fed to the filter. The measurement is 2D, so
-    // this is a chi-square quantile with 2 degrees of freedom: 9.21 keeps 99% of
-    // correctly predicted detections, 13.82 keeps 99.9%. Tightening it much below this
-    // starts throwing away good data whenever the motion model is briefly wrong, which
-    // it always is for a frame or two after a kick.
-    constexpr double MAHALANOBIS_GATE_THRESHOLD = 9.21;
+    constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
 
     // The fastest we will believe the ball could be travelling when deciding whether a
     // detection could plausibly belong to it. This is deliberately well above the 6.5 m/s
@@ -303,14 +297,9 @@ void BallFilter::widenCovarianceOnContact(const Point& previous_position,
     // If the function hasn't returned by now, the ball is in contact with something. We
     // widen the covariance as we can't trust the physics model anymore; we must trust the
     // measurement as the ball is being moved by an external entity.
-    //
-    // Widening is all we do. We deliberately do not reflect the velocity: what a contact
-    // does to the ball is not something we can know from geometry alone. A ball meeting a
-    // dribbler stops dead, one clipping a robot's hull glances off, one hitting a kicker
-    // plate leaves faster than it arrived -- and specular reflection would assert one
-    // confident answer for all three. Saying "we no longer know the velocity" is the
-    // honest statement, and the next detection or two re-establishes it from data.
-    kalman_filter.state_covariance = INITIAL_COVARIANCE;
+    kalman_filter.state_covariance  = INITIAL_COVARIANCE;
+    kalman_filter.state_estimate(2) = 0;
+    kalman_filter.state_estimate(3) = 0;
 }
 
 bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,
