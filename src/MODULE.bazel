@@ -172,6 +172,7 @@ archive_override(
 
 archive_override(
     module_name = "nanopb",
+    patches = ["//starlark/patches/nanopb:fix_protobuf_syspath.patch"],
     sha256 = "1ae1c26cee315dc8840d6e436d3306c43f8fe41c4326d00dbc193b334658bb82",
     strip_prefix = "nanopb-d21fa5084287ab67da2f166f4def045bedcb535e",
     url = "https://github.com/nanopb/nanopb/archive/d21fa5084287ab67da2f166f4def045bedcb535e.tar.gz",
