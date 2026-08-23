@@ -161,8 +161,9 @@ std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_
         return std::nullopt;
     }
 
-    uint16_t combined = (static_cast<uint8_t>(most_significant) << 8) |
-                        static_cast<uint8_t>(least_significant);
+    uint16_t combined =
+        static_cast<uint16_t>((static_cast<uint8_t>(most_significant) << 8) |
+                              static_cast<uint8_t>(least_significant));
 
     return static_cast<int16_t>(combined);
 }
@@ -240,7 +241,7 @@ std::optional<Eigen::Vector2d> ImuService::pollLinearAcceleration()
         return std::nullopt;
     }
 
-    int16_t raw_x = -opt_y.value();
+    int16_t raw_x = static_cast<int16_t>(-opt_y.value());
     int16_t raw_y = opt_x.value();
 
     double a_x = (static_cast<double>(raw_x) / SHRT_MAX) * ACCELEROMETER_FULL_SCALE_G *
