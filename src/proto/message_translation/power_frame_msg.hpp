@@ -325,7 +325,8 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
 {
     auto buffer       = serializeToVector(status);
     auto proto_status = std::make_unique<TbotsProto::PowerStatus>();
-    proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
+    std::ignore =
+        proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
     return proto_status;
 }
 
