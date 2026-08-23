@@ -327,6 +327,57 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["external_include_paths"] = feature(
+        name = "external_include_paths",
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.linkstamp_compile,
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.clif_match,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-isystem", "%{external_include_paths}"],
+                        iterate_over = "external_include_paths",
+                        expand_if_available = "external_include_paths",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    # Treat the bin directory (bazel-bin) as a system include directory.
+    # The purpose of this is to suppress warnings coming from generated headers
+    # (e.g. compiled protobufs) which are output in the bin directory.
+    # Our own headers are found through -iquote and are NOT affected by this,
+    # so our own code stays fully checked.
+    result["generated_include_paths"] = feature(
+        name = "generated_include_paths",
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.linkstamp_compile,
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.clif_match,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-isystem", ctx.bin_dir.path],
+                    ),
+                ],
+            ),
+        ],
+    )
+
     result["has_configured_linker_path_feature"] = feature(name = "has_configured_linker_path")
 
     result["copy_dynamic_libraries_to_binary_feature"] = \

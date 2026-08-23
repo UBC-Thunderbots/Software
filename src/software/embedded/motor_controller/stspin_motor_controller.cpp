@@ -262,7 +262,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
                 *std::next(delimiter_pos, MESSAGE_DELIMITER.size());
 
             const uint8_t current_seq = motor_status_.at(motor).seq_num;
-            const uint8_t prev_seq    = current_seq - 1;
+            const uint8_t prev_seq    = static_cast<uint8_t>(current_seq - 1);
 
             // Accept responses where the sequence number is either the current
             // sequence number (ACK for the message we just sent) or the

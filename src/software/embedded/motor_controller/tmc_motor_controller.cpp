@@ -65,15 +65,19 @@ int TmcMotorController::readThenWriteVelocity(const MotorIndex motor,
     {
         const int velocity_erpm = readThenWriteValue(
             motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET,
-            target_velocity * DRIBBLER_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM);
-        return velocity_erpm * DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
+            static_cast<int>(target_velocity *
+                             DRIBBLER_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM));
+        return static_cast<int>(velocity_erpm *
+                                DRIBBLER_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM);
     }
     else
     {
         const int velocity_erpm = readThenWriteValue(
             motor, TMC4671_PID_VELOCITY_ACTUAL, TMC4671_PID_VELOCITY_TARGET,
-            target_velocity * DRIVE_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM);
-        return velocity_erpm * DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM;
+            static_cast<int>(target_velocity *
+                             DRIVE_MOTOR_ELECTRICAL_RPM_PER_MECHANICAL_RPM));
+        return static_cast<int>(velocity_erpm *
+                                DRIVE_MOTOR_MECHANICAL_RPM_PER_ELECTRICAL_RPM);
     }
 }
 
