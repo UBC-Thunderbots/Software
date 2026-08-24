@@ -44,31 +44,30 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     bool on_first_segment = true;
     while (travel_distance > FIXED_EPSILON)
     {
-        Segment curr_segment = polygon_segments[segment_index];
-        Point from_point     = curr_segment.getStart();
+        Segment curr_segment  = polygon_segments[segment_index];
+        Point from_point      = curr_segment.getStart();
         double segment_length = curr_segment.length();
 
         if (on_first_segment)
         {
-            from_point      = closest_start;
-            segment_length  = distance(closest_start, curr_segment.getEnd());
+            from_point       = closest_start;
+            segment_length   = distance(closest_start, curr_segment.getEnd());
             on_first_segment = false;
         }
 
         if (segment_length < FIXED_EPSILON)
         {
-            // End of segment. Advance to next. 
+            // End of segment. Advance to next.
             segment_index = (segment_index + 1) % polygon_segments.size();
             continue;
         }
-        
+
         if (travel_distance <= segment_length)
         {
             double ratio = travel_distance / segment_length;
-            return Point(from_point.x() +
-                             ratio * (curr_segment.getEnd().x() - from_point.x()),
-                         from_point.y() +
-                             ratio * (curr_segment.getEnd().y() - from_point.y()));
+            return Point(
+                from_point.x() + ratio * (curr_segment.getEnd().x() - from_point.x()),
+                from_point.y() + ratio * (curr_segment.getEnd().y() - from_point.y()));
         }
 
         travel_distance -= segment_length;

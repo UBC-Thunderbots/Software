@@ -29,8 +29,8 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     Angle center_angle = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
 
     Ray center_ray(enemy_threat_origin, center_angle);
-    std::optional<Point> center_position = findDefenseAreaIntersection(
-        field, center_ray, robot_obstacle_inflation_factor);
+    std::optional<Point> center_position =
+        findDefenseAreaIntersection(field, center_ray, robot_obstacle_inflation_factor);
 
     if (!center_position.has_value())
     {
@@ -47,7 +47,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     Rectangle defense_perimeter =
         field.friendlyDefenseArea().expand(robot_radius_expansion);
 
-    double step_distance   = 2.0 * ROBOT_MAX_RADIUS_METERS;
+    double step_distance = 2.0 * ROBOT_MAX_RADIUS_METERS;
     // Positive stepAlongPerimeter follows the rectangle vertex order (CCW). On the
     // front of the crease that is toward -y (RIGHT); negative is toward +y (LEFT).
     double travel_distance = step_distance;
