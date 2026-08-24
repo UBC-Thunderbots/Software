@@ -91,11 +91,17 @@ std::optional<Ball> BallFilter::estimateBallState(
 	// We record position before prediction, to compute segment travelled within a frame. This is used in collision handling
     const Point position_before_predict(kalman_filter.state_estimate(0),
                                         kalman_filter.state_estimate(1));
-    if (last_predict_timestamp)
+	// A stale or out of order packet would integrate the model backwards, which inflates
+	// the velocity and leaves the process covariance with negative correlation terms
+    if (last_predict_timestamp && current_time > *last_predict_timestamp)
     {
         predict((current_time - *last_predict_timestamp).toSeconds());
+        last_predict_timestamp = current_time;
     }
-    last_predict_timestamp = current_time;
+    else if (!last_predict_timestamp)
+    {
+        last_predict_timestamp = current_time;
+    }
     widenCovarianceOnContact(position_before_predict, robots, field);
 
 	// We use the detection if there is any
