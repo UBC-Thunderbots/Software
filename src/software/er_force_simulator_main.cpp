@@ -13,7 +13,7 @@
 
 // CSV file that the filtered ball state is logged to, alongside the ground truth
 // ball state from the simulator, for evaluating the ball filter
-static const std::string BALL_FILTER_CSV_FILE_NAME = "realistic_ball_filter_v10.csv";
+static const std::string BALL_FILTER_CSV_FILE_NAME = "realistic_ball_filter_v13.csv";
 
 int main(int argc, char** argv)
 {

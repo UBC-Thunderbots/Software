@@ -103,11 +103,13 @@ std::optional<Ball> BallFilter::estimateBallState(
     {
         last_predict_timestamp = current_time;
     }
-    widenCovarianceOnContact(position_before_predict, robots, field);
+
+    constrainToField(field);
 
 	// We use the detection if there is any
     if (best_ball_detection)
     {
+		widenCovarianceOnContact(position_before_predict, robots, field, false);
         Measurement measurement(best_ball_detection->position.x(),
                                 best_ball_detection->position.y());
 
@@ -139,6 +141,7 @@ std::optional<Ball> BallFilter::estimateBallState(
             }
         }
     }
+
 
 	// if there isn't a detection we report nothing
 	// This is handled here because the code above might reject the incoming detection
@@ -204,9 +207,38 @@ void BallFilter::predict(double delta_t)
     kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
 }
 
+void BallFilter::constrainToField(const Field& field)
+{
+    // The ball's centre can get within one radius of the wall, no closer
+    const double limit_x = field.fieldBoundary().xMax() - BALL_MAX_RADIUS_METERS;
+    const double limit_y = field.fieldBoundary().yMax() - BALL_MAX_RADIUS_METERS;
+
+    if (kalman_filter.state_estimate(0) > limit_x)
+    {
+        kalman_filter.state_estimate(0) = limit_x;
+        kalman_filter.state_estimate(2) = std::min(kalman_filter.state_estimate(2), 0.0);
+    }
+    else if (kalman_filter.state_estimate(0) < -limit_x)
+    {
+        kalman_filter.state_estimate(0) = -limit_x;
+        kalman_filter.state_estimate(2) = std::max(kalman_filter.state_estimate(2), 0.0);
+    }
+
+    if (kalman_filter.state_estimate(1) > limit_y)
+    {
+        kalman_filter.state_estimate(1) = limit_y;
+        kalman_filter.state_estimate(3) = std::min(kalman_filter.state_estimate(3), 0.0);
+    }
+    else if (kalman_filter.state_estimate(1) < -limit_y)
+    {
+        kalman_filter.state_estimate(1) = -limit_y;
+        kalman_filter.state_estimate(3) = std::max(kalman_filter.state_estimate(3), 0.0);
+    }
+}
+
 void BallFilter::widenCovarianceOnContact(const Point& previous_position,
                                           const std::vector<Robot>& robots,
-                                          const Field& field)
+                                          const Field& field, const bool is_visible)
 {
     const Point ball_position(kalman_filter.state_estimate(0),
                               kalman_filter.state_estimate(1));

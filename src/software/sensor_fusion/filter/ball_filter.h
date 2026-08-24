@@ -78,6 +78,24 @@ class BallFilter
     void predict(double delta_t);
 
     /**
+     * Pulls the estimate back inside the field boundary if the motion model has pushed
+     * it out, and brings it to rest against whatever it ran into.
+     *
+     * A ball cannot physically be outside the boundary, so an estimate that says it is
+     * is wrong no matter how confident the model is. This matters most when there are no
+     * detections to correct it: vision loses a ball resting against a wall, and the
+     * estimate coasts straight through the boundary and keeps going for as long as the
+     * ball is missing.
+     *
+     * The velocity component pointing out of the field is zeroed along with the position,
+     * because pinning the position alone leaves a velocity that re-crosses the boundary
+     * on the next frame and walks the estimate along the wall.
+     *
+     * @param field The field being played on
+     */
+    void constrainToField(const Field& field);
+
+    /**
      * Widens the covariance if the ball is in contact with anything on the field -- a
      * robot, a goalpost, the back of a net, or the walls around the field.
      *
@@ -95,7 +113,7 @@ class BallFilter
      */
     void widenCovarianceOnContact(const Point& previous_position,
                                   const std::vector<Robot>& robots,
-                                  const Field& field);
+                                  const Field& field, const bool is_visible);
 
     /**
      * Returns whether the ball could physically have reached the given position since
