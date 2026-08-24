@@ -1,6 +1,5 @@
 import time
-import PyQt6.QtWidgets as QtWidgets
-import PyQt6.QtCore
+from pyqtgraph.Qt import QtCore, QtWidgets
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.py_constants import MILLISECONDS_PER_SECOND
 
@@ -42,9 +41,9 @@ class FPSWidget(QtWidgets.QWidget):
         self.refresh_function_table.resizeColumnsToContents()
 
         buffertime_title = QtWidgets.QLabel("<b> Buffertime FPS <b>")
-        buffertime_title.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
+        buffertime_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter)
         refresh_function_title = QtWidgets.QLabel("<b> Refresh Function FPS <b>")
-        refresh_function_title.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
+        refresh_function_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter)
 
         self.vertical_layout.addWidget(buffertime_title)
         self.vertical_layout.addWidget(self.buffertime_table)
@@ -66,7 +65,7 @@ class FPSWidget(QtWidgets.QWidget):
         :param text: the text to update the cell with
         """
         text = QtWidgets.QTableWidgetItem(text)
-        text.setTextAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
+        text.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter)
         table.setItem(row, col, text)
 
     def refresh(self) -> None:

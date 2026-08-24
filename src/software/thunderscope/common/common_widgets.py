@@ -1,5 +1,4 @@
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt import QtCore, QtWidgets
 from software.py_constants import *
 from software.thunderscope.util import color_from_gradient
 from typing import override
@@ -131,7 +130,7 @@ class ColorProgressBar(QtWidgets.QProgressBar):
         )
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" "{" "background: grey" "color: black" "}"
+            "QProgressBar::chunk{background: greycolor: black}"
         )
 
         self.valueChanged.connect(self.emitFloatValueChanged)
