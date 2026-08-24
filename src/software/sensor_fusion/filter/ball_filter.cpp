@@ -104,11 +104,17 @@ std::optional<Ball> BallFilter::estimateBallState(
         Measurement measurement(best_ball_detection->position.x(),
                                 best_ball_detection->position.y());
 
+		// The first detection is all we know, so we start the estimate on it rather than
+		// blending it against a state we never had grounds for
+        if (!prev_detection_timestamp)
+        {
+            reset(measurement, current_time);
+        }
 		// Two gates determining whether we take the detection:
 		// 1. Whether it is physically possible to arrive the new destination
 		// 2. Statistical gating using mahalanobis
-        if (isWithinMaxBallSpeed(best_ball_detection->position, current_time) &&
-            kalman_filter.mahalanobisDistance(measurement) < MAHALANOBIS_GATE_THRESHOLD)
+        else if (isWithinMaxBallSpeed(best_ball_detection->position, current_time) &&
+                 kalman_filter.mahalanobisDistance(measurement) < MAHALANOBIS_GATE_THRESHOLD)
         {
             kalman_filter.update(measurement);
             consecutive_outliers     = 0;

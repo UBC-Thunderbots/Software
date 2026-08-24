@@ -304,7 +304,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
 
         if (new_ball)
         {
-            updateBall(*new_ball);
+            updateBall(Ball(dribbler_in_ball_detection.front().position,
+                            new_ball->velocity(), new_ball->timestamp()));
         }
     }
     else
