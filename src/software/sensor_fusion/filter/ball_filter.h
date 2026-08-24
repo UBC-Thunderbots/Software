@@ -123,5 +123,6 @@ class BallFilter
     std::optional<Timestamp> prev_detection_timestamp;
     std::optional<Measurement> prev_measurement;
     std::optional<Timestamp> last_predict_timestamp;
+	int consecutive_in_contact_;
 	
 };

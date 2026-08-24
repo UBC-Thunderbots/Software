@@ -58,7 +58,7 @@ namespace
     // detection could plausibly belong to it. This is deliberately well above the 6.5 m/s
     // rule limit; the gate exists to reject detections that are physically impossible,
     // not to enforce the rules on a ball that has been kicked too hard.
-    constexpr double MAX_BALL_SPEED_M_PER_S = 15.0;
+    constexpr double MAX_BALL_SPEED_M_PER_S = 6.0;
 
     // Slack on the max ball speed gate, so that vision noise on a ball that has been
     // sitting still cannot by itself push a detection out of reach of the estimate
@@ -77,7 +77,8 @@ BallFilter::BallFilter()
                     Eigen::Matrix<double, STATE_SIZE, STATE_SIZE>::Zero(),
                     Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE>::Zero(),
                     MEASUREMENT_MODEL, MEASUREMENT_COVARIANCE),
-      consecutive_outliers(0)
+      consecutive_outliers(0),
+	  consecutive_in_contact_(0)
 {
 }
 
@@ -303,6 +304,7 @@ void BallFilter::widenCovarianceOnContact(const Point& previous_position,
     // nothing to correct
     if (!contact_normal)
     {
+		consecutive_in_contact_ =0;
         return;
     }
 
@@ -310,8 +312,11 @@ void BallFilter::widenCovarianceOnContact(const Point& previous_position,
     // widen the covariance as we can't trust the physics model anymore; we must trust the
     // measurement as the ball is being moved by an external entity.
     kalman_filter.state_covariance  = INITIAL_COVARIANCE;
+	consecutive_in_contact_++;
+	if (consecutive_in_contact_>=5){
     kalman_filter.state_estimate(2) = 0;
     kalman_filter.state_estimate(3) = 0;
+	}
 }
 
 bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,
