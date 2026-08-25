@@ -492,7 +492,9 @@ unsigned int SensorFusion::resolveGoalieId(const Team& team, unsigned int goalie
                 lowest_id = robot.id();
             }
         }
-		LOG(WARNING) << "Assigned goalie robot" << goalie_id << "not found! Falling back goalie to next available robot:" << lowest_id <<std::endl;
+        LOG(WARNING) << "Assigned goalie robot" << goalie_id
+                     << "not found! Falling back goalie to next available robot:"
+                     << lowest_id << std::endl;
         return lowest_id;
     }
 
