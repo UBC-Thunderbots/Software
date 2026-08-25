@@ -16,9 +16,7 @@ from software.gameplay_tests.validation.robot_enters_region import (
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
 @pytest.mark.parametrize(
@@ -31,8 +29,8 @@ from software.gameplay_tests.simulated_test_fixture import (
         (tbots_cpp.Point(1.5, 0.5), True),
     ],
 )
-def test_free_kick_play_friendly(ball_initial_pos, must_score, simulated_test_runner):
-    def setup(*args):
+def test_free_kick_play_friendly(ball_initial_pos, must_score, gameplay_test_runner):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-4.5, 0),
             tbots_cpp.Point(-3, 1.5),
@@ -53,7 +51,7 @@ def test_free_kick_play_friendly(ball_initial_pos, must_score, simulated_test_ru
             .enemyDefenseArea()
             .negXPosYCorner(),
         ]
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=blue_bots,
                 yellow_robot_locations=yellow_bots,
@@ -62,17 +60,17 @@ def test_free_kick_play_friendly(ball_initial_pos, must_score, simulated_test_ru
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.NORMAL_START, team=Team.BLUE
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=Command.Type.DIRECT, team=Team.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=PlayName.FreeKickPlay, yellow_play=PlayName.HaltPlay
         )
 
@@ -89,10 +87,9 @@ def test_free_kick_play_friendly(ball_initial_pos, must_score, simulated_test_ru
         ],
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,
     )
 
