@@ -476,13 +476,11 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
 
 unsigned int SensorFusion::resolveGoalieId(const Team& team, unsigned int goalie_id)
 {
-    // If the desired goalie exists on the team, use it
     if (team.getRobotById(goalie_id).has_value())
     {
         return goalie_id;
     }
 
-    // Otherwise, find the lowest robot ID present on the team
     const auto& all_robots = team.getAllRobots();
     if (!all_robots.empty())
     {
@@ -494,10 +492,10 @@ unsigned int SensorFusion::resolveGoalieId(const Team& team, unsigned int goalie
                 lowest_id = robot.id();
             }
         }
+		LOG(WARNING) << "Assigned goalie robot" << goalie_id << "not found! Falling back goalie to next available robot:" << lowest_id <<std::endl;
         return lowest_id;
     }
 
-    // If there are no robots on the team yet, fall back to the desired goalie ID
     return goalie_id;
 }
 
