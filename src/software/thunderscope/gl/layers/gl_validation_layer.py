@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.opengl import *
 
 import time
 

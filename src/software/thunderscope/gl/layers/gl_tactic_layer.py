@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 
 import textwrap
 
@@ -57,7 +57,7 @@ class GLTacticLayer(GLLayer):
         # Ensure we have the same number of graphics as robots
         self.tactic_fsm_info_graphics.resize(
             len(team.team_robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.SECONDARY_TEXT_COLOR,
             ),

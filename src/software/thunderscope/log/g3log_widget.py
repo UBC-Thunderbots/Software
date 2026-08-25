@@ -1,22 +1,22 @@
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *
 
-import software.thunderscope.constants as constants
+from software.thunderscope import constants
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class g3logWidget(QWidget):
+class g3logWidget(QtWidgets.QWidget):
     def __init__(self, buffer_size: int = 10):
         """The g3log widget is a console widget that displays g3log messages
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
-        QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
 
         self.console_widget = pg_console.ConsoleWidget()
         self.console_widget.setStyleSheet(
@@ -27,7 +27,7 @@ class g3logWidget(QWidget):
             """
         )
 
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
         # disable input and buttons
         self.console_widget.input.hide()

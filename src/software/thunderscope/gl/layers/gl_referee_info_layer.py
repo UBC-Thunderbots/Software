@@ -1,4 +1,4 @@
-from PyQt6 import QtGui
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
 from proto.import_all_protos import *

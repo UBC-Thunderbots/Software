@@ -1,4 +1,3 @@
-from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from thefuzz import fuzz
 from proto.import_all_protos import *

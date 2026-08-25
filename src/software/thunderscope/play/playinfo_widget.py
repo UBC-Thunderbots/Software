@@ -1,12 +1,12 @@
 from proto.play_info_msg_pb2 import PlayInfo
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from proto.import_all_protos import *
 from software.thunderscope.common.common_widgets import set_table_data
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class PlayInfoWidget(QWidget):
+class PlayInfoWidget(QtWidgets.QWidget):
     NUM_ROWS = 6
     NUM_COLS = 4
 
@@ -20,15 +20,17 @@ class PlayInfoWidget(QWidget):
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
-        QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
 
-        self.play_table = QTableWidget(PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS)
+        self.play_table = QtWidgets.QTableWidget(
+            PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS
+        )
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.play_table.verticalHeader().setVisible(False)
         self.last_playinfo = None
 
-        self.vertical_layout = QVBoxLayout()
+        self.vertical_layout = QtWidgets.QVBoxLayout()
         self.vertical_layout.addWidget(self.play_table)
         self.setLayout(self.vertical_layout)
 

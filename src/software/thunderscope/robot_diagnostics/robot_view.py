@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.constants import IndividualRobotMode
@@ -9,7 +9,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import Type
 
 
-class RobotViewComponent(QWidget):
+class RobotViewComponent(QtWidgets.QWidget):
     """Class to show a snapshot of the robot's current state,
     along with an expandable view of the full robot state
 
@@ -36,7 +36,7 @@ class RobotViewComponent(QWidget):
         super().__init__()
 
         self.robot_id = robot_id
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
         self.robot_info = RobotInfo(
             robot_id,
@@ -73,7 +73,7 @@ class RobotViewComponent(QWidget):
         self.robot_info.update_robot_statistic(robot_statistic)
 
 
-class RobotView(QScrollArea):
+class RobotView(QtWidgets.QScrollArea):
     """Widget that displays a collection of robot view components for all
     robots currently being used
 
@@ -93,7 +93,7 @@ class RobotView(QScrollArea):
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
         self.robot_statistic_buffer = ThreadSafeBuffer(10, RobotStatistic)
 
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
         self.components = []
 
@@ -108,7 +108,7 @@ class RobotView(QScrollArea):
         # doing so causes no scrolling to happen, and all the components get smaller
         # instead, widgets are added to the layout which is set for a container
         # the container is set as the current QScrollArea's widget
-        self.container = QFrame(self)
+        self.container = QtWidgets.QFrame(self)
         self.container.setLayout(self.layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)
