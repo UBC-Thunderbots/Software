@@ -25,13 +25,13 @@ class IndividualRobotMode(IntEnum):
     AI = 2
 
 
-class CameraView(Enum):
+class CameraView(StrEnum):
     """Enum for preset camera views in the 3D visualizer"""
 
-    ORTHOGRAPHIC = 1
-    LANDSCAPE_HIGH_ANGLE = 2
-    LEFT_HALF_HIGH_ANGLE = 3
-    RIGHT_HALF_HIGH_ANGLE = 4
+    ORTHOGRAPHIC = "Orthographic Top Down"
+    LANDSCAPE_HIGH_ANGLE = "Landscape High Angle"
+    LEFT_HALF_HIGH_ANGLE = "Left Half High Angle"
+    RIGHT_HALF_HIGH_ANGLE = "Right Half High Angle"
 
 
 class EstopMode(IntEnum):
@@ -193,6 +193,27 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
     """
 )
+
+SANDBOX_MODE_HELP_TEXT = textwrap.dedent(
+    """
+    <h3>Sandbox Mode Controls</h3><br>
+    <br>
+    <b>All Sandbox Mode controls need <code>Ctrl + Shift</code> to work.<br>
+    <br>
+    <b><code>Double Click: </code></b>Add a new robot or remove an existing one<br>
+    <b><code>Click and Drag: </code></b>Move an existing robot around the field<br>
+    <br>
+    <b><code>Undo: </code><b>Undoes the last operation<br>
+    <b><code>Redo: </code><b>Redoes the last operation<br>
+    <b><code>Clear Field: </code><b>Removes all robots from field<br>
+    """
+)
+
+
+class TeamToAdd(StrEnum):
+    BLUE = "Blue"
+    YELLOW = "Yellow"
+
 
 THUNDERSCOPE_UI_FONT_NAME = "Roboto"
 
