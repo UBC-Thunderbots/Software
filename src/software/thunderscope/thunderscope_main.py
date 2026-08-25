@@ -245,10 +245,34 @@ if __name__ == "__main__":
         help="Record stats about fullsystem performance (during AI vs AI) for a set amount of time in minutes",
     )
 
+    parser.add_argument(
+        "--test_mode",
+        action="store_true",
+        default=False,
+        help="Launch Thunderscope with a widget for selecting and running gameplay tests",
+    )
+    parser.add_argument(
+        "--run_field_test",
+        action="store_true",
+        default=False,
+        help="In test mode, run field tests instead of simulated tests",
+    )
+
     args = parser.parse_args()
 
+    ###########################################################################
+    #                              Test Mode                                  #
+    ###########################################################################
+    #
+    # Launch Thunderscope with the gameplay-test binaries running, plus a
+    # widget to select and run gameplay tests within Thunderscope.
+    if args.test_mode:
+        from software.gameplay_tests import test_mode
+
+        test_mode.launch_test_mode(args)
+
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
-    if not args.run_blue and not args.run_yellow and args.launch_gc:
+    elif not args.run_blue and not args.run_yellow and args.launch_gc:
         parser.error(
             "--launch_gc has to be ran with --run_blue or --run_yellow argument"
         )

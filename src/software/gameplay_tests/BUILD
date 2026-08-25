@@ -95,3 +95,21 @@ py_library(
         requirement("pytest"),
     ],
 )
+
+py_library(
+    name = "test_mode",
+    srcs = [
+        "test_mode.py",
+    ],
+    deps = [
+        ":fixture",
+        ":util",
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/thunderscope",
+        "//software/thunderscope:config",
+        "//software/thunderscope:test_runner_widget",
+        "//software/thunderscope:thunderscope_types",
+        requirement("pytest"),
+    ],
+)
