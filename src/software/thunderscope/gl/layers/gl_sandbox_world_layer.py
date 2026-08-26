@@ -3,7 +3,10 @@ from typing import Optional, override
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt import QtGui
-from software.py_constants import *
+from software.py_constants import (
+    MILLIMETERS_PER_METER,
+    ROBOT_MAX_RADIUS_MILLIMETERS,
+)
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.proto_unix_io import ProtoUnixIO

@@ -3,7 +3,6 @@ import psutil
 from collections.abc import Iterator
 from software.python_bindings import *
 from proto.import_all_protos import *
-from software.py_constants import *
 
 
 def _find_cmd(command: list[str]) -> Iterator[psutil.Process]:

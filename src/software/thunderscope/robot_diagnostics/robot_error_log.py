@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt.QtCore import Qt, QTimer
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import BATTERY_WARNING_VOLTAGE
 from software.thunderscope.robot_diagnostics.error_log_widgets import (
     RobotLogMessageWidget,
     RobotCrashLogMessageWidget,

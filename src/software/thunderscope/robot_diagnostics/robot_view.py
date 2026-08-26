@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt import QtWidgets
-from software.py_constants import *
+from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
 from proto.import_all_protos import *
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo

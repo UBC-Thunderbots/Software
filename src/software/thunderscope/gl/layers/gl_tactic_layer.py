@@ -4,7 +4,10 @@ import pyqtgraph.opengl as gl
 import textwrap
 
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    ROBOT_MAX_HEIGHT_METERS,
+    ROBOT_MAX_RADIUS_METERS,
+)
 from software.thunderscope.constants import (
     Colors,
     DepthValues,

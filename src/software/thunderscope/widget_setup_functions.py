@@ -3,7 +3,7 @@ import os
 
 from typing import Any, Optional
 
-from software.py_constants import *
+from software.py_constants import BALL_MAX_SPEED_METERS_PER_SECOND
 from proto.import_all_protos import *
 from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter

@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtWidgets
-from software.py_constants import *
+from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *

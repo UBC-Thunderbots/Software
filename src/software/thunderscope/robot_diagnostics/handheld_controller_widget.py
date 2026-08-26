@@ -14,7 +14,6 @@ from pyqtgraph.Qt import QtCore
 
 import software.python_bindings as tbots_cpp
 
-from software.py_constants import *
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.handheld_controller import (
     HandheldController,

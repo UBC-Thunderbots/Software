@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt import QtWidgets
-from software.py_constants import *
+from software.py_constants import CHICKER_TIMEOUT
 from proto.import_all_protos import *
 from enum import Enum
 from software.thunderscope.common import common_widgets

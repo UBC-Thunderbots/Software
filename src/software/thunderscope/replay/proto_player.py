@@ -7,7 +7,12 @@ import gzip
 import glob
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.py_constants import *
+from software.py_constants import (
+    REPLAY_FILE_EXTENSION,
+    REPLAY_FILE_VERSION,
+    REPLAY_FILE_VERSION_PREFIX,
+    REPLAY_METADATA_DELIMITER,
+)
 
 from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO

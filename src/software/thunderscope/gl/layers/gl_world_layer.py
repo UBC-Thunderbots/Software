@@ -6,7 +6,12 @@ import math
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    BALL_MAX_RADIUS_METERS,
+    BALL_MAX_SPEED_METERS_PER_SECOND,
+    ROBOT_MAX_HEIGHT_METERS,
+    ROBOT_MAX_RADIUS_METERS,
+)
 from software.thunderscope.constants import (
     Colors,
     DepthValues,

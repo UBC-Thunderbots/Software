@@ -7,7 +7,21 @@ import time
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    BLUE_PRIMITIVE_SET,
+    BLUE_ROBOT_STATUS_PATH,
+    BLUE_SSL_WRAPPER_PATH,
+    BLUE_WORLD_PATH,
+    SIMULATION_TICK_PATH,
+    SIMULATOR_STATE_PATH,
+    SSL_WRAPPER_PATH,
+    WORLD_STATE_PATH,
+    WORLD_STATE_RECEIVED_TRIGGER_PATH,
+    YELLOW_PRIMITIVE_SET,
+    YELLOW_ROBOT_STATUS_PATH,
+    YELLOW_SSL_WRAPPER_PATH,
+    YELLOW_WORLD_PATH,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.binary_context_managers.util import *

@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtCore, QtWidgets
-from software.py_constants import *
+from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.util import color_from_gradient
 from typing import override
 
