@@ -46,7 +46,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
             global_angular_velocity=AngularVelocity(radians_per_second=0),
         )
 
-        world_state.yellow_robots[5].CopyFrom(last_robot)
+        world_state.yellow_robots.robot_states[5].CopyFrom(last_robot)
 
         simulated_test_runner.set_world_state(world_state)
 
