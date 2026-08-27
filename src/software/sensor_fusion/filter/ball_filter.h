@@ -96,24 +96,42 @@ class BallFilter
     void constrainToField(const Field& field);
 
     /**
-     * Widens the covariance if the ball is in contact with anything on the field -- a
-     * robot, a goalpost, the back of a net, or the walls around the field.
+     * Returns the outward surface normal of whatever the ball is in contact with -- a
+     * robot, a goalpost, the back of a net, or the walls around the field -- or
+     * std::nullopt if the ball is in free flight.
      *
      * The check is against the whole path the ball travelled this frame rather than only
      * where it ended up. A ball moving at 5 m/s covers over 8 cm between frames at 60 Hz,
      * so a test that only asked whether the ball was currently within its own radius of a
      * surface would step straight over anything thin, and a goalpost is thin.
      *
-     * A ball travelling into whatever it touched is also brought to rest, since the
-     * motion model no longer describes where it is about to go.
-     *
      * @param previous_position Where the estimate was before it was advanced this frame
      * @param robots The robots currently on the field
      * @param field The field being played on
+     *
+     * @return The outward normal at the point of contact, or std::nullopt if there is no
+     * contact
      */
-    void widenCovarianceOnContact(const Point& previous_position,
-                                  const std::vector<Robot>& robots,
-                                  const Field& field, const bool is_visible);
+    std::optional<Vector> findContactNormal(const Point& previous_position,
+                                            const std::vector<Robot>& robots,
+                                            const Field& field) const;
+
+    /**
+     * Corrects the motion model for a ball that has been resting against something for
+     * several frames in a row by bringing it to rest.
+     *
+     * This runs on every frame, including frames with no detection. A ball is very often
+     * occluded precisely because a robot is sitting on it, and a constant velocity model
+     * left uncorrected will coast the estimate straight through that robot for as long as
+     * vision cannot see it.
+     *
+     * A single frame of contact is not enough to conclude the ball has stopped -- a ball
+     * bouncing off a wall is in contact for a frame or two and is still moving -- so the
+     * estimate is only zeroed once contact has persisted.
+     *
+     * @param in_contact Whether the ball is touching anything this frame
+     */
+    void updateContactState(bool in_contact);
 
     /**
      * Returns whether the ball could physically have reached the given position since

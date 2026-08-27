@@ -312,26 +312,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
     {
         std::optional<Ball> new_ball = createBall(
             ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
-        if (new_ball)
-        {
-            // If vision detected a new ball, then use that one
-            updateBall(*new_ball);
-        }
-        else if (ball)
-        {
-            // If we already have a ball from a previous frame, but is occluded this frame
-            std::optional<Robot> closest_enemy =
-                enemy_team.getNearestRobot(ball->position());
-
-            if (closest_enemy.has_value())
-            {
-                ball = Ball(closest_enemy->position() +
-                                Vector::createFromAngle(closest_enemy->orientation())
-                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                            Vector(0, 0), closest_enemy->timestamp());
-            }
-        }
-
+        updateBall(*new_ball);
         // we shouldn't trust breakbeam so we reset the dribbler and its associated
         // variables
         friendly_robot_id_with_ball_in_dribbler = std::nullopt;

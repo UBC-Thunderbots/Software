@@ -67,6 +67,10 @@ namespace
     // How many detections in a row may be rejected as outliers before we conclude the
     // estimate itself is wrong and reset onto the newest detection
     constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
+
+    // How many frames of unbroken contact before we conclude the ball is resting against
+    // whatever it is touching rather than bouncing off it, and bring the estimate to rest
+    constexpr int CONSECUTIVE_CONTACT_THRESHOLD = 5;
 }  // namespace
 
 BallFilter::BallFilter()
@@ -106,10 +110,24 @@ std::optional<Ball> BallFilter::estimateBallState(
 
     constrainToField(field);
 
-	// We use the detection if there is any
+    // Contact is a fact about the world, not about this frame's detections, so it is
+    // resolved on every frame. The motion model correction below has to run while the
+    // ball is occluded; the covariance widening further down does not, because covariance
+    // only ever takes effect through an update()
+    const std::optional<Vector> contact_normal =
+        findContactNormal(position_before_predict, robots, field);
+    updateContactState(contact_normal.has_value());
+
+    // We use the detection if there is any
     if (best_ball_detection)
     {
-		widenCovarianceOnContact(position_before_predict, robots, field, false);
+        // The ball is being moved by something the physics model does not describe, so we
+        // widen the covariance to make the filter defer to the measurement instead
+        if (contact_normal)
+        {
+            kalman_filter.state_covariance = INITIAL_COVARIANCE;
+        }
+
         Measurement measurement(best_ball_detection->position.x(),
                                 best_ball_detection->position.y());
 
@@ -236,16 +254,17 @@ void BallFilter::constrainToField(const Field& field)
     }
 }
 
-void BallFilter::widenCovarianceOnContact(const Point& previous_position,
-                                          const std::vector<Robot>& robots,
-                                          const Field& field, const bool is_visible)
+std::optional<Vector> BallFilter::findContactNormal(const Point& previous_position,
+                                                    const std::vector<Robot>& robots,
+                                                    const Field& field) const
 {
     const Point ball_position(kalman_filter.state_estimate(0),
                               kalman_filter.state_estimate(1));
-	// Using the position before and after the model prediction step, we construct a segment
+    // Using the position before and after the model prediction step, we construct a
+    // segment
     const Segment ball_path(previous_position, ball_position);
 
-	// Outwatd normal of object in contact, if there is any. We need this for rebouncing velocity
+    // Outward normal of the object in contact, if there is any
     std::optional<Vector> contact_normal;
 
     const double robot_collision_distance =
@@ -332,23 +351,26 @@ void BallFilter::widenCovarianceOnContact(const Point& previous_position,
         }
     }
 
+    return contact_normal;
+}
+
+void BallFilter::updateContactState(bool in_contact)
+{
     // The ball is in free flight, so the motion model still describes it and there is
     // nothing to correct
-    if (!contact_normal)
+    if (!in_contact)
     {
-		consecutive_in_contact_ =0;
+        consecutive_in_contact_ = 0;
         return;
     }
 
-    // If the function hasn't returned by now, the ball is in contact with something. We
-    // widen the covariance as we can't trust the physics model anymore; we must trust the
-    // measurement as the ball is being moved by an external entity.
-    kalman_filter.state_covariance  = INITIAL_COVARIANCE;
-	consecutive_in_contact_++;
-	if (consecutive_in_contact_>=5){
-    kalman_filter.state_estimate(2) = 0;
-    kalman_filter.state_estimate(3) = 0;
-	}
+    consecutive_in_contact_++;
+
+    if (consecutive_in_contact_ >= CONSECUTIVE_CONTACT_THRESHOLD)
+    {
+        kalman_filter.state_estimate(2) = 0;
+        kalman_filter.state_estimate(3) = 0;
+    }
 }
 
 bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,
