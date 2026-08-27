@@ -13,14 +13,6 @@ from thefuzz import process
 from typer import Argument, Context, Typer
 
 from cli.cli_params import (
-    CATEGORY_CHOICES,
-    DEBUG_POWERLOOP_PLAYBOOK,
-    DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
-    INTERACTIVE_STYLE,
-    LAUNCH_MODE_CHOICES,
-    PLAYBOOK_CHOICES,
-    THUNDERSCOPE_OPTIONS_MAP,
-    THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
     ActionArgument,
     AnsiblePlaybook,
     DebugBinary,
@@ -42,25 +34,7 @@ from cli.cli_params import (
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
-HISTORY_FILE = "/tmp/tbots_history"
-HISTORY_MAX_ENTRIES = 50
 
-
-def load_history() -> list[str]:
-    if not os.path.exists(HISTORY_FILE):
-        return []
-    with open(HISTORY_FILE) as f:
-        lines = [line.strip() for line in f.readlines()]
-    return [l for l in lines if l]
-
-
-def save_to_history(cmd_str: str):
-    history = load_history()
-    history = [h for h in history if h != cmd_str]
-    history.append(cmd_str)
-    history = history[-HISTORY_MAX_ENTRIES:]
-    with open(HISTORY_FILE, "w") as f:
-        f.write("\n".join(history) + "\n")
 
 
 @dataclass
@@ -99,6 +73,324 @@ class BazelFlag(tuple, Enum):
 
 
 app = Typer()
+
+class InteractiveCli:
+    HISTORY_FILE = "/tmp/tbots_history"
+    HISTORY_MAX_ENTRIES = 50
+
+    # ---------------------------------------------------------------------------
+    # Interactive CLI styling
+    #
+    # Shared questionary style applied to every interactive prompt. The highlighted
+    # (pointed-at) option is rendered in bold cyan so it stands out, while the other
+    # rows are dimmed. questionary draws the per-option description on a line at the
+    # bottom of the prompt using the same "text" class as the unselected rows, so it
+    # inherits the dim styling and is distinguished by its "Description:" label and
+    # position. Colours use ANSI names so they adapt to the user's terminal theme.
+    # ---------------------------------------------------------------------------
+    INTERACTIVE_STYLE = questionary.Style(
+        [
+            ("qmark", "fg:ansicyan bold"),
+            ("question", "bold"),
+            ("pointer", "fg:ansicyan bold"),
+            ("highlighted", "fg:ansicyan bold"),
+            ("selected", "fg:ansigreen"),
+            ("answer", "fg:ansicyan bold"),
+            ("text", "fg:ansibrightblack"),
+            ("instruction", "fg:ansibrightblack italic"),
+            ("disabled", "fg:ansibrightblack italic"),
+        ]
+    )
+
+
+    # ---------------------------------------------------------------------------
+    # Interactive CLI choices
+    #
+    # Each questionary.Choice pairs an option's display title with a description.
+    # questionary renders the description inline when the option is highlighted in
+    # the interactive menus, giving users guidance without leaving the prompt.
+    # When a Choice has no explicit value, questionary returns its title, so the
+    # titles below double as the values consumed by start_interactive_cli.
+    # ---------------------------------------------------------------------------
+
+    # Top-level "What would you like to do?" menu.
+    class Category(str, Enum):
+        THUNDERSCOPE = "thunderscope"
+        TEST = "test"
+        FLASH = "flash"
+        REPEAT_CMD_MSG = "Repeat a past command"
+    CATEGORY_CHOICES = [
+        questionary.Choice(
+            title="Run thunderscope",
+            value=Category.THUNDERSCOPE,
+            description="Launch Thunderscope against the simulator or real robots",
+        ),
+        questionary.Choice(
+            title="Test",
+            value=Category.TEST,
+            description="Run a single test or the entire test suite",
+        ),
+        questionary.Choice(
+            title="Flash",
+            value=Category.FLASH,
+            description="Deploy software or firmware to a robot via Ansible",
+        ),
+    ]
+
+    class LaunchMode(str, Enum):
+        SIM = "sim" # This value is not used, only the enum is checked
+        RUN_DIAG = "run_diagnostics"
+        RUN_BLUE = "run_blue"
+        RUN_YELLOW = "run_yellow"
+    # Thunderscope "Launch mode?" menu.
+    LAUNCH_MODE_CHOICES = [
+        questionary.Choice(
+            title="Simulator",
+            value = LaunchMode.SIM,
+            description="Run Thunderscope against the simulated full system",
+        ),
+        questionary.Choice(
+            title="Diagnostics",
+            value=LaunchMode.RUN_DIAG,
+            description="Run Thunderscope in diagnostics mode against real robots",
+        ),
+        questionary.Choice(
+            title="Run blue",
+            value=LaunchMode.RUN_BLUE,
+            description="run_blue",
+        ),
+        questionary.Choice(
+            title="Run yellow",
+            value=LaunchMode.RUN_YELLOW,
+            description="run_yellow",
+        ),
+    ]
+
+    class SimOptions(str, Enum):
+        RECORD_STATS = "record_stats"
+        ENABLE_AUTOREF = "enable_autoref"
+        CI_MODE = "ci_mode"
+        ENABLE_REALISM = "enable_realism"
+        ENABLE_AUTOGC = "enable_autogc"
+    # Thunderscope simulator "Options:" checkbox.
+    THUNDERSCOPE_SIMULATOR_OPTION_CHOICES = [
+        questionary.Choice(
+            title="Enable Automatic Referee",
+            value=SimOptions.ENABLE_AUTOREF,
+            description="Run the autoref alongside the simulator",
+        ),
+        questionary.Choice(
+            title="CI Mode",
+            value=SimOptions.CI_MODE,
+            description="Run in continuous integration mode (headless friendly)",
+        ),
+        questionary.Choice(
+            title="Record Statistics",
+            value=SimOptions.RECORD_STATS,
+            description="Record gameplay statistics for a given duration in minutes",
+        ),
+        questionary.Choice(
+            title="Enable Realism",
+            value=SimOptions.ENABLE_REALISM,
+            description="Enable realistic simulation physics and sensor noise",
+        ),
+        questionary.Choice(
+            title="Enable Automatic Game Controller",
+            value=SimOptions.ENABLE_AUTOGC,
+            description="Run the automated game controller alongside the simulator",
+        ),
+    ]
+
+    # Deploy robot software "Options:" checkbox. Each option compiles Thunderloop
+    # with a preprocessor flag that disables the corresponding service, letting
+    # Thunderloop run on a robot whose powerboard or motorboard is unavailable.
+    class DeployOption(str, Enum):
+        DISABLE_POWER_SERVICE = "DISABLE_POWER_SERVICE"
+        DISABLE_MOTOR_SERVICE = "DISABLE_MOTOR_SERVICE"
+    DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES = [
+        questionary.Choice(
+            title="Disable Power Service",
+            value=DeployOption.DISABLE_POWER_SERVICE,
+            description="Compile Thunderloop without the Power Service (no powerboard)",
+        ),
+        questionary.Choice(
+            title="Disable Motor Service",
+            value=DeployOption.DISABLE_MOTOR_SERVICE,
+            description="Compile Thunderloop without the Motor Service (no motorboard)",
+        ),
+    ]
+
+    # Marker value returned by the DEBUG_POWERLOOP playbook choice. It maps to the
+    # deploy_powerboard.yml playbook but additionally compiles powerloop_main with
+    # the DEBUG_POWERLOOP flag, swapping in bare setup()/loop() stubs so arbitrary
+    # code can be flashed onto the powerboard microcontroller for debugging.
+    DEBUG_POWERLOOP_PLAYBOOK = "deploy_powerboard.yml (DEBUG_POWERLOOP)"
+
+    # Flash "Select playbook:" menu.
+    PLAYBOOK_CHOICES = [
+        questionary.Choice(
+            title="setup_pi.yml",
+            value=("setup_pi.yml", False),
+            description="First-time setup of the Raspberry Pi on a robot",
+        ),
+        # If the playbook name changes then you must change the if statement below.
+        questionary.Choice(
+            title="deploy_robot_software.yml",
+            value=("deploy_robot_software.yml", False),
+            description="Build and flash Thunderloop and the robot software",
+        ),
+        questionary.Choice(
+            title="deploy_powerboard.yml",
+            value=("deploy_powerboard.yml", False),
+            description="Flash the powerboard firmware (powerloop_main)",
+        ),
+        questionary.Choice(
+            title=DEBUG_POWERLOOP_PLAYBOOK,
+            value=("deploy_powerboard.yml", True),
+            description="Flash powerloop_main built with the DEBUG_POWERLOOP flag "
+                        "for inserting arbitrary debug code onto the powerboard",
+        ),
+        questionary.Choice(
+            title="deploy_motor_firmware.yml",
+            value=("deploy_motor_firmware.yml", False),
+            description="Flash the motor controller firmware",
+        ),
+    ]
+
+
+    @staticmethod
+    def load_history() -> list[str]:
+        if not os.path.exists(InteractiveCli.HISTORY_FILE):
+            return []
+        with open(InteractiveCli.HISTORY_FILE) as f:
+            lines = [line.strip() for line in f.readlines()]
+        return [l for l in lines if l]
+
+    @staticmethod
+    def save_to_history(cmd_str: str):
+        history = InteractiveCli.load_history()
+        history = [h for h in history if h != cmd_str]
+        history.append(cmd_str)
+        history = history[-InteractiveCli.HISTORY_MAX_ENTRIES:]
+        with open(InteractiveCli.HISTORY_FILE, "w") as f:
+            f.write("\n".join(history) + "\n")
+
+    @staticmethod
+    def start_interactive_cli():
+        """Run the menu-driven interactive CLI.
+
+        Walks the user through a series of questionary prompts to assemble a
+        :class:`BuildConfig`, then validates, builds, and executes the resulting
+        Bazel command. Returns early without running anything if the user aborts
+        the top-level prompt.
+        """
+        config = BuildConfig(action=ActionArgument.run)  # Default action
+        extra_args = []
+
+        history = InteractiveCli.load_history()
+        choices = InteractiveCli.CATEGORY_CHOICES
+        if history:
+            choices = [InteractiveCli.Category.REPEAT_CMD_MSG] + InteractiveCli.CATEGORY_CHOICES
+
+        category = questionary.select(
+            "What would you like to do?",
+            choices=choices,
+            style=InteractiveCli.INTERACTIVE_STYLE,
+        ).unsafe_ask()
+
+        match category:
+            case InteractiveCli.Category.REPEAT_CMD_MSG:
+                past_cmd = questionary.select(
+                    "Select a command to re-run:",
+                    choices=list(reversed(history)),
+                ).unsafe_ask()
+                if not past_cmd:
+                    return
+                print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{past_cmd}\n\n{'=' * 81}\n")
+                InteractiveCli.save_to_history(past_cmd)
+                code = os.system(past_cmd)
+                sys.exit(1 if code != 0 else 0)
+            case InteractiveCli.Category.THUNDERSCOPE:
+                config.action = ActionArgument.run
+                config.search_query = "thunderscope"
+                launch = questionary.select(
+                    "Launch mode?",
+                    choices=InteractiveCli.LAUNCH_MODE_CHOICES,
+                    style=InteractiveCli.INTERACTIVE_STYLE,
+                ).unsafe_ask()
+                if launch == InteractiveCli.LaunchMode.SIM:
+                    selected = questionary.checkbox(
+                        "Options:",
+                        choices=InteractiveCli.THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
+                        style=InteractiveCli.INTERACTIVE_STYLE,
+                    ).unsafe_ask()
+                    for opt in selected:
+                        extra_args.extend([f"--{opt.value}"])
+                        if opt == InteractiveCli.SimOptions.RECORD_STATS:
+                            duration = questionary.text(
+                                "Enter record stats duration (minutes):",
+                                style=InteractiveCli.INTERACTIVE_STYLE,
+                                validate= lambda x: x.isdigit(),
+                            ).unsafe_ask()
+                            extra_args.extend([duration])
+                else:
+                    iface = questionary.text(
+                        "Network interface?", style=InteractiveCli.INTERACTIVE_STYLE
+                    ).unsafe_ask()
+                    extra_args.extend(
+                        [f"--{launch.value}", "--interface", iface]
+                    )
+
+            case InteractiveCli.Category.TEST:
+                config.action = ActionArgument.test
+                test_name = questionary.text(
+                    "Enter test name (leave empty for entire suite)",
+                    style=InteractiveCli.INTERACTIVE_STYLE,
+                ).unsafe_ask()
+                if not test_name:
+                    config.test_suite = True
+                else:
+                    config.search_query = test_name
+                    runs_str = questionary.text(
+                        "Number of times to run each test (leave empty for 1):",
+                        style=InteractiveCli.INTERACTIVE_STYLE,
+                    ).unsafe_ask()
+                    if runs_str and runs_str.isdigit() and int(runs_str) > 1:
+                        config.runs = int(runs_str)
+
+            case InteractiveCli.Category.FLASH:
+                config.action = ActionArgument.run
+                config.search_query = "ansible"
+                playbook, debug_powerloop = questionary.select(
+                    "Select playbook:",
+                    choices=InteractiveCli.PLAYBOOK_CHOICES,
+                    style=InteractiveCli.INTERACTIVE_STYLE,
+                ).unsafe_ask()
+
+                config.ansible_playbook = playbook
+                config.debug_powerloop = debug_powerloop
+
+                if config.ansible_playbook == "deploy_robot_software.yml":
+                    selected = (
+                            questionary.checkbox(
+                                "Options:",
+                                choices=InteractiveCli.DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
+                                style=InteractiveCli.INTERACTIVE_STYLE,
+                            ).unsafe_ask()
+                            or []
+                    )
+                    config.disable_power_service = InteractiveCli.DeployOption.DISABLE_POWER_SERVICE in selected
+                    config.disable_motor_service = InteractiveCli.DeployOption.DISABLE_MOTOR_SERVICE in selected
+                config.robot_name = questionary.text(
+                    "Robot name?", style=InteractiveCli.INTERACTIVE_STYLE
+                ).unsafe_ask()
+                config.ssh_password = questionary.password(
+                    "SSH password?", style=InteractiveCli.INTERACTIVE_STYLE
+                ).unsafe_ask()
+
+        validate(config)
+        command = create_command(config, extra_args)
+        execute_command(command)
 
 
 @app.command(
@@ -151,7 +443,7 @@ def main(
     :param ansible_playbook: name of the Ansible playbook to run
     """
     if not action and not search_query:
-        start_interactive_cli()
+        InteractiveCli.start_interactive_cli()
         return
 
     config = BuildConfig(
@@ -318,130 +610,11 @@ def execute_command(command: list[str], print_only: bool = False):
         print(cmd_str)
     else:
         print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{cmd_str}\n\n{'=' * 81}\n")
-        save_to_history(cmd_str)
+        InteractiveCli.save_to_history(cmd_str)
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
 
 
-def start_interactive_cli():
-    """Run the menu-driven interactive CLI.
-
-    Walks the user through a series of questionary prompts to assemble a
-    :class:`BuildConfig`, then validates, builds, and executes the resulting
-    Bazel command. The menu choices (and their inline descriptions) live in
-    cli_params.py. Returns early without running anything if the user aborts
-    the top-level prompt.
-    """
-    config = BuildConfig(action=ActionArgument.run)  # Default action
-    extra_args = []
-
-    history = load_history()
-    choices = CATEGORY_CHOICES
-    if history:
-        choices = ["Repeat a past command"] + CATEGORY_CHOICES
-
-    category = questionary.select(
-        "What would you like to do?",
-        choices=choices,
-        style=INTERACTIVE_STYLE,
-    ).unsafe_ask()
-
-    if category == "Repeat a past command":
-        past_cmd = questionary.select(
-            "Select a command to re-run:",
-            choices=list(reversed(history)),
-        ).ask()
-        if not past_cmd:
-            return
-        print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{past_cmd}\n\n{'=' * 81}\n")
-        save_to_history(past_cmd)
-        code = os.system(past_cmd)
-        sys.exit(1 if code != 0 else 0)
-
-    match category:
-        case "Run thunderscope":
-            config.action = ActionArgument.run
-            config.search_query = "thunderscope"
-            launch = questionary.select(
-                "Launch mode?",
-                choices=LAUNCH_MODE_CHOICES,
-                style=INTERACTIVE_STYLE,
-            ).unsafe_ask()
-            if launch == "Simulator":
-                selected = questionary.checkbox(
-                    "Options:",
-                    choices=THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
-                    style=INTERACTIVE_STYLE,
-                ).unsafe_ask()
-                for opt in selected:
-                    extra_args.extend([f"--{opt}"])
-                    if opt == "record_stats":
-                        time = questionary.text(
-                            "Enter record stats duration (minutes):",
-                            style=INTERACTIVE_STYLE,
-                        ).unsafe_ask()
-                        extra_args.extend([time])
-            else:
-                iface = questionary.text(
-                    "Network interface?", style=INTERACTIVE_STYLE
-                ).unsafe_ask()
-                extra_args.extend(
-                    [f"--{THUNDERSCOPE_OPTIONS_MAP[launch]}", "--interface", iface]
-                )
-
-        case "Test":
-            config.action = ActionArgument.test
-            test_name = questionary.text(
-                "Enter test name (leave empty for entire suite)",
-                style=INTERACTIVE_STYLE,
-            ).unsafe_ask()
-            if not test_name:
-                config.test_suite = True
-            else:
-                config.search_query = test_name
-                runs_str = questionary.text(
-                    "Number of times to run each test (leave empty for 1):",
-                    style=INTERACTIVE_STYLE,
-                ).unsafe_ask()
-                if runs_str and runs_str.isdigit() and int(runs_str) > 1:
-                    config.runs = int(runs_str)
-
-        case "Flash":
-            config.action = ActionArgument.run
-            config.search_query = "ansible"
-            playbook_choice = questionary.select(
-                "Select playbook:",
-                choices=PLAYBOOK_CHOICES,
-                style=INTERACTIVE_STYLE,
-            ).unsafe_ask()
-
-            if playbook_choice == DEBUG_POWERLOOP_PLAYBOOK:
-                config.ansible_playbook = "deploy_powerboard.yml"
-                config.debug_powerloop = True
-            else:
-                config.ansible_playbook = playbook_choice
-
-            if config.ansible_playbook == "deploy_robot_software.yml":
-                selected = (
-                    questionary.checkbox(
-                        "Options:",
-                        choices=DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
-                        style=INTERACTIVE_STYLE,
-                    ).unsafe_ask()
-                    or []
-                )
-                config.disable_power_service = "DISABLE_POWER_SERVICE" in selected
-                config.disable_motor_service = "DISABLE_MOTOR_SERVICE" in selected
-            config.robot_name = questionary.text(
-                "Robot name?", style=INTERACTIVE_STYLE
-            ).unsafe_ask()
-            config.ssh_password = questionary.password(
-                "SSH password?", style=INTERACTIVE_STYLE
-            ).unsafe_ask()
-
-    validate(config)
-    command = create_command(config, extra_args)
-    execute_command(command)
 
 
 def fuzzy_find_target(
