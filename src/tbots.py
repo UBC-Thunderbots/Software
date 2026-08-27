@@ -36,7 +36,6 @@ THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 
-
 @dataclass
 class BuildConfig:
     action: ActionArgument
@@ -74,6 +73,7 @@ class BazelFlag(tuple, Enum):
 
 app = Typer()
 
+
 class InteractiveCli:
     HISTORY_FILE = "/tmp/tbots_history"
     HISTORY_MAX_ENTRIES = 50
@@ -102,7 +102,6 @@ class InteractiveCli:
         ]
     )
 
-
     # ---------------------------------------------------------------------------
     # Interactive CLI choices
     #
@@ -119,6 +118,7 @@ class InteractiveCli:
         TEST = "test"
         FLASH = "flash"
         REPEAT_CMD_MSG = "Repeat a past command"
+
     CATEGORY_CHOICES = [
         questionary.Choice(
             title="Run thunderscope",
@@ -138,15 +138,16 @@ class InteractiveCli:
     ]
 
     class LaunchMode(str, Enum):
-        SIM = "sim" # This value is not used, only the enum is checked
+        SIM = "sim"  # This value is not used, only the enum is checked
         RUN_DIAG = "run_diagnostics"
         RUN_BLUE = "run_blue"
         RUN_YELLOW = "run_yellow"
+
     # Thunderscope "Launch mode?" menu.
     LAUNCH_MODE_CHOICES = [
         questionary.Choice(
             title="Simulator",
-            value = LaunchMode.SIM,
+            value=LaunchMode.SIM,
             description="Run Thunderscope against the simulated full system",
         ),
         questionary.Choice(
@@ -172,6 +173,7 @@ class InteractiveCli:
         CI_MODE = "ci_mode"
         ENABLE_REALISM = "enable_realism"
         ENABLE_AUTOGC = "enable_autogc"
+
     # Thunderscope simulator "Options:" checkbox.
     THUNDERSCOPE_SIMULATOR_OPTION_CHOICES = [
         questionary.Choice(
@@ -207,6 +209,7 @@ class InteractiveCli:
     class DeployOption(str, Enum):
         DISABLE_POWER_SERVICE = "DISABLE_POWER_SERVICE"
         DISABLE_MOTOR_SERVICE = "DISABLE_MOTOR_SERVICE"
+
     DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES = [
         questionary.Choice(
             title="Disable Power Service",
@@ -248,7 +251,7 @@ class InteractiveCli:
             title=DEBUG_POWERLOOP_PLAYBOOK,
             value=("deploy_powerboard.yml", True),
             description="Flash powerloop_main built with the DEBUG_POWERLOOP flag "
-                        "for inserting arbitrary debug code onto the powerboard",
+            "for inserting arbitrary debug code onto the powerboard",
         ),
         questionary.Choice(
             title="deploy_motor_firmware.yml",
@@ -256,7 +259,6 @@ class InteractiveCli:
             description="Flash the motor controller firmware",
         ),
     ]
-
 
     @staticmethod
     def load_history() -> list[str]:
@@ -271,7 +273,7 @@ class InteractiveCli:
         history = InteractiveCli.load_history()
         history = [h for h in history if h != cmd_str]
         history.append(cmd_str)
-        history = history[-InteractiveCli.HISTORY_MAX_ENTRIES:]
+        history = history[-InteractiveCli.HISTORY_MAX_ENTRIES :]
         with open(InteractiveCli.HISTORY_FILE, "w") as f:
             f.write("\n".join(history) + "\n")
 
@@ -290,7 +292,9 @@ class InteractiveCli:
         history = InteractiveCli.load_history()
         choices = InteractiveCli.CATEGORY_CHOICES
         if history:
-            choices = [InteractiveCli.Category.REPEAT_CMD_MSG.value] + InteractiveCli.CATEGORY_CHOICES
+            choices = [
+                InteractiveCli.Category.REPEAT_CMD_MSG.value
+            ] + InteractiveCli.CATEGORY_CHOICES
 
         category = questionary.select(
             "What would you like to do?",
@@ -330,16 +334,14 @@ class InteractiveCli:
                             duration = questionary.text(
                                 "Enter record stats duration (minutes):",
                                 style=InteractiveCli.INTERACTIVE_STYLE,
-                                validate= lambda x: x.isdigit(),
+                                validate=lambda x: x.isdigit(),
                             ).unsafe_ask()
                             extra_args.extend([duration])
                 else:
                     iface = questionary.text(
                         "Network interface?", style=InteractiveCli.INTERACTIVE_STYLE
                     ).unsafe_ask()
-                    extra_args.extend(
-                        [f"--{launch.value}", "--interface", iface]
-                    )
+                    extra_args.extend([f"--{launch.value}", "--interface", iface])
 
             case InteractiveCli.Category.TEST:
                 config.action = ActionArgument.test
@@ -372,15 +374,19 @@ class InteractiveCli:
 
                 if config.ansible_playbook == "deploy_robot_software.yml":
                     selected = (
-                            questionary.checkbox(
-                                "Options:",
-                                choices=InteractiveCli.DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
-                                style=InteractiveCli.INTERACTIVE_STYLE,
-                            ).unsafe_ask()
-                            or []
+                        questionary.checkbox(
+                            "Options:",
+                            choices=InteractiveCli.DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
+                            style=InteractiveCli.INTERACTIVE_STYLE,
+                        ).unsafe_ask()
+                        or []
                     )
-                    config.disable_power_service = InteractiveCli.DeployOption.DISABLE_POWER_SERVICE in selected
-                    config.disable_motor_service = InteractiveCli.DeployOption.DISABLE_MOTOR_SERVICE in selected
+                    config.disable_power_service = (
+                        InteractiveCli.DeployOption.DISABLE_POWER_SERVICE in selected
+                    )
+                    config.disable_motor_service = (
+                        InteractiveCli.DeployOption.DISABLE_MOTOR_SERVICE in selected
+                    )
                 config.robot_name = questionary.text(
                     "Robot name?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
@@ -613,8 +619,6 @@ def execute_command(command: list[str], print_only: bool = False):
         InteractiveCli.save_to_history(cmd_str)
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
-
-
 
 
 def fuzzy_find_target(

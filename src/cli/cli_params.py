@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Annotated
 
-import questionary
 from typer import Argument, Option
 
 from cli.multi_option import MultiOption
@@ -103,6 +102,3 @@ RobotName = Annotated[
 AnsiblePlaybook = Annotated[
     str, Option("-ap", "--ansible_playbook", help="Ansible playbook name")
 ]
-
-
-
