@@ -30,7 +30,6 @@ from software.python_bindings import *
 import proto.import_all_protos as protos
 from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import *
-from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -236,7 +235,7 @@ gdb --args bazel-bin/{self.full_system}
             protos.CostVisualization,
             protos.NamedValue,
             protos.PlayInfo,
-            ObstacleList,
+            protos.ObstacleList,
             protos.DebugShapes,
             protos.BallPlacementVisualization,
         ]:

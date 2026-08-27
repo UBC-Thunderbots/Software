@@ -3,7 +3,8 @@ from typing import override
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from software.stats.logs.event_log import EventType, Team
+from software.stats.logs.event_log import EventType
+import proto.import_all_protos as protos
 import queue
 
 
@@ -18,8 +19,8 @@ class GoalieTracker(Tracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         for_friendly: bool,
         **kwargs,

@@ -3,7 +3,7 @@ from software.stats.trackers.tracker import Tracker
 import proto.import_all_protos as protos
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.logs.event_log import EventType, Team
+from software.stats.logs.event_log import EventType
 import queue
 
 
@@ -25,8 +25,8 @@ class RefereeTracker(Tracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         friendly_color_yellow: bool,
         toggle_logging: Callable[[bool], None] | None = None,

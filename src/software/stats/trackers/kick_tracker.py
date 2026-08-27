@@ -64,10 +64,10 @@ class KickTracker(Tracker):
         self.kick_taken = False
 
         self.attacker_vis_buffer = ThreadSafeBuffer(
-            self.buffer_size, AttackerVisualization
+            self.buffer_size, protos.AttackerVisualization
         )
         self.proto_unix_io.register_observer(
-            AttackerVisualization, self.attacker_vis_buffer
+            protos.AttackerVisualization, self.attacker_vis_buffer
         )
 
         self.curr_pass = None
@@ -120,7 +120,7 @@ class KickTracker(Tracker):
         self._refresh_kicks(attacker_vis_msg, self.cached_world)
 
     def _refresh_kicks(
-        self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
+        self, attacker_vis_msg: protos.AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         raise Exception("Not Implemented, please use the appropriate subclass!")
 
@@ -154,7 +154,7 @@ class PassTracker(KickTracker):
 
     @override
     def _refresh_kicks(
-        self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
+        self, attacker_vis_msg: protos.AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the pass tracker with the new attacker visualization
         and the latest state of the world.
@@ -223,7 +223,7 @@ class ShotTracker(KickTracker):
 
     @override
     def _refresh_kicks(
-        self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
+        self, attacker_vis_msg: protos.AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the shot tracker with the new attacker visualization
         and the latest state of the world.
