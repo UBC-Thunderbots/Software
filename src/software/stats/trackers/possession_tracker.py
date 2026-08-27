@@ -1,7 +1,6 @@
 from software.stats.trackers.tracker import Tracker
 from typing import override
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
 from software.stats.logs.event_log import EventType, Team
 import queue

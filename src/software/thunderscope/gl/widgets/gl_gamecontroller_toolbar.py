@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt import QtGui
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from typing import Callable, override
 import webbrowser
@@ -182,13 +182,13 @@ class GLGamecontrollerToolbar(GLToolbar):
 
         command_type = None
         if play == GamecontrollerPlays.DIRECT:
-            command_type = Command.Type.DIRECT
+            command_type = protos.Command.Type.DIRECT
         elif play == GamecontrollerPlays.INDIRECT:
-            command_type = Command.Type.INDIRECT
+            command_type = protos.Command.Type.INDIRECT
         elif play == GamecontrollerPlays.KICKOFF:
-            command_type = Command.Type.KICKOFF
+            command_type = protos.Command.Type.KICKOFF
         else:
-            command_type = Command.Type.PENALTY
+            command_type = protos.Command.Type.PENALTY
 
         self.__send_gc_command(
             command_type,
@@ -240,29 +240,29 @@ class GLGamecontrollerToolbar(GLToolbar):
 
     def __send_stop_command(self) -> None:
         """Sends a STOP command to the gamecontroller"""
-        self.__send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
+        self.__send_gc_command(protos.Command.Type.STOP, SslTeam.UNKNOWN)
 
     def __send_force_start_command(self) -> None:
         """Sends a FORCE_START command for the current friendly team to the gamecontroller"""
-        self.__send_gc_command(Command.Type.FORCE_START, SslTeam.UNKNOWN)
+        self.__send_gc_command(protos.Command.Type.FORCE_START, SslTeam.UNKNOWN)
 
     def __send_halt_command(self) -> None:
         """Sends a HALT command for the current friendly team to the gamecontroller"""
-        self.__send_gc_command(Command.Type.HALT, SslTeam.UNKNOWN)
+        self.__send_gc_command(protos.Command.Type.HALT, SslTeam.UNKNOWN)
 
     def __send_normal_start_command(self) -> None:
         """Sends a NORMAL START command for the current friendly team to the gamecontroller
         And resets the plays menu selection
         """
         if self.normal_start_enabled:
-            self.__send_gc_command(Command.Type.NORMAL_START, SslTeam.UNKNOWN)
+            self.__send_gc_command(protos.Command.Type.NORMAL_START, SslTeam.UNKNOWN)
 
             self.__toggle_normal_start_button()
 
             self.plays_menu_button.setText("Plays")
             self.plays_menu_button.setIcon(QtGui.QIcon())
 
-    def __send_gc_command(self, command: Command.Type, team: Team) -> None:
+    def __send_gc_command(self, command: protos.Command.Type, team: protos.Team) -> None:
         """Sends the given command to the gamecontroller for the given Team
         If ball_pos is defined, sets the ball position
 
@@ -270,8 +270,8 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param team the team the command should be sent for (BLUE, YELLOW, or UNKNOWN)
         :param ball_pos if defined, sets the position of the ball on field
         """
-        command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
-        self.proto_unix_io.send_proto(ManualGCCommand, command)
+        command = protos.ManualGCCommand(manual_command=protos.Command(type=command, for_team=team))
+        self.proto_unix_io.send_proto(protos.ManualGCCommand, command)
 
     def __open_runtime_installer_dialog(self) -> None:
         """Opens the runtime installer modal, initializing if first time"""

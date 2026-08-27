@@ -1,6 +1,6 @@
 import math
 from typing import Optional, override
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt import QtGui
 from software.py_constants import (
@@ -419,8 +419,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_remove_double_click = None
 
     def __add_robot_to_state(
-        self, world_state: WorldState, id: int, pos: QtGui.QVector3D, orientation: float
-    ) -> WorldState:
+        self, world_state: protos.WorldState, id: int, pos: QtGui.QVector3D, orientation: float
+    ) -> protos.WorldState:
         """Adds a robot with the given state and id to the given world state
         To the right team based on current team color
         Converts position and orientation if needed
@@ -436,12 +436,12 @@ class GLSandboxWorldLayer(GLWorldLayer):
             converted_orientation,
         ) = self.__invert_robot_if_defending_negative_half(pos, orientation)
         # build the robot state
-        robot_state = RobotState(
-            global_position=Point(
+        robot_state = protos.RobotState(
+            global_position=protos.Point(
                 x_meters=converted_pos.x(),
                 y_meters=converted_pos.y(),
             ),
-            global_orientation=Angle(radians=converted_orientation),
+            global_orientation=protos.Angle(radians=converted_orientation),
         )
 
         if self.friendly_colour_yellow:
@@ -450,7 +450,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             world_state.blue_robots.robot_states[id].CopyFrom(robot_state)
         return world_state
 
-    def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
+    def __remove_robot_from_state(self, world_state: protos.WorldState, id: int) -> protos.WorldState:
         """Removes a robot with the given id from the right team in the given world state
         Based on current team color
 
@@ -549,7 +549,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param clear_redo: If True, indicates a new action instead of an action from the undo/redo list.
                             clears redo list if True
         """
-        world_state = WorldState()
+        world_state = protos.WorldState()
 
         # copy over existing robots for the current team
         for robot_ in self.cached_world.friendly_team.team_robots:
@@ -585,15 +585,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.redo_operations.clear()
 
         # send out world state
-        self.simulator_io.send_proto(WorldState, world_state)
+        self.simulator_io.send_proto(protos.WorldState, world_state)
 
     def __update_with_new_position(
         self,
-        world_state: WorldState,
+        world_state: protos.WorldState,
         robot_id: int,
         new_pos: Optional[QtGui.QVector3D],
         new_orientation: float = 0,
-    ) -> WorldState:
+    ) -> protos.WorldState:
         """Updates the world state with the new robot position for the given id
         New position is defined if adding / moving a robot and None if removing one
 

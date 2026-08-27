@@ -1,5 +1,5 @@
 import math
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.gameplay_tests.field_test_fixture import *
 
 from software.gameplay_tests.simulated_test_fixture import *
@@ -25,10 +25,10 @@ def test_pivot_kick(field_test_runner):
 
     field_test_runner.set_tactics(
         blue_tactics={
-            id: PivotKickTactic(
-                kick_origin=Point(x_meters=-1.13, y_meters=0.75),
-                kick_direction=Angle(radians=-math.pi / 2),
-                auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
+            id: protos.PivotKickTactic(
+                kick_origin=protos.Point(x_meters=-1.13, y_meters=0.75),
+                kick_direction=protos.Angle(radians=-math.pi / 2),
+                auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=5.0),
             )
         },
         yellow_tactics=None,
@@ -40,7 +40,7 @@ def test_pivot_kick(field_test_runner):
     )
 
     # Send a halt tactic after the test finishes
-    field_test_runner.set_tactics(blue_tactics={id: HaltTactic()}, yellow_tactics=None)
+    field_test_runner.set_tactics(blue_tactics={id: protos.HaltTactic()}, yellow_tactics=None)
 
 
 if __name__ == "__main__":

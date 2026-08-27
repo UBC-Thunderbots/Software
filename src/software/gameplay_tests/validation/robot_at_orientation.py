@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -26,7 +26,7 @@ class RobotAtOrientation(Validation):
         self.threshold = threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the robot is at the expected orientation
 
         :param world: The world msg to validate
@@ -40,11 +40,11 @@ class RobotAtOrientation(Validation):
                 )
                 angle_diff = robot_angle.minDiff(self.orientation).toRadians()
                 if angle_diff < self.threshold:
-                    return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+                    return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Returns the orientation of the robot for visualization
 
         :param world: The world msg to create validation geometry from

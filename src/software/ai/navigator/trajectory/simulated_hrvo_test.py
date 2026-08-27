@@ -6,7 +6,7 @@ from software.gameplay_tests.validation.avoid_collisions import *
 import software.python_bindings as tbots
 from proto.message_translation.tbots_protobuf import create_world_state
 import math
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.ssl_gc_common_pb2 import Team
 from software.gameplay_tests.simulated_test_fixture import SimulatedTestRunner
 from software.gameplay_tests.validation.validation import (
@@ -48,7 +48,7 @@ class HRVORobotEntersRegionAndStops:
 
         self.is_stationary = True
 
-    def get_validation_status(self, world: tbots.World) -> ValidationStatus:
+    def get_validation_status(self, world: tbots.World) -> protos.ValidationStatus:
         """Checks if a specific robot id is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
 
@@ -74,14 +74,14 @@ class HRVORobotEntersRegionAndStops:
                         self.ticks_so_far = self.ticks_so_far + 1
                         self.is_stationary = True
                         if self.ticks_so_far >= self.num_ticks:
-                            return ValidationStatus.PASSING
+                            return protos.ValidationStatus.PASSING
                     else:
                         self.ticks_so_far = 0
                         self.is_stationary = False
 
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
-    def get_validation_geometry(self, world: tbots.World) -> ValidationGeometry:
+    def get_validation_geometry(self, world: tbots.World) -> protos.ValidationGeometry:
         """(override) shows region to enter"""
         return create_validation_geometry([self.region])
 
@@ -194,13 +194,13 @@ def hrvo_setup(
     )
 
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, team=Team.BLUE
+        gc_command=protos.Command.Type.STOP, team=Team.BLUE
     )
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, team=Team.YELLOW
+        gc_command=protos.Command.Type.STOP, team=Team.YELLOW
     )
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        gc_command=protos.Command.Type.FORCE_START, team=Team.BLUE
     )
 
     blue_tactics = {}
@@ -545,14 +545,14 @@ def get_move_tactic(
     :param desired_orientation: the desired orientation of the robot
     :return: a MoveTactic
     """
-    return MoveTactic(
-        destination=Point(x_meters=destination.x(), y_meters=destination.y()),
-        final_orientation=Angle(radians=desired_orientation.toRadians()),
-        dribbler_mode=DribblerMode.OFF,
-        ball_collision_type=BallCollisionType.ALLOW,
-        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        obstacle_avoidance_mode=ObstacleAvoidanceMode.AGGRESSIVE,
+    return protos.MoveTactic(
+        destination=protos.Point(x_meters=destination.x(), y_meters=destination.y()),
+        final_orientation=protos.Angle(radians=desired_orientation.toRadians()),
+        dribbler_mode=protos.DribblerMode.OFF,
+        ball_collision_type=protos.BallCollisionType.ALLOW,
+        auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.AGGRESSIVE,
     )
 
 

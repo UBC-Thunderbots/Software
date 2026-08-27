@@ -1,4 +1,4 @@
-from proto.validation_pb2 import *
+from proto.validation_pb2 import ValidationGeometry, ValidationStatus
 from software.gameplay_tests.validation.validation import (
     Validation,
 )

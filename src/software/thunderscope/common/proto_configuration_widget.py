@@ -1,12 +1,11 @@
 import os
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.constants import ProtoConfigurationConstant
 import logging
 from pyqtgraph.Qt.QtCore import QTimer
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph import parametertree
-from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
 from typing import Any, Callable
 
@@ -24,7 +23,7 @@ class ProtoConfigurationWidget(QtWidgets.QWidget):
 
     def __init__(
         self,
-        on_change_callback: Callable[[Any, Any, ThunderbotsConfig], None],
+        on_change_callback: Callable[[Any, Any, protos.ThunderbotsConfig], None],
         is_yellow: bool,
         search_filter_threshold: int = 60,
     ):
@@ -114,7 +113,7 @@ class ProtoConfigurationWidget(QtWidgets.QWidget):
             logging.info(
                 "No previously saved ThunderbotsConfig found. Creating a new default one."
             )
-            self.proto_to_configure = ThunderbotsConfig()
+            self.proto_to_configure = protos.ThunderbotsConfig()
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
                 self.is_yellow
             )
@@ -125,7 +124,7 @@ class ProtoConfigurationWidget(QtWidgets.QWidget):
 
         logging.info("Loading protobuf from file: {}".format(path_to_file))
         with open(path_to_file, "rb") as f:
-            self.proto_to_configure = ThunderbotsConfig()
+            self.proto_to_configure = protos.ThunderbotsConfig()
             self.proto_to_configure.ParseFromString(f.read())
 
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
@@ -212,7 +211,7 @@ class ProtoConfigurationWidget(QtWidgets.QWidget):
 
     def reset_button_callback(self) -> None:
         """Resetting the protobufs when the reset button has been clicked"""
-        self.proto_to_configure = ThunderbotsConfig()
+        self.proto_to_configure = protos.ThunderbotsConfig()
         self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
             self.is_yellow
         )

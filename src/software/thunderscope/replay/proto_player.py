@@ -5,8 +5,8 @@ import base64
 import os
 import gzip
 import glob
-from proto.import_all_protos import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import *
+import proto.import_all_protos as protos
+from extlibs.er_force_sim.src.protobuf import world_pb2 as _er_force_world_pb2  # noqa: F401
 from software.py_constants import (
     REPLAY_FILE_EXTENSION,
     REPLAY_FILE_VERSION,
@@ -17,6 +17,7 @@ from software.py_constants import (
 from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
+import google.protobuf.symbol_database as _symbol_database
 from google.protobuf.message import Message
 from typing import Callable, Type, List
 import pickle
@@ -174,7 +175,7 @@ class ProtoPlayer:
                 "chunk_name": file name of the chunk
             }
         """
-        if kwargs["protobuf_type"] == ReplayBookmark:
+        if kwargs["protobuf_type"] == protos.ReplayBookmark:
             self.bookmark_indices.append(kwargs["timestamp"])
 
     def finish_preprocess_replay_file(self) -> None:
@@ -429,8 +430,10 @@ class ProtoPlayer:
         try:
             # The format of the protobuf type is:
             # package.proto_class (e.g. TbotsProto.Primitive)
-            proto_class = eval(str(protobuf_type.split(b".")[-1], encoding="utf-8"))
-        except NameError:
+            proto_class = _symbol_database.Default().GetSymbol(
+                str(protobuf_type, encoding="utf-8")
+            )
+        except KeyError:
             raise TypeError(f"Unknown proto type in replay: '{protobuf_type}'")
 
         # Deserialize protobuf

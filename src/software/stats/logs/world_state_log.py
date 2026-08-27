@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.stats.logs.log_interface import IEvalLog
 from software.stats.logs.type_utils import count_primitive_fields
 from software.py_constants import DIV_B_NUM_ROBOTS
@@ -12,9 +12,9 @@ class RobotLog(IEvalLog):
     """Represents a single robot on the field, with ID and current state."""
 
     id: int
-    state: RobotState
+    state: protos.RobotState
 
-    num_cols: int = count_primitive_fields(RobotState.DESCRIPTOR)
+    num_cols: int = count_primitive_fields(protos.RobotState.DESCRIPTOR)
 
     @classmethod
     @override
@@ -53,13 +53,13 @@ class RobotLog(IEvalLog):
         if all(val == "None" for val in data):
             return None
 
-        state = RobotState(
-            global_position=Point(x_meters=float(data[0]), y_meters=float(data[1])),
-            global_orientation=Angle(radians=float(data[2])),
-            global_velocity=Vector(
+        state = protos.RobotState(
+            global_position=protos.Point(x_meters=float(data[0]), y_meters=float(data[1])),
+            global_orientation=protos.Angle(radians=float(data[2])),
+            global_velocity=protos.Vector(
                 x_component_meters=float(data[3]), y_component_meters=float(data[4])
             ),
-            global_angular_velocity=AngularVelocity(radians_per_second=float(data[5])),
+            global_angular_velocity=protos.AngularVelocity(radians_per_second=float(data[5])),
         )
 
         return RobotLog(id=id, state=state)
@@ -69,9 +69,9 @@ class RobotLog(IEvalLog):
 class BallLog(IEvalLog):
     """Represents a single ball on the field."""
 
-    state: BallState
+    state: protos.BallState
 
-    num_cols: int = count_primitive_fields(BallState.DESCRIPTOR) - 1
+    num_cols: int = count_primitive_fields(protos.BallState.DESCRIPTOR) - 1
 
     def get_position(self) -> list[float]:
         """Returns the current ball position as a [float, float] array
@@ -100,9 +100,9 @@ class BallLog(IEvalLog):
         """Parses a full CSV row into an BallLog"""
         data = [next(row_iter) for _ in range(BallLog.num_cols)]
 
-        state = BallState(
-            global_position=Point(x_meters=float(data[0]), y_meters=float(data[1])),
-            global_velocity=Vector(
+        state = protos.BallState(
+            global_position=protos.Point(x_meters=float(data[0]), y_meters=float(data[1])),
+            global_velocity=protos.Vector(
                 x_component_meters=float(data[2]), y_component_meters=float(data[3])
             ),
             distance_from_ground=0.0,
@@ -124,7 +124,7 @@ class WorldStateLog(IEvalLog):
     )
 
     @staticmethod
-    def from_world(world_msg: World) -> WorldStateLog:
+    def from_world(world_msg: protos.World) -> WorldStateLog:
         """Creates a WorldStateLog from a world protobuf message
 
         :param world_msg: the world object containing the state of the game

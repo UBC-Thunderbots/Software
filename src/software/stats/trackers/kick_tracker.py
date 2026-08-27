@@ -2,7 +2,7 @@ from typing import Optional
 
 import software.python_bindings as tbots_cpp
 from proto.visualization_pb2 import AttackerVisualization
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from typing import override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.stats.trackers.tracker import Tracker
@@ -74,7 +74,7 @@ class KickTracker(Tracker):
         self.curr_pass = None
 
     def _get_new_kick_angle(
-        self, origin: Point, target: Point, latest_angle: tbots_cpp.Angle
+        self, origin: protos.Point, target: protos.Point, latest_angle: tbots_cpp.Angle
     ) -> Optional[tbots_cpp.Angle]:
         """For a kick with the given origin and target, return the new kick angle
         IF it is different enough from the latest angle so far

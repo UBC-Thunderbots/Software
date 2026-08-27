@@ -5,7 +5,7 @@ import time
 import os
 import software.python_bindings as tbots_cpp
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -49,10 +49,10 @@ class RobotCommunication:
 
         self.running = False
 
-        self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+        self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, protos.PrimitiveSet)
 
-        self.motor_control_primitive_buffer = ThreadSafeBuffer(1, MotorControl)
-        self.power_control_primitive_buffer = ThreadSafeBuffer(1, PowerControl)
+        self.motor_control_primitive_buffer = ThreadSafeBuffer(1, protos.MotorControl)
+        self.power_control_primitive_buffer = ThreadSafeBuffer(1, protos.PowerControl)
 
         # dynamic map of robot id to the individual control mode
         self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
@@ -61,15 +61,15 @@ class RobotCommunication:
         self.robot_stop_primitive_send_count: list[int] = [0] * MAX_ROBOT_IDS_PER_SIDE
 
         self.current_proto_unix_io.register_observer(
-            PrimitiveSet, self.fullsystem_primitive_set_buffer
+            protos.PrimitiveSet, self.fullsystem_primitive_set_buffer
         )
 
         self.current_proto_unix_io.register_observer(
-            MotorControl, self.motor_control_primitive_buffer
+            protos.MotorControl, self.motor_control_primitive_buffer
         )
 
         self.current_proto_unix_io.register_observer(
-            PowerControl, self.power_control_primitive_buffer
+            protos.PowerControl, self.power_control_primitive_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(
@@ -163,7 +163,7 @@ class RobotCommunication:
                 self.__queue_stop_for_all_robots()
 
             self.current_proto_unix_io.send_proto(
-                EstopState, EstopState(is_playing=self.estop_is_playing)
+                protos.EstopState, protos.EstopState(is_playing=self.estop_is_playing)
             )
             time.sleep(0.1)
 
@@ -200,8 +200,8 @@ class RobotCommunication:
             motor_control = self.motor_control_primitive_buffer.get(block=False)
             power_control = self.power_control_primitive_buffer.get(block=False)
 
-            diagnostics_primitive = Primitive(
-                direct_control=DirectControlPrimitive(
+            diagnostics_primitive = protos.Primitive(
+                direct_control=protos.DirectControlPrimitive(
                     motor_control=motor_control,
                     power_control=power_control,
                 )
@@ -243,7 +243,7 @@ class RobotCommunication:
                 self.robot_stop_primitive_send_count
             ):
                 if num_times_to_send_stop > 0:
-                    robot_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
+                    robot_primitives_map[robot_id] = protos.Primitive(stop=protos.StopPrimitive())
                     self.robot_stop_primitive_send_count[robot_id] = (
                         num_times_to_send_stop - 1
                     )
@@ -257,7 +257,7 @@ class RobotCommunication:
                     continue
                 primitive.sequence_number = self.sequence_number
                 primitive.time_sent.CopyFrom(
-                    Timestamp(epoch_timestamp_seconds=time.time())
+                    protos.Timestamp(epoch_timestamp_seconds=time.time())
                 )
                 self.communication_manager.send_primitive(
                     robot_id=robot_id, primitive=primitive

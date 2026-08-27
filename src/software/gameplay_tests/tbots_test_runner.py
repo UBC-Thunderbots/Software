@@ -1,4 +1,6 @@
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
+from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_state_pb2 import Command
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
@@ -34,45 +36,45 @@ class TbotsTestRunner:
         self.yellow_full_system_proto_unix_io = yellow_full_system_proto_unix_io
         self.gamecontroller = gamecontroller
         self.is_yellow_friendly = is_yellow_friendly
-        self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size=20, protobuf_type=protos.World)
         self.primitive_set_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=PrimitiveSet
+            buffer_size=1, protobuf_type=protos.PrimitiveSet
         )
         self.last_exception = None
 
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=SSL_WrapperPacket
+            buffer_size=1, protobuf_type=protos.SSL_WrapperPacket
         )
         self.robot_status_buffer = ThreadSafeBuffer(
-            buffer_size=1, protobuf_type=RobotStatus
+            buffer_size=1, protobuf_type=protos.RobotStatus
         )
 
         self.blue_full_system_proto_unix_io.register_observer(
-            SSL_WrapperPacket, self.ssl_wrapper_buffer
+            protos.SSL_WrapperPacket, self.ssl_wrapper_buffer
         )
         self.blue_full_system_proto_unix_io.register_observer(
-            RobotStatus, self.robot_status_buffer
+            protos.RobotStatus, self.robot_status_buffer
         )
         if self.is_yellow_friendly:
             self.yellow_full_system_proto_unix_io.register_observer(
-                World, self.world_buffer
+                protos.World, self.world_buffer
             )
             self.yellow_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_set_buffer
+                protos.PrimitiveSet, self.primitive_set_buffer
             )
         # Only validate on the blue worlds
         else:
             self.blue_full_system_proto_unix_io.register_observer(
-                World, self.world_buffer
+                protos.World, self.world_buffer
             )
             self.blue_full_system_proto_unix_io.register_observer(
-                PrimitiveSet, self.primitive_set_buffer
+                protos.PrimitiveSet, self.primitive_set_buffer
             )
 
     def send_gamecontroller_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
+        gc_command: Command,
+        team: Team,
         final_ball_placement_point=None,
     ):
         """Sends a gamecontroller command that is to be broadcasted to the given team
@@ -102,30 +104,30 @@ class TbotsTestRunner:
         if blue_tactics is not None:
             blue_params = self._create_assigned_tactic_params(blue_tactics)
             self.blue_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, blue_params
+                protos.AssignedTacticPlayControlParams, blue_params
             )
 
         if yellow_tactics is not None:
             yellow_params = self._create_assigned_tactic_params(yellow_tactics)
             self.yellow_full_system_proto_unix_io.send_proto(
-                AssignedTacticPlayControlParams, yellow_params
+                protos.AssignedTacticPlayControlParams, yellow_params
             )
 
-    def set_plays(self, blue_play: PlayName, yellow_play: PlayName):
+    def set_plays(self, blue_play: protos.PlayName, yellow_play: protos.PlayName):
         """Overrides current AI play for both teams
 
         :param blue_play: the play name for the blue team to use
         :param yellow_play: the play name for the yellow team to use
         """
-        self.blue_full_system_proto_unix_io.send_proto(Play, Play(name=blue_play))
-        self.yellow_full_system_proto_unix_io.send_proto(Play, Play(name=yellow_play))
+        self.blue_full_system_proto_unix_io.send_proto(protos.Play, protos.Play(name=blue_play))
+        self.yellow_full_system_proto_unix_io.send_proto(protos.Play, protos.Play(name=yellow_play))
 
     def _create_assigned_tactic_params(self, tactics: dict[int, Any]):
         """Converts dict of tactics to AssignedTacticPlayControlParams message
 
         :param tactics: dict of robot_id -> tactic
         """
-        params = AssignedTacticPlayControlParams()
+        params = protos.AssignedTacticPlayControlParams()
 
         # Checks which oneof field in Tactic to assign the specified tactic to
         for robot_id, specific_tactic in tactics.items():
@@ -138,7 +140,7 @@ class TbotsTestRunner:
         return params
 
     @abstractmethod
-    def set_world_state(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: protos.WorldState):
         """Sets the worldstate for the given team
 
         :param worldstate: the worldstate proto to use

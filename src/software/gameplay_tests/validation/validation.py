@@ -1,5 +1,11 @@
 import software.python_bindings as tbots_cpp
-from proto.validation_pb2 import *
+from proto.validation_pb2 import (
+    ValidationGeometry,
+    ValidationProto,
+    ValidationProtoSet,
+    ValidationStatus,
+    ValidationType,
+)
 
 from abc import abstractmethod
 

@@ -6,7 +6,7 @@ from proto.play_pb2 import PlayName
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
@@ -39,7 +39,7 @@ def test_shoot_or_chip_play(simulated_test_runner):
             ball_velocity=ball_initial_vel,
         )
 
-        last_robot = RobotState(
+        last_robot = protos.RobotState(
             global_position=Point(x_meters=1, y_meters=2),
             global_velocity=Vector(x_component_meters=-4.6, y_component_meters=0),
             global_orientation=Angle(radians=math.pi),
@@ -55,10 +55,10 @@ def test_shoot_or_chip_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=protos.Command.Type.FORCE_START, team=Team.BLUE
         )
 
     # TODO (#3651): add validations

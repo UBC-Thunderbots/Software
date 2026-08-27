@@ -1,6 +1,6 @@
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt import QtWidgets
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from enum import IntEnum
 import software.python_bindings as tbots_cpp
 
@@ -82,7 +82,7 @@ class DriveAndDribblerWidget(QtWidgets.QWidget):
         common_widgets.disable_button(self.stop_and_reset_dribbler)
         common_widgets.disable_button(self.stop_and_reset_direct)
 
-    def override_slider_values(self, motor_control: MotorControl) -> None:
+    def override_slider_values(self, motor_control: protos.MotorControl) -> None:
         """Set the widget's sliders to match the values in the given MotorControl
 
         :param motor_control: the MotorControl values to override the widget's sliders with
@@ -115,7 +115,7 @@ class DriveAndDribblerWidget(QtWidgets.QWidget):
 
     def refresh(self) -> None:
         """Refresh the widget and send the MotorControl message with the current values depending on the ControlMode"""
-        motor_control = MotorControl()
+        motor_control = protos.MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
         if self.control_mode == ControlMode.VELOCITY:
             motor_control.direct_velocity_control.velocity.x_component_meters = (
@@ -139,7 +139,7 @@ class DriveAndDribblerWidget(QtWidgets.QWidget):
                 self.back_right_motor_slider.value()
             )
 
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        self.proto_unix_io.send_proto(protos.MotorControl, motor_control)
 
     def __setup_direct_velocity_widgets(self) -> QtWidgets.QGroupBox:
         """Create a widget to control the direct velocity of the robot's motors
@@ -359,7 +359,7 @@ class DriveAndDribblerWidget(QtWidgets.QWidget):
         self.__reset_motor_sliders()
         self.__reset_direct_sliders()
 
-        motor_control = MotorControl()
+        motor_control = protos.MotorControl()
         if use_control_mode == ControlMode.VELOCITY:
             # Show the direct velocity widget
             motor_control.ClearField("direct_per_wheel_control")
@@ -370,7 +370,7 @@ class DriveAndDribblerWidget(QtWidgets.QWidget):
             motor_control.ClearField("direct_velocity_control")
             self.direct_velocity_widget.setVisible(False)
             self.per_motor_widget.setVisible(True)
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        self.proto_unix_io.send_proto(protos.MotorControl, motor_control)
 
     def __reset_direct_sliders(self) -> None:
         """Reset the direct velocity sliders back to 0"""

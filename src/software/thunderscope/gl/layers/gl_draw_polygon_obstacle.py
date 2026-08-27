@@ -3,14 +3,14 @@ from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtCore import QTimer, Qt
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
-from typing import Callable, override
+from typing import Callable, List, override
 
 
 class GLDrawPolygonObstacleLayer(GLLayer):
@@ -30,8 +30,8 @@ class GLDrawPolygonObstacleLayer(GLLayer):
 
         self.friendly_io = friendly_io
 
-        self.points: List[Point] = []
-        self.obstacles: List[Obstacle] = []
+        self.points: List[protos.Point] = []
+        self.obstacles: List[protos.Obstacle] = []
 
         # Stores the polygons that are currently visible
         self.rendering_polygons = ObservableList(self._graphics_changed)
@@ -69,13 +69,13 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             print("Cannot push polygon to stack as there are less than two points.")
             return
 
-        self.obstacles.append(Obstacle(polygon=Polygon(points=self.points.copy())))
+        self.obstacles.append(protos.Obstacle(polygon=protos.Polygon(points=self.points.copy())))
         self.points.clear()
 
         self.rendering_polygons.append(self.current_polygon)
         self.current_polygon = GLPolygon(parent_item=self, line_width=2)
 
-    def __add_one_point(self, point: Point) -> None:
+    def __add_one_point(self, point: protos.Point) -> None:
         """Adding one points to a polygon
 
         :param point: represent the point (x,y) that is added to the polygon
@@ -92,12 +92,12 @@ class GLDrawPolygonObstacleLayer(GLLayer):
         if len(self.points) >= 3:
             obstacles = self.obstacles.copy()
 
-            polygon = Polygon(points=self.points.copy())
-            obstacle = Obstacle(polygon=polygon)
+            polygon = protos.Polygon(points=self.points.copy())
+            obstacle = protos.Obstacle(polygon=polygon)
             obstacles.append(obstacle)
 
             self.friendly_io.send_proto(
-                VirtualObstacles, VirtualObstacles(obstacles=obstacles)
+                protos.VirtualObstacles, protos.VirtualObstacles(obstacles=obstacles)
             )
 
     def __create_single_click_callback(
@@ -116,7 +116,7 @@ class GLDrawPolygonObstacleLayer(GLLayer):
             # as a single click.
             if self.can_double_click:
                 point = event.point_in_scene
-                self.__add_one_point(Point(x_meters=point.x(), y_meters=point.y()))
+                self.__add_one_point(protos.Point(x_meters=point.x(), y_meters=point.y()))
 
             self.can_double_click = False
 

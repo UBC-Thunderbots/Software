@@ -1,6 +1,6 @@
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import PlayName
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.gameplay_tests.simulated_test_fixture import (
@@ -48,7 +48,7 @@ def test_crease_defense_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
         )
 
     eventually_validations = [

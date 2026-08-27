@@ -1,7 +1,7 @@
 import pytest
 import software.python_bindings as tbots_cpp
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from proto.play_pb2 import PlayName
 from proto.ssl_gc_common_pb2 import Team
@@ -63,13 +63,13 @@ def test_free_kick_play_friendly(ball_initial_pos, must_score, simulated_test_ru
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+            gc_command=protos.Command.Type.NORMAL_START, team=Team.BLUE
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.DIRECT, team=Team.BLUE
+            gc_command=protos.Command.Type.DIRECT, team=Team.BLUE
         )
 
         simulated_test_runner.set_plays(

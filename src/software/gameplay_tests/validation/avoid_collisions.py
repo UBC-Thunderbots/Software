@@ -1,6 +1,6 @@
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 import software.python_bindings as tbots
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_types,
@@ -21,7 +21,7 @@ class RobotsDoNotCollide(Validation):
         self.fouled_robots = []
 
     @override
-    def get_validation_status(self, world: World) -> ValidationStatus:
+    def get_validation_status(self, world: protos.World) -> protos.ValidationStatus:
         """Checks if any 2 robots in the world have collided
 
         :param world: the World message to validate
@@ -34,11 +34,11 @@ class RobotsDoNotCollide(Validation):
         for i in range(0, len(robots) - 1):
             for j in range(i + 1, len(robots)):
                 if self.check_robot_collision(robots[i], robots[j]):
-                    return ValidationStatus.FAILING
+                    return protos.ValidationStatus.FAILING
 
-        return ValidationStatus.PASSING
+        return protos.ValidationStatus.PASSING
 
-    def check_robot_collision(self, robot1: Robot, robot2: Robot):
+    def check_robot_collision(self, robot1: protos.Robot, robot2: protos.Robot):
         """Helper function to check if 2 robots have collided
         Also determines which robots have committed a foul
 
@@ -50,14 +50,14 @@ class RobotsDoNotCollide(Validation):
         """
         # robot positions
         robot1_pos = tbots.createVector(
-            Vector(
+            protos.Vector(
                 x_component_meters=robot1.current_state.global_position.x_meters,
                 y_component_meters=robot1.current_state.global_position.y_meters,
             )
         )
 
         robot2_pos = tbots.createVector(
-            Vector(
+            protos.Vector(
                 x_component_meters=robot2.current_state.global_position.x_meters,
                 y_component_meters=robot2.current_state.global_position.y_meters,
             )
@@ -65,14 +65,14 @@ class RobotsDoNotCollide(Validation):
 
         # robot velocities
         robot1_vel = tbots.createVector(
-            Vector(
+            protos.Vector(
                 x_component_meters=robot1.current_state.global_velocity.x_component_meters,
                 y_component_meters=robot1.current_state.global_velocity.y_component_meters,
             )
         )
 
         robot2_vel = tbots.createVector(
-            Vector(
+            protos.Vector(
                 x_component_meters=robot2.current_state.global_velocity.x_component_meters,
                 y_component_meters=robot2.current_state.global_velocity.y_component_meters,
             )
@@ -95,7 +95,7 @@ class RobotsDoNotCollide(Validation):
         return False
 
     def check_fouled_robots(
-        self, robot1_id: int, robot1_vel: Vector, robot2_id: int, robot2_vel: Vector
+        self, robot1_id: int, robot1_vel: protos.Vector, robot2_id: int, robot2_vel: protos.Vector
     ):
         """Determines which of the 2 robots have fouled based on their speed
         and adds them to the fouled robots list
@@ -120,7 +120,7 @@ class RobotsDoNotCollide(Validation):
                 self.fouled_robots.extend([robot2_id])
 
     @override
-    def get_validation_geometry(self, world: World) -> ValidationGeometry:
+    def get_validation_geometry(self, world: protos.World) -> protos.ValidationGeometry:
         """Returns a list of circles indicating the boundary of each robot in the world
 
         :param world: the world message to create geometry for

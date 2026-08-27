@@ -16,7 +16,7 @@ from software.gameplay_tests.validation.ball_enters_region import BallNeverEnter
 from software.gameplay_tests.validation.or_validation import OrValidation
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from proto.import_all_protos import Command
+import proto.import_all_protos as protos
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -56,17 +56,17 @@ def test_kickoff_friendly_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.KICKOFF, team=Team.BLUE
+            gc_command=protos.Command.Type.KICKOFF, team=Team.BLUE
         )
 
         # Let robots get ready before starting kickoff
         threading.Timer(
             4.0,
             lambda: simulated_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+                gc_command=protos.Command.Type.NORMAL_START, team=Team.BLUE
             ),
         ).start()
 

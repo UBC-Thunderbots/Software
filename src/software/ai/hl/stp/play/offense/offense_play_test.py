@@ -6,6 +6,7 @@ from software.gameplay_tests.validation.friendly_has_ball_possession import *
 from software.gameplay_tests.validation.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_state_pb2 import Command
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )

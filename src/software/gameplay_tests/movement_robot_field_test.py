@@ -1,7 +1,7 @@
 import math
 import threading
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.gameplay_tests.field_test_fixture import *
 
 from software.gameplay_tests.simulated_test_fixture import *
@@ -45,18 +45,18 @@ def test_basic_rotation(field_test_runner):
 
         for angle in test_angles:
             print(f"Rotating to {angle} degrees")
-            move_tactic = MoveTactic()
+            move_tactic = protos.MoveTactic()
             move_tactic.destination.CopyFrom(rob_pos_p)
-            move_tactic.dribbler_mode = DribblerMode.OFF
+            move_tactic.dribbler_mode = protos.DribblerMode.OFF
             move_tactic.final_orientation.CopyFrom(
-                Angle(radians=angle * math.pi / 180.0)
+                protos.Angle(radians=angle * math.pi / 180.0)
             )
-            move_tactic.ball_collision_type = BallCollisionType.AVOID
+            move_tactic.ball_collision_type = protos.BallCollisionType.AVOID
             move_tactic.auto_chip_or_kick.CopyFrom(
-                AutoChipOrKick(autokick_speed_m_per_s=0.0)
+                protos.AutoChipOrKick(autokick_speed_m_per_s=0.0)
             )
-            move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
-            move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
+            move_tactic.max_allowed_speed_mode = protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
+            move_tactic.obstacle_avoidance_mode = protos.ObstacleAvoidanceMode.SAFE
 
             # Setup Tactic
             field_test_runner.set_tactics(
@@ -74,7 +74,7 @@ def test_basic_rotation(field_test_runner):
 
         # Send a halt tactic after the test finishes
         field_test_runner.set_tactics(
-            blue_tactics={id: HaltTactic()}, yellow_tactics=None
+            blue_tactics={id: protos.HaltTactic()}, yellow_tactics=None
         )
 
     test_thread = threading.Thread(target=execute_test, daemon=True)
@@ -103,46 +103,46 @@ def test_one_robots_square(field_test_runner):
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")
 
-    point1 = Point(x_meters=0.4, y_meters=0.4)
-    point2 = Point(x_meters=0.4, y_meters=-0.4)
-    point3 = Point(x_meters=-0.4, y_meters=-0.4)
-    point4 = Point(x_meters=-0.4, y_meters=0.4)
+    point1 = protos.Point(x_meters=0.4, y_meters=0.4)
+    point2 = protos.Point(x_meters=0.4, y_meters=-0.4)
+    point3 = protos.Point(x_meters=-0.4, y_meters=-0.4)
+    point4 = protos.Point(x_meters=-0.4, y_meters=0.4)
 
-    tactic_0 = MoveTactic(
+    tactic_0 = protos.MoveTactic(
         destination=point1,
-        dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
-        ball_collision_type=BallCollisionType.AVOID,
-        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        dribbler_mode=protos.DribblerMode.OFF,
+        final_orientation=protos.Angle(radians=-math.pi / 2),
+        ball_collision_type=protos.BallCollisionType.AVOID,
+        auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
     )
-    tactic_1 = MoveTactic(
+    tactic_1 = protos.MoveTactic(
         destination=point2,
-        dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
-        ball_collision_type=BallCollisionType.AVOID,
-        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        dribbler_mode=protos.DribblerMode.OFF,
+        final_orientation=protos.Angle(radians=-math.pi / 2),
+        ball_collision_type=protos.BallCollisionType.AVOID,
+        auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
     )
-    tactic_2 = MoveTactic(
+    tactic_2 = protos.MoveTactic(
         destination=point3,
-        dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
-        ball_collision_type=BallCollisionType.AVOID,
-        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        dribbler_mode=protos.DribblerMode.OFF,
+        final_orientation=protos.Angle(radians=-math.pi / 2),
+        ball_collision_type=protos.BallCollisionType.AVOID,
+        auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
     )
-    tactic_3 = MoveTactic(
+    tactic_3 = protos.MoveTactic(
         destination=point4,
-        dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
-        ball_collision_type=BallCollisionType.AVOID,
-        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        dribbler_mode=protos.DribblerMode.OFF,
+        final_orientation=protos.Angle(radians=-math.pi / 2),
+        ball_collision_type=protos.BallCollisionType.AVOID,
+        auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
     )
 
     tactics = [tactic_0, tactic_1, tactic_2, tactic_3, tactic_0]
@@ -175,7 +175,7 @@ def test_one_robots_square(field_test_runner):
 
         # Send a halt tactic after the test finishes
         field_test_runner.set_tactics(
-            blue_tactics={id: HaltTactic()}, yellow_tactics=None
+            blue_tactics={id: protos.HaltTactic()}, yellow_tactics=None
         )
 
     test_thread = threading.Thread(target=execute_test, daemon=True)

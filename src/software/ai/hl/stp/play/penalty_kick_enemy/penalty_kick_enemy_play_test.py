@@ -14,7 +14,7 @@ from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import Command
+import proto.import_all_protos as protos
 from proto.ssl_gc_common_pb2 import Team
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
@@ -136,10 +136,10 @@ def test_penalty_kick_enemy_play_setup(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.HALT, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.HALT, team=Team.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.PENALTY, team=Team.YELLOW
+            gc_command=protos.Command.Type.PENALTY, team=Team.YELLOW
         )
 
         simulated_test_runner.set_plays(

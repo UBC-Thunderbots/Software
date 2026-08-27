@@ -6,7 +6,7 @@ from software.gameplay_tests.validation.robot_enters_region import (
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.play_pb2 import PlayName
-from proto.import_all_protos import Command
+import proto.import_all_protos as protos
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -48,13 +48,13 @@ def test_example_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+            gc_command=protos.Command.Type.NORMAL_START, team=Team.BLUE
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.DIRECT, team=Team.BLUE
+            gc_command=protos.Command.Type.DIRECT, team=Team.BLUE
         )
 
         simulated_test_runner.set_plays(

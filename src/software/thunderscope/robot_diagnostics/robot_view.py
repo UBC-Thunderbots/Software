@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt import QtWidgets
 from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
@@ -55,7 +55,7 @@ class RobotViewComponent(QtWidgets.QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
-    def update_robot_status(self, robot_status: RobotStatus):
+    def update_robot_status(self, robot_status: protos.RobotStatus):
         """Receives a RobotStatus message and updates the widgets
         in this component with the new data
 
@@ -64,7 +64,7 @@ class RobotViewComponent(QtWidgets.QWidget):
         self.robot_info.update_robot_status(robot_status)
         self.robot_status_view.update(robot_status)
 
-    def update_robot_statistic(self, robot_statistic: RobotStatistic):
+    def update_robot_statistic(self, robot_statistic: protos.RobotStatistic):
         """Receives a RobotStatistic message and updates the widgets
         in this component with the new data
 
@@ -90,8 +90,8 @@ class RobotView(QtWidgets.QScrollArea):
         """
         super().__init__()
 
-        self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
-        self.robot_statistic_buffer = ThreadSafeBuffer(10, RobotStatistic)
+        self.robot_status_buffer = ThreadSafeBuffer(10, protos.RobotStatus)
+        self.robot_statistic_buffer = ThreadSafeBuffer(10, protos.RobotStatistic)
 
         self.layout = QtWidgets.QVBoxLayout()
 

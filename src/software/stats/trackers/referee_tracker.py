@@ -1,6 +1,6 @@
 from typing import override, Callable
 from software.stats.trackers.tracker import Tracker
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.stats.logs.event_log import EventType, Team
@@ -13,13 +13,13 @@ class RefereeTracker(Tracker):
     # we want to ignore all breaks, times before the game actually starts
     # and all penalty related stages
     STAGES_TO_IGNORE = [
-        Referee.Stage.PENALTY_SHOOTOUT_BREAK,
-        Referee.Stage.PENALTY_SHOOTOUT,
-        Referee.Stage.NORMAL_FIRST_HALF_PRE,
-        Referee.Stage.NORMAL_SECOND_HALF_PRE,
-        Referee.Stage.EXTRA_TIME_BREAK,
-        Referee.Stage.EXTRA_FIRST_HALF_PRE,
-        Referee.Stage.EXTRA_SECOND_HALF_PRE,
+        protos.Referee.Stage.PENALTY_SHOOTOUT_BREAK,
+        protos.Referee.Stage.PENALTY_SHOOTOUT,
+        protos.Referee.Stage.NORMAL_FIRST_HALF_PRE,
+        protos.Referee.Stage.NORMAL_SECOND_HALF_PRE,
+        protos.Referee.Stage.EXTRA_TIME_BREAK,
+        protos.Referee.Stage.EXTRA_FIRST_HALF_PRE,
+        protos.Referee.Stage.EXTRA_SECOND_HALF_PRE,
     ]
 
     def __init__(
@@ -49,8 +49,8 @@ class RefereeTracker(Tracker):
             **kwargs,
         )
 
-        self.referee_buffer = ThreadSafeBuffer(self.buffer_size, Referee)
-        self.proto_unix_io.register_observer(Referee, self.referee_buffer)
+        self.referee_buffer = ThreadSafeBuffer(self.buffer_size, protos.Referee)
+        self.proto_unix_io.register_observer(protos.Referee, self.referee_buffer)
 
         self.friendly_color_yellow = friendly_color_yellow
 
@@ -83,7 +83,7 @@ class RefereeTracker(Tracker):
             self.toggle_logging(True)
 
         # if game has just started, log a game start event once
-        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+        if game_stage == protos.Referee.Stage.NORMAL_FIRST_HALF:
             self.curr_stage = self._log_event_if_change(
                 new_value=game_stage,
                 old_value=self.curr_stage,
@@ -92,7 +92,7 @@ class RefereeTracker(Tracker):
             return
 
         # if the game has just ended, log a game end event once
-        if game_stage == Referee.Stage.POST_GAME:
+        if game_stage == protos.Referee.Stage.POST_GAME:
             self.curr_stage = self._log_event_if_change(
                 new_value=game_stage,
                 old_value=self.curr_stage,

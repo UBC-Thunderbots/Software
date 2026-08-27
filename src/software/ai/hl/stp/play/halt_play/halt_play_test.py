@@ -2,6 +2,7 @@ import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_state_pb2 import Command
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )

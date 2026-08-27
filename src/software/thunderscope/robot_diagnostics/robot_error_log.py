@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt.QtCore import Qt, QTimer
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.py_constants import BATTERY_WARNING_VOLTAGE
 from software.thunderscope.robot_diagnostics.error_log_widgets import (
     RobotLogMessageWidget,
@@ -34,8 +34,8 @@ class RobotErrorLog(QtWidgets.QScrollArea):
     def __init__(self):
         super(RobotErrorLog, self).__init__()
 
-        self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
-        self.robot_crash_buffer = ThreadSafeBuffer(10, RobotCrash)
+        self.robot_status_buffer = ThreadSafeBuffer(10, protos.RobotStatus)
+        self.robot_crash_buffer = ThreadSafeBuffer(10, protos.RobotCrash)
         self.robot_log_buffer = ThreadSafeBuffer(10, RobotLog)
 
         self.robot_last_crash_time_s = {}
@@ -49,7 +49,7 @@ class RobotErrorLog(QtWidgets.QScrollArea):
         # when the robot has an error code, its added to tne list keyed to the robot id
         # which prevents spamming the same error code log
         # list set back to empty if no error code
-        self.error_code_log_disabled: dict[int, list[ErrorCode]] = {}
+        self.error_code_log_disabled: dict[int, list[protos.ErrorCode]] = {}
 
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -167,7 +167,7 @@ class RobotErrorLog(QtWidgets.QScrollArea):
             # prevent repeated crash logs by having a buffer time
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()
 
-    def __refresh_robot_status_error_code(self, robot_status: RobotStatus) -> None:
+    def __refresh_robot_status_error_code(self, robot_status: protos.RobotStatus) -> None:
         """Adds a log to the widget for each of the error codes in the RobotStatus message
         Doesn't log if this robot has already logged a specific error code type (to prevent spam)
         Clears the types of error codes already added for a robot if no error
@@ -181,8 +181,8 @@ class RobotErrorLog(QtWidgets.QScrollArea):
         # if there's an error code, add to log
         for code in robot_status.error_code:
             if (
-                code != ErrorCode.NO_ERROR
-                and code != ErrorCode.LOW_BATTERY
+                code != protos.ErrorCode.NO_ERROR
+                and code != protos.ErrorCode.LOW_BATTERY
                 and code in ERROR_CODE_MESSAGES.keys()
                 and code not in self.error_code_log_disabled[robot_status.robot_id]
             ):
@@ -194,10 +194,10 @@ class RobotErrorLog(QtWidgets.QScrollArea):
                 # add to list for this robot id to prevent spamming
                 self.error_code_log_disabled[robot_status.robot_id].append(code)
             # if there is no more errors, clear the list so far
-            elif code == ErrorCode.NO_ERROR:
+            elif code == protos.ErrorCode.NO_ERROR:
                 self.error_code_log_disabled[robot_status.robot_id] = []
 
-    def __refresh_robot_status_battery_voltage(self, robot_status: RobotStatus) -> None:
+    def __refresh_robot_status_battery_voltage(self, robot_status: protos.RobotStatus) -> None:
         """If the current robot's battery is lower than the threshold, adds a log
         Records that this robot has already had a log added to prevent spamming
         Resets the spamming flag once voltage for this robot goes back above threshold

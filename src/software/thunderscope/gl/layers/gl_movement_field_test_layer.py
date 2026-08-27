@@ -1,7 +1,7 @@
 import math
 from pyqtgraph.Qt.QtCore import Qt
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.gl.layers.gl_world_layer import tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.logger.logger import create_logger
@@ -33,10 +33,10 @@ class GLMovementFieldTestLayer(GLLayer):
         """
         super().__init__(name)
 
-        self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer: ThreadSafeBuffer = ThreadSafeBuffer(buffer_size, protos.World)
         self.fullsystem_io: ProtoUnixIO = fullsystem_io
         self.selected_robot_id = 0
-        self.cached_world: World | None = None
+        self.cached_world: protos.World | None = None
         self.is_selected = False
 
         # State for drag-to-orient movement
@@ -57,7 +57,7 @@ class GLMovementFieldTestLayer(GLLayer):
         self.preview_robot_graphic.hide()
         self.preview_orientation_graphic.hide()
 
-    def _get_selected_robot(self, cached_world: World | None, selected_robot_id: int):
+    def _get_selected_robot(self, cached_world: protos.World | None, selected_robot_id: int):
         """Return the proto robot matching the selected robot ID, or None.
 
         :param cached_world: The world snapshot to search
@@ -139,21 +139,21 @@ class GLMovementFieldTestLayer(GLLayer):
 
         robot_id = self.selected_robot_id
 
-        point = Point(x_meters=point.x(), y_meters=point.y())
-        move_tactic = MoveTactic(
+        point = protos.Point(x_meters=point.x(), y_meters=point.y())
+        move_tactic = protos.MoveTactic(
             destination=point,
-            dribbler_mode=DribblerMode.OFF,
-            final_orientation=Angle(radians=orientation),
-            ball_collision_type=BallCollisionType.AVOID,
-            auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-            max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-            obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+            dribbler_mode=protos.DribblerMode.OFF,
+            final_orientation=protos.Angle(radians=orientation),
+            ball_collision_type=protos.BallCollisionType.AVOID,
+            auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+            max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+            obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
         )
 
-        assign_tactic = AssignedTacticPlayControlParams()
+        assign_tactic = protos.AssignedTacticPlayControlParams()
         assign_tactic.assigned_tactics[robot_id].move.CopyFrom(move_tactic)
 
-        self.fullsystem_io.send_proto(AssignedTacticPlayControlParams, assign_tactic)
+        self.fullsystem_io.send_proto(protos.AssignedTacticPlayControlParams, assign_tactic)
 
     @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:

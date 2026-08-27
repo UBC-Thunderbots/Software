@@ -4,7 +4,7 @@ from typing import Callable, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
     from software.thunderscope.thunderscope import Thunderscope
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.message_translation import tbots_protobuf
 from software.py_constants import (
     SECONDS_PER_MILLISECOND,
@@ -61,14 +61,14 @@ def async_sim_ticker(
                                     SSL Vision packet
     """
     blue_primitive_set_buffer = ThreadSafeBuffer(
-        buffer_size=1, protobuf_type=PrimitiveSet
+        buffer_size=1, protobuf_type=protos.PrimitiveSet
     )
     yellow_primitive_set_buffer = ThreadSafeBuffer(
-        buffer_size=1, protobuf_type=PrimitiveSet
+        buffer_size=1, protobuf_type=protos.PrimitiveSet
     )
 
-    blue_proto_unix_io.register_observer(PrimitiveSet, blue_primitive_set_buffer)
-    yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
+    blue_proto_unix_io.register_observer(protos.PrimitiveSet, blue_primitive_set_buffer)
+    yellow_proto_unix_io.register_observer(protos.PrimitiveSet, yellow_primitive_set_buffer)
 
     while tscope.is_open():
         # flush primitive set buffers before sending the next tick
@@ -80,8 +80,8 @@ def async_sim_ticker(
             pass
 
         # Tick simulation
-        tick = SimulatorTick(milliseconds=tick_rate_ms)
-        sim_proto_unix_io.send_proto(SimulatorTick, tick)
+        tick = protos.SimulatorTick(milliseconds=tick_rate_ms)
+        sim_proto_unix_io.send_proto(protos.SimulatorTick, tick)
         time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
 
         while True:
@@ -89,7 +89,7 @@ def async_sim_ticker(
                 blue_primitive_set_buffer.get(block=True, timeout=buffer_timeout_s)
                 break
             except queue.Empty:
-                sim_proto_unix_io.send_proto(SimulatorTick, tick)
+                sim_proto_unix_io.send_proto(protos.SimulatorTick, tick)
                 time_provider_instance.tick_ns(
                     tick_rate_ms * NANOSECONDS_PER_MILLISECOND
                 )
@@ -99,7 +99,7 @@ def async_sim_ticker(
                 yellow_primitive_set_buffer.get(block=True, timeout=buffer_timeout_s)
                 break
             except queue.Empty:
-                sim_proto_unix_io.send_proto(SimulatorTick, tick)
+                sim_proto_unix_io.send_proto(protos.SimulatorTick, tick)
                 time_provider_instance.tick_ns(
                     tick_rate_ms * NANOSECONDS_PER_MILLISECOND
                 )
@@ -114,8 +114,8 @@ def realtime_sim_ticker(
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
     :param tscope:              Thunderscope instance that is tied to the simulation ticking
     """
-    simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
-    sim_proto_unix_io.register_observer(SimulationState, simulation_state_buffer)
+    simulation_state_buffer = ThreadSafeBuffer(5, protos.SimulationState)
+    sim_proto_unix_io.register_observer(protos.SimulationState, simulation_state_buffer)
     per_tick_delay_s = tick_rate_ms * SECONDS_PER_MILLISECOND
 
     # Tick simulation if Thundersocpe is open
@@ -123,8 +123,8 @@ def realtime_sim_ticker(
         simulation_state_message = simulation_state_buffer.get()
 
         if simulation_state_message.is_playing:
-            tick = SimulatorTick(milliseconds=tick_rate_ms)
-            sim_proto_unix_io.send_proto(SimulatorTick, tick)
+            tick = protos.SimulatorTick(milliseconds=tick_rate_ms)
+            sim_proto_unix_io.send_proto(protos.SimulatorTick, tick)
             time_provider_instance.tick_ns(tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
 
         time.sleep(per_tick_delay_s / simulation_state_message.simulation_speed)
@@ -140,14 +140,14 @@ def sync_simulation(
     :param timeout_s:           How long to wait before we retry our attempt to synchronize with the simulator
     """
     sim_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM]
-    world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+    world_state_received_buffer = ThreadSafeBuffer(1, protos.WorldStateReceivedTrigger)
     sim_proto_unix_io.register_observer(
-        WorldStateReceivedTrigger, world_state_received_buffer
+        protos.WorldStateReceivedTrigger, world_state_received_buffer
     )
     world_state = tbots_protobuf.create_default_world_state(num_robots)
 
     while True:
-        sim_proto_unix_io.send_proto(WorldState, world_state)
+        sim_proto_unix_io.send_proto(protos.WorldState, world_state)
 
         try:
             world_state_received = world_state_received_buffer.get(

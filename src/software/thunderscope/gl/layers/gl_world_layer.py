@@ -5,7 +5,7 @@ import pyqtgraph.opengl as gl
 import math
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.py_constants import (
     BALL_MAX_RADIUS_METERS,
     BALL_MAX_SPEED_METERS_PER_SECOND,
@@ -67,12 +67,12 @@ class GLWorldLayer(GLLayer):
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
-        self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
-        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, SimulationState)
-        self.cached_world = World()
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, protos.PrimitiveSet)
+        self.robot_status_buffer = ThreadSafeBuffer(buffer_size, protos.RobotStatus)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, protos.Referee, False)
+        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, protos.SimulationState)
+        self.cached_world = protos.World()
         # fields to store the team from the cached world state as a dict
         self._cached_friendly_team = {}
         self._cached_enemy_team = {}
@@ -205,12 +205,12 @@ class GLWorldLayer(GLLayer):
 
         :return: the current play state
         """
-        simulator_state = SimulationState(
+        simulator_state = protos.SimulationState(
             is_playing=not self.is_playing, simulation_speed=self.simulation_speed
         )
         self.is_playing = not self.is_playing
 
-        self.simulator_io.send_proto(SimulationState, simulator_state)
+        self.simulator_io.send_proto(protos.SimulationState, simulator_state)
 
         return self.is_playing
 
@@ -220,10 +220,10 @@ class GLWorldLayer(GLLayer):
         :param speed: the new speed to set
         """
         self.simulation_speed = speed
-        simulator_state = SimulationState(
+        simulator_state = protos.SimulationState(
             is_playing=self.is_playing, simulation_speed=self.simulation_speed
         )
-        self.simulator_io.send_proto(SimulationState, simulator_state)
+        self.simulator_io.send_proto(protos.SimulationState, simulator_state)
 
     @override
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -247,16 +247,16 @@ class GLWorldLayer(GLLayer):
         )
 
         # Send a command to the simulator to move the ball to the picked point
-        world_state = WorldState()
+        world_state = protos.WorldState()
         world_state.ball_state.CopyFrom(
-            BallState(
-                global_position=Point(
+            protos.BallState(
+                global_position=protos.Point(
                     x_meters=self.point_in_scene_picked.x(),
                     y_meters=self.point_in_scene_picked.y(),
                 )
             )
         )
-        self.simulator_io.send_proto(WorldState, world_state)
+        self.simulator_io.send_proto(protos.WorldState, world_state)
 
     @override
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
@@ -296,14 +296,14 @@ class GLWorldLayer(GLLayer):
         # Send a command to the simulator to give the ball the specified
         # velocity (i.e. kick it)
 
-        world_state = WorldState()
+        world_state = protos.WorldState()
         world_state.ball_state.CopyFrom(
-            BallState(
-                global_position=Point(
+            protos.BallState(
+                global_position=protos.Point(
                     x_meters=self.point_in_scene_picked.x(),
                     y_meters=self.point_in_scene_picked.y(),
                 ),
-                global_velocity=Vector(
+                global_velocity=protos.Vector(
                     x_component_meters=self.ball_velocity_vector.x(),
                     y_component_meters=self.ball_velocity_vector.y(),
                 ),
@@ -311,7 +311,7 @@ class GLWorldLayer(GLLayer):
         )
 
         self.ball_velocity_vector = None
-        self.simulator_io.send_proto(WorldState, world_state)
+        self.simulator_io.send_proto(protos.WorldState, world_state)
 
     @override
     def refresh_graphics(self) -> None:
@@ -388,7 +388,7 @@ class GLWorldLayer(GLLayer):
             {},
         )
 
-    def __update_field_graphics(self, field: Field) -> None:
+    def __update_field_graphics(self, field: protos.Field) -> None:
         """Update the GLGraphicsItems that display the field lines and markings
 
         :param field: The field proto
@@ -427,7 +427,7 @@ class GLWorldLayer(GLLayer):
 
         self.field_center_circle_graphic.set_radius(field.center_circle_radius)
 
-    def __update_goal_graphics(self, field: Field) -> None:
+    def __update_goal_graphics(self, field: protos.Field) -> None:
         """Update the GLGraphicsItems that display the goals
 
         :param field: The field proto
@@ -445,7 +445,7 @@ class GLWorldLayer(GLLayer):
         self.enemy_goal_graphic.set_position(field.field_x_length / 2, 0)
         self.enemy_goal_graphic.set_orientation(180)
 
-    def __update_ball_graphics(self, ball_state: BallState) -> None:
+    def __update_ball_graphics(self, ball_state: protos.BallState) -> None:
         """Update the GLGraphicsItems that display the ball
 
         :param ball_state: The ball state proto

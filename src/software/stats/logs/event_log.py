@@ -1,7 +1,8 @@
 from __future__ import annotations
+from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.ssl_gc_common_pb2 import Team
 from typing import Any, override
 from software.stats.logs.log_interface import TimestampedEvalLog
@@ -41,7 +42,7 @@ class EventLog(TimestampedEvalLog):
 
     @staticmethod
     def from_world(
-        world_msg: World, event_type: EventType, from_team: Team, for_team: Team
+        world_msg: protos.World, event_type: EventType, from_team: Team, for_team: Team
     ) -> EventLog:
         """Creates an EventLog from a world protobuf message
 

@@ -12,7 +12,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
 from software.stats.logs.event_log import EventLog
 import logging
-from proto.import_all_protos import *
 import queue
 from proto.ssl_gc_common_pb2 import Team
 
