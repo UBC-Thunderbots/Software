@@ -41,7 +41,10 @@ class EventLog(TimestampedEvalLog):
 
     @staticmethod
     def from_world(
-        world_msg: protos.World, event_type: EventType, from_team: protos.Team, for_team: protos.Team
+        world_msg: protos.World,
+        event_type: EventType,
+        from_team: protos.Team,
+        for_team: protos.Team,
     ) -> EventLog:
         """Creates an EventLog from a world protobuf message
 

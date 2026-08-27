@@ -30,7 +30,10 @@ class DurationValidation(Validation):
         :return: FAILING if given validation has not yet passed for given duration.
                  PASSING if given validation has passed for given duration.
         """
-        if self.validation.get_validation_status(world) == protos.ValidationStatus.PASSING:
+        if (
+            self.validation.get_validation_status(world)
+            == protos.ValidationStatus.PASSING
+        ):
             self.passing_ticks += 1
         else:
             self.passing_ticks = 0

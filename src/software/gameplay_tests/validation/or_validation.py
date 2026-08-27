@@ -19,7 +19,10 @@ class OrValidation(Validation):
     @override
     def get_validation_status(self, world):
         for validation in self.validations:
-            if validation.get_validation_status(world) == protos.ValidationStatus.PASSING:
+            if (
+                validation.get_validation_status(world)
+                == protos.ValidationStatus.PASSING
+            ):
                 return protos.ValidationStatus.PASSING
         return protos.ValidationStatus.FAILING
 

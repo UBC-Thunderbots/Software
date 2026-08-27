@@ -121,7 +121,8 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
         )
 
         simulated_test_runner.set_plays(
-            blue_play=protos.PlayName.DefensePlay, yellow_play=protos.PlayName.ShootOrPassPlay
+            blue_play=protos.PlayName.DefensePlay,
+            yellow_play=protos.PlayName.ShootOrPassPlay,
         )
 
     simulated_test_runner.run_test(

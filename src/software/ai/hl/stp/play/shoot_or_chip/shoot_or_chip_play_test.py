@@ -39,7 +39,9 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         last_robot = protos.RobotState(
             global_position=protos.Point(x_meters=1, y_meters=2),
-            global_velocity=protos.Vector(x_component_meters=-4.6, y_component_meters=0),
+            global_velocity=protos.Vector(
+                x_component_meters=-4.6, y_component_meters=0
+            ),
             global_orientation=protos.Angle(radians=math.pi),
             global_angular_velocity=protos.AngularVelocity(radians_per_second=0),
         )
@@ -49,7 +51,8 @@ def test_shoot_or_chip_play(simulated_test_runner):
         simulated_test_runner.set_world_state(world_state)
 
         simulated_test_runner.set_plays(
-            blue_play=protos.PlayName.ShootOrChipPlay, yellow_play=protos.PlayName.HaltPlay
+            blue_play=protos.PlayName.ShootOrChipPlay,
+            yellow_play=protos.PlayName.HaltPlay,
         )
 
         simulated_test_runner.send_gamecontroller_command(

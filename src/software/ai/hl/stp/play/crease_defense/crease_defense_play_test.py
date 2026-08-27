@@ -43,7 +43,8 @@ def test_crease_defense_play(simulated_test_runner):
         )
 
         simulated_test_runner.set_plays(
-            blue_play=protos.PlayName.CreaseDefensePlay, yellow_play=protos.PlayName.HaltPlay
+            blue_play=protos.PlayName.CreaseDefensePlay,
+            yellow_play=protos.PlayName.HaltPlay,
         )
 
         simulated_test_runner.send_gamecontroller_command(

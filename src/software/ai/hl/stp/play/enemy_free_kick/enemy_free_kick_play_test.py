@@ -113,7 +113,8 @@ def test_enemy_free_kick_play(
         )
 
         simulated_test_runner.set_plays(
-            blue_play=protos.PlayName.EnemyFreeKickPlay, yellow_play=protos.PlayName.FreeKickPlay
+            blue_play=protos.PlayName.EnemyFreeKickPlay,
+            yellow_play=protos.PlayName.FreeKickPlay,
         )
 
     # Validation RoboCup SSL rules: can't be within 0.5m of ball before its kicked

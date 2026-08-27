@@ -57,7 +57,11 @@ class StatsLogger:
         self.tracker = (
             TrackerBuilder(
                 proto_unix_io=proto_unix_io,
-                from_team=(protos.Team.YELLOW if self.friendly_colour_yellow else protos.Team.BLUE),
+                from_team=(
+                    protos.Team.YELLOW
+                    if self.friendly_colour_yellow
+                    else protos.Team.BLUE
+                ),
                 event_queue=self.event_queue,
                 buffer_size=buffer_size,
             )
@@ -78,10 +82,14 @@ class StatsLogger:
                 TrackerBuilder(
                     proto_unix_io=proto_unix_io,
                     from_team=(
-                        protos.Team.YELLOW if self.friendly_colour_yellow else protos.Team.BLUE
+                        protos.Team.YELLOW
+                        if self.friendly_colour_yellow
+                        else protos.Team.BLUE
                     ),
                     for_team=(
-                        protos.Team.BLUE if self.friendly_colour_yellow else protos.Team.YELLOW
+                        protos.Team.BLUE
+                        if self.friendly_colour_yellow
+                        else protos.Team.YELLOW
                     ),
                     event_queue=self.event_queue,
                     buffer_size=buffer_size,

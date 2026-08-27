@@ -35,7 +35,9 @@ class GLAttackerLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, protos.AttackerVisualization)
+        self.attacker_vis_buffer = ThreadSafeBuffer(
+            buffer_size, protos.AttackerVisualization
+        )
 
         self.pass_graphics = ObservableList(self._graphics_changed)
         self.shot_graphics = ObservableList(self._graphics_changed)

@@ -48,7 +48,8 @@ def test_shoot_or_pass_play(simulated_test_runner):
         )
 
         simulated_test_runner.set_plays(
-            blue_play=protos.PlayName.ShootOrPassPlay, yellow_play=protos.PlayName.HaltPlay
+            blue_play=protos.PlayName.ShootOrPassPlay,
+            yellow_play=protos.PlayName.HaltPlay,
         )
 
     # Eventually Validation
