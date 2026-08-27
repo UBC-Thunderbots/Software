@@ -269,13 +269,14 @@ class InteractiveCli:
         return [l for l in lines if l]
 
     @staticmethod
-    def save_to_history(cmd_str: str):
+    def save_to_history(cmd_title: str, cmd_str: str):
         history = InteractiveCli.load_history()
         history = [h for h in history if h != cmd_str]
-        history.append(cmd_str)
+        history.append(cmd_title + ": " + cmd_str)
         history = history[-InteractiveCli.HISTORY_MAX_ENTRIES :]
         with open(InteractiveCli.HISTORY_FILE, "w") as f:
             f.write("\n".join(history) + "\n")
+
 
     @staticmethod
     def start_interactive_cli():
@@ -304,19 +305,24 @@ class InteractiveCli:
 
         match category:
             case InteractiveCli.Category.REPEAT_CMD_MSG:
-                past_cmd = questionary.select(
+                cmd = questionary.select(
                     "Select a command to re-run:",
                     choices=list(reversed(history)),
-                ).unsafe_ask()
+                ).unsafe_ask().split(": ")
+                cmd_title = cmd[0]
+                past_cmd = cmd[1]
+
                 if not past_cmd:
                     return
                 print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{past_cmd}\n\n{'=' * 81}\n")
-                InteractiveCli.save_to_history(past_cmd)
+                # InteractiveCli.save_to_history(cmd_title, past_cmd)
                 code = os.system(past_cmd)
                 sys.exit(1 if code != 0 else 0)
+
             case InteractiveCli.Category.THUNDERSCOPE:
                 config.action = ActionArgument.run
                 config.search_query = "thunderscope"
+                cmd_title = "Run Thunderscope"
                 launch = questionary.select(
                     "Launch mode?",
                     choices=InteractiveCli.LAUNCH_MODE_CHOICES,
@@ -344,6 +350,7 @@ class InteractiveCli:
                     extra_args.extend([f"--{launch.value}", "--interface", iface])
 
             case InteractiveCli.Category.TEST:
+                cmd_title = "Run Tests"
                 config.action = ActionArgument.test
                 test_name = questionary.text(
                     "Enter test name (leave empty for entire suite)",
@@ -361,6 +368,7 @@ class InteractiveCli:
                         config.runs = int(runs_str)
 
             case InteractiveCli.Category.FLASH:
+                cmd_title = "Flash"
                 config.action = ActionArgument.run
                 config.search_query = "ansible"
                 playbook, debug_powerloop = questionary.select(
@@ -368,7 +376,7 @@ class InteractiveCli:
                     choices=InteractiveCli.PLAYBOOK_CHOICES,
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-
+                cmd_title += " " + playbook
                 config.ansible_playbook = playbook
                 config.debug_powerloop = debug_powerloop
 
@@ -387,15 +395,20 @@ class InteractiveCli:
                     config.disable_motor_service = (
                         InteractiveCli.DeployOption.DISABLE_MOTOR_SERVICE in selected
                     )
-                config.robot_name = questionary.text(
+
+                name = questionary.text(
                     "Robot name?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
+                config.robot_name  = name
+                cmd_title += " to " + name
                 config.ssh_password = questionary.password(
                     "SSH password?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
 
         validate(config)
         command = create_command(config, extra_args)
+        cmd_str = " ".join(command)
+        InteractiveCli.save_to_history(cmd_title, cmd_str)
         execute_command(command)
 
 
@@ -473,6 +486,7 @@ def main(
 
     validate(config)
     command = create_command(config, ctx.args)
+
     execute_command(command, print_only=print_command)
 
 
@@ -616,7 +630,6 @@ def execute_command(command: list[str], print_only: bool = False):
         print(cmd_str)
     else:
         print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{cmd_str}\n\n{'=' * 81}\n")
-        InteractiveCli.save_to_history(cmd_str)
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
 
