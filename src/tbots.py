@@ -277,7 +277,6 @@ class InteractiveCli:
         with open(InteractiveCli.HISTORY_FILE, "w") as f:
             f.write("\n".join(history) + "\n")
 
-
     @staticmethod
     def start_interactive_cli():
         """Run the menu-driven interactive CLI.
@@ -305,17 +304,20 @@ class InteractiveCli:
 
         match category:
             case InteractiveCli.Category.REPEAT_CMD_MSG:
-                cmd = questionary.select(
-                    "Select a command to re-run:",
-                    choices=list(reversed(history)),
-                ).unsafe_ask().split(": ")
+                cmd = (
+                    questionary.select(
+                        "Select a command to re-run:",
+                        choices=list(reversed(history)),
+                    )
+                    .unsafe_ask()
+                    .split(": ")
+                )
                 cmd_title = cmd[0]
                 past_cmd = cmd[1]
 
                 if not past_cmd:
                     return
                 print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{past_cmd}\n\n{'=' * 81}\n")
-                # InteractiveCli.save_to_history(cmd_title, past_cmd)
                 code = os.system(past_cmd)
                 sys.exit(1 if code != 0 else 0)
 
@@ -399,7 +401,7 @@ class InteractiveCli:
                 name = questionary.text(
                     "Robot name?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
-                config.robot_name  = name
+                config.robot_name = name
                 cmd_title += " to " + name
                 config.ssh_password = questionary.password(
                     "SSH password?", style=InteractiveCli.INTERACTIVE_STYLE
