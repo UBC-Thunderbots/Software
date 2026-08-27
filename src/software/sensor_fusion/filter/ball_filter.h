@@ -1,52 +1,20 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
+#include <Eigen/Dense>
 #include <optional>
 
-#include "software/geom/line.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/world/field.h"
+#include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
+#include "software/world/robot.h"
 
-/**
- * Given ball data from SSL Vision, filters and returns the position/velocity of the
- * "real" ball.
- *
- * This ball filter stores a buffer of previous SSL Vision detections, and uses linear
- * regression to find the path the ball is travelling on and estimate its position
- * and velocity. This buffer/regression system was chosen because it results in a
- * very stable output, particularly for the ball velocity. The data we receive isn't
- * perfect (which is why we have a filter). If we receive a noisy position that is off
- * the ball's current trajectory, it will have minimal impact. This means that as
- * the ball is travelling, this filter will return a very steady velocity vector.
- * This is important because small deviations in velocity orientation can have large
- * effects when the AI tries to predict the future position of the ball. For example,
- * consistently receiving a pass relies on the ball's velocity being very stable,
- * otherwise the robot would "jiggle" back and forth as the estimated receiver position
- * would keep changing.
- */
 class BallFilter
 {
    public:
-    // The min and max sizes of the ball detection buffer.
-    // As the ball slows down, the buffer size will approach the MAX_BUFFER_SIZE.
-    // As the ball speeds up, the buffer size will approach the MIN_BUFFER_SIZE.
-    static constexpr unsigned int MIN_BUFFER_SIZE = 4;
-    static constexpr unsigned int MAX_BUFFER_SIZE = 10;
-    // If the estimated ball speed is less than this value, the largest possible buffer
-    // will be used by the filter
-    static constexpr double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
-    // If the estimated ball speed is greater than this value, the smallest possible
-    // buffer will be used by the filter
-    static constexpr double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
-    // The extra amount beyond the ball's max speed that we treat ball detections as valid
-    static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
-    // The maximum root mean squared error threshold to considering using the generated
-    // linear regression.
-    // TODO (#2752): Investigate different values of error threshold
-    static constexpr double LINEAR_REGRESSION_ERROR_THRESHOLD = 1000.0;
 
     /**
      * Creates a new Ball Filter
@@ -58,139 +26,156 @@ class BallFilter
      * estimated state of the ball given the new data
      *
      * @param new_ball_detections A list of new Ball detections
-     * @param filter_area The area within which the ball filter will work. Any detections
-     * outside of this area will be ignored.
+     * @param field The field being played on. Detections outside its boundary are
+     * ignored, and its goals are obstacles the ball may bounce off.
+     * @param robots The robots currently on the field, which the ball may bounce off
+     * @param current_time The time to estimate the ball's state at
      *
      * @return The new ball based on the estimated state of the ball given the new data.
      * If a filtered result cannot be calculated, returns std::nullopt
      */
     std::optional<Ball> estimateBallState(
+        const std::vector<BallDetection>& new_ball_detections, const Field& field,
+        const std::vector<Robot>& robots, const Timestamp& current_time);
+
+    /**
+     * Forces the estimate onto a position known from a source other than vision, such as
+     * the breakbeam of a robot with the ball in its dribbler, and returns the resulting
+     * ball.
+     *
+     * A trusted position is not a detection and must not be run through the gates that
+     * detections are. Those gates compare against the current estimate, so a breakbeam
+     * fed in as a detection is rejected in exactly the case it exists for -- vision has
+     * lost the ball and the estimate has drifted away from where the robot says it is.
+     *
+     * The ball is placed at rest, since a ball held in a dribbler is not moving relative
+     * to the robot holding it.
+     *
+     * @param position The position to force the estimate onto
+     * @param current_time The time the position is valid at
+     *
+     * @return The ball at the forced position
+     */
+    Ball forceBallState(const Point& position, const Timestamp& current_time);
+
+   private:
+
+	// KF Dimensions
+	// State: position x, position y, veloity x, velocity y
+    static constexpr int STATE_SIZE       = 4;
+	// Measurement: x and y from vision
+    static constexpr int MEASUREMENT_SIZE = 2;
+	// No control 
+    static constexpr int CONTROL_SIZE     = 1;
+
+    using BallKalmanFilter =
+        KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE>;
+    using Measurement = Eigen::Vector<double, MEASUREMENT_SIZE>;
+
+    /**
+     * Returns the detection we should treat as the ball this frame, which is the
+     * highest confidence detection lying inside the filter area.
+     *
+     * @param new_ball_detections The detections to choose from
+     * @param filter_area The area within which the ball filter will work. Any detections
+     * outside of this area will be ignored.
+     *
+     * @return The detection to use, or std::nullopt if there is no usable detection
+     */
+    static std::optional<BallDetection> getBestBallDetection(
         const std::vector<BallDetection>& new_ball_detections,
         const Rectangle& filter_area);
 
-   private:
     /**
-     * A simple struct we use to pass around velocity estimate data
+     * Advances the Kalman filter's estimate forward to the given time using a constant
+     * velocity motion model with damping.
+     *
+     * Both the motion model and the process noise depend on how much time is being
+     * advanced over, so both are rebuilt here rather than being fixed at construction.
+     *
+     * @param delta_t The amount of time to advance the estimate by, in seconds
      */
-    struct BallVelocityEstimate
-    {
-        Vector average_velocity;
-        double average_velocity_magnitude;
-        // The average of the max velocity magnitude and min velocity magnitude
-        double min_max_magnitude_average;
-    };
+    void predict(double delta_t);
 
     /**
-     * A simple struct to pass around linear regression data
+     * Pulls the estimate back inside the field boundary if the motion model has pushed
+     * it out, and brings it to rest against whatever it ran into.
+     *
+     * A ball cannot physically be outside the boundary, so an estimate that says it is
+     * is wrong no matter how confident the model is. This matters most when there are no
+     * detections to correct it: vision loses a ball resting against a wall, and the
+     * estimate coasts straight through the boundary and keeps going for as long as the
+     * ball is missing.
+     *
+     * The velocity component pointing out of the field is zeroed along with the position,
+     * because pinning the position alone leaves a velocity that re-crosses the boundary
+     * on the next frame and walks the estimate along the wall.
+     *
+     * @param field The field being played on
      */
-    struct LinearRegressionResults
-    {
-        Line regression_line;
-        // Regression error is root mean squared error
-        double regression_error;
-    };
+    void constrainToField(const Field& field);
 
     /**
-     * Adds ball detections to the buffer stored by this filter. This function will ignore
-     * data if:
-     * - the data is outside of the filter_area, or
-     * - the data is too far away from the current known ball position
-     *   (since it is likely to be random noise).
+     * Returns whether the ball is touching anything on the field -- a robot, a goalpost,
+     * the back of a net, or the walls around the field.
      *
-     * @param new_ball_detections The ball detections to try add to the buffer
-     * @param filter_area The area within which the ball filter will work. Any detections
-     * outside of this area will be ignored.
+     * The check is against the whole path the ball travelled this frame rather than only
+     * where it ended up. A ball moving at 5 m/s covers over 8 cm between frames at 60 Hz,
+     * so a test that only asked whether the ball was currently within its own radius of a
+     * surface would step straight over anything thin, and a goalpost is thin.
+     *
+     * @param previous_position Where the estimate was before it was advanced this frame
+     * @param robots The robots currently on the field
+     * @param field The field being played on
+     *
+     * @return Whether the ball is in contact with anything
      */
-    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
-                                  const Rectangle& filter_area);
+    bool isInContact(const Point& previous_position, const std::vector<Robot>& robots,
+                     const Field& field) const;
 
     /**
-     * Uses linear regression to filter the given list of ball detections to find the
-     * current "real" state of the ball.
+     * Corrects the motion model for a ball that has been resting against something for
+     * several frames in a row by bringing it to rest.
      *
-     * @param ball_detections The detections to filter
+     * This runs on every frame, including frames with no detection. A ball is very often
+     * occluded precisely because a robot is sitting on it, and a constant velocity model
+     * left uncorrected will coast the estimate straight through that robot for as long as
+     * vision cannot see it.
      *
-     * @return The new ball based on the filtered state. If a filtered result cannot be
-     * calculated, returns std::nullopt
+     * A single frame of contact is not enough to conclude the ball has stopped -- a ball
+     * bouncing off a wall is in contact for a frame or two and is still moving -- so the
+     * estimate is only zeroed once contact has persisted.
+     *
+     * @param in_contact Whether the ball is touching anything this frame
      */
-    static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections);
+    void updateContactState(bool in_contact);
 
     /**
-     * Returns how large the buffer of ball detections should be based on the ball's
-     * estimated velocity. A slower moving ball will result in a larger buffer size, and a
-     * faster ball will result in a smaller buffer size. This is because with a slow
-     * moving ball, we need more data in order to fit a line with reasonable accuracy,
-     * since the datapoints will be very close to one another.
+     * Returns whether the ball could physically have reached the given position since
+     * the last accepted detection, assuming it cannot exceed the maximum ball speed.
      *
-     * @param ball_detections The full list of ball detections
+     * @param detection_position The position of the detection to check
+     * @param current_time The time the detection was taken at
      *
-     * @return The size the buffer should be to perform filtering operations. If an error
-     * occurs that prevents the size from being calculated correctly, returns std::nullopt
+     * @return whether the detection is within reach of the current estimate
      */
-    static std::optional<size_t> getAdjustedBufferSize(
-        boost::circular_buffer<BallDetection> ball_detections);
+    bool isWithinMaxBallSpeed(const Point& detection_position,
+                              const Timestamp& current_time) const;
 
     /**
-     * Given a buffer of ball detections, returns the line of best fit through
-     * the detection positions, and calculate the root mean squared error of this
-     * regression.
-     * Note: also considers vertical lines.
+     * Discards the filter's current estimate and reinitializes it on the given
+     * measurement, at rest and with the covariance widened back out.
      *
-     * @throws std::invalid_argument if ball_detections has less than 2 elements
-     *
-     * @param ball_detections The ball detections to fit
-     *
-     * @return The line of best fit through the given ball detection positions
+     * @param measurement The measurement to reinitialize the estimate on
+     * @param current_time The time the measurement was taken at
      */
-    static LinearRegressionResults calculateLineOfBestFit(
-        boost::circular_buffer<BallDetection> ball_detections);
+    void reset(const Measurement& measurement, const Timestamp& current_time);
 
-    /**
-     * Given a list of ball detections, use linear regression to find a line of best fit
-     * through the ball positions, and calculate the root mean squared error of this
-     * regression.
-     *
-     * @throws std::invalid_argument if ball_detections has less than 2 elements
-     *
-     * @param ball_detections The ball detections to use in the regression
-     *
-     * @return A struct containing the regression line and error of the linear regression
-     */
-    static LinearRegressionResults calculateLinearRegression(
-        boost::circular_buffer<BallDetection> ball_detections);
-
-    /**
-     * Estimates the current position of the ball given a buffer of ball detections
-     * and the line of best fit through them.
-     *
-     * @throws std::invalid_argument if ball_detections has less than 2 elements
-     *
-     * @param ball_detections The ball detections
-     * @param regression_line The line of best fit through the ball positions
-     *
-     * @return The estimated position of the ball
-     */
-    static Point estimateBallPosition(
-        boost::circular_buffer<BallDetection> ball_detections,
-        const Line& regression_line);
-
-    /**
-     * Estimates the ball's velocity based on the current detections in the given buffer.
-     * If the ball_regression_line is provided, the detection positions are projected onto
-     * the line before the velocities are calculated. If no velocity can be estimated,
-     * std::nullopt is returned.
-     *
-     * @param ball_detections The ball detections to use to calculate
-     * @param ball_regression_line The ball_regression_line to snap detections to before
-     * calculating velocities.
-     *
-     * @return A struct containing various estimates of the ball's velocity based on the
-     * given detections. If no velocity can be estimated, std::nullopt is returned
-     */
-    static std::optional<BallVelocityEstimate> estimateBallVelocity(
-        boost::circular_buffer<BallDetection> ball_detections,
-        const std::optional<Line>& ball_regression_line = std::nullopt);
-
-    boost::circular_buffer<BallDetection> ball_detection_buffer;
+    BallKalmanFilter kalman_filter;
+    int consecutive_outliers;
+    std::optional<Timestamp> prev_detection_timestamp;
+    std::optional<Measurement> prev_measurement;
+    std::optional<Timestamp> last_predict_timestamp;
+	int consecutive_in_contact_;
+	
 };

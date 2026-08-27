@@ -1,381 +1,372 @@
 #include "software/sensor_fusion/filter/ball_filter.h"
 
-#include <Eigen/Dense>
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <utility>
 #include <vector>
 
 #include "shared/constants.h"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/math/math_functions.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
+#include "software/geom/circle.h"
+#include "software/geom/segment.h"
 
+namespace
+{
+    // The ball starts out unknown, so the initial estimate is given a covariance wide
+    // enough to cover anywhere on the field it might be and any speed it might legally be
+    // moving at. This makes the filter trust the first detections it sees almost
+    // entirely, letting it converge onto the ball within a few frames.
+    constexpr double INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
+    constexpr double INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
+    const Eigen::Vector<double, 4> INITIAL_STATE = Eigen::Vector<double, 4>::Zero();
+    const Eigen::Matrix<double, 4, 4> INITIAL_COVARIANCE =
+        Eigen::Vector<double, 4>(
+            INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
+            INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
+            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S * INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
+            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S * INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
+            .asDiagonal();
 
-BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
+    // The standard deviation of the acceleration that the constant velocity motion model
+    // does not account for: deflections, uneven turf, and the tail of a kick. A kick
+    // itself is far larger than this, but it is also abrupt enough that the outlier gates
+    // catch it and reset the filter, so this does not need to cover one.
+    constexpr double ACCELERATION_NOISE_M_PER_S_SQUARED = 5.0;
+
+    // How noisy we expect SSL Vision's ball position detections to be. Measure this by
+    // logging a stationary ball and taking the standard deviation of the detections.
+    constexpr double VISION_NOISE_M = 0.01;
+    const Eigen::Matrix<double, 2, 2> MEASUREMENT_COVARIANCE =
+        Eigen::Matrix<double, 2, 2>::Identity() * (VISION_NOISE_M * VISION_NOISE_M);
+
+    // Vision measures the ball's position but not its velocity
+    const Eigen::Matrix<double, 2, 4> MEASUREMENT_MODEL =
+        (Eigen::Matrix<double, 2, 4>() << 1, 0, 0, 0, 0, 1, 0, 0).finished();
+
+    // The fraction of its velocity the ball retains each second as it rolls, accounting
+    // for friction. Empirically measured.
+    constexpr double DAMPING = 0.9889;
+
+    constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
+
+    // The fastest we will believe the ball could be travelling when deciding whether a
+    // detection could plausibly belong to it. This is deliberately well above the 6.5 m/s
+    // rule limit; the gate exists to reject detections that are physically impossible,
+    // not to enforce the rules on a ball that has been kicked too hard.
+    constexpr double MAX_BALL_SPEED_M_PER_S = 6.0;
+
+    // Slack on the max ball speed gate, so that vision noise on a ball that has been
+    // sitting still cannot by itself push a detection out of reach of the estimate
+    constexpr double MAX_BALL_SPEED_GATE_TOLERANCE_M = 0.05;
+
+    // How many detections in a row may be rejected as outliers before we conclude the
+    // estimate itself is wrong and reset onto the newest detection
+    constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
+
+    // How many frames of unbroken contact before we conclude the ball is resting against
+    // whatever it is touching rather than bouncing off it, and bring the estimate to rest
+    constexpr int CONSECUTIVE_CONTACT_THRESHOLD = 5;
+}  // namespace
+
+BallFilter::BallFilter()
+    // The process model and the process covariance both depend on the length of the
+    // timestep being predicted over, so they are left zeroed here and built in predict()
+    : kalman_filter(INITIAL_STATE, INITIAL_COVARIANCE,
+                    Eigen::Matrix<double, STATE_SIZE, STATE_SIZE>::Zero(),
+                    Eigen::Matrix<double, STATE_SIZE, STATE_SIZE>::Zero(),
+                    Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE>::Zero(),
+                    MEASUREMENT_MODEL, MEASUREMENT_COVARIANCE),
+      consecutive_outliers(0),
+	  consecutive_in_contact_(0)
+{
+}
 
 std::optional<Ball> BallFilter::estimateBallState(
-    const std::vector<BallDetection>& new_ball_detections, const Rectangle& filter_area)
+    const std::vector<BallDetection>& new_ball_detections, const Field& field,
+    const std::vector<Robot>& robots, const Timestamp& current_time)
 {
-    addNewDetectionsToBuffer(new_ball_detections, filter_area);
-    return estimateBallStateFromBuffer(ball_detection_buffer);
-}
+    const std::optional<BallDetection> best_ball_detection =
+        getBestBallDetection(new_ball_detections, field.fieldBoundary());
 
-void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
-                                          const Rectangle& filter_area)
-{
-    // Sort the detections in increasing order before processing. This places the oldest
-    // detections (with the smallest timestamp) at the front of the buffer, and the most
-    // recent detections (largest timestamp) at the end of the buffer.
-    std::sort(new_ball_detections.begin(), new_ball_detections.end());
-
-    for (const auto& detection : new_ball_detections)
+	// We record position before prediction, to compute segment travelled within a frame. This is used in collision handling
+    const Point position_before_predict(kalman_filter.state_estimate(0),
+                                        kalman_filter.state_estimate(1));
+	// A stale or out of order packet would integrate the model backwards, which inflates
+	// the velocity and leaves the process covariance with negative correlation terms
+    if (last_predict_timestamp && current_time > *last_predict_timestamp)
     {
-        // Remove any detections outside the filter area
-        if (!contains(filter_area, detection.position))
+        predict((current_time - *last_predict_timestamp).toSeconds());
+        last_predict_timestamp = current_time;
+    }
+    else if (!last_predict_timestamp)
+    {
+        last_predict_timestamp = current_time;
+    }
+
+    constrainToField(field);
+
+    // Contact is a fact about the world, not about this frame's detections, so it is
+    // resolved on every frame. The motion model correction below has to run while the
+    // ball is occluded; the covariance widening further down does not, because covariance
+    // only ever takes effect through an update()
+    const bool in_contact = isInContact(position_before_predict, robots, field);
+    updateContactState(in_contact);
+
+    // We use the detection if there is any
+    if (best_ball_detection)
+    {
+        // The ball is being moved by something the physics model does not describe, so we
+        // widen the covariance to make the filter defer to the measurement instead
+        if (in_contact)
         {
-            continue;
+            kalman_filter.state_covariance = INITIAL_COVARIANCE;
         }
 
-        if (!ball_detection_buffer.empty())
+        Measurement measurement(best_ball_detection->position.x(),
+                                best_ball_detection->position.y());
+
+		// The first detection is all we know, so we start the estimate on it rather than
+		// blending it against a state we never had grounds for
+        if (!prev_detection_timestamp)
         {
-            // Use the smallest timestamp to minimize time_diffs of 0
-            auto detection_with_smallest_timestamp = *std::min_element(
-                ball_detection_buffer.begin(), ball_detection_buffer.end());
-            Duration time_diff =
-                detection.timestamp - detection_with_smallest_timestamp.timestamp;
-
-            // Ignore any data from the past, and any data that is as old as the oldest
-            // data in the buffer since it provides no additional value. This also
-            // prevents division by 0 when calculating the estimated velocity
-            if (time_diff.toSeconds() <= 0)
-            {
-                continue;
-            }
-
-            // We determine if the detection is noise based on how far it is from a ball
-            // detection in the buffer. From this, we can calculate how fast the ball
-            // must have moved to reach the new detection position. If this estimated
-            // velocity is too far above the maximum allowed velocity, then there is a
-            // good chance the detection is just noise and not the real ball. In this
-            // case, we ignore the new "noise" data
-            double detection_distance =
-                (detection.position - detection_with_smallest_timestamp.position)
-                    .length();
-            double estimated_detection_velocity_magnitude =
-                detection_distance / time_diff.toSeconds();
-
-            // Make the maximum acceptable velocity a bit larger than the strict limits
-            // according to the game rules to account for measurement error, and to be a
-            // bit on the safe side. We don't want to risk discarding real data.
-            double maximum_acceptable_velocity_magnitude =
-                BALL_MAX_SPEED_METERS_PER_SECOND + MAX_ACCEPTABLE_BALL_SPEED_BUFFER;
-            if (estimated_detection_velocity_magnitude >
-                maximum_acceptable_velocity_magnitude)
-            {
-                // If we determine the data to be noise, remove an entry from the buffer.
-                // This way if we have messed up and now the ball is too far away for the
-                // buffer to track, the buffer will rapidly shrink and start tracking the
-                // ball at its new location once the buffer is empty.
-                // We sort the vector in decreasing order first so that we can always
-                // ensure any elements that are ejected from the end of the buffer are the
-                // oldest data
-                std::sort(ball_detection_buffer.rbegin(), ball_detection_buffer.rend());
-                ball_detection_buffer.pop_back();
-            }
-            else
-            {
-                // We sort the vector in decreasing order first so that we can always
-                // ensure any elements that are ejected from the end of the buffer are the
-                // oldest data
-                std::sort(ball_detection_buffer.rbegin(), ball_detection_buffer.rend());
-                ball_detection_buffer.push_front(detection);
-            }
+            reset(measurement, current_time);
         }
+		// Two gates determining whether we take the detection:
+		// 1. Whether it is physically possible to arrive the new destination
+		// 2. Statistical gating using mahalanobis
+        else if (isWithinMaxBallSpeed(best_ball_detection->position, current_time) &&
+                 kalman_filter.mahalanobisDistance(measurement) < MAHALANOBIS_GATE_THRESHOLD)
+        {
+            kalman_filter.update(measurement);
+            consecutive_outliers     = 0;
+            prev_measurement         = measurement;
+            prev_detection_timestamp = current_time;
+        }
+		// If rejected, accumulate outliers. Once a threshold is reached we reset to adapt to new position
         else
         {
-            // If there is no data in the buffer, we always add the new data
-            ball_detection_buffer.push_front(detection);
+            consecutive_outliers++;
+
+            if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD)
+            {
+                reset(measurement, current_time);
+            }
         }
     }
-}
 
-std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
-    boost::circular_buffer<BallDetection> ball_detections)
-{
-    // Sort the detections in decreasing order before processing. This places the most
-    // recent detections (with the largest timestamp) at the front of the buffer, and the
-    // oldest detections (smallest timestamp) at the end of the buffer
-    std::sort(ball_detections.rbegin(), ball_detections.rend());
 
-    if (ball_detections.empty())
-    {
-        return std::nullopt;
-    }
-    else if (ball_detections.size() == 1)
-    {
-        // If there is only 1 entry in the buffer, we can't fit a regression line
-        // or calculate a velocity so we do our best with just the position
-        BallState ball_state(ball_detections.front().position, Vector(0, 0),
-                             ball_detections.front().distance_from_ground);
-        Ball ball(ball_state, ball_detections.front().timestamp);
-        return ball;
-    }
-
-    std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
-    if (!adjusted_buffer_size)
-    {
-        return std::nullopt;
-    }
-    ball_detections.resize(*adjusted_buffer_size);
-
-    auto regression = calculateLineOfBestFit(ball_detections);
-
-    Point filtered_position =
-        estimateBallPosition(ball_detections, regression.regression_line);
-
-    auto estimated_velocity = estimateBallVelocity(ball_detections, std::nullopt);
-
-    if (regression.regression_error < LINEAR_REGRESSION_ERROR_THRESHOLD)
-    {
-        estimated_velocity =
-            estimateBallVelocity(ball_detections, regression.regression_line);
-    }
-    if (!estimated_velocity)
+	// if there isn't a detection we report nothing
+	// This is handled here because the code above might reject the incoming detection
+    if (!prev_detection_timestamp)
     {
         return std::nullopt;
     }
 
-    BallState ball_state(filtered_position, estimated_velocity->average_velocity,
-                         ball_detections.front().distance_from_ground);
-    return Ball(ball_state, ball_detections.front().timestamp);
+	// Returns the ball
+    const Eigen::Vector<double, STATE_SIZE> state = kalman_filter.state_estimate;
+    const Point ball_position(state(0), state(1));
+    const Vector ball_velocity(state(2), state(3));
+    const double distance_from_ground =
+        best_ball_detection ? best_ball_detection->distance_from_ground : 0.0;
+
+    return Ball(BallState(ball_position, ball_velocity, distance_from_ground),
+                current_time);
 }
 
-std::optional<size_t> BallFilter::getAdjustedBufferSize(
-    boost::circular_buffer<BallDetection> ball_detections)
+Ball BallFilter::forceBallState(const Point& position, const Timestamp& current_time)
 {
-    // Sort the detections in decreasing order before processing. This places the most
-    // recent detections (with the largest timestamp) at the front of the buffer, and the
-    // oldest detections (smallest timestamp) at the end of the buffer
-    std::sort(ball_detections.rbegin(), ball_detections.rend());
+    reset(Measurement(position.x(), position.y()), current_time);
 
-    double buffer_size_velocity_magnitude_diff =
-        MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE - MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE;
+    return Ball(BallState(position, Vector(0, 0), 0.0), current_time);
+}
 
-    unsigned int max_buffer_size =
-        std::min(MAX_BUFFER_SIZE, static_cast<unsigned int>(ball_detections.size()));
-    unsigned int min_buffer_size =
-        std::min(MIN_BUFFER_SIZE, static_cast<unsigned int>(ball_detections.size()));
-    double buffer_size_diff = max_buffer_size - min_buffer_size;
+std::optional<BallDetection> BallFilter::getBestBallDetection(
+    const std::vector<BallDetection>& new_ball_detections, const Rectangle& filter_area)
+{
+    std::vector<BallDetection> detections_in_filter_area;
+    std::copy_if(new_ball_detections.begin(), new_ball_detections.end(),
+                 std::back_inserter(detections_in_filter_area),
+                 [&filter_area](const BallDetection& detection)
+                 { return contains(filter_area, detection.position); });
 
-    std::optional<BallVelocityEstimate> velocity_estimate =
-        estimateBallVelocity(ball_detections);
-    if (!velocity_estimate)
+    if (detections_in_filter_area.empty())
     {
         return std::nullopt;
     }
-    // Use the average of the min and max velocity magnitudes in the buffer. We use this
-    // rather than the average so we can quickly respond to drastic changes in the ball
-    // velocity, such as when the ball goes from being stationary to moving quickly (like
-    // when it's kicked). If the buffer is large, then it will take more time for the mean
-    // speed to increase enough to start shrinking the buffer. However, the average of the
-    // min and max values will immediately increase if the ball starts moving, so the
-    // buffer can start shrinking more quickly and increase the filter response time to
-    // these sorts of changes.
-    double min_max_magnitude_average = velocity_estimate->min_max_magnitude_average;
 
-    // Between the min and max velocity magnitudes, we linearly scale the size of the
-    // buffer
-    double linear_offset =
-        MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE + (buffer_size_velocity_magnitude_diff / 2);
-    double linear_scaling_factor = linear(min_max_magnitude_average, linear_offset,
-                                          buffer_size_velocity_magnitude_diff);
-    int buffer_size =
-        max_buffer_size -
-        static_cast<unsigned int>(std::floor(linear_scaling_factor * buffer_size_diff));
-
-    return static_cast<size_t>(buffer_size);
+    return *std::max_element(detections_in_filter_area.begin(),
+                             detections_in_filter_area.end(),
+                             [](const BallDetection& a, const BallDetection& b)
+                             { return a.confidence < b.confidence; });
 }
 
-BallFilter::LinearRegressionResults BallFilter::calculateLineOfBestFit(
-    boost::circular_buffer<BallDetection> ball_detections)
+void BallFilter::predict(double delta_t)
 {
-    if (ball_detections.size() < 2)
+    const double velocity_retained = std::pow(DAMPING, delta_t);
+
+    kalman_filter.process_model << 1, 0, delta_t, 0, 0, 1, 0, delta_t, 0, 0,
+        velocity_retained, 0, 0, 0, 0, velocity_retained;
+
+   // We compute the process covariance with the Discrete White Noise Acceleration model.
+   // It depends on delta_t, so we compute it dynamically based on time passed since last prediction
+    const double acceleration_variance =
+        ACCELERATION_NOISE_M_PER_S_SQUARED * ACCELERATION_NOISE_M_PER_S_SQUARED;
+    const double delta_t_squared = delta_t * delta_t;
+    const double position_noise  = acceleration_variance * delta_t_squared *
+                                  delta_t_squared / 4.0;
+    const double correlation_noise =
+        acceleration_variance * delta_t_squared * delta_t / 2.0;
+    const double velocity_noise = acceleration_variance * delta_t_squared;
+
+    kalman_filter.process_covariance << position_noise, 0, correlation_noise, 0, 0,
+        position_noise, 0, correlation_noise, correlation_noise, 0, velocity_noise, 0, 0,
+        correlation_noise, 0, velocity_noise;
+
+	// Actual prediction step
+    kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
+}
+
+void BallFilter::constrainToField(const Field& field)
+{
+    // The ball's centre can get within one radius of the wall, no closer
+    const double limit_x = field.fieldBoundary().xMax() - BALL_MAX_RADIUS_METERS;
+    const double limit_y = field.fieldBoundary().yMax() - BALL_MAX_RADIUS_METERS;
+
+    if (kalman_filter.state_estimate(0) > limit_x)
     {
-        throw std::invalid_argument("At least 2 elements required for linear regression");
+        kalman_filter.state_estimate(0) = limit_x;
+        kalman_filter.state_estimate(2) = std::min(kalman_filter.state_estimate(2), 0.0);
+    }
+    else if (kalman_filter.state_estimate(0) < -limit_x)
+    {
+        kalman_filter.state_estimate(0) = -limit_x;
+        kalman_filter.state_estimate(2) = std::max(kalman_filter.state_estimate(2), 0.0);
     }
 
-    auto x_vs_y_regression = calculateLinearRegression(ball_detections);
-
-    // Linear regression cannot fit a vertical line. To get around this, we fit two lines,
-    // one with x and y swapped, so any vertical line becomes horizontal. Then we take the
-    // line of the two that fit the best.
-    boost::circular_buffer<BallDetection> swapped_ball_detections = ball_detections;
-    for (auto& detection : swapped_ball_detections)
+    if (kalman_filter.state_estimate(1) > limit_y)
     {
-        detection.position = Point(detection.position.y(), detection.position.x());
+        kalman_filter.state_estimate(1) = limit_y;
+        kalman_filter.state_estimate(3) = std::min(kalman_filter.state_estimate(3), 0.0);
     }
-    auto y_vs_x_regression = calculateLinearRegression(swapped_ball_detections);
-    // Because we swapped the coordinates of the input, we have to swap the coordinates of
-    // the output to get back to our expected coordinate space
-    y_vs_x_regression.regression_line.swapXY();
-
-    // We use the regression from above with the least error
-    if (x_vs_y_regression.regression_error < y_vs_x_regression.regression_error)
+    else if (kalman_filter.state_estimate(1) < -limit_y)
     {
-        return x_vs_y_regression;
-    }
-    else
-    {
-        return y_vs_x_regression;
+        kalman_filter.state_estimate(1) = -limit_y;
+        kalman_filter.state_estimate(3) = std::max(kalman_filter.state_estimate(3), 0.0);
     }
 }
 
-BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
-    boost::circular_buffer<BallDetection> ball_detections)
+bool BallFilter::isInContact(const Point& previous_position,
+                             const std::vector<Robot>& robots, const Field& field) const
 {
-    if (ball_detections.size() < 2)
+    const Point ball_position(kalman_filter.state_estimate(0),
+                              kalman_filter.state_estimate(1));
+    // Using the position before and after the model prediction step, we construct a
+    // segment
+    const Segment ball_path(previous_position, ball_position);
+
+    const double robot_collision_distance =
+        ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS;
+
+    // Robots are the one obstacle we treat as round
+    for (const Robot& robot : robots)
     {
-        throw std::invalid_argument("At least 2 elements required for linear regression");
-    }
-
-    // Sort the detections in increasing order before processing. This places the oldest
-    // detections (smallest timestamp) at the front of the buffer, and the most recent
-    // detections (with the largest timestamp) at the end of the buffer
-    std::sort(ball_detections.begin(), ball_detections.end());
-
-    // Construct matrix A and vector b for linear regression. The first column of A
-    // contains the bias variable, and the second column contains the x coordinates of the
-    // ball. Vector b contains the y coordinates of the ball.
-    Eigen::MatrixXf A(ball_detections.size(), 2);
-    Eigen::VectorXf b(ball_detections.size());
-    for (unsigned i = 0; i < ball_detections.size(); i++)
-    {
-        // This extra column of 1's is the bias variable, so that we can regress with a
-        // y-intercept
-        A(i, 0) = 1.0;
-        A(i, 1) = static_cast<float>(ball_detections.at(i).position.x());
-
-        b(i) = static_cast<float>(ball_detections.at(i).position.y());
-    }
-
-    // Perform linear regression to find the line of best fit through the ball positions.
-    // This is solving the formula Ax = b, where x is the vector we want to solve for.
-    Eigen::Vector2f regression_vector =
-        A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
-    // How to calculate the error is from
-    // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-    // NOTE: using absolute error instead of relative because coordinates
-    // values should not affect error, also handles divide by 0 error
-    double regression_error = (A * regression_vector - b).norm();  // norm() is L2 norm
-
-    // Find 2 points on the regression line that we solved for, and use this to construct
-    // our own Line class
-    Eigen::Vector2f p1_vec(1, 0);
-    Point p1(0, p1_vec.dot(regression_vector));
-    Eigen::Vector2f p2_vec(1, 1);
-    Point p2(1, p2_vec.dot(regression_vector));
-    Line regression_line = Line(p1, p2);
-
-    LinearRegressionResults results({regression_line, regression_error});
-
-    return results;
-}
-
-Point BallFilter::estimateBallPosition(
-    boost::circular_buffer<BallDetection> ball_detections, const Line& regression_line)
-{
-    if (ball_detections.empty())
-    {
-        throw std::invalid_argument(
-            "Non-empty buffer required to estimate ball position");
-    }
-
-    // Take the position of the most recent ball position and project it onto the line of
-    // best fit. We do this because we assume the ball must be travelling along its
-    // velocity vector (the line), and this allows us to return more stable position
-    // values since the line of best fit is less likely to fluctuate compared to the raw
-    // position of a ball detection
-    BallDetection latest_ball_detection = ball_detections.front();
-    return closestPoint(latest_ball_detection.position, regression_line);
-}
-
-std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity(
-    boost::circular_buffer<BallDetection> ball_detections,
-    const std::optional<Line>& ball_regression_line)
-{
-    // Sort the detections in increasing order before processing. This places the oldest
-    // detections (smallest timestamp) at the front of the buffer, and the most recent
-    // detections (with the largest timestamp) at the end of the buffer
-    std::sort(ball_detections.begin(), ball_detections.end());
-
-    std::vector<Vector> ball_velocities;
-    std::vector<double> ball_velocity_magnitudes;
-    for (unsigned i = 1; i < ball_detections.size(); i++)
-    {
-        for (unsigned j = i; j < ball_detections.size(); j++)
+        if (intersects(ball_path, Circle(robot.position(), robot_collision_distance)))
         {
-            BallDetection previous_detection = ball_detections.at(i - 1);
-            BallDetection current_detection  = ball_detections.at(j);
-
-            Duration time_diff =
-                current_detection.timestamp - previous_detection.timestamp;
-            // Avoid division by 0. If we have adjacent detections with the same timestamp
-            // the velocity cannot be calculated
-            if (time_diff.toSeconds() == 0)
-            {
-                continue;
-            }
-
-            // Project the detection positions onto the regression line if it was provided
-            Point current_position;
-            Point previous_position;
-            if (ball_regression_line)
-            {
-                current_position  = closestPoint(current_detection.position,
-                                                 ball_regression_line.value());
-                previous_position = closestPoint(previous_detection.position,
-                                                 ball_regression_line.value());
-            }
-            else
-            {
-                current_position  = current_detection.position;
-                previous_position = previous_detection.position;
-            }
-            Vector velocity_vector    = current_position - previous_position;
-            double velocity_magnitude = velocity_vector.length() / time_diff.toSeconds();
-            Vector velocity           = velocity_vector.normalize(velocity_magnitude);
-
-            ball_velocity_magnitudes.emplace_back(velocity_magnitude);
-            ball_velocities.emplace_back(velocity);
+            return true;
         }
     }
 
-    if (ball_velocities.empty() || ball_velocity_magnitudes.empty())
+    // If we still haven't found a contact, we check the goals
+    // This only checks the net, and two posts
+    const std::array<std::pair<Rectangle, double>, 2> goals = {
+        std::pair(field.friendlyGoal(), field.friendlyGoal().xMin()),
+        std::pair(field.enemyGoal(), field.enemyGoal().xMax())};
+
+    const std::vector<Segment>& walls = field.fieldBoundary().getSegments();
+
+    std::vector<Segment> barriers;
+    barriers.reserve(goals.size() * 3 + walls.size());
+
+    for (const auto& [goal, back_x] : goals)
     {
-        return std::nullopt;
+        barriers.emplace_back(Point(back_x, goal.yMin()), Point(back_x, goal.yMax()));
+        barriers.emplace_back(Point(goal.xMin(), goal.yMax()),
+                              Point(goal.xMax(), goal.yMax()));
+        barriers.emplace_back(Point(goal.xMin(), goal.yMin()),
+                              Point(goal.xMax(), goal.yMin()));
     }
 
-    double velocity_magnitude_sum = 0;
-    for (const auto& velocity_magnitude : ball_velocity_magnitudes)
+    barriers.insert(barriers.end(), walls.begin(), walls.end());
+
+    for (const Segment& barrier : barriers)
     {
-        velocity_magnitude_sum += velocity_magnitude;
+        // Either the ball crossed the barrier this frame, or it is sitting against it
+        // with too little speed for the path to reach across
+        if (intersects(ball_path, barrier) ||
+            distance(ball_path.getEnd(), barrier) <= BALL_MAX_RADIUS_METERS)
+        {
+            return true;
+        }
     }
-    double average_velocity_magnitude =
-        velocity_magnitude_sum / static_cast<double>(ball_velocity_magnitudes.size());
-    double velocity_magnitude_max = *std::max_element(ball_velocity_magnitudes.begin(),
-                                                      ball_velocity_magnitudes.end());
-    double velocity_magnitude_min = *std::min_element(ball_velocity_magnitudes.begin(),
-                                                      ball_velocity_magnitudes.end());
-    double min_max_average = (velocity_magnitude_min + velocity_magnitude_max) / 2.0;
 
-    Vector velocity_vector_sum = Vector(0, 0);
-    for (const auto& velocity : ball_velocities)
+    return false;
+}
+
+void BallFilter::updateContactState(bool in_contact)
+{
+    // The ball is in free flight, so the motion model still describes it and there is
+    // nothing to correct
+    if (!in_contact)
     {
-        velocity_vector_sum += velocity;
+        consecutive_in_contact_ = 0;
+        return;
     }
-    Vector average_velocity = velocity_vector_sum.normalize(average_velocity_magnitude);
 
-    BallVelocityEstimate velocity_data(
-        {average_velocity, average_velocity_magnitude, min_max_average});
+    consecutive_in_contact_++;
 
-    return velocity_data;
+    if (consecutive_in_contact_ >= CONSECUTIVE_CONTACT_THRESHOLD)
+    {
+        kalman_filter.state_estimate(2) = 0;
+        kalman_filter.state_estimate(3) = 0;
+    }
+}
+
+bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,
+                                      const Timestamp& current_time) const
+{
+    // Without a previous detection there is no interval to reason over, so we have no
+    // grounds to call this one impossible
+    if (!prev_detection_timestamp)
+    {
+        return true;
+    }
+
+    const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
+    const Point predicted_position(kalman_filter.state_estimate(0),
+                                   kalman_filter.state_estimate(1));
+    const double reachable_distance = MAX_BALL_SPEED_M_PER_S * std::max(delta_t, 0.0) +
+                                      MAX_BALL_SPEED_GATE_TOLERANCE_M;
+
+    return (detection_position - predicted_position).length() <= reachable_distance;
+}
+
+void BallFilter::reset(const Measurement& measurement, const Timestamp& current_time)
+{
+    // Start the estimate at rest. Differencing two measurements to seed a velocity
+    // divides vision noise by a very short timestep, and the pair either side of a
+    // rejection streak is the least trustworthy pair to difference. The wide covariance
+    // below lets the next few detections pull the velocity in on their own.
+    kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
+    kalman_filter.state_covariance = INITIAL_COVARIANCE;
+
+    consecutive_outliers = 0;
+    // The reset measurement is now what the estimate is built on, so it becomes the
+    // reference for the next timestep. Leaving the old timestamp here would make the
+    // next predict() jump forward by the whole rejection streak.
+    prev_measurement         = measurement;
+    prev_detection_timestamp = current_time;
+    last_predict_timestamp   = current_time;
 }
