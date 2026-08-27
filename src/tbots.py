@@ -290,7 +290,7 @@ class InteractiveCli:
         history = InteractiveCli.load_history()
         choices = InteractiveCli.CATEGORY_CHOICES
         if history:
-            choices = [InteractiveCli.Category.REPEAT_CMD_MSG] + InteractiveCli.CATEGORY_CHOICES
+            choices = [InteractiveCli.Category.REPEAT_CMD_MSG.value] + InteractiveCli.CATEGORY_CHOICES
 
         category = questionary.select(
             "What would you like to do?",
