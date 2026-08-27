@@ -288,25 +288,19 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
 
-        std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-            .position =
-                robot_with_ball_in_dribbler->position() +
-                Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                               BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-            .distance_from_ground = 0,
-            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-            .confidence = 1}};
+        const Point ball_in_dribbler_position =
+            robot_with_ball_in_dribbler->position() +
+            Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                           BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING);
 
-        std::optional<Ball> new_ball =
-            createBall(dribbler_in_ball_detection,
-                       Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
-
-        if (new_ball)
-        {
-            updateBall(Ball(dribbler_in_ball_detection.front().position,
-                            new_ball->velocity(), new_ball->timestamp()));
-        }
+        // The breakbeam is trusted over the filter's own estimate, so the estimate is
+        // forced onto this position rather than offered to it as a detection. Feeding it
+        // through the detection path instead would leave the filter's state and the ball
+        // we report here describing two different balls.
+        updateBall(ball_filter.forceBallState(
+            ball_in_dribbler_position,
+            Timestamp::fromSeconds(ssl_detection_frame.t_capture())));
     }
     else
     {

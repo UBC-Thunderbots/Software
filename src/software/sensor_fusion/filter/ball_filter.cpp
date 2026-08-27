@@ -7,12 +7,10 @@
 #include <vector>
 
 #include "shared/constants.h"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/circle.h"
-#include "software/geom/geom_constants.h"
 #include "software/geom/segment.h"
 
 namespace
@@ -114,16 +112,15 @@ std::optional<Ball> BallFilter::estimateBallState(
     // resolved on every frame. The motion model correction below has to run while the
     // ball is occluded; the covariance widening further down does not, because covariance
     // only ever takes effect through an update()
-    const std::optional<Vector> contact_normal =
-        findContactNormal(position_before_predict, robots, field);
-    updateContactState(contact_normal.has_value());
+    const bool in_contact = isInContact(position_before_predict, robots, field);
+    updateContactState(in_contact);
 
     // We use the detection if there is any
     if (best_ball_detection)
     {
         // The ball is being moved by something the physics model does not describe, so we
         // widen the covariance to make the filter defer to the measurement instead
-        if (contact_normal)
+        if (in_contact)
         {
             kalman_filter.state_covariance = INITIAL_COVARIANCE;
         }
@@ -177,6 +174,13 @@ std::optional<Ball> BallFilter::estimateBallState(
 
     return Ball(BallState(ball_position, ball_velocity, distance_from_ground),
                 current_time);
+}
+
+Ball BallFilter::forceBallState(const Point& position, const Timestamp& current_time)
+{
+    reset(Measurement(position.x(), position.y()), current_time);
+
+    return Ball(BallState(position, Vector(0, 0), 0.0), current_time);
 }
 
 std::optional<BallDetection> BallFilter::getBestBallDetection(
@@ -254,9 +258,8 @@ void BallFilter::constrainToField(const Field& field)
     }
 }
 
-std::optional<Vector> BallFilter::findContactNormal(const Point& previous_position,
-                                                    const std::vector<Robot>& robots,
-                                                    const Field& field) const
+bool BallFilter::isInContact(const Point& previous_position,
+                             const std::vector<Robot>& robots, const Field& field) const
 {
     const Point ball_position(kalman_filter.state_estimate(0),
                               kalman_filter.state_estimate(1));
@@ -264,94 +267,52 @@ std::optional<Vector> BallFilter::findContactNormal(const Point& previous_positi
     // segment
     const Segment ball_path(previous_position, ball_position);
 
-    // Outward normal of the object in contact, if there is any
-    std::optional<Vector> contact_normal;
-
     const double robot_collision_distance =
         ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS;
 
-    // Robots are the one obstacle we treat as round, so the surface normal points
-    // straight out from the robot's centre through the point of contact
+    // Robots are the one obstacle we treat as round
     for (const Robot& robot : robots)
     {
-        if (!intersects(ball_path, Circle(robot.position(), robot_collision_distance)))
+        if (intersects(ball_path, Circle(robot.position(), robot_collision_distance)))
         {
-            continue;
+            return true;
         }
-
-        const Point contact_point  = closestPoint(robot.position(), ball_path);
-        const Vector robot_to_ball = contact_point - robot.position();
-
-        // The ball passed exactly over the robot's centre, so there is no direction to
-        // bounce it in
-        if (robot_to_ball.length() < FIXED_EPSILON)
-        {
-            continue;
-        }
-
-        contact_normal = robot_to_ball.normalize();
-        break;
     }
 
-	// If we still haven't found a contact, we check the goals
-	// This only checks the net, and two posts
-    if (!contact_normal)
+    // If we still haven't found a contact, we check the goals
+    // This only checks the net, and two posts
+    const std::array<std::pair<Rectangle, double>, 2> goals = {
+        std::pair(field.friendlyGoal(), field.friendlyGoal().xMin()),
+        std::pair(field.enemyGoal(), field.enemyGoal().xMax())};
+
+    const std::vector<Segment>& walls = field.fieldBoundary().getSegments();
+
+    std::vector<Segment> barriers;
+    barriers.reserve(goals.size() * 3 + walls.size());
+
+    for (const auto& [goal, back_x] : goals)
     {
-        const std::array<std::pair<Rectangle, double>, 2> goals = {
-            std::pair(field.friendlyGoal(), field.friendlyGoal().xMin()),
-            std::pair(field.enemyGoal(), field.enemyGoal().xMax())};
+        barriers.emplace_back(Point(back_x, goal.yMin()), Point(back_x, goal.yMax()));
+        barriers.emplace_back(Point(goal.xMin(), goal.yMax()),
+                              Point(goal.xMax(), goal.yMax()));
+        barriers.emplace_back(Point(goal.xMin(), goal.yMin()),
+                              Point(goal.xMax(), goal.yMin()));
+    }
 
-        const std::vector<Segment>& walls = field.fieldBoundary().getSegments();
+    barriers.insert(barriers.end(), walls.begin(), walls.end());
 
-        std::vector<Segment> barriers;
-        barriers.reserve(goals.size() * 3 + walls.size());
-
-        for (const auto& [goal, back_x] : goals)
+    for (const Segment& barrier : barriers)
+    {
+        // Either the ball crossed the barrier this frame, or it is sitting against it
+        // with too little speed for the path to reach across
+        if (intersects(ball_path, barrier) ||
+            distance(ball_path.getEnd(), barrier) <= BALL_MAX_RADIUS_METERS)
         {
-            barriers.emplace_back(Point(back_x, goal.yMin()), Point(back_x, goal.yMax()));
-            barriers.emplace_back(Point(goal.xMin(), goal.yMax()),
-                                  Point(goal.xMax(), goal.yMax()));
-            barriers.emplace_back(Point(goal.xMin(), goal.yMin()),
-                                  Point(goal.xMax(), goal.yMin()));
-        }
-
-        barriers.insert(barriers.end(), walls.begin(), walls.end());
-
-        for (const Segment& barrier : barriers)
-        {
-            // Either the ball crossed the barrier this frame, or it is sitting against it
-            // with too little speed for the path to reach across
-            if (!intersects(ball_path, barrier) &&
-                distance(ball_path.getEnd(), barrier) > BALL_MAX_RADIUS_METERS)
-            {
-                continue;
-            }
-
-            const Vector barrier_direction = barrier.getEnd() - barrier.getStart();
-
-            if (barrier_direction.length() < FIXED_EPSILON)
-            {
-                continue;
-            }
-
-            Vector normal = barrier_direction.perpendicular().normalize();
-
-            // A segment has two perpendiculars; we want the one pointing back towards the
-            // side the ball approached from
-            const Vector barrier_to_ball =
-                ball_path.getStart() - closestPoint(ball_path.getStart(), barrier);
-
-            if (normal.dot(barrier_to_ball) < 0)
-            {
-                normal = -normal;
-            }
-
-            contact_normal = normal;
-            break;
+            return true;
         }
     }
 
-    return contact_normal;
+    return false;
 }
 
 void BallFilter::updateContactState(bool in_contact)

@@ -38,6 +38,26 @@ class BallFilter
         const std::vector<BallDetection>& new_ball_detections, const Field& field,
         const std::vector<Robot>& robots, const Timestamp& current_time);
 
+    /**
+     * Forces the estimate onto a position known from a source other than vision, such as
+     * the breakbeam of a robot with the ball in its dribbler, and returns the resulting
+     * ball.
+     *
+     * A trusted position is not a detection and must not be run through the gates that
+     * detections are. Those gates compare against the current estimate, so a breakbeam
+     * fed in as a detection is rejected in exactly the case it exists for -- vision has
+     * lost the ball and the estimate has drifted away from where the robot says it is.
+     *
+     * The ball is placed at rest, since a ball held in a dribbler is not moving relative
+     * to the robot holding it.
+     *
+     * @param position The position to force the estimate onto
+     * @param current_time The time the position is valid at
+     *
+     * @return The ball at the forced position
+     */
+    Ball forceBallState(const Point& position, const Timestamp& current_time);
+
    private:
 
 	// KF Dimensions
@@ -96,9 +116,8 @@ class BallFilter
     void constrainToField(const Field& field);
 
     /**
-     * Returns the outward surface normal of whatever the ball is in contact with -- a
-     * robot, a goalpost, the back of a net, or the walls around the field -- or
-     * std::nullopt if the ball is in free flight.
+     * Returns whether the ball is touching anything on the field -- a robot, a goalpost,
+     * the back of a net, or the walls around the field.
      *
      * The check is against the whole path the ball travelled this frame rather than only
      * where it ended up. A ball moving at 5 m/s covers over 8 cm between frames at 60 Hz,
@@ -109,12 +128,10 @@ class BallFilter
      * @param robots The robots currently on the field
      * @param field The field being played on
      *
-     * @return The outward normal at the point of contact, or std::nullopt if there is no
-     * contact
+     * @return Whether the ball is in contact with anything
      */
-    std::optional<Vector> findContactNormal(const Point& previous_position,
-                                            const std::vector<Robot>& robots,
-                                            const Field& field) const;
+    bool isInContact(const Point& previous_position, const std::vector<Robot>& robots,
+                     const Field& field) const;
 
     /**
      * Corrects the motion model for a ball that has been resting against something for
