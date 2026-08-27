@@ -1,4 +1,4 @@
-from proto.play_info_msg_pb2 import PlayInfo
+import proto.import_all_protos as protos
 from pyqtgraph.Qt import QtWidgets
 from software.thunderscope.common.common_widgets import set_table_data
 
@@ -25,7 +25,7 @@ class PlayInfoWidget(QtWidgets.QWidget):
             PlayInfoWidget.NUM_ROWS, PlayInfoWidget.NUM_COLS
         )
 
-        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
+        self.playinfo_buffer = ThreadSafeBuffer(buffer_size, protos.PlayInfo, False)
         self.play_table.verticalHeader().setVisible(False)
         self.last_playinfo = None
 

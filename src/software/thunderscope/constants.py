@@ -2,7 +2,6 @@ from pyqtgraph.Qt import QtGui
 from OpenGL import GL
 import proto.import_all_protos as protos
 from enum import Enum, IntEnum, StrEnum
-from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
@@ -100,11 +99,11 @@ ORTHOGRAPHIC_FOV_DEGREES = 1.0
 
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
-    LogLevel.DEBUG: "DEBUG",
-    LogLevel.INFO: "INFO",
-    LogLevel.WARNING: "WARNING",
-    LogLevel.FATAL: "FATAL",
-    LogLevel.CONTRACT: "CONTRACT",
+    protos.LogLevel.DEBUG: "DEBUG",
+    protos.LogLevel.INFO: "INFO",
+    protos.LogLevel.WARNING: "WARNING",
+    protos.LogLevel.FATAL: "FATAL",
+    protos.LogLevel.CONTRACT: "CONTRACT",
 }
 
 # Paths to check for estop when running diagnostics, used as a fallback for Linux.

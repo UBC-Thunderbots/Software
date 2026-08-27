@@ -9,7 +9,6 @@ from software.thunderscope.robot_diagnostics.error_log_widgets import (
     LowBatteryLogMessageWidget,
     FatalLogMessageWidget,
 )
-from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import (
     ERROR_CODE_MESSAGES,
@@ -36,7 +35,7 @@ class RobotErrorLog(QtWidgets.QScrollArea):
 
         self.robot_status_buffer = ThreadSafeBuffer(10, protos.RobotStatus)
         self.robot_crash_buffer = ThreadSafeBuffer(10, protos.RobotCrash)
-        self.robot_log_buffer = ThreadSafeBuffer(10, RobotLog)
+        self.robot_log_buffer = ThreadSafeBuffer(10, protos.RobotLog)
 
         self.robot_last_crash_time_s = {}
         self.robot_last_fatal_time_s = {}
@@ -137,8 +136,8 @@ class RobotErrorLog(QtWidgets.QScrollArea):
 
         if robot_log is not None:
             if (
-                robot_log.log_level == LogLevel.FATAL
-                or robot_log.log_level == LogLevel.CONTRACT
+                robot_log.log_level == protos.LogLevel.FATAL
+                or robot_log.log_level == protos.LogLevel.CONTRACT
             ):
                 if (
                     robot_log.robot_id not in self.robot_last_fatal_time_s

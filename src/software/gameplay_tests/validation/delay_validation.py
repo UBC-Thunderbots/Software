@@ -1,6 +1,6 @@
 from typing import override
 
-from proto.validation_pb2 import ValidationStatus, ValidationType, ValidationGeometry
+import proto.import_all_protos as protos
 from software.py_constants import DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -16,7 +16,7 @@ class DelayValidation(Validation):
         self.validation = validation
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks validation after delay finished. If during delay, returns default validation status.
 
         :param world: The world msg to validate
@@ -28,13 +28,13 @@ class DelayValidation(Validation):
             return self.validation.get_validation_status(world)
         else:
             return (
-                ValidationStatus.PASSING
-                if self.validation.get_validation_type() == ValidationType.ALWAYS
-                else ValidationStatus.FAILING
+                protos.ValidationStatus.PASSING
+                if self.validation.get_validation_type() == protos.ValidationType.ALWAYS
+                else protos.ValidationStatus.FAILING
             )
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         return self.validation.get_validation_geometry(world)
 
     @override
@@ -42,5 +42,5 @@ class DelayValidation(Validation):
         return f"Delayed validation after {self.delay_s} seconds for {self.validation.__repr__()}"
 
     @override
-    def get_validation_type(self, world) -> ValidationType:
+    def get_validation_type(self, world) -> protos.ValidationType:
         return self.validation.get_validation_type()

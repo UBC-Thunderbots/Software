@@ -1,6 +1,4 @@
 import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team
-from proto.ssl_gc_state_pb2 import Command
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
@@ -73,8 +71,8 @@ class TbotsTestRunner:
 
     def send_gamecontroller_command(
         self,
-        gc_command: Command,
-        team: Team,
+        gc_command: protos.Command,
+        team: protos.Team,
         final_ball_placement_point=None,
     ):
         """Sends a gamecontroller command that is to be broadcasted to the given team

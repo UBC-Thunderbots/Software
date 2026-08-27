@@ -1,4 +1,4 @@
-from proto.validation_pb2 import ValidationGeometry, ValidationStatus
+import proto.import_all_protos as protos
 from software.gameplay_tests.validation.validation import (
     Validation,
 )
@@ -19,13 +19,13 @@ class OrValidation(Validation):
     @override
     def get_validation_status(self, world):
         for validation in self.validations:
-            if validation.get_validation_status(world) == ValidationStatus.PASSING:
-                return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+            if validation.get_validation_status(world) == protos.ValidationStatus.PASSING:
+                return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
     def get_validation_geometry(self, world):
-        validation_geometry = ValidationGeometry()
+        validation_geometry = protos.ValidationGeometry()
 
         for validation in self.validations:
             individual_geometry = validation.get_validation_geometry(world)

@@ -12,7 +12,6 @@ from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
     GLDrawPolygonObstacleLayer,
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.robot_log_msg_pb2 import RobotLog
 from software.thunderscope.dock_style import *
 
 # Import Widgets
@@ -255,7 +254,7 @@ def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
     logs = g3logWidget()
 
     # Register observer
-    proto_unix_io.register_observer(RobotLog, logs.log_buffer)
+    proto_unix_io.register_observer(protos.RobotLog, logs.log_buffer)
 
     return logs
 
@@ -385,7 +384,7 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     proto_unix_io.register_observer(
         protos.RobotCrash, robot_error_log.robot_crash_buffer
     )
-    proto_unix_io.register_observer(RobotLog, robot_error_log.robot_log_buffer)
+    proto_unix_io.register_observer(protos.RobotLog, robot_error_log.robot_log_buffer)
     return robot_error_log
 
 

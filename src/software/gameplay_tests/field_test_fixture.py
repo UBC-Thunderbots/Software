@@ -7,8 +7,6 @@ import threading
 import pytest
 import argparse
 import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team
-from proto.ssl_gc_state_pb2 import Command
 
 from software.gameplay_tests.validation import validation
 from software.thunderscope.constants import EstopMode, IndividualRobotMode
@@ -117,8 +115,8 @@ class FieldTestRunner(TbotsTestRunner):
     @override
     def send_gamecontroller_command(
         self,
-        gc_command: Command,
-        team: Team,
+        gc_command: protos.Command,
+        team: protos.Team,
         final_ball_placement_point=None,
     ):
         """Send a command to the gamecontroller

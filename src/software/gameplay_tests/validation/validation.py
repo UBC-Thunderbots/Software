@@ -1,11 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.validation_pb2 import (
-    ValidationGeometry,
-    ValidationProto,
-    ValidationProtoSet,
-    ValidationStatus,
-    ValidationType,
-)
+import proto.import_all_protos as protos
 
 from abc import abstractmethod
 
@@ -14,15 +8,15 @@ class Validation:
     """A validation function"""
 
     @abstractmethod
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         raise NotImplementedError("get_validation_status is not implemented")
 
     @abstractmethod
-    def get_validation_type(self, world) -> ValidationType:
+    def get_validation_type(self, world) -> protos.ValidationType:
         raise NotImplementedError("get_validation_type is not implemented")
 
     @abstractmethod
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
 
     def __repr__(self):
@@ -78,8 +72,8 @@ def create_validation_types(validation_class):
         :param world: The world msg to validate on
         """
         return {
-            ValidationStatus.FAILING: ValidationStatus.PASSING,
-            ValidationStatus.PASSING: ValidationStatus.FAILING,
+            protos.ValidationStatus.FAILING: protos.ValidationStatus.PASSING,
+            protos.ValidationStatus.PASSING: protos.ValidationStatus.FAILING,
         }[self.validation.get_validation_status(world)]
 
     # Generate the types: specifically, all Eventually validations will return
@@ -99,7 +93,7 @@ def create_validation_types(validation_class):
             **common,
             "__repr__": lambda self: "EventuallyTrueValidation: "
             + repr(self.validation),
-            "get_validation_type": lambda self: ValidationType.EVENTUALLY,
+            "get_validation_type": lambda self: protos.ValidationType.EVENTUALLY,
             "get_validation_status": lambda self,
             world: self.validation.get_validation_status(world),
         },
@@ -112,7 +106,7 @@ def create_validation_types(validation_class):
             **common,
             "__repr__": lambda self: "EventuallyFalseValidation: "
             + repr(self.validation),
-            "get_validation_type": lambda self: ValidationType.EVENTUALLY,
+            "get_validation_type": lambda self: protos.ValidationType.EVENTUALLY,
             "get_validation_status": lambda self, world: flip_validation(self, world),
         },
     )
@@ -123,7 +117,7 @@ def create_validation_types(validation_class):
         {
             **common,
             "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
-            "get_validation_type": lambda self: ValidationType.ALWAYS,
+            "get_validation_type": lambda self: protos.ValidationType.ALWAYS,
             "get_validation_status": lambda self,
             world: self.validation.get_validation_status(world),
         },
@@ -135,7 +129,7 @@ def create_validation_types(validation_class):
         {
             **common,
             "__repr__": lambda self: "AlwaysFalseValidation: " + repr(self.validation),
-            "get_validation_type": lambda self: ValidationType.ALWAYS,
+            "get_validation_type": lambda self: protos.ValidationType.ALWAYS,
             "get_validation_status": lambda self, world: flip_validation(self, world),
         },
     )
@@ -160,10 +154,10 @@ def run_validation_sequence_sets(
     """
     # Proto that stores validation geometry and validation status of
     # all validations passed in
-    always_validation_proto_set = ValidationProtoSet()
-    always_validation_proto_set.validation_type = ValidationType.ALWAYS
-    eventually_validation_proto_set = ValidationProtoSet()
-    eventually_validation_proto_set.validation_type = ValidationType.EVENTUALLY
+    always_validation_proto_set = protos.ValidationProtoSet()
+    always_validation_proto_set.validation_type = protos.ValidationType.ALWAYS
+    eventually_validation_proto_set = protos.ValidationProtoSet()
+    eventually_validation_proto_set.validation_type = protos.ValidationType.EVENTUALLY
 
     def create_validation_proto_helper(validation_proto_set, validation):
         """Helper function that computes the status and creates a
@@ -173,7 +167,7 @@ def run_validation_sequence_sets(
         :param validation: The validation to put into the proto
         """
         # Stores the validation result
-        validation_proto = ValidationProto()
+        validation_proto = protos.ValidationProto()
 
         # Get status
         status = validation.get_validation_status(world)
@@ -200,11 +194,11 @@ def run_validation_sequence_sets(
 
             # If the current validation is failing, we don't care about
             # the next one. Keep evaluating until this one passes.
-            if status == ValidationStatus.FAILING:
+            if status == protos.ValidationStatus.FAILING:
                 break
 
             # If the validation has passed, remove it from the set.
-            if status == ValidationStatus.PASSING:
+            if status == protos.ValidationStatus.PASSING:
                 validation_sequence.remove(validation)
                 continue
 
@@ -223,11 +217,11 @@ def check_validation(validation_proto_set):
     :raises: AssertionError
     """
     for validation_proto in validation_proto_set.validations:
-        if validation_proto.status == ValidationStatus.FAILING:
+        if validation_proto.status == protos.ValidationStatus.FAILING:
             raise AssertionError(validation_proto.failure_msg)
 
 
-def create_validation_geometry(geometry=[]) -> ValidationGeometry:
+def create_validation_geometry(geometry=[]) -> protos.ValidationGeometry:
     """Creates a ValidationGeometry which is a visual representation of the
     validation to be rendered as either green (PASSING) or red (FAILING)
 
@@ -237,7 +231,7 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     :param geometry: A list of geom
     :return: ValidationGeometry
     """
-    validation_geometry = ValidationGeometry()
+    validation_geometry = protos.ValidationGeometry()
 
     CREATE_PROTO_DISPATCH = {
         tbots_cpp.Vector.__name__: tbots_cpp.createVectorProto,

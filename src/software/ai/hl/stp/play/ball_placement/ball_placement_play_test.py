@@ -3,7 +3,7 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 
 import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
@@ -124,12 +124,12 @@ def ball_placement_play_setup(
 
     # Game Controller Setup
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
+        gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
     )
     # Pass in placement point here - not required for all play tests
     simulated_test_runner.send_gamecontroller_command(
         gc_command=protos.Command.Type.BALL_PLACEMENT,
-        team=Team.BLUE,
+        team=SslTeam.BLUE,
         final_ball_placement_point=ball_placement_point,
     )
 

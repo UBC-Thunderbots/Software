@@ -1,5 +1,4 @@
 from collections import deque, defaultdict
-from proto.world_pb2 import World
 import proto.import_all_protos as protos
 
 from software.thunderscope.constants import Colors, DepthValues, TrailValues
@@ -24,10 +23,10 @@ class GLTrailLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
         self.trail_graphics_head = ObservableList(self._graphics_changed)
         self.robot_trail_queues = defaultdict(lambda: deque([], self.max_trail_length))
-        self.cached_world = World()
+        self.cached_world = protos.World()
 
         self.max_trail_length = TrailValues.DEFAULT_TRAIL_LENGTH
         self.refresh_interval = TrailValues.DEFAULT_TRAIL_SAMPLING_RATE

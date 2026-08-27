@@ -2,8 +2,7 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from proto.play_pb2 import PlayName
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
@@ -42,14 +41,14 @@ def test_shoot_or_pass_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.ShootOrPassPlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.ShootOrPassPlay, yellow_play=protos.PlayName.HaltPlay
         )
 
     # Eventually Validation

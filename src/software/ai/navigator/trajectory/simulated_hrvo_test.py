@@ -7,7 +7,6 @@ import software.python_bindings as tbots
 from proto.message_translation.tbots_protobuf import create_world_state
 import math
 import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team
 from software.gameplay_tests.simulated_test_fixture import SimulatedTestRunner
 from software.gameplay_tests.validation.validation import (
     create_validation_types,
@@ -194,13 +193,13 @@ def hrvo_setup(
     )
 
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=protos.Command.Type.STOP, team=Team.BLUE
+        gc_command=protos.Command.Type.STOP, team=protos.Team.BLUE
     )
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=protos.Command.Type.STOP, team=Team.YELLOW
+        gc_command=protos.Command.Type.STOP, team=protos.Team.YELLOW
     )
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=protos.Command.Type.FORCE_START, team=Team.BLUE
+        gc_command=protos.Command.Type.FORCE_START, team=protos.Team.BLUE
     )
 
     blue_tactics = {}

@@ -1,13 +1,12 @@
 from typing import Optional
 
 import software.python_bindings as tbots_cpp
-from proto.visualization_pb2 import AttackerVisualization
 import proto.import_all_protos as protos
 from typing import override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.stats.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.logs.event_log import EventType, Team
+from software.stats.logs.event_log import EventType
 import queue
 
 
@@ -40,8 +39,8 @@ class KickTracker(Tracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):
@@ -132,8 +131,8 @@ class PassTracker(KickTracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):
@@ -201,8 +200,8 @@ class ShotTracker(KickTracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):

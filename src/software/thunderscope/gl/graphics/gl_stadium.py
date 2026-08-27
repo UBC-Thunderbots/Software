@@ -4,7 +4,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_shape import GLShape
-from proto.geometry_pb2 import Stadium
+import proto.import_all_protos as protos
 
 from typing import Optional
 
@@ -96,7 +96,7 @@ class GLStadium(GLShape):
 
         self._update_shape_data()
 
-    def update_from_stadium(self, stadium: Stadium):
+    def update_from_stadium(self, stadium: protos.Stadium):
         """Updates the stadium to match the parameters of another stadium
 
         :param stadium: The stadium to copy the parameters from
