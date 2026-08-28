@@ -293,12 +293,6 @@ class InteractiveCli:
         ),
     ]
 
-    # Marker value returned by the DEBUG_POWERLOOP playbook choice. It maps to the
-    # deploy_powerboard.yml playbook but additionally compiles powerloop_main with
-    # the DEBUG_POWERLOOP flag, swapping in bare setup()/loop() stubs so arbitrary
-    # code can be flashed onto the powerboard microcontroller for debugging.
-    DEBUG_POWERLOOP_PLAYBOOK = "deploy_powerboard.yml (DEBUG_POWERLOOP)"
-
     # Flash "Select playbook:" menu.
     PLAYBOOK_CHOICES = [
         questionary.Choice(
@@ -317,8 +311,11 @@ class InteractiveCli:
             value=("powerboard firmware ", "deploy_powerboard.yml", False),
             description="Flash the powerboard firmware (powerloop_main)",
         ),
+        # Maps to the deploy_powerboard.yml playbook but additionally compiles
+        # powerloop_main with the DEBUG_POWERLOOP flag, swapping in bare setup()/loop()
+        # stubs so arbitrary code can be flashed onto the powerboard microcontroller for debugging.
         questionary.Choice(
-            title=DEBUG_POWERLOOP_PLAYBOOK,
+            title="deploy_powerboard.yml (DEBUG_POWERLOOP)",
             value=("powerboard firmware with debug ", "deploy_powerboard.yml", True),
             description="Flash powerloop_main built with the DEBUG_POWERLOOP flag "
             "for inserting arbitrary debug code onto the powerboard",
