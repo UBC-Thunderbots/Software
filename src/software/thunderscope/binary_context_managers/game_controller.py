@@ -15,10 +15,6 @@ from subprocess import Popen
 from typing import Any, Final
 
 import proto.import_all_protos as protos
-import proto.ssl_gc_state_pb2
-import proto.ssl_gc_common_pb2
-import proto.ssl_gc_ci_pb2
-import proto.ssl_gc_engine_config_pb2
 from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import (
@@ -286,8 +282,8 @@ class Gamecontroller:
 
     def send_gc_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
+        gc_command: protos.Command,
+        team: SslTeam,
         final_ball_placement_point: tbots_cpp.Point = None,
     ) -> Any:
         """Send a ci input to the gamecontroller.
@@ -341,9 +337,7 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def send_ci_input(
-        self, ci_input: proto.ssl_gc_ci_pb2.CiInput
-    ) -> list[protos.CiOutput]:
+    def send_ci_input(self, ci_input: protos.CiInput) -> list[protos.CiOutput]:
         """Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
         :param CiInput proto to send to the Gamecontroller
@@ -387,9 +381,7 @@ class Gamecontroller:
 
         return self.send_ci_input(ci_input)
 
-    def update_game_engine_config(
-        self, config: proto.ssl_gc_engine_config_pb2
-    ) -> list[protos.CiOutput]:
+    def update_game_engine_config(self, config: protos.Config) -> list[protos.CiOutput]:
         """Sends a game engine config update.
 
         :param config: the new SSL game engine config
