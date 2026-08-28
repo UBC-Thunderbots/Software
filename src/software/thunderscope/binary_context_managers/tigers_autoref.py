@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import proto.import_all_protos as protos
-import proto.ssl_vision_wrapper_tracked_pb2
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
@@ -9,7 +8,7 @@ from software.networking.ssl_proto_communication import (
 )
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
+from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
