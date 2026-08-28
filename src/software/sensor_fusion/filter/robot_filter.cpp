@@ -5,7 +5,7 @@ RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_durat
       expiry_buffer_duration(expiry_buffer_duration)
 {
 }
-
+// change the constructor initializations
 RobotFilter::RobotFilter(RobotDetection current_robot_state,
                          Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state.id, current_robot_state.position,
@@ -102,7 +102,34 @@ std::optional<Robot> RobotFilter::getFilteredData(
     }
 }
 
+std::optional<Robot> RobotFilter::estimateRobotState(
+    const std::vector<RobotDetection>& new_robot_data,
+    const Timestamp& current_time,
+    const std::optional<RobotId> breakbeam_tripped_id)
+{
+    return std::nullopt;
+    // implement the estimate state
+}
+
+//completely fine DO NOT TOUCH
 unsigned int RobotFilter::getRobotId() const
 {
     return this->current_robot_state.id();
+}
+
+void RobotFilter::predict(double delta_t)
+{
+    // predict logic
+}
+
+bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
+                                      const Timestamp& current_time) const
+{
+    // within max robot speed logic
+    return true;
+}
+
+void RobotFilter::reset(const PosMeasurement& pos_measurement, const AngMeasurement& ang_measurement, const Timestamp& current_time)
+{
+    // reset logic
 }
