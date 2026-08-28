@@ -103,7 +103,8 @@ class RobotFilter
 
     using PosKalmanFilter = KalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
     using AngKalmanFilter = KalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
-    using Measurement     = Eigen::Vector<double, MEASUREMENT_SIZE>;
+    using PosMeasurement  = Eigen::Vector<double, POS_MEASUREMENT_SIZE>;
+    using AngMeasurement  = Eigen::Vector<double, ANG_MEASUREMENT_SIZE>;
 
     /**
      * Advances the Kalman filter's estimate forward to the given time using a constant
@@ -135,11 +136,12 @@ class RobotFilter
      * @param measurement The measurement to reinitialize the estimate on
      * @param current_time The time the measurement was taken at
      */
-    void reset(const Measurement& measurement, const Timestamp& current_time);
+    void reset(const PosMeasurement& pos_measurement, const AngMeasurement& ang_measurement, const Timestamp& current_time);
 
     PosKalmanFilter pos_kalman_filter;
     AngKalmanFilter ang_kalman_filter;
     std::optional<Timestamp> prev_detection_timestamp;
-    std::optional<Measurement> prev_measurement;
+    std::optional<PosMeasurement> prev_pos_measurement;
+    std::optional<AngMeasurement> prev_ang_measurement;
     std::optional<Timestamp> last_predict_timestamp;
 };
