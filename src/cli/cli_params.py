@@ -145,6 +145,7 @@ class BazelFlag(tuple, Enum):
 
 class InteractiveCli:
     HISTORY_FILE = "/tmp/tbots_history"
+    HISTORY_DELIMITER = "<<||>>"
     HISTORY_MAX_ENTRIES = 50
 
     # ---------------------------------------------------------------------------
@@ -185,7 +186,7 @@ class InteractiveCli:
 
     CATEGORY_CHOICES = [
         questionary.Choice(
-            title="Run thunderscope",
+            title="Run Thunderscope",
             value=Category.THUNDERSCOPE,
             description="Launch Thunderscope against the simulator or real robots",
         ),
@@ -336,7 +337,7 @@ class InteractiveCli:
     def save_to_history(cmd_title: str, cmd_str: str):
         history = InteractiveCli.load_history()
         history = [h for h in history if h != cmd_str]
-        history.append(cmd_title + ": " + cmd_str)
+        history.append(cmd_title + InteractiveCli.HISTORY_DELIMITER + cmd_str)
         history = history[-InteractiveCli.HISTORY_MAX_ENTRIES :]
         with open(InteractiveCli.HISTORY_FILE, "w") as f:
             f.write("\n".join(h.replace("\n", "\\n") for h in history) + "\n")
@@ -375,9 +376,9 @@ class InteractiveCli:
             case InteractiveCli.Category.REPEAT_CMD_MSG:
                 choices = [
                     questionary.Choice(
-                        title=entry.split(": ")[0],
-                        value=entry.split(": ")[1],
-                        description=entry.split(": ")[1],
+                        title=entry.split(InteractiveCli.HISTORY_DELIMITER)[0],
+                        value=entry.split(InteractiveCli.HISTORY_DELIMITER)[1],
+                        description=entry.split(InteractiveCli.HISTORY_DELIMITER)[1],
                     )
                     for entry in list(reversed(history))
                 ]
