@@ -3,8 +3,7 @@ import threading
 import time
 
 import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team
-from proto.ssl_gc_state_pb2 import Command
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.field_test_fixture import (
     WORLD_BUFFER_TIMEOUT,
 )
@@ -44,8 +43,8 @@ def test_basic_rotation(field_test_runner):
 
         # Force start the game automatically
         field_test_runner.gamecontroller.send_gc_command(
-            Command.FORCE_START,
-            Team.UNKNOWN,
+            protos.Command.FORCE_START,
+            SslTeam.UNKNOWN,
             final_ball_placement_point=None,
         )
 
@@ -161,8 +160,8 @@ def test_one_robots_square(field_test_runner):
 
         # Force start the game automatically
         field_test_runner.gamecontroller.send_gc_command(
-            Command.FORCE_START,
-            Team.UNKNOWN,
+            protos.Command.FORCE_START,
+            SslTeam.UNKNOWN,
             final_ball_placement_point=None,
         )
 
