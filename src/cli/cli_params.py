@@ -182,22 +182,27 @@ class InteractiveCli:
         THUNDERSCOPE = "thunderscope"
         TEST = "test"
         FLASH = "flash"
-        REPEAT_CMD_MSG = "Repeat a past command"
+        REPEAT = "repeat"  # this value is not used, only the enum is checked
 
     CATEGORY_CHOICES = [
         questionary.Choice(
+            title="Repeat a past command",
+            value=("", Category.REPEAT),
+            description="Show a list of previous commands to select from",
+        ),
+        questionary.Choice(
             title="Run Thunderscope",
-            value=Category.THUNDERSCOPE,
+            value=("Run Thunderscope ", Category.THUNDERSCOPE),
             description="Launch Thunderscope against the simulator or real robots",
         ),
         questionary.Choice(
             title="Test",
-            value=Category.TEST,
+            value=("Test ", Category.TEST),
             description="Run a single test or the entire test suite",
         ),
         questionary.Choice(
             title="Flash",
-            value=Category.FLASH,
+            value=("Flash ", Category.FLASH),
             description="Deploy software or firmware to a robot via Ansible",
         ),
     ]
@@ -212,22 +217,22 @@ class InteractiveCli:
     LAUNCH_MODE_CHOICES = [
         questionary.Choice(
             title="Simulator",
-            value=LaunchMode.SIM,
+            value=("as simulator ", LaunchMode.SIM),
             description="Run Thunderscope against the simulated full system",
         ),
         questionary.Choice(
             title="Diagnostics",
-            value=LaunchMode.RUN_DIAG,
+            value=("in diagnostic mode ", LaunchMode.RUN_DIAG),
             description="Run Thunderscope in diagnostics mode against real robots",
         ),
         questionary.Choice(
             title="Run blue",
-            value=LaunchMode.RUN_BLUE,
+            value=("as blue team", LaunchMode.RUN_BLUE),
             description="run as blue team",
         ),
         questionary.Choice(
             title="Run yellow",
-            value=LaunchMode.RUN_YELLOW,
+            value=("as yellow team", LaunchMode.RUN_YELLOW),
             description="run as yellow team",
         ),
     ]
@@ -243,27 +248,27 @@ class InteractiveCli:
     THUNDERSCOPE_SIMULATOR_OPTION_CHOICES = [
         questionary.Choice(
             title="Enable Automatic Referee",
-            value=SimOptions.ENABLE_AUTOREF,
+            value=("with autoref, ", SimOptions.ENABLE_AUTOREF),
             description="Run the autoref alongside the simulator",
         ),
         questionary.Choice(
             title="CI Mode",
-            value=SimOptions.CI_MODE,
+            value=("in CI, ", SimOptions.CI_MODE),
             description="Run in continuous integration mode (headless friendly)",
         ),
         questionary.Choice(
             title="Record Statistics",
-            value=SimOptions.RECORD_STATS,
+            value=("recording stats, ", SimOptions.RECORD_STATS),
             description="Record gameplay statistics for a given duration in minutes",
         ),
         questionary.Choice(
             title="Enable Realism",
-            value=SimOptions.ENABLE_REALISM,
+            value=("with realism, ", SimOptions.ENABLE_REALISM),
             description="Enable realistic simulation physics and sensor noise",
         ),
         questionary.Choice(
             title="Enable Automatic Game Controller",
-            value=SimOptions.ENABLE_AUTOGC,
+            value=("with gc, ", SimOptions.ENABLE_AUTOGC),
             description="Run the automated game controller alongside the simulator",
         ),
     ]
@@ -278,12 +283,12 @@ class InteractiveCli:
     DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES = [
         questionary.Choice(
             title="Disable Power Service",
-            value=DeployOption.DISABLE_POWER_SERVICE,
+            value=("without power service, ", DeployOption.DISABLE_POWER_SERVICE),
             description="Compile Thunderloop without the Power Service (no powerboard)",
         ),
         questionary.Choice(
             title="Disable Motor Service",
-            value=DeployOption.DISABLE_MOTOR_SERVICE,
+            value=("without motor service, ", DeployOption.DISABLE_MOTOR_SERVICE),
             description="Compile Thunderloop without the Motor Service (no motorboard)",
         ),
     ]
@@ -298,29 +303,29 @@ class InteractiveCli:
     PLAYBOOK_CHOICES = [
         questionary.Choice(
             title="setup_pi.yml",
-            value=("setup_pi.yml", False),
+            value=("PI setup ", "setup_pi.yml", False),
             description="First-time setup of the Raspberry Pi on a robot",
         ),
         # If the playbook name changes then you must change the if statement below.
         questionary.Choice(
             title="deploy_robot_software.yml",
-            value=("deploy_robot_software.yml", False),
+            value=("robot software ", "deploy_robot_software.yml", False),
             description="Build and flash Thunderloop and the robot software",
         ),
         questionary.Choice(
             title="deploy_powerboard.yml",
-            value=("deploy_powerboard.yml", False),
+            value=("powerboard firmware ", "deploy_powerboard.yml", False),
             description="Flash the powerboard firmware (powerloop_main)",
         ),
         questionary.Choice(
             title=DEBUG_POWERLOOP_PLAYBOOK,
-            value=("deploy_powerboard.yml", True),
+            value=("powerboard firmware with debug ", "deploy_powerboard.yml", True),
             description="Flash powerloop_main built with the DEBUG_POWERLOOP flag "
             "for inserting arbitrary debug code onto the powerboard",
         ),
         questionary.Choice(
             title="deploy_motor_firmware.yml",
-            value=("deploy_motor_firmware.yml", False),
+            value=("motorboard firmware ", "deploy_motor_firmware.yml", False),
             description="Flash the motor controller firmware",
         ),
     ]
@@ -358,23 +363,21 @@ class InteractiveCli:
         extra_args = []
 
         history = InteractiveCli.load_history()
-        choices = InteractiveCli.CATEGORY_CHOICES
+        choices = InteractiveCli.CATEGORY_CHOICES[1:]
         if history:
-            choices = [
-                InteractiveCli.Category.REPEAT_CMD_MSG.value
-            ] + InteractiveCli.CATEGORY_CHOICES
+            choices = InteractiveCli.CATEGORY_CHOICES[0:]
 
-        category = questionary.select(
+        category_label, category = questionary.select(
             "What would you like to do?",
             choices=choices,
             style=InteractiveCli.INTERACTIVE_STYLE,
         ).unsafe_ask()
 
-        cmd_title = ""
+        cmd_title = category_label
 
         match category:
-            case InteractiveCli.Category.REPEAT_CMD_MSG:
-                choices = [
+            case InteractiveCli.Category.REPEAT:
+                history_choices = [
                     questionary.Choice(
                         title=entry.split(InteractiveCli.HISTORY_DELIMITER)[0],
                         value=entry.split(InteractiveCli.HISTORY_DELIMITER)[1],
@@ -384,7 +387,7 @@ class InteractiveCli:
                 ]
                 past_cmd = questionary.select(
                     "Select a command to re-run:",
-                    choices=choices,
+                    choices=history_choices,
                 ).unsafe_ask()
 
                 if not past_cmd:
@@ -396,35 +399,41 @@ class InteractiveCli:
             case InteractiveCli.Category.THUNDERSCOPE:
                 config.action = ActionArgument.run
                 config.search_query = "thunderscope"
-                cmd_title = "Run Thunderscope"
-                launch = questionary.select(
+
+                launch_label, launch_mode = questionary.select(
                     "Launch mode?",
                     choices=InteractiveCli.LAUNCH_MODE_CHOICES,
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-                if launch == InteractiveCli.LaunchMode.SIM:
-                    selected = questionary.checkbox(
+                cmd_title += launch_label
+
+                if launch_mode == InteractiveCli.LaunchMode.SIM:
+                    sim_option_selection = questionary.checkbox(
                         "Options:",
                         choices=InteractiveCli.THUNDERSCOPE_SIMULATOR_OPTION_CHOICES,
                         style=InteractiveCli.INTERACTIVE_STYLE,
                     ).unsafe_ask()
-                    for opt in selected:
-                        extra_args.extend([f"--{opt.value}"])
-                        if opt == InteractiveCli.SimOptions.RECORD_STATS:
-                            duration = questionary.text(
-                                "Enter record stats duration (minutes):",
-                                style=InteractiveCli.INTERACTIVE_STYLE,
-                                validate=lambda x: x.isdigit(),
-                            ).unsafe_ask()
-                            extra_args.extend([duration])
+                    if sim_option_selection:
+                        sim_option_labels, sim_options = zip(*sim_option_selection)
+                        for label in sim_option_labels:
+                            cmd_title += label
+
+                        for opt in sim_options:
+                            extra_args.extend([f"--{opt.value}"])
+                            if opt == InteractiveCli.SimOptions.RECORD_STATS:
+                                duration = questionary.text(
+                                    "Enter record stats duration (minutes):",
+                                    style=InteractiveCli.INTERACTIVE_STYLE,
+                                    validate=lambda x: x.isdigit(),
+                                ).unsafe_ask()
+                                extra_args.extend([duration])
                 else:
                     iface = questionary.text(
                         "Network interface?", style=InteractiveCli.INTERACTIVE_STYLE
                     ).unsafe_ask()
-                    extra_args.extend([f"--{launch.value}", "--interface", iface])
+                    extra_args.extend([f"--{launch_mode.value}", "--interface", iface])
 
             case InteractiveCli.Category.TEST:
-                cmd_title = "Run Tests"
                 config.action = ActionArgument.test
                 test_name = questionary.text(
                     "Enter test name (leave empty for entire suite)",
@@ -442,20 +451,20 @@ class InteractiveCli:
                         config.runs = int(runs_str)
 
             case InteractiveCli.Category.FLASH:
-                cmd_title = "Flash"
                 config.action = ActionArgument.run
                 config.search_query = "ansible"
-                playbook, debug_powerloop = questionary.select(
+                flash_cmd_label, playbook, debug_powerloop = questionary.select(
                     "Select playbook:",
                     choices=InteractiveCli.PLAYBOOK_CHOICES,
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-                cmd_title += " " + playbook
+                cmd_title += flash_cmd_label
+
                 config.ansible_playbook = playbook
                 config.debug_powerloop = debug_powerloop
 
                 if config.ansible_playbook == "deploy_robot_software.yml":
-                    selected = (
+                    robot_software_config = (
                         questionary.checkbox(
                             "Options:",
                             choices=InteractiveCli.DEPLOY_ROBOT_SOFTWARE_OPTION_CHOICES,
@@ -463,18 +472,26 @@ class InteractiveCli:
                         ).unsafe_ask()
                         or []
                     )
-                    config.disable_power_service = (
-                        InteractiveCli.DeployOption.DISABLE_POWER_SERVICE in selected
-                    )
-                    config.disable_motor_service = (
-                        InteractiveCli.DeployOption.DISABLE_MOTOR_SERVICE in selected
-                    )
+                    if robot_software_config:
+                        robot_software_option_labels, robot_software_options = zip(
+                            *robot_software_config
+                        )
+                        for label in robot_software_option_labels:
+                            cmd_title += label
+                        config.disable_power_service = (
+                            InteractiveCli.DeployOption.DISABLE_POWER_SERVICE
+                            in robot_software_options
+                        )
+                        config.disable_motor_service = (
+                            InteractiveCli.DeployOption.DISABLE_MOTOR_SERVICE
+                            in robot_software_options
+                        )
 
                 name = questionary.text(
                     "Robot name?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
                 config.robot_name = name
-                cmd_title += " to " + name
+                cmd_title += "to " + name
                 config.ssh_password = questionary.password(
                     "SSH password?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
