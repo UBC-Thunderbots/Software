@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import proto.import_all_protos as protos
-import proto.ssl_vision_wrapper_tracked_pb2
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
@@ -194,7 +193,7 @@ class TigersAutoref:
                 )
 
     def _forward_to_gamecontroller(
-        self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
+        self, tracker_wrapper: protos.TrackerWrapperPacket
     ) -> list[protos.CiOutput]:
         """Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
         given tracker_wrapper to support asynchronous ticking.
