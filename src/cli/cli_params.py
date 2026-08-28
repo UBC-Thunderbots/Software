@@ -173,8 +173,8 @@ class InteractiveCli:
     # Each questionary.Choice pairs an option's display title with a description.
     # questionary renders the description inline when the option is highlighted in
     # the interactive menus, giving users guidance without leaving the prompt.
-    # When a Choice has no explicit value, questionary returns its title, so the
-    # titles below double as the values consumed by start_interactive_cli.
+    # All values below encode a label for history tracking and a value for argument
+    # creation.
     # ---------------------------------------------------------------------------
 
     # Top-level "What would you like to do?" menu.
