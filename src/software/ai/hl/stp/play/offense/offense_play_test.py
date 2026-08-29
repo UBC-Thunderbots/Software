@@ -1,9 +1,17 @@
 import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from software.gameplay_tests.validation.friendly_team_scored import *
-from software.gameplay_tests.validation.ball_enters_region import *
-from software.gameplay_tests.validation.friendly_has_ball_possession import *
-from software.gameplay_tests.validation.excessive_dribbling import *
+from software.gameplay_tests.validation.friendly_team_scored import (
+    FriendlyTeamEventuallyScored,
+)
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallAlwaysStaysInRegion,
+)
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
+    FriendlyAlwaysHasBallPossession,
+)
+from software.gameplay_tests.validation.excessive_dribbling import (
+    NeverExcessivelyDribbles,
+)
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (

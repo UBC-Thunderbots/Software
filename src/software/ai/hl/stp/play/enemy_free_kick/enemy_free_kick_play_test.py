@@ -5,8 +5,9 @@ import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.or_validation import OrValidation
 
-from software.gameplay_tests.validation.friendly_team_scored import *
-from software.gameplay_tests.validation.ball_enters_region import *
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallNeverEntersRegion,
+)
 from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,

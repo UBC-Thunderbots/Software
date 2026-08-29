@@ -2,7 +2,9 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from software.gameplay_tests.validation.robot_enters_placement_region import *
+from software.gameplay_tests.validation.robot_enters_placement_region import (
+    RobotNeverEntersPlacementRegion,
+)
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )

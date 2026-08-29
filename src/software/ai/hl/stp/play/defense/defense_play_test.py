@@ -2,7 +2,9 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from software.gameplay_tests.validation.ball_enters_region import *
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallNeverEntersRegion,
+)
 from software.gameplay_tests.validation.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )

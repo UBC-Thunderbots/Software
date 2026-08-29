@@ -2,7 +2,9 @@ import pytest
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.gameplay_tests.validation.avoid_collisions import *
+from software.gameplay_tests.validation.avoid_collisions import (
+    RobotsDoNotCollide,
+)
 import software.python_bindings as tbots
 from proto.message_translation.tbots_protobuf import create_world_state
 import math

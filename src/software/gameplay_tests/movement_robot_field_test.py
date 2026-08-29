@@ -1,10 +1,15 @@
 import math
 import threading
+import time
 
 import proto.import_all_protos as protos
-from software.gameplay_tests.field_test_fixture import *
-
-from software.gameplay_tests.simulated_test_fixture import *
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.field_test_fixture import (
+    WORLD_BUFFER_TIMEOUT,
+)
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 from software.logger.logger import create_logger
 
 logger = create_logger(__name__)
@@ -38,8 +43,8 @@ def test_basic_rotation(field_test_runner):
 
         # Force start the game automatically
         field_test_runner.gamecontroller.send_gc_command(
-            proto.ssl_gc_state_pb2.Command.FORCE_START,
-            proto.ssl_gc_common_pb2.Team.UNKNOWN,
+            protos.Command.FORCE_START,
+            SslTeam.UNKNOWN,
             final_ball_placement_point=None,
         )
 
@@ -155,8 +160,8 @@ def test_one_robots_square(field_test_runner):
 
         # Force start the game automatically
         field_test_runner.gamecontroller.send_gc_command(
-            proto.ssl_gc_state_pb2.Command.FORCE_START,
-            proto.ssl_gc_common_pb2.Team.UNKNOWN,
+            protos.Command.FORCE_START,
+            SslTeam.UNKNOWN,
             final_ball_placement_point=None,
         )
 
