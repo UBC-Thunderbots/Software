@@ -6,19 +6,29 @@ import queue
 import random
 import logging
 import os
+import socket
+import math
 import time
-from subprocess import Popen
-from typing import Any
+import netifaces
 
-from proto.import_all_protos import *
+from subprocess import Popen
+from typing import Any, Final
+
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.networking.ssl_proto_communication import *
+from software.networking.ssl_proto_communication import (
+    SslSocket,
+    SslSocketProtoParseException,
+)
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.python_bindings import *
-from software.py_constants import *
-from software.thunderscope.binary_context_managers.util import *
+from software.py_constants import (
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_NANOSECOND,
+    SSL_REFEREE_PORT,
+)
+from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
@@ -44,27 +54,30 @@ class Gamecontroller:
         suppress_logs: bool = False,
         use_conventional_port: bool = False,
         automate_referee: bool = False,
+        parallelized: bool = False,
     ) -> None:
         """Run Gamecontroller
 
         :param suppress_logs: True if logs should be suppressed
         :param use_conventional_port: True when using static referee port. False for dynamic port assignments.
-        :param automate_referee: True if referee commands should be automated
+        :param automate_referee: True if referee commands should be automated.
+        :param parallelized: True when this is one of many Gamecontrollers running at once.
         """
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
+        self.parallelized = parallelized
 
         self.use_conventional_port = use_conventional_port
         self.referee_port = None
         self.ci_port = None
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
-            buffer_size=2, protobuf_type=ManualGCCommand
+            buffer_size=2, protobuf_type=protos.ManualGCCommand
         )
 
         self.simulator_proto_unix_io = None
         self.blue_team_world_buffer = ThreadSafeCircularBuffer(
-            buffer_size=1, protobuf_type=World
+            buffer_size=1, protobuf_type=protos.World
         )
         self.latest_world = None
         self.blue_removed_robot_ids = queue.Queue()
@@ -109,17 +122,20 @@ class Gamecontroller:
 
             command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
             command += ["-ciAddress", f"localhost:{self.ci_port}"]
-            command += [
-                "-address",
-                "localhost:0",
-                "-autorefAddress",
-                "localhost:0",
-                "-remoteControlAddress",
-                "localhost:0",
-                "-teamAddress",
-                "localhost:0",
-                "-backendOnly",
-            ]
+            if self.parallelized:
+                # One of many GCs running at once: no web UI and all-dynamic ports so
+                # instances don't collide on the fixed UI / autoref ports.
+                command += [
+                    "-address",
+                    "localhost:0",
+                    "-autorefAddress",
+                    "localhost:0",
+                    "-remoteControlAddress",
+                    "localhost:0",
+                    "-teamAddress",
+                    "localhost:0",
+                    "-backendOnly",
+                ]
 
             if self.suppress_logs:
                 with open(os.devnull, "w") as fp:
@@ -233,46 +249,41 @@ class Gamecontroller:
         :param simulator_proto_unix_io: The socket for the Gamecontroller to interact with the simulator
         """
 
-        def __send_referee_command(data: Referee) -> None:
+        def __send_referee_command(data: protos.Referee) -> None:
             """Send a referee command from the gamecontroller to both full
             systems.
 
             :param data: The referee command to send
             """
             self.__handle_referee(data)
-            blue_full_system_proto_unix_io.send_proto(Referee, data)
-            yellow_full_system_proto_unix_io.send_proto(Referee, data)
+            blue_full_system_proto_unix_io.send_proto(protos.Referee, data)
+            yellow_full_system_proto_unix_io.send_proto(protos.Referee, data)
             if autoref_proto_unix_io is not None:
-                autoref_proto_unix_io.send_proto(Referee, data)
-
-        if is_current_platform_macos():
-            loopback_iface = "en0"
-        else:
-            loopback_iface = "lo"
+                autoref_proto_unix_io.send_proto(protos.Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP,
             self.referee_port,
-            loopback_iface,
+            self.__get_referee_multicast_interface(),
             __send_referee_command,
             True,
         )
 
         blue_full_system_proto_unix_io.register_observer(
-            ManualGCCommand, self.command_override_buffer
+            protos.ManualGCCommand, self.command_override_buffer
         )
         yellow_full_system_proto_unix_io.register_observer(
-            ManualGCCommand, self.command_override_buffer
+            protos.ManualGCCommand, self.command_override_buffer
         )
         blue_full_system_proto_unix_io.register_observer(
-            World, self.blue_team_world_buffer
+            protos.World, self.blue_team_world_buffer
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
 
     def send_gc_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
+        gc_command: protos.Command,
+        team: SslTeam,
         final_ball_placement_point: tbots_cpp.Point = None,
     ) -> Any:
         """Send a ci input to the gamecontroller.
@@ -287,11 +298,11 @@ class Gamecontroller:
         :param final_ball_placement_point: ball placement point for BallPlacement messages
         :return: The response CiOutput containing 1 or more refree msgs
         """
-        ci_input = CiInput(timestamp=int(time.time_ns()))
-        api_input = Input()
-        change = Change()
-        new_command = Change.NewCommand()
-        command = Command(type=gc_command, for_team=team)
+        ci_input = protos.CiInput(timestamp=int(time.time_ns()))
+        api_input = protos.Input()
+        change = protos.Change()
+        new_command = protos.Change.NewCommand()
+        command = protos.Command(type=gc_command, for_team=team)
 
         new_command.command.CopyFrom(command)
         change.new_command_change.CopyFrom(new_command)
@@ -301,23 +312,23 @@ class Gamecontroller:
         # Do this only if ball placement pos is specified
         if final_ball_placement_point:
             # Set position
-            ball_placement_pos = Change.SetBallPlacementPos()
+            ball_placement_pos = protos.Change.SetBallPlacementPos()
             ball_placement_pos.pos.CopyFrom(
-                Vector2(
+                protos.Vector2(
                     x=float(final_ball_placement_point.x()),
                     y=float(final_ball_placement_point.y()),
                 )
             )
-            change = Change()
-            api_input = Input()
+            change = protos.Change()
+            api_input = protos.Input()
             change.set_ball_placement_pos_change.CopyFrom(ball_placement_pos)
             api_input.change.CopyFrom(change)
             ci_input.api_inputs.append(api_input)
 
             # Start Placement
-            api_input = Input()
-            start_placement = ContinueAction()
-            start_placement.type = ContinueAction.Type.BALL_PLACEMENT_START
+            api_input = protos.Input()
+            start_placement = protos.ContinueAction()
+            start_placement.type = protos.ContinueAction.Type.BALL_PLACEMENT_START
             start_placement.for_team = team
             api_input.continue_action.CopyFrom(start_placement)
             ci_input.api_inputs.append(api_input)
@@ -326,7 +337,7 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput) -> list[CiOutput]:
+    def send_ci_input(self, ci_input: protos.CiInput) -> list[protos.CiOutput]:
         """Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
         :param CiInput proto to send to the Gamecontroller
@@ -337,7 +348,7 @@ class Gamecontroller:
         while True:
             try:
                 self.ci_socket.send(ci_input)
-                ci_output_list = self.ci_socket.receive(CiOutput)
+                ci_output_list = self.ci_socket.receive(protos.CiOutput)
                 break
             except SslSocketProtoParseException as parse_err:
                 logging.info(
@@ -347,20 +358,22 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def reset_match(self) -> list[CiOutput]:
+    def reset_match(self) -> list[protos.CiOutput]:
         """Sends a message to the Gamecontroller to reset match information to our defaults.
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
-        ci_input = CiInput(timestamp=int(time.time_ns()))
+        ci_input = protos.CiInput(timestamp=int(time.time_ns()))
 
-        input_reset_match = Input()
+        input_reset_match = protos.Input()
         input_reset_match.reset_match = True
 
-        input_set_match_config = Input()
-        input_set_match_config.change.update_config_change.division = Division.DIV_B
+        input_set_match_config = protos.Input()
+        input_set_match_config.change.update_config_change.division = (
+            protos.Division.DIV_B
+        )
         input_set_match_config.change.update_config_change.match_type = (
-            MatchType.FRIENDLY
+            protos.MatchType.FRIENDLY
         )
 
         ci_input.api_inputs.append(input_reset_match)
@@ -368,25 +381,23 @@ class Gamecontroller:
 
         return self.send_ci_input(ci_input)
 
-    def update_game_engine_config(
-        self, config: proto.ssl_gc_engine_config_pb2
-    ) -> list[CiOutput]:
+    def update_game_engine_config(self, config: protos.Config) -> list[protos.CiOutput]:
         """Sends a game engine config update.
 
         :param config: the new SSL game engine config
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
-        ci_input = CiInput(timestamp=int(time.time_ns()))
+        ci_input = protos.CiInput(timestamp=int(time.time_ns()))
 
-        game_config_input = Input()
+        game_config_input = protos.Input()
         game_config_input.config_delta.CopyFrom(config)
 
         ci_input.api_inputs.append(game_config_input)
 
         return self.send_ci_input(ci_input)
 
-    def __handle_referee(self, referee: Referee) -> None:
+    def __handle_referee(self, referee: protos.Referee) -> None:
         """Updates the world state based on the referee message
         :param referee: the referee protobuf message
         """
@@ -411,7 +422,7 @@ class Gamecontroller:
         ):
             self.__update_max_allowed_robots(referee)
 
-    def __automate_referee(self, referee: Referee) -> None:
+    def __automate_referee(self, referee: protos.Referee) -> None:
         """Automate referee events by handling possible goals, ball placement failures,
         game stage changes, starting new game, and resetting when there is no game progress.
 
@@ -423,10 +434,10 @@ class Gamecontroller:
             self.__handle_game_stage_change(referee.stage)
 
         possible_goal_events = self.__find_unprocessed_events(
-            referee, GameEvent.Type.POSSIBLE_GOAL
+            referee, protos.GameEvent.Type.POSSIBLE_GOAL
         )
         placement_failed_events = self.__find_unprocessed_events(
-            referee, GameEvent.Type.PLACEMENT_FAILED
+            referee, protos.GameEvent.Type.PLACEMENT_FAILED
         )
 
         if len(possible_goal_events) >= 1:
@@ -438,7 +449,7 @@ class Gamecontroller:
             self.processed_event_ids.add(placement_failed_events[0].id)
             self.processed_event_ids.add(placement_failed_events[1].id)
 
-    def __handle_game_no_progress(self, referee: Referee) -> None:
+    def __handle_game_no_progress(self, referee: protos.Referee) -> None:
         """Handle game stalling by ending early if there is no progress in game stage time for too long.
 
         :param referee: the referee protobuf message
@@ -463,21 +474,21 @@ class Gamecontroller:
                 f"Gamecontroller: Ending game early due unknown issue halting "
                 f"game progress for {self.NO_GAME_PROGRESS_DURATION_S} seconds"
             )
-            self.__handle_game_stage_change(Referee.Stage.NORMAL_SECOND_HALF)
+            self.__handle_game_stage_change(protos.Referee.Stage.NORMAL_SECOND_HALF)
             self.pause_start_timestamp = None
 
-    def __handle_game_stage_change(self, game_stage: Referee.Stage) -> None:
+    def __handle_game_stage_change(self, game_stage: protos.Referee.Stage) -> None:
         """Handle game stage change by advancing to the next half once first half is over
         and starting a new game once the second half is over.
 
         :param game_stage: The current game stage from the referee message
         """
-        if game_stage == Referee.Stage.NORMAL_FIRST_HALF:
+        if game_stage == protos.Referee.Stage.NORMAL_FIRST_HALF:
             # skip to pre second half
-            self.__set_game_stage(Referee.Stage.NORMAL_SECOND_HALF_PRE)
+            self.__set_game_stage(protos.Referee.Stage.NORMAL_SECOND_HALF_PRE)
         else:
             # end game
-            self.__set_game_stage(Referee.Stage.POST_GAME)
+            self.__set_game_stage(protos.Referee.Stage.POST_GAME)
 
             # Race condition where events don't get resolved before setting new match settings
             time.sleep(self.RESET_MATCH_DELAY_S)
@@ -487,18 +498,18 @@ class Gamecontroller:
 
         self.__reset_world_state()
 
-    def __set_game_stage(self, new_stage: Referee.Stage) -> None:
-        ci_input = CiInput(timestamp=int(time.time_ns()))
-        api_input = Input()
-        change = Change()
+    def __set_game_stage(self, new_stage: protos.Referee.Stage) -> None:
+        ci_input = protos.CiInput(timestamp=int(time.time_ns()))
+        api_input = protos.Input()
+        change = protos.Change()
         change.change_stage_change.new_stage = new_stage
         api_input.change.CopyFrom(change)
         ci_input.api_inputs.append(api_input)
         self.send_ci_input(ci_input)
 
     def __find_unprocessed_events(
-        self, referee: Referee, event_type: GameEvent.Type
-    ) -> list[GameEvent]:
+        self, referee: protos.Referee, event_type: protos.GameEvent.Type
+    ) -> list[protos.GameEvent]:
         """Find unprocessed game events of the specified type.
 
         :param referee: the referee protobuf message
@@ -516,17 +527,17 @@ class Gamecontroller:
 
         :param scoring_team: the team that scored the goal
         """
-        ci_input = CiInput(timestamp=int(time.time_ns()))
-        api_input = Input()
-        change = Change()
+        ci_input = protos.CiInput(timestamp=int(time.time_ns()))
+        api_input = protos.Input()
+        change = protos.Change()
 
         # Send goal game event to resolve the possible goal
-        game_event = GameEvent(
-            type=GameEvent.Type.GOAL,
+        game_event = protos.GameEvent(
+            type=protos.GameEvent.Type.GOAL,
             origin=[
                 "Majority"
             ],  # Required or else ssl-gamecontroller will convert game event to proposal
-            goal=GameEvent.Goal(by_team=scoring_team),
+            goal=protos.GameEvent.Goal(by_team=scoring_team),
         )
 
         change.add_game_event_change.game_event.CopyFrom(game_event)
@@ -538,40 +549,40 @@ class Gamecontroller:
 
     def __handle_placement_failed(self) -> None:
         """Handle a placement failed event by moving the ball to the placement point."""
-        world_state = WorldState()
+        world_state = protos.WorldState()
         world_state.ball_state.global_position.CopyFrom(
             self.latest_world.game_state.ball_placement_point
         )
-        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+        self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
 
     def __reset_world_state(self) -> None:
         """Resets the robot and ball positions"""
         self.simulator_proto_unix_io.send_proto(
-            WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+            protos.WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
         )
-        self.send_gc_command(gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN)
+        self.send_gc_command(gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN)
 
-    def __update_max_allowed_robots(self, referee: Referee) -> None:
+    def __update_max_allowed_robots(self, referee: protos.Referee) -> None:
         """Update the world state by adding or removing robots for each team to match
         their maximum allowed number of robots.
 
         :param referee: the referee protobuf message
         """
-        world_state = WorldState()
+        world_state = protos.WorldState()
         field_edge_y_meters: Final[int] = (
             self.latest_world.field.field_y_length
             - self.latest_world.field.boundary_buffer_size
         )
 
         self.__update_robot_count(
-            world_state.blue_robots,
+            world_state.blue_robots.robot_states,
             self.latest_world.friendly_team,
             referee.blue.max_allowed_bots,
             self.blue_removed_robot_ids,
             field_edge_y_meters,
         )
         self.__update_robot_count(
-            world_state.yellow_robots,
+            world_state.yellow_robots.robot_states,
             self.latest_world.enemy_team,
             referee.yellow.max_allowed_bots,
             self.yellow_removed_robot_ids,
@@ -581,19 +592,20 @@ class Gamecontroller:
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
             for robot in itertools.chain(
-                world_state.blue_robots, world_state.yellow_robots
+                world_state.blue_robots.robot_states,
+                world_state.yellow_robots.robot_states,
             ):
                 robot.current_state.global_position.x_meters *= -1
                 robot.current_state.global_position.y_meters *= -1
                 robot.current_state.global_orientation.radians += math.pi
 
         # Send out updated world state
-        self.simulator_proto_unix_io.send_proto(WorldState, world_state)
+        self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
 
     @staticmethod
     def __update_robot_count(
         robot_states,
-        team: Team,
+        team: protos.Team,
         max_robots: int,
         removed_robot_ids: queue.Queue[int],
         field_edge_y_meters: float,
@@ -609,8 +621,8 @@ class Gamecontroller:
         :return:
         """
         # build the robot state for placing robots at the edge of field
-        place_state = RobotState(
-            global_position=Point(x_meters=0, y_meters=field_edge_y_meters)
+        place_state = protos.RobotState(
+            global_position=protos.Point(x_meters=0, y_meters=field_edge_y_meters)
         )
         # Remove robots, as we have too many. Set robot velocities to zero to avoid any drift
         for count, robot in enumerate(team.team_robots, start=1):
@@ -630,3 +642,19 @@ class Gamecontroller:
                 robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
             except queue.Empty:
                 return
+
+    @staticmethod
+    def __get_referee_multicast_interface() -> str:
+        """Determine the network interface to join the referee multicast group on.
+
+        :return: the name of the interface to receive referee multicast on
+        """
+        if not is_current_platform_macos():
+            return "lo"
+
+        default = netifaces.gateways().get("default", {}).get(netifaces.AF_INET)
+        if default:
+            gateway_ip, interface_name = default
+            return interface_name
+
+        raise RuntimeError("Could not determine the default network interface on macOS")

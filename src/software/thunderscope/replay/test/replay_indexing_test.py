@@ -9,7 +9,6 @@ import shutil
 import gzip
 import os
 from google.protobuf.message import Message
-from software.py_constants import *
 
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO

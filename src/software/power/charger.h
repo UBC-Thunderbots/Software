@@ -12,27 +12,39 @@ class Charger
      * Creates a Charger setting up pins and attaching interrupts.
      */
     Charger();
+
     /**
      * Sets the state of the capacitors and whether we should charge them.
      * @param pin_state HIGH to begin charging the capacitors. Otherwise, sets the charge
      * pin to LOW.
      */
     static void setCapacitorPin(bool pin_state);
+
     /**
      * Returns the voltage of the capacitors
      *
      * @return voltage of capacitors
      */
     float getCapacitorVoltage();
+
     /**
-     * Returns the status of the flyback fault
-     *
-     * @return whether the flyback fault is tripped or not
+     * Updates the capacitor charger and recharges if necessary.
      */
-    bool getFlybackFault();
+    void update();
 
    private:
-    static constexpr float VOLTAGE_DIVIDER = 1003.0 / 13.0;
-    static constexpr float RESOLUTION      = 4096.0;
-    static constexpr float SCALE_VOLTAGE   = 3.3;
+    /**
+     * Reads CHRG_DONE with the ADC to confirm the capacitors have finished charging.
+     *
+     * @return True if CHRG_DONE is below threshold (charging done), false otherwise
+     */
+    static bool isDonePinLow();
+
+    static bool is_charging;
+    static unsigned long charge_start_ms;
+    static constexpr float VOLTAGE_DIVIDER                  = 1003.0 / 13.0;
+    static constexpr float MAX_CHARGE_DURATION_MILLISECONDS = 2000;
+    static constexpr float RESOLUTION                       = 4096.0;
+    static constexpr float SCALE_VOLTAGE                    = 3.3;
+    static constexpr float DONE_PIN_THRESHOLD_VOLTAGE       = 0.5;
 };
