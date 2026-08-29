@@ -1,13 +1,15 @@
 #include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_tactic.h"
 
 #include <algorithm>
+
 #include "software/world/robot_capabilities.h"
 
 
 KickOrChipTactic::KickOrChipTactic(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticBase<KickOrChipFSM, GetBehindBallFSM>(
-          {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}, ai_config_ptr)
+          {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move},
+          ai_config_ptr)
 {
 }
 
