@@ -71,7 +71,7 @@ class KeyboardController(QObject, IControllerBase, metaclass=_QABCMeta):
         return (
             DiagnosticsConstants.SPEED_SLOWDOWN_FACTOR
             if Qt.Key.Key_Shift in self._held_keys
-            else 0.75
+            else 1.0
         )
 
     def is_dribbler_held(self) -> bool:
