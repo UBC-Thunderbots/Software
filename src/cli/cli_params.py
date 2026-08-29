@@ -293,6 +293,7 @@ class InteractiveCli:
         ),
     ]
 
+    ROBOT_SOFTWARE_PLAYBOOK_NAME = "deploy_robot_software.yml"
     # Flash "Select playbook:" menu.
     PLAYBOOK_CHOICES = [
         questionary.Choice(
@@ -300,9 +301,8 @@ class InteractiveCli:
             value=("PI setup ", "setup_pi.yml", False),
             description="First-time setup of the Raspberry Pi on a robot",
         ),
-        # If the playbook name changes then you must change the if statement below.
         questionary.Choice(
-            title="deploy_robot_software.yml",
+            title=ROBOT_SOFTWARE_PLAYBOOK_NAME,
             value=("robot software ", "deploy_robot_software.yml", False),
             description="Build and flash Thunderloop and the robot software",
         ),
@@ -345,7 +345,9 @@ class InteractiveCli:
             f.write("\n".join(h.replace("\n", "\\n") for h in history) + "\n")
 
     @staticmethod
-    def start_interactive_cli(config: BuildConfig) -> tuple[str, BuildConfig, list[str]] | None:
+    def start_interactive_cli(
+        config: BuildConfig,
+    ) -> tuple[str, BuildConfig, list[str]] | None:
         """Run the menu-driven interactive CLI.
 
         Walks the user through a series of questionary prompts to assemble a
@@ -461,7 +463,10 @@ class InteractiveCli:
                 config.ansible_playbook = playbook
                 config.debug_powerloop = debug_powerloop
 
-                if config.ansible_playbook == "deploy_robot_software.yml":
+                if (
+                    config.ansible_playbook
+                    == InteractiveCli.ROBOT_SOFTWARE_PLAYBOOK_NAME
+                ):
                     robot_software_config = (
                         questionary.checkbox(
                             "Options:",

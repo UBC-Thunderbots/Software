@@ -89,8 +89,6 @@ def main(
     :param robot_name: hostname of the robot targeted by an Ansible playbook
     :param ansible_playbook: name of the Ansible playbook to run
     """
-
-
     config = BuildConfig(
         action=action,
         search_query=search_query,
