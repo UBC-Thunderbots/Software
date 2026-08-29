@@ -1,10 +1,13 @@
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 
 import textwrap
 
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    ROBOT_MAX_HEIGHT_METERS,
+    ROBOT_MAX_RADIUS_METERS,
+)
 from software.thunderscope.constants import (
     Colors,
     DepthValues,
@@ -57,7 +60,7 @@ class GLTacticLayer(GLLayer):
         # Ensure we have the same number of graphics as robots
         self.tactic_fsm_info_graphics.resize(
             len(team.team_robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.SECONDARY_TEXT_COLOR,
             ),

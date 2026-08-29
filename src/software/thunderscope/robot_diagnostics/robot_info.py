@@ -1,10 +1,16 @@
 from __future__ import annotations
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtWidgets import *
-from software.py_constants import *
+from pyqtgraph.Qt import QtWidgets
+from software.py_constants import (
+    DISCONNECT_DURATION_MS,
+    MAX_BATTERY_VOLTAGE,
+    MILLISECONDS_PER_SECOND,
+    MIN_BATTERY_VOLTAGE,
+    SECONDS_PER_MILLISECOND,
+)
 from proto.import_all_protos import *
-import software.thunderscope.common.common_widgets as common_widgets
+from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
@@ -12,7 +18,7 @@ from typing import Type, override
 from collections import deque
 
 
-class BreakbeamLabel(QLabel):
+class BreakbeamLabel(QtWidgets.QLabel):
     """Displays the current breakbeam status
     Extension of a QLabel which displays a tooltip and updates the UI with the current status
     """
@@ -65,7 +71,7 @@ class BreakbeamLabel(QLabel):
         return super().event(event)
 
 
-class RobotInfo(QWidget):
+class RobotInfo(QtWidgets.QWidget):
     # Offsets the minimum of the battery bar from the minimum ideal voltage
     # Allows battery % to go below the minimum ideal level
     BATTERY_MIN_OFFSET = 3
@@ -92,18 +98,18 @@ class RobotInfo(QWidget):
 
         self.time_of_last_robot_status = time.time()
 
-        self.layout = QHBoxLayout()
+        self.layout = QtWidgets.QHBoxLayout()
 
-        self.status_layout = QVBoxLayout()
+        self.status_layout = QtWidgets.QVBoxLayout()
 
         # Battery Bar
-        self.stats_layout = QHBoxLayout()
+        self.stats_layout = QtWidgets.QHBoxLayout()
         self.battery_progress_bar = common_widgets.ColorProgressBar(
             MIN_BATTERY_VOLTAGE - self.BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
         )
 
         # Battery Voltage Label
-        self.battery_label = QLabel()
+        self.battery_label = QtWidgets.QLabel()
 
         # Label changes when voltage bar level changes
         self.battery_progress_bar.floatValueChanged.connect(
@@ -111,7 +117,7 @@ class RobotInfo(QWidget):
         )
 
         # Stop primitive received indicator
-        self.stop_primitive_label = QLabel()
+        self.stop_primitive_label = QtWidgets.QLabel()
         self.stats_layout.addWidget(self.stop_primitive_label)
 
         # Primitive loss rate label
@@ -141,13 +147,13 @@ class RobotInfo(QWidget):
         self.status_layout.addLayout(self.stats_layout)
 
         # Control mode dropdown
-        self.control_mode_layout = QHBoxLayout()
+        self.control_mode_layout = QtWidgets.QHBoxLayout()
         self.control_mode_menu = self.__create_control_mode_menu(
             available_control_modes
         )
 
         # Button to expand/collapse the robot status view
-        self.expand_robot_status_button = QPushButton()
+        self.expand_robot_status_button = QtWidgets.QPushButton()
         self.expand_robot_status_button.setCheckable(True)
         self.expand_robot_status_button.setText("INFO")
 
@@ -161,7 +167,7 @@ class RobotInfo(QWidget):
         self.status_layout.addLayout(self.control_mode_layout)
 
         # Layout containing the Vision Pattern and breakbeam indicator
-        self.robot_model_layout = QVBoxLayout()
+        self.robot_model_layout = QtWidgets.QVBoxLayout()
         self.robot_model_layout.setContentsMargins(0, 5, 5, 0)
 
         # Vision Pattern
@@ -172,7 +178,7 @@ class RobotInfo(QWidget):
             Colors.BW_ROBOT_MIDDLE_BLUE, ROBOT_RADIUS, False
         )
 
-        self.robot_model = QLabel()
+        self.robot_model = QtWidgets.QLabel()
 
         # breakbeam indicator above robot
         self.breakbeam_label = BreakbeamLabel()
@@ -222,7 +228,7 @@ class RobotInfo(QWidget):
 
     def __create_control_mode_menu(
         self, available_control_modes: list[IndividualRobotMode]
-    ) -> QComboBox:
+    ) -> QtWidgets.QComboBox:
         """Creates the drop down menu to select the input for each robot
 
         :param robot_id: the id of the robot this menu belongs to
@@ -230,7 +236,7 @@ class RobotInfo(QWidget):
                                         according to what mode thunderscope is run in
         :return: QComboBox object
         """
-        control_mode_menu = QComboBox()
+        control_mode_menu = QtWidgets.QComboBox()
 
         control_mode_menu.addItems(
             [control_mode.name for control_mode in available_control_modes]

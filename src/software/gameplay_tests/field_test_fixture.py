@@ -22,7 +22,11 @@ from software.thunderscope.thunderscope_config import configure_field_test_view
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.estop_helpers import get_estop_config
-from software.py_constants import *
+from software.py_constants import (
+    MAX_ROBOT_IDS_PER_SIDE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
 from typing import override
 
 logger = create_logger(__name__)

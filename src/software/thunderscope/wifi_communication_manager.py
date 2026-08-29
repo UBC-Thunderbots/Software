@@ -3,7 +3,19 @@ from typing import Any, Callable, Self, Type
 from proto.import_all_protos import *
 from software.logger.logger import create_logger
 import software.python_bindings as tbots_cpp
-from software.py_constants import *
+from software.py_constants import (
+    FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+    MAX_ROBOT_IDS_PER_SIDE,
+    PRIMITIVE_PORT,
+    ROBOT_CRASH_PORT,
+    ROBOT_LOGS_PORT,
+    ROBOT_STATUS_PORT,
+    ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
+    SSL_REFEREE_ADDRESS,
+    SSL_REFEREE_PORT,
+    SSL_VISION_ADDRESS,
+    SSL_VISION_PORT,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 

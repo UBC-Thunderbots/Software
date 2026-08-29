@@ -7,7 +7,15 @@ from rich.live import Live
 from rich.table import Table
 from rich.console import Console
 from rich.logging import RichHandler
-from software.py_constants import *
+from software.py_constants import (
+    ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY,
+    ROBOT_ID_CONFIG_KEY,
+    ROBOT_KICK_CONSTANT_CONFIG_KEY,
+    ROBOT_KICK_EXP_COEFF_CONFIG_KEY,
+    ROBOT_MULTICAST_CHANNEL_CONFIG_KEY,
+    ROBOT_NETWORK_INTERFACE_CONFIG_KEY,
+    WHEEL_ROTATION_MAX_SPEED_M_PER_S,
+)
 from typer_shell import make_typer_shell
 from functools import wraps
 from typing import List, Optional
@@ -22,7 +30,6 @@ from software.embedded.constants.py_constants import (
     ROBOT_MAX_SPEED_M_PER_S,
     MAX_FORCE_DRIBBLER_SPEED_RPM,
 )
-from software.py_constants import WHEEL_ROTATION_MAX_SPEED_M_PER_S
 
 
 class RobotDiagnosticsCLI:

@@ -1,7 +1,7 @@
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt.QtCore import Qt, QTimer
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import BATTERY_WARNING_VOLTAGE
 from software.thunderscope.robot_diagnostics.error_log_widgets import (
     RobotLogMessageWidget,
     RobotCrashLogMessageWidget,
@@ -21,7 +21,7 @@ from software.thunderscope.constants import (
 import time
 
 
-class RobotErrorLog(QScrollArea):
+class RobotErrorLog(QtWidgets.QScrollArea):
     """A log of all the errors from all robots during gameplay
 
     Allows for dynamically adding new entries
@@ -51,7 +51,7 @@ class RobotErrorLog(QScrollArea):
         # list set back to empty if no error code
         self.error_code_log_disabled: dict[int, list[ErrorCode]] = {}
 
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.error_log_messages: list[RobotLogMessageWidget] = []
@@ -60,7 +60,7 @@ class RobotErrorLog(QScrollArea):
         # doing so causes no scrolling to happen, and all the components get smaller
         # instead, widgets are added to the layout which is set for a container
         # the container is set as the current QScrollArea's widget
-        self.container = QFrame(self)
+        self.container = QtWidgets.QFrame(self)
         self.container.setLayout(self.layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)

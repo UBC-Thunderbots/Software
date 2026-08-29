@@ -1,12 +1,17 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 
 import math
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    BALL_MAX_RADIUS_METERS,
+    BALL_MAX_SPEED_METERS_PER_SECOND,
+    ROBOT_MAX_HEIGHT_METERS,
+    ROBOT_MAX_RADIUS_METERS,
+)
 from software.thunderscope.constants import (
     Colors,
     DepthValues,
@@ -473,14 +478,14 @@ class GLWorldLayer(GLLayer):
         robot_graphics.resize(len(robots), lambda: GLRobot(color=color))
         robot_id_graphics.resize(
             len(robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
         robot_name_graphics.resize(
             len(robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=GLWorldLayer.TEXT_GRAPHICS_QFONT,
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
@@ -525,7 +530,7 @@ class GLWorldLayer(GLLayer):
     def __update_robot_label_graphic(
         self,
         toggle: bool,
-        label: GLTextItem,
+        label: gl.GLTextItem,
         text: str,
         pos: tuple[float, float, float],
     ) -> None:

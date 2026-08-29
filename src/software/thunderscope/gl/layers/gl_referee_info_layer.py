@@ -1,8 +1,12 @@
-from PyQt6 import QtGui
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl.items.GLTextItem import GLTextItem
 
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    BALL_PLACEMENT_ROBOT_AVOID_RADIUS_METERS,
+    BALL_PLACEMENT_TIME_LIMIT_S,
+    BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
+)
 import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import (
     DepthValues,

@@ -1,4 +1,4 @@
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt import QtGui
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
@@ -38,7 +38,10 @@ class GLGamecontrollerToolbar(GLToolbar):
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
     def __init__(
-        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool
+        self,
+        parent: QtWidgets.QWidget,
+        proto_unix_io: ProtoUnixIO,
+        friendly_color_yellow: bool,
     ):
         """Initializes the toolbar and constructs its layout
 
@@ -80,9 +83,9 @@ class GLGamecontrollerToolbar(GLToolbar):
         )
 
         # set up the menu for selecting plays
-        self.plays_menu = QMenu()
+        self.plays_menu = QtWidgets.QMenu()
 
-        self.plays_menu_button = QPushButton()
+        self.plays_menu_button = QtWidgets.QPushButton()
         self.plays_menu_button.setText("Plays")
         self.plays_menu_button.setStyleSheet(self.get_button_style())
         self.plays_menu_button.setMenu(self.plays_menu)
@@ -117,7 +120,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
 
-        self.layout().addWidget(QLabel("<b>Gamecontroller</b>"))
+        self.layout().addWidget(QtWidgets.QLabel("<b>Gamecontroller</b>"))
         self.__add_separator(self.layout())
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
@@ -137,13 +140,13 @@ class GLGamecontrollerToolbar(GLToolbar):
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
-    def __add_separator(self, layout: QBoxLayout) -> None:
+    def __add_separator(self, layout: QtWidgets.QBoxLayout) -> None:
         """Adds a separator line with enough spacing to the given layout
 
         :param layout: the layout to add the separator to
         """
         layout.addSpacing(10)
-        layout.addWidget(QLabel("<b>|</b>"))
+        layout.addWidget(QtWidgets.QLabel("<b>|</b>"))
         layout.addSpacing(10)
 
     def __add_plays_menu_items(self, is_blue: bool) -> None:
@@ -216,7 +219,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         tooltip: str,
         callback: Callable[[], None],
         display_text: str = None,
-    ) -> QPushButton:
+    ) -> QtWidgets.QPushButton:
         """Sets up a button with the given name and callback
 
         :param icon: the icon displayed on the button
@@ -225,7 +228,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param display_text: optional param if button needs both text and an icon
         :return: the button
         """
-        button = QPushButton()
+        button = QtWidgets.QPushButton()
         button.setIcon(icon)
         button.setToolTip(tooltip)
         button.setStyleSheet(self.get_button_style())

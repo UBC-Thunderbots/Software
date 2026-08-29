@@ -8,20 +8,19 @@ except ImportError:
     pass
 
 from proto.import_all_protos import *
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt import QtCore
 
 
 import software.python_bindings as tbots_cpp
 
-from software.py_constants import *
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.handheld_controller import (
     HandheldController,
 )
 
 
-class HandheldControllerWidget(QWidget):
+class HandheldControllerWidget(QtWidgets.QWidget):
     """This widget lets the user detect and use a connected handheld controller
     to manually control our robots. The user can toggle whether controller input
     is enabled or disabled.
@@ -51,7 +50,7 @@ class HandheldControllerWidget(QWidget):
         self.kick_power = DiagnosticsConstants.MIN_KICK_POWER
         self.chip_distance = DiagnosticsConstants.MIN_CHIP_POWER
 
-        widget_layout = QVBoxLayout()
+        widget_layout = QtWidgets.QVBoxLayout()
         widget_layout.addWidget(self.__create_widgets())
         self.setLayout(widget_layout)
 
@@ -91,7 +90,7 @@ class HandheldControllerWidget(QWidget):
         if self.enable_input_checkbox.isChecked():
             self.__read_controller_inputs()
 
-    def __create_widgets(self) -> QGroupBox:
+    def __create_widgets(self) -> QtWidgets.QGroupBox:
         """Create the widgets that make up the HandheldControllerWidget UI.
 
         :return: a QGroupBox containing:
@@ -99,17 +98,17 @@ class HandheldControllerWidget(QWidget):
             - a QPushButton that tries detecting a controller when pressed
             - a QCheckBox that controls whether controller input is enabled
         """
-        self.controller_status_label = QLabel()
+        self.controller_status_label = QtWidgets.QLabel()
         self.controller_status_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        self.detect_controller_button = QPushButton("Detect Controller")
+        self.detect_controller_button = QtWidgets.QPushButton("Detect Controller")
         self.detect_controller_button.clicked.connect(self.detect_controller)
 
-        self.enable_input_checkbox = QCheckBox("Enable Input")
+        self.enable_input_checkbox = QtWidgets.QCheckBox("Enable Input")
         self.enable_input_checkbox.setChecked(False)
         self.enable_input_checkbox.setEnabled(True)
 
-        grid_layout = QGridLayout()
+        grid_layout = QtWidgets.QGridLayout()
         grid_layout.addWidget(self.controller_status_label, 0, 0, 2, 1)
         grid_layout.addWidget(self.detect_controller_button, 0, 1)
         grid_layout.addWidget(
@@ -118,7 +117,7 @@ class HandheldControllerWidget(QWidget):
         grid_layout.setColumnStretch(0, 4)
         grid_layout.setColumnStretch(1, 1)
 
-        box = QGroupBox()
+        box = QtWidgets.QGroupBox()
         box.setTitle("Controller Status")
         box.setLayout(grid_layout)
 

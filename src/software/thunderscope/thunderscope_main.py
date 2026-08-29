@@ -17,7 +17,13 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers import *
 from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_MINUTE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.thunderscope.constants import (

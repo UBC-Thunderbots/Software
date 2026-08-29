@@ -1,12 +1,12 @@
 from collections import defaultdict
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class RefereeInfoWidget(QWidget):
+class RefereeInfoWidget(QtWidgets.QWidget):
     NUM_ROWS = 13
     NUM_COLS = 3
 
@@ -20,16 +20,16 @@ class RefereeInfoWidget(QWidget):
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
-        QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
 
-        self.referee_table = QTableWidget(
+        self.referee_table = QtWidgets.QTableWidget(
             RefereeInfoWidget.NUM_ROWS, RefereeInfoWidget.NUM_COLS
         )
-        self.referee_info = QLabel()
+        self.referee_info = QtWidgets.QLabel()
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.referee_table.verticalHeader().setVisible(False)
 
-        self.vertical_layout = QVBoxLayout()
+        self.vertical_layout = QtWidgets.QVBoxLayout()
         self.vertical_layout.addWidget(self.referee_table)
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
