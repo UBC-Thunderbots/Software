@@ -381,14 +381,17 @@ direction LR
 PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 PositionToBlock --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
 PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
-PositionToBlock --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
+PositionToBlock --> DribbleFSM : [shouldPivotChip]\n<i>controlBallForChip</i>
 PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
 DribbleFSM --> PivotKickFSM : [retrieveDone]\n<i>updatePivotKick</i>
+DribbleFSM --> PivotKickFSM : [ballControlled && shouldPivotChip]\n<i>updatePivotKick</i>
 DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>retrieveFromDeadZone</i>
+DribbleFSM --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
+DribbleFSM --> DribbleFSM : [shouldPivotChip]\n<i>controlBallForChip</i>
+DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>controlBallForChip</i>
 DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-Panic --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
+Panic --> DribbleFSM : [shouldPivotChip]\n<i>controlBallForChip</i>
 Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
 Panic --> Panic : <i>panic</i>
 PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>

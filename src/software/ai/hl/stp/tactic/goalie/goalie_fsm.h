@@ -75,6 +75,16 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
     static Rectangle getNoChipRectangle(const Field& field);
 
     /**
+     * Gets the point the goalie should dribble to before chipping the ball
+     *
+     * @param field the field
+     * @param ball_position the current ball position
+     *
+     * @return the point the goalie should chip from
+     */
+    static Point getChipOrigin(const Field& field, const Point& ball_position);
+
+    /**
      * Finds a good point to chip the ball to from its current position
      *
      * @param world the world
@@ -184,6 +194,25 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
      */
     bool ballInInflatedDefenseArea(const Update& event);
 
+    /**
+     * Guard to check if goalie has control of ball (ready to chip)
+     *
+     * @param event GoalieFSM::Update event
+     *
+     * @return if the goalie has control of the ball
+     */
+    bool ballControlled(const Update& event);
+
+    /**
+     * Action that dribbles to get the ball and face the direction we want to chip in
+     * before we enter PivotKickFSM
+     *
+     * @param event GoalieFSM::Update event
+     * @param processEvent processes the DribbleFSM::Update
+     */
+    void controlBallForChip(const Update& event,
+                            boost::sml::back::process<DribbleFSM::Update> processEvent);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -203,12 +232,14 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
         DEFINE_SML_GUARD(shouldPanic)
         DEFINE_SML_GUARD(shouldMoveToGoalLine)
         DEFINE_SML_GUARD(retrieveDone)
+        DEFINE_SML_GUARD(ballControlled)
 
         DEFINE_SML_ACTION(panic)
         DEFINE_SML_ACTION(positionToBlock)
         DEFINE_SML_ACTION(moveToGoalLine)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updatePivotKick, PivotKickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(retrieveFromDeadZone, DribbleFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(controlBallForChip, DribbleFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -217,19 +248,23 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
             PositionToBlock_S +
                 Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A = DribbleFSM_S,
             PositionToBlock_S + Update_E[shouldPanic_G] / panic_A         = Panic_S,
-            PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
-                PivotKickFSM_S,
+            PositionToBlock_S + Update_E[shouldPivotChip_G] / controlBallForChip_A =
+                DribbleFSM_S,
             PositionToBlock_S + Update_E / positionToBlock_A,
             DribbleFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A = PivotKickFSM_S,
+            DribbleFSM_S + Update_E[ballControlled_G && shouldPivotChip_G] /
+                               updatePivotKick_A = PivotKickFSM_S,
             DribbleFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            DribbleFSM_S + Update_E[ballInInflatedDefenseArea_G] / retrieveFromDeadZone_A,
+            DribbleFSM_S + Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A,
+            DribbleFSM_S + Update_E[shouldPivotChip_G] / controlBallForChip_A,
+            DribbleFSM_S + Update_E[ballInInflatedDefenseArea_G] / controlBallForChip_A,
             DribbleFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
                 PositionToBlock_S,
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A = PivotKickFSM_S,
-            Panic_S + Update_E[panicDone_G] / positionToBlock_A       = PositionToBlock_S,
+            Panic_S + Update_E[shouldPivotChip_G] / controlBallForChip_A = DribbleFSM_S,
+            Panic_S + Update_E[panicDone_G] / positionToBlock_A = PositionToBlock_S,
             Panic_S + Update_E / panic_A,
             PivotKickFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
