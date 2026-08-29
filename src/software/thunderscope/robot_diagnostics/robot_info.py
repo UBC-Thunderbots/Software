@@ -11,7 +11,15 @@ from software.py_constants import (
 )
 import proto.import_all_protos as protos
 from software.thunderscope.common import common_widgets
-from software.thunderscope.constants import *
+from software.thunderscope.constants import (
+    Colors,
+    IndividualRobotMode,
+    MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+    MAX_ACCEPTABLE_PACKET_LOSS_PERCENT,
+    MAX_LENGTH_PRIMITIVE_SET_STORE,
+    MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+    ROBOT_RADIUS,
+)
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
 from typing import Type, override

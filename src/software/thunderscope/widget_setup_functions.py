@@ -12,7 +12,6 @@ from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
     GLDrawPolygonObstacleLayer,
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.dock_style import *
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
@@ -46,6 +45,13 @@ from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+
+from pyqtgraph.dockarea.Dock import Dock, DockLabel
+from software.thunderscope import dock_style
+
+# monkey patches for custom styles
+Dock.updateStyle = dock_style.updateDockStylePatched
+DockLabel.updateStyle = dock_style.updateDockLabelStylePatched
 
 
 ################################

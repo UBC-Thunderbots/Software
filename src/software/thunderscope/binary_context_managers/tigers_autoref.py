@@ -8,7 +8,7 @@ from software.networking.ssl_proto_communication import (
 )
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
@@ -193,7 +193,7 @@ class TigersAutoref:
                 )
 
     def _forward_to_gamecontroller(
-        self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
+        self, tracker_wrapper: protos.TrackerWrapperPacket
     ) -> list[protos.CiOutput]:
         """Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
         given tracker_wrapper to support asynchronous ticking.

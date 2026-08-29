@@ -5,7 +5,6 @@ import logging
 import time
 
 from subprocess import Popen
-from software.python_bindings import *
 import proto.import_all_protos as protos
 from software.py_constants import (
     BLUE_PRIMITIVE_SET,
@@ -24,7 +23,10 @@ from software.py_constants import (
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
-from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.binary_context_managers.util import (
+    is_cmd_running,
+    kill_cmd_if_running,
+)
 
 
 class Simulator:
