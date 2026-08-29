@@ -345,18 +345,19 @@ class InteractiveCli:
             f.write("\n".join(h.replace("\n", "\\n") for h in history) + "\n")
 
     @staticmethod
-    def start_interactive_cli() -> tuple[str, BuildConfig, list[str]] | None:
+    def start_interactive_cli(config: BuildConfig) -> tuple[str, BuildConfig, list[str]] | None:
         """Run the menu-driven interactive CLI.
 
         Walks the user through a series of questionary prompts to assemble a
-        :class:`BuildConfig`, then validates, builds, and executes the resulting
-        Bazel command. Returns early without running anything if the user aborts
-        the top-level prompt.
+        :class:`BuildConfig` by modifying an existing config. Returns early without
+        running anything if the user aborts the top-level prompt.
+
+        :param config: The cli config to modify.
 
         :returns The build title, build config assembled from the user prompts, and
         extra args. None if failure to build config.
         """
-        config = BuildConfig(action=ActionArgument.run)  # Default action
+        config.action = ActionArgument.run  # Default action
         extra_args = []
 
         history = InteractiveCli.load_history()

@@ -89,15 +89,7 @@ def main(
     :param robot_name: hostname of the robot targeted by an Ansible playbook
     :param ansible_playbook: name of the Ansible playbook to run
     """
-    if not action and not search_query:
-        cmd_title, config, extra_args = InteractiveCli.start_interactive_cli()
-        if config:
-            validate(config)
-            command = create_command(config, extra_args)
-            cmd_str = " ".join(command)
-            InteractiveCli.save_to_history(cmd_title, cmd_str)
-            execute_command(command)
-        return
+
 
     config = BuildConfig(
         action=action,
@@ -118,8 +110,16 @@ def main(
         ansible_playbook=ansible_playbook,
     )
 
-    validate(config)
-    command = create_command(config, ctx.args)
+    if not action and not search_query:
+        cmd_title, config, extra_args = InteractiveCli.start_interactive_cli(config)
+        if config:
+            validate(config)
+            command = create_command(config, extra_args)
+            cmd_str = " ".join(command)
+            InteractiveCli.save_to_history(cmd_title, cmd_str)
+    else:
+        validate(config)
+        command = create_command(config, ctx.args)
 
     execute_command(command, print_only=print_command)
 
