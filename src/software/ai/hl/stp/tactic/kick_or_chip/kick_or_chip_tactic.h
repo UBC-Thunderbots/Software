@@ -40,7 +40,7 @@ class KickOrChipTactic : public TacticBase<KickOrChipFSM, GetBehindBallFSM>
      * the associated parameter for that model
      */
     void updateControlParams(const Point& kick_or_chip_origin,
-                             const Point& kickd_or_chip_target,
+                             const Point& kick_or_chip_target,
                              AutoChipOrKick auto_chip_or_kick);
 
     void accept(TacticVisitor& visitor) const override;
