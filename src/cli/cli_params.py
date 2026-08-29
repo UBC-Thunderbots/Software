@@ -228,12 +228,12 @@ class InteractiveCli:
         questionary.Choice(
             title="Run blue",
             value=("as blue team", LaunchMode.RUN_BLUE),
-            description="run as blue team",
+            description="Run as blue team",
         ),
         questionary.Choice(
             title="Run yellow",
             value=("as yellow team", LaunchMode.RUN_YELLOW),
-            description="run as yellow team",
+            description="Run as yellow team",
         ),
     ]
 
@@ -303,7 +303,7 @@ class InteractiveCli:
         ),
         questionary.Choice(
             title=ROBOT_SOFTWARE_PLAYBOOK_NAME,
-            value=("robot software ", "deploy_robot_software.yml", False),
+            value=("robot software ", ROBOT_SOFTWARE_PLAYBOOK_NAME, False),
             description="Build and flash Thunderloop and the robot software",
         ),
         questionary.Choice(
