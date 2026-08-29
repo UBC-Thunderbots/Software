@@ -336,7 +336,7 @@ std::optional<Ball> SensorFusion::createBall(
     {
         // Both teams are filtered before the ball is, so these are this frame's robot
         // positions and the ball filter can use them to detect bounces
-        std::vector<Robot> robots = friendly_team.getAllRobots();
+        std::vector<Robot> robots             = friendly_team.getAllRobots();
         const std::vector<Robot> enemy_robots = enemy_team.getAllRobots();
         robots.insert(robots.end(), enemy_robots.begin(), enemy_robots.end());
 

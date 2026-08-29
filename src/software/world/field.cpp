@@ -57,9 +57,8 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       friendly_goal_(Rectangle(
           Point(friendlyGoalCenter().x() - goalXLength(), friendlyGoalpostPos().y()),
           Point(friendlyGoalCenter().x(), friendlyGoalpostNeg().y()))),
-      field_boundary_(
-          Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
-                    Point(totalXLength() / 2, totalYLength() / 2)))
+      field_boundary_(Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
+                                Point(totalXLength() / 2, totalYLength() / 2)))
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
         defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||

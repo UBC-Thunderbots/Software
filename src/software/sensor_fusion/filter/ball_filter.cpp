@@ -15,60 +15,60 @@
 
 namespace
 {
-    // The ball starts out unknown, so the initial estimate is given a covariance wide
-    // enough to cover anywhere on the field it might be and any speed it might legally be
-    // moving at. This makes the filter trust the first detections it sees almost
-    // entirely, letting it converge onto the ball within a few frames.
-    constexpr double INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
-    constexpr double INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
-    const Eigen::Vector<double, 4> INITIAL_STATE = Eigen::Vector<double, 4>::Zero();
-    const Eigen::Matrix<double, 4, 4> INITIAL_COVARIANCE =
-        Eigen::Vector<double, 4>(
-            INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
-            INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
-            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S * INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
-            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S * INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
-            .asDiagonal();
+// The ball starts out unknown, so the initial estimate is given a covariance wide
+// enough to cover anywhere on the field it might be and any speed it might legally be
+// moving at. This makes the filter trust the first detections it sees almost
+// entirely, letting it converge onto the ball within a few frames.
+constexpr double INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
+constexpr double INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
+const Eigen::Vector<double, 4> INITIAL_STATE          = Eigen::Vector<double, 4>::Zero();
+const Eigen::Matrix<double, 4, 4> INITIAL_COVARIANCE =
+    Eigen::Vector<double, 4>(
+        INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
+        INITIAL_POSITION_UNCERTAINTY_M* INITIAL_POSITION_UNCERTAINTY_M,
+        INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
+        INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
+        .asDiagonal();
 
-    // The standard deviation of the acceleration that the constant velocity motion model
-    // does not account for: deflections, uneven turf, and the tail of a kick. A kick
-    // itself is far larger than this, but it is also abrupt enough that the outlier gates
-    // catch it and reset the filter, so this does not need to cover one.
-    constexpr double ACCELERATION_NOISE_M_PER_S_SQUARED = 5.0;
+// The standard deviation of the acceleration that the constant velocity motion model
+// does not account for: deflections, uneven turf, and the tail of a kick. A kick
+// itself is far larger than this, but it is also abrupt enough that the outlier gates
+// catch it and reset the filter, so this does not need to cover one.
+constexpr double ACCELERATION_NOISE_M_PER_S_SQUARED = 5.0;
 
-    // How noisy we expect SSL Vision's ball position detections to be. Measure this by
-    // logging a stationary ball and taking the standard deviation of the detections.
-    constexpr double VISION_NOISE_M = 0.01;
-    const Eigen::Matrix<double, 2, 2> MEASUREMENT_COVARIANCE =
-        Eigen::Matrix<double, 2, 2>::Identity() * (VISION_NOISE_M * VISION_NOISE_M);
+// How noisy we expect SSL Vision's ball position detections to be. Measure this by
+// logging a stationary ball and taking the standard deviation of the detections.
+constexpr double VISION_NOISE_M = 0.01;
+const Eigen::Matrix<double, 2, 2> MEASUREMENT_COVARIANCE =
+    Eigen::Matrix<double, 2, 2>::Identity() * (VISION_NOISE_M * VISION_NOISE_M);
 
-    // Vision measures the ball's position but not its velocity
-    const Eigen::Matrix<double, 2, 4> MEASUREMENT_MODEL =
-        (Eigen::Matrix<double, 2, 4>() << 1, 0, 0, 0, 0, 1, 0, 0).finished();
+// Vision measures the ball's position but not its velocity
+const Eigen::Matrix<double, 2, 4> MEASUREMENT_MODEL =
+    (Eigen::Matrix<double, 2, 4>() << 1, 0, 0, 0, 0, 1, 0, 0).finished();
 
-    // The fraction of its velocity the ball retains each second as it rolls, accounting
-    // for friction. Empirically measured.
-    constexpr double DAMPING = 0.9889;
+// The fraction of its velocity the ball retains each second as it rolls, accounting
+// for friction. Empirically measured.
+constexpr double DAMPING = 0.9889;
 
-    constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
+constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
 
-    // The fastest we will believe the ball could be travelling when deciding whether a
-    // detection could plausibly belong to it. This is deliberately well above the 6.5 m/s
-    // rule limit; the gate exists to reject detections that are physically impossible,
-    // not to enforce the rules on a ball that has been kicked too hard.
-    constexpr double MAX_BALL_SPEED_M_PER_S = 6.0;
+// The fastest we will believe the ball could be travelling when deciding whether a
+// detection could plausibly belong to it. This is deliberately well above the 6.5 m/s
+// rule limit; the gate exists to reject detections that are physically impossible,
+// not to enforce the rules on a ball that has been kicked too hard.
+constexpr double MAX_BALL_SPEED_M_PER_S = 6.0;
 
-    // Slack on the max ball speed gate, so that vision noise on a ball that has been
-    // sitting still cannot by itself push a detection out of reach of the estimate
-    constexpr double MAX_BALL_SPEED_GATE_TOLERANCE_M = 0.05;
+// Slack on the max ball speed gate, so that vision noise on a ball that has been
+// sitting still cannot by itself push a detection out of reach of the estimate
+constexpr double MAX_BALL_SPEED_GATE_TOLERANCE_M = 0.05;
 
-    // How many detections in a row may be rejected as outliers before we conclude the
-    // estimate itself is wrong and reset onto the newest detection
-    constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
+// How many detections in a row may be rejected as outliers before we conclude the
+// estimate itself is wrong and reset onto the newest detection
+constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 
-    // How many frames of unbroken contact before we conclude the ball is resting against
-    // whatever it is touching rather than bouncing off it, and bring the estimate to rest
-    constexpr int CONSECUTIVE_CONTACT_THRESHOLD = 5;
+// How many frames of unbroken contact before we conclude the ball is resting against
+// whatever it is touching rather than bouncing off it, and bring the estimate to rest
+constexpr int CONSECUTIVE_CONTACT_THRESHOLD = 5;
 }  // namespace
 
 BallFilter::BallFilter()
@@ -80,7 +80,7 @@ BallFilter::BallFilter()
                     Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE>::Zero(),
                     MEASUREMENT_MODEL, MEASUREMENT_COVARIANCE),
       consecutive_outliers(0),
-	  consecutive_in_contact_(0)
+      consecutive_in_contact_(0)
 {
 }
 
@@ -91,11 +91,12 @@ std::optional<Ball> BallFilter::estimateBallState(
     const std::optional<BallDetection> best_ball_detection =
         getBestBallDetection(new_ball_detections, field.fieldBoundary());
 
-	// We record position before prediction, to compute segment travelled within a frame. This is used in collision handling
+    // We record position before prediction, to compute segment travelled within a frame.
+    // This is used in collision handling
     const Point position_before_predict(kalman_filter.state_estimate(0),
                                         kalman_filter.state_estimate(1));
-	// A stale or out of order packet would integrate the model backwards, which inflates
-	// the velocity and leaves the process covariance with negative correlation terms
+    // A stale or out of order packet would integrate the model backwards, which inflates
+    // the velocity and leaves the process covariance with negative correlation terms
     if (last_predict_timestamp && current_time > *last_predict_timestamp)
     {
         predict((current_time - *last_predict_timestamp).toSeconds());
@@ -128,24 +129,26 @@ std::optional<Ball> BallFilter::estimateBallState(
         Measurement measurement(best_ball_detection->position.x(),
                                 best_ball_detection->position.y());
 
-		// The first detection is all we know, so we start the estimate on it rather than
-		// blending it against a state we never had grounds for
+        // The first detection is all we know, so we start the estimate on it rather than
+        // blending it against a state we never had grounds for
         if (!prev_detection_timestamp)
         {
             reset(measurement, current_time);
         }
-		// Two gates determining whether we take the detection:
-		// 1. Whether it is physically possible to arrive the new destination
-		// 2. Statistical gating using mahalanobis
+        // Two gates determining whether we take the detection:
+        // 1. Whether it is physically possible to arrive the new destination
+        // 2. Statistical gating using mahalanobis
         else if (isWithinMaxBallSpeed(best_ball_detection->position, current_time) &&
-                 kalman_filter.mahalanobisDistance(measurement) < MAHALANOBIS_GATE_THRESHOLD)
+                 kalman_filter.mahalanobisDistance(measurement) <
+                     MAHALANOBIS_GATE_THRESHOLD)
         {
             kalman_filter.update(measurement);
             consecutive_outliers     = 0;
             prev_measurement         = measurement;
             prev_detection_timestamp = current_time;
         }
-		// If rejected, accumulate outliers. Once a threshold is reached we reset to adapt to new position
+        // If rejected, accumulate outliers. Once a threshold is reached we reset to adapt
+        // to new position
         else
         {
             consecutive_outliers++;
@@ -158,14 +161,14 @@ std::optional<Ball> BallFilter::estimateBallState(
     }
 
 
-	// if there isn't a detection we report nothing
-	// This is handled here because the code above might reject the incoming detection
+    // if there isn't a detection we report nothing
+    // This is handled here because the code above might reject the incoming detection
     if (!prev_detection_timestamp)
     {
         return std::nullopt;
     }
 
-	// Returns the ball
+    // Returns the ball
     const Eigen::Vector<double, STATE_SIZE> state = kalman_filter.state_estimate;
     const Point ball_position(state(0), state(1));
     const Vector ball_velocity(state(2), state(3));
@@ -210,13 +213,14 @@ void BallFilter::predict(double delta_t)
     kalman_filter.process_model << 1, 0, delta_t, 0, 0, 1, 0, delta_t, 0, 0,
         velocity_retained, 0, 0, 0, 0, velocity_retained;
 
-   // We compute the process covariance with the Discrete White Noise Acceleration model.
-   // It depends on delta_t, so we compute it dynamically based on time passed since last prediction
+    // We compute the process covariance with the Discrete White Noise Acceleration model.
+    // It depends on delta_t, so we compute it dynamically based on time passed since last
+    // prediction
     const double acceleration_variance =
         ACCELERATION_NOISE_M_PER_S_SQUARED * ACCELERATION_NOISE_M_PER_S_SQUARED;
     const double delta_t_squared = delta_t * delta_t;
-    const double position_noise  = acceleration_variance * delta_t_squared *
-                                  delta_t_squared / 4.0;
+    const double position_noise =
+        acceleration_variance * delta_t_squared * delta_t_squared / 4.0;
     const double correlation_noise =
         acceleration_variance * delta_t_squared * delta_t / 2.0;
     const double velocity_noise = acceleration_variance * delta_t_squared;
@@ -225,7 +229,7 @@ void BallFilter::predict(double delta_t)
         position_noise, 0, correlation_noise, correlation_noise, 0, velocity_noise, 0, 0,
         correlation_noise, 0, velocity_noise;
 
-	// Actual prediction step
+    // Actual prediction step
     kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
 }
 
@@ -347,8 +351,8 @@ bool BallFilter::isWithinMaxBallSpeed(const Point& detection_position,
     const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
     const Point predicted_position(kalman_filter.state_estimate(0),
                                    kalman_filter.state_estimate(1));
-    const double reachable_distance = MAX_BALL_SPEED_M_PER_S * std::max(delta_t, 0.0) +
-                                      MAX_BALL_SPEED_GATE_TOLERANCE_M;
+    const double reachable_distance =
+        MAX_BALL_SPEED_M_PER_S * std::max(delta_t, 0.0) + MAX_BALL_SPEED_GATE_TOLERANCE_M;
 
     return (detection_position - predicted_position).length() <= reachable_distance;
 }
