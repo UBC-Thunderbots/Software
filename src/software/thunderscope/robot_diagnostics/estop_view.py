@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt import QtCore
-from proto.estop_state_pb2 import EstopState
+import proto.import_all_protos as protos
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -10,7 +10,7 @@ class EstopView(QtWidgets.QLabel):
     def __init__(self) -> None:
         super().__init__()
 
-        self.estop_state_buffer = ThreadSafeBuffer(1, EstopState)
+        self.estop_state_buffer = ThreadSafeBuffer(1, protos.EstopState)
 
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setText("Disconnected")

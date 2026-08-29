@@ -3,7 +3,7 @@ import pyqtgraph.opengl as gl
 
 import textwrap
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.py_constants import (
     ROBOT_MAX_HEIGHT_METERS,
     ROBOT_MAX_RADIUS_METERS,
@@ -35,9 +35,9 @@ class GLTacticLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
-        self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
-        self.cached_world = World()
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
+        self.play_info_buffer = ThreadSafeBuffer(buffer_size, protos.PlayInfo, False)
+        self.cached_world = protos.World()
 
         self.tactic_fsm_info_graphics = ObservableList(self._graphics_changed)
 
@@ -49,7 +49,7 @@ class GLTacticLayer(GLLayer):
 
         self.__update_tactic_name_graphics(self.cached_world.friendly_team, play_info)
 
-    def __update_tactic_name_graphics(self, team: Team, play_info) -> None:
+    def __update_tactic_name_graphics(self, team: protos.Team, play_info) -> None:
         """Update the GLGraphicsItems that display tactic data
 
         :param team: The team proto

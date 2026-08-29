@@ -5,8 +5,7 @@ import pyqtgraph as pg
 import time
 import numpy as np
 
-from proto.world_pb2 import World
-from proto.visualization_pb2 import CostVisualization
+import proto.import_all_protos as protos
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
@@ -84,12 +83,12 @@ class GLCostVisLayer(GLLayer):
         self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)
         self.cost_vis_overlay_layer = GLCostVisOverlayLayer(self)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
         self.cost_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, CostVisualization
+            buffer_size, protos.CostVisualization
         )
-        self.cached_world = World()
-        self.cached_cost_vis = CostVisualization()
+        self.cached_world = protos.World()
+        self.cached_cost_vis = protos.CostVisualization()
         self.timeout = time.time() + GLCostVisLayer.COST_VISUALIZATION_TIMEOUT_S
 
         self.color_map = pg.colormap.get("CET-L1")

@@ -12,9 +12,8 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.constants import RuntimeManagerConstants
 from software.stats.logs.event_log import EventLog
 import logging
-from proto.import_all_protos import *
 import queue
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 
 
 class StatsLogger:
@@ -58,7 +57,9 @@ class StatsLogger:
         self.tracker = (
             TrackerBuilder(
                 proto_unix_io=proto_unix_io,
-                from_team=(Team.YELLOW if self.friendly_colour_yellow else Team.BLUE),
+                from_team=(
+                    SslTeam.YELLOW if self.friendly_colour_yellow else SslTeam.BLUE
+                ),
                 event_queue=self.event_queue,
                 buffer_size=buffer_size,
             )
@@ -79,10 +80,10 @@ class StatsLogger:
                 TrackerBuilder(
                     proto_unix_io=proto_unix_io,
                     from_team=(
-                        Team.YELLOW if self.friendly_colour_yellow else Team.BLUE
+                        SslTeam.YELLOW if self.friendly_colour_yellow else SslTeam.BLUE
                     ),
                     for_team=(
-                        Team.BLUE if self.friendly_colour_yellow else Team.YELLOW
+                        SslTeam.BLUE if self.friendly_colour_yellow else SslTeam.YELLOW
                     ),
                     event_queue=self.event_queue,
                     buffer_size=buffer_size,

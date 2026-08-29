@@ -1,7 +1,6 @@
 from __future__ import annotations
 from abc import abstractmethod, ABC
 from dataclasses import dataclass, field
-from proto.import_all_protos import *
 from typing import Iterator, Any, override
 from software.thunderscope.time_provider import time_provider_instance
 

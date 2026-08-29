@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.or_validation import OrValidation
 
@@ -12,7 +12,7 @@ from software.gameplay_tests.validation.robot_enters_region import (
     RobotNeverEntersRegion,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -106,14 +106,15 @@ def test_enemy_free_kick_play(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.DIRECT, team=Team.YELLOW
+            gc_command=protos.Command.Type.DIRECT, team=SslTeam.YELLOW
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
+            blue_play=protos.PlayName.EnemyFreeKickPlay,
+            yellow_play=protos.PlayName.FreeKickPlay,
         )
 
     # Validation RoboCup SSL rules: can't be within 0.5m of ball before its kicked

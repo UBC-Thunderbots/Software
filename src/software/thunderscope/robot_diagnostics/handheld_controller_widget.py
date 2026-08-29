@@ -7,7 +7,7 @@ try:
 except ImportError:
     pass
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt import QtCore
 
@@ -45,7 +45,7 @@ class HandheldControllerWidget(QtWidgets.QWidget):
         self.last_btn_a_value = False
         self.last_btn_b_value = False
 
-        self.motor_control = MotorControl()
+        self.motor_control = protos.MotorControl()
         self.dribbler_speed = 0
         self.kick_power = DiagnosticsConstants.MIN_KICK_POWER
         self.chip_distance = DiagnosticsConstants.MIN_CHIP_POWER

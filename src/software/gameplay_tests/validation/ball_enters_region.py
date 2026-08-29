@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -17,7 +17,7 @@ class BallEntersRegion(Validation):
         self.ball_position = None
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the ball enters the provided regions
 
         :param world: The world msg to validate
@@ -29,11 +29,11 @@ class BallEntersRegion(Validation):
             if tbots_cpp.contains(
                 region, tbots_cpp.createPoint(world.ball.current_state.global_position)
             ):
-                return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+                return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create validation geometry from

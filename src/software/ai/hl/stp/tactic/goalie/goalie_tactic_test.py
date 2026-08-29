@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.gameplay_tests.validation.robot_enters_region import *
 from software.gameplay_tests.validation.ball_enters_region import *
 from software.gameplay_tests.validation.ball_moves_in_direction import *
@@ -126,8 +126,8 @@ def test_goalie_blocks_shot(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: GoalieTactic(
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                0: protos.GoalieTactic(
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
                 )
             }
         )
@@ -207,8 +207,8 @@ def test_goalie_clears_from_dead_zone(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: GoalieTactic(
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                0: protos.GoalieTactic(
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
                 )
             }
         )

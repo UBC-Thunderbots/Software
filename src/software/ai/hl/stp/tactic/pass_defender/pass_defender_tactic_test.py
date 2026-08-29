@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.gameplay_tests.validation.robot_enters_region import *
 from software.gameplay_tests.validation.ball_enters_region import *
 from software.gameplay_tests.validation.ball_moves_in_direction import *
@@ -48,11 +48,11 @@ def test_ball_chipped_on_intercept(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: PassDefenderTactic(
+                0: protos.PassDefenderTactic(
                     position_to_block_from=tbots_cpp.createPointProto(
                         position_to_block_from
                     ),
-                    ball_steal_mode=BallStealMode.STEAL,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )
@@ -121,11 +121,11 @@ def test_avoid_intercept_scenario(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: PassDefenderTactic(
+                0: protos.PassDefenderTactic(
                     position_to_block_from=tbots_cpp.createPointProto(
                         position_to_block_from
                     ),
-                    ball_steal_mode=BallStealMode.STEAL,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )
@@ -254,11 +254,11 @@ def test_steal_ball(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: PassDefenderTactic(
+                0: protos.PassDefenderTactic(
                     position_to_block_from=tbots_cpp.createPointProto(
                         position_to_block_from
                     ),
-                    ball_steal_mode=BallStealMode.STEAL,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )

@@ -21,9 +21,7 @@ from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.world_pb2 import SimulationState
-from proto.replay_bookmark_pb2 import ReplayBookmark
-from proto.tbots_timestamp_msg_pb2 import Timestamp
+import proto.import_all_protos as protos
 
 from software.thunderscope.common.toast_msg_helper import success_toast
 from typing import override
@@ -64,7 +62,7 @@ class GLWidget(QtWidgets.QWidget):
             lambda: self.frame_swap_counter.add_one_datapoint()
         )
 
-        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, protos.SimulationState)
 
         # Connect event handlers
         self.gl_view_widget.mouse_in_scene_pressed_signal.connect(
@@ -391,8 +389,8 @@ class GLWidget(QtWidgets.QWidget):
     def add_bookmark(self):
         """Handler for clicking 'add bookmark' button"""
         timestamp = time.time()
-        bookmark = ReplayBookmark(
-            timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
+        bookmark = protos.ReplayBookmark(
+            timestamp=protos.Timestamp(epoch_timestamp_seconds=timestamp)
         )
-        self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
+        self.proto_unix_io.send_proto(protos.ReplayBookmark, bookmark)
         success_toast(self.parentWidget(), "Added bookmark!")

@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt import QtWidgets
 from software.py_constants import CHICKER_TIMEOUT
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from enum import Enum
 from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import DiagnosticsConstants
@@ -253,7 +253,7 @@ class ChickerWidget(QtWidgets.QWidget):
         chip_pulse_width = self.chipper_pulse_width_slider.value()
 
         # Send kick, chip, autokick, or autochip primitive
-        power_control = PowerControl()
+        power_control = protos.PowerControl()
         power_control.geneva_slot = 3
 
         if command == ChickerCommandMode.KICK:
@@ -277,7 +277,7 @@ class ChickerWidget(QtWidgets.QWidget):
                 chip_pulse_width
             )
 
-        self.proto_unix_io.send_proto(PowerControl, power_control)
+        self.proto_unix_io.send_proto(protos.PowerControl, power_control)
 
         if (
             command == ChickerCommandMode.KICK
@@ -289,9 +289,9 @@ class ChickerWidget(QtWidgets.QWidget):
             # spamming of kick/chip commands. This is because if no new messages are received in the
             # buffer, the last sent message will be repeatedly resent to the robot, which we don't
             # want for kick/chip.
-            power_control = PowerControl()
+            power_control = protos.PowerControl()
             power_control.geneva_slot = 3
-            self.proto_unix_io.send_proto(PowerControl, power_control, True)
+            self.proto_unix_io.send_proto(protos.PowerControl, power_control, True)
 
     def enable(self) -> None:
         """Enable all sliders and buttons in the ChickerWidget"""
