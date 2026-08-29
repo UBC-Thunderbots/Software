@@ -19,8 +19,6 @@ typedef struct FilteredRobotData_t
     Point position;
     Vector velocity;
     Angle orientation;
-    double orientation_cos;
-    double orientation_sin;
     AngularVelocity angular_velocity;
     Timestamp timestamp;
 } FilteredRobotData;
@@ -157,4 +155,5 @@ class RobotFilter
     std::optional<PosMeasurement> prev_pos_measurement;
     std::optional<AngMeasurement> prev_ang_measurement;
     std::optional<Timestamp> last_predict_timestamp;
+    int consecutive_outliers;
 };

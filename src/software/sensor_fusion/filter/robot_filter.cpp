@@ -1,5 +1,10 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 
+namespace{
+    constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
+    constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
+}
+
 RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state),
       expiry_buffer_duration(expiry_buffer_duration)
@@ -25,8 +30,6 @@ std::optional<Robot> RobotFilter::getFilteredData(
                                     .position         = Point(0, 0),
                                     .velocity         = Vector(0, 0),
                                     .orientation      = Angle::fromRadians(0),
-                                    .orientation_cos  = 0.0,
-                                    .orientation_sin  = 0.0,
                                     .angular_velocity = AngularVelocity::fromRadians(0),
                                     .timestamp        = Timestamp().fromSeconds(0)};
 
@@ -128,11 +131,67 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     if (best_robot_detection)
     {
         // check if viable, if so then update and return later?
+
+        PosMeasurement pos_measurement(best_robot_detection->position.x(),
+                        best_robot_detection->position.y());
+        AngMeasurement ang_measurement(best_robot_detection->orientation.toRadians());
+        // so this is an Angle. 
+
+        // The first detection is all we know, so we start the estimate on it rather than
+        // blending it against a state we never had grounds for
+        if (!prev_detection_timestamp)
+        {
+            reset(pos_measurement, ang_measurement, current_time);
+        }
+        // Two gates determining whether we take the detection:
+        // 1. Whether it is physically possible to arrive the new destination
+        // 2. Statistical gating using Mahalanobis
+        else if (isWithinMaxRobotSpeed(best_robot_detection->position, current_time) &&
+                 pos_kalman_filter.mahalanobisDistance(pos_measurement) <
+                     MAHALANOBIS_GATE_THRESHOLD)
+        {
+            pos_kalman_filter.update(pos_measurement);
+            ang_kalman_filter.update(ang_measurement);
+            consecutive_outliers     = 0;
+            prev_pos_measurement         = pos_measurement;
+            prev_detection_timestamp = current_time;
+        }
+        // If rejected, accumulate outliers. Once a threshold is reached we reset to adapt
+        // to new position
+        else
+        {
+            consecutive_outliers++;
+
+            if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD)
+            {
+                reset(pos_measurement, ang_measurement, current_time);
+            }
+        }
     }
-    
+    if (!prev_detection_timestamp)
+    {
+        return std::nullopt;
+    }
 
+    // Position State: position x, position y, velocity x, velocity y
+    // Angle State: angle theta, angular velocity w
 
-    return std::nullopt;
+    bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
+    // this->current_robot_state =
+    //    Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
+    //            filtered_data.orientation, filtered_data.angular_velocity,
+    //            filtered_data.timestamp, breakbeam_tripped);
+
+    const Eigen::Vector<double, POS_STATE_SIZE> pos_state = pos_kalman_filter.state_estimate;
+    const Eigen::Vector<double, ANG_STATE_SIZE> ang_state = ang_kalman_filter.state_estimate;
+    const Point robot_position(pos_state(0), pos_state(1));
+    const Vector robot_velocity(pos_state(2), pos_state(3));
+    const Angle robot_orientation = Angle::fromRadians(ang_state(0));
+    const AngularVelocity robot_angular_velocity = AngularVelocity::fromRadians(ang_state(1));
+
+    this->current_robot_state = Robot(this->getRobotId(), robot_position, robot_velocity, robot_orientation, robot_angular_velocity, current_time, breakbeam_tripped);
+
+    return std::make_optional(this->current_robot_state);
 }
 
 //completely fine DO NOT TOUCH
@@ -148,7 +207,7 @@ std::optional<RobotDetection> RobotFilter::getBestRobotDetection(
     {
         return std::nullopt;
     }
-
+    
     return *std::max_element(new_robot_detections.begin(),
                              new_robot_detections.end(),
                              [](const RobotDetection& a, const RobotDetection& b)
@@ -157,7 +216,7 @@ std::optional<RobotDetection> RobotFilter::getBestRobotDetection(
 
 void RobotFilter::predict(double delta_t)
 {
-    // make a process model
+    // make a process model, these are just completely stand in variables
     pos_kalman_filter.process_model << 1, 1, 1;
     ang_kalman_filter.process_model << 1, 1, 1;
 
@@ -172,11 +231,11 @@ void RobotFilter::predict(double delta_t)
 bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
                                       const Timestamp& current_time) const
 {
-    // within max robot speed logic
+    // write within max robot speed logic
     return true;
 }
 
 void RobotFilter::reset(const PosMeasurement& pos_measurement, const AngMeasurement& ang_measurement, const Timestamp& current_time)
 {
-    // reset logic
+    // write reset logic
 }
