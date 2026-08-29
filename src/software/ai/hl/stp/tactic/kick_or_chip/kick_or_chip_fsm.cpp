@@ -14,12 +14,13 @@ void KickOrChipFSM::kickOrChipBall(const Update& event)
         Vector::createFromAngle(event.control_params.kick_or_chip_direction);
     Point kick_or_chip_target = event.control_params.kick_or_chip_origin -
                                 direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
+	TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode =  event.control_params.auto_chip_or_kick.auto_chip_kick_mode== AutoChipOrKickMode::AUTOCHIP? TbotsProto::ObstacleAvoidanceMode::SAFE: TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE;
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, kick_or_chip_target,
         event.control_params.kick_or_chip_direction,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
+        obstacle_avoidance_mode, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
 }
 
