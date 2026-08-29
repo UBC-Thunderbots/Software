@@ -19,6 +19,8 @@ typedef struct FilteredRobotData_t
     Point position;
     Vector velocity;
     Angle orientation;
+    double orientation_cos;
+    double orientation_sin;
     AngularVelocity angular_velocity;
     Timestamp timestamp;
 } FilteredRobotData;
@@ -105,6 +107,17 @@ class RobotFilter
     using AngKalmanFilter = KalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
     using PosMeasurement  = Eigen::Vector<double, POS_MEASUREMENT_SIZE>;
     using AngMeasurement  = Eigen::Vector<double, ANG_MEASUREMENT_SIZE>;
+
+    /**
+     * Returns the detection we should treat as the robot this frame, which is the
+     * highest confidence detection. 
+     *
+     * @param new_robot_detections The detections to choose from
+     *
+     * @return The detection to use, or std::nullopt if there is no usable detection
+     */
+    static std::optional<RobotDetection> getBestRobotDetection(
+        const std::vector<RobotDetection>& new_robot_detections);
 
     /**
      * Advances the Kalman filter's estimate forward to the given time using a constant

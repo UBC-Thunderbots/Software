@@ -25,6 +25,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
                                     .position         = Point(0, 0),
                                     .velocity         = Vector(0, 0),
                                     .orientation      = Angle::fromRadians(0),
+                                    .orientation_cos  = 0.0,
+                                    .orientation_sin  = 0.0,
                                     .angular_velocity = AngularVelocity::fromRadians(0),
                                     .timestamp        = Timestamp().fromSeconds(0)};
 
@@ -107,8 +109,30 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     const Timestamp& current_time,
     const std::optional<RobotId> breakbeam_tripped_id)
 {
+    // FIRST PART: GET YOUR BEST GUESS OF ACTUAL DATA
+    const std::optional<RobotDetection> best_robot_detection = getBestRobotDetection(new_robot_data);
+
+    // STEP 2: IF NOT OUT OF ORDER, DO THE PREDICTING
+    if (last_predict_timestamp && current_time > *last_predict_timestamp)
+    {
+        predict((current_time - *last_predict_timestamp).toSeconds());
+        last_predict_timestamp = current_time;
+    }
+    else if (!last_predict_timestamp)
+    {
+        last_predict_timestamp = current_time;
+    }
+
+    // if there is a good detection from above, then!
+    
+    if (best_robot_detection)
+    {
+        // check if viable, if so then update and return later?
+    }
+    
+
+
     return std::nullopt;
-    // implement the estimate state
 }
 
 //completely fine DO NOT TOUCH
@@ -117,9 +141,32 @@ unsigned int RobotFilter::getRobotId() const
     return this->current_robot_state.id();
 }
 
+std::optional<RobotDetection> RobotFilter::getBestRobotDetection(
+    const std::vector<RobotDetection>& new_robot_detections)
+{
+    if (new_robot_detections.empty())
+    {
+        return std::nullopt;
+    }
+
+    return *std::max_element(new_robot_detections.begin(),
+                             new_robot_detections.end(),
+                             [](const RobotDetection& a, const RobotDetection& b)
+                             { return a.confidence < b.confidence; });
+}
+
 void RobotFilter::predict(double delta_t)
 {
-    // predict logic
+    // make a process model
+    pos_kalman_filter.process_model << 1, 1, 1;
+    ang_kalman_filter.process_model << 1, 1, 1;
+
+    // make acceleration variance, position noise, correlation noise, velocity noise
+    // make process covariance
+
+    // Prediction Steps, which gets new state estimate and state covariance
+    pos_kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
+    ang_kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
 }
 
 bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
