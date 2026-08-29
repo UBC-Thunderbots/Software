@@ -46,6 +46,13 @@ from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLo
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
+from pyqtgraph.dockarea.Dock import Dock, DockLabel
+from software.thunderscope import dock_style
+
+# monkey patches for custom styles
+Dock.updateStyle = dock_style.updateDockStylePatched
+DockLabel.updateStyle = dock_style.updateDockLabelStylePatched
+
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
