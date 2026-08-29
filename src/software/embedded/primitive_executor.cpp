@@ -51,11 +51,11 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         trajectory_path_ = new_trajectory_path;
         position_controller_.reset();
-        time_since_linear_trajectory_creation_s_ = VISION_TO_ROBOT_DELAY_S;
+        time_since_linear_trajectory_creation_s_ = 0.5;
 
         angular_trajectory_ = new_angular_trajectory;
         orientation_controller_.reset();
-        time_since_angular_trajectory_creation_s_ = VISION_TO_ROBOT_DELAY_S;
+        time_since_angular_trajectory_creation_s_ = 0.5;
     }
 
     const auto update_end = std::chrono::steady_clock::now();
