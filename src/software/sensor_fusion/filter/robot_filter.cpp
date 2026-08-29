@@ -1,6 +1,8 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 
 namespace{
+    constexpr double MAX_BALL_SPEED_M_PER_S = 6.0;
+    constexpr double MAX_BALL_SPEED_GATE_TOLERANCE_M = 0.05;
     constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
     constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 }
@@ -112,7 +114,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     const Timestamp& current_time,
     const std::optional<RobotId> breakbeam_tripped_id)
 {
-    // FIRST PART: GET YOUR BEST GUESS OF ACTUAL DATA
+    // Gets best detection in case camera accidentally has multiple detections
     const std::optional<RobotDetection> best_robot_detection = getBestRobotDetection(new_robot_data);
 
     // STEP 2: IF NOT OUT OF ORDER, DO THE PREDICTING
@@ -125,17 +127,12 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     {
         last_predict_timestamp = current_time;
     }
-
-    // if there is a good detection from above, then!
     
     if (best_robot_detection)
     {
-        // check if viable, if so then update and return later?
-
         PosMeasurement pos_measurement(best_robot_detection->position.x(),
                         best_robot_detection->position.y());
         AngMeasurement ang_measurement(best_robot_detection->orientation.toRadians());
-        // so this is an Angle. 
 
         // The first detection is all we know, so we start the estimate on it rather than
         // blending it against a state we never had grounds for
@@ -153,7 +150,8 @@ std::optional<Robot> RobotFilter::estimateRobotState(
             pos_kalman_filter.update(pos_measurement);
             ang_kalman_filter.update(ang_measurement);
             consecutive_outliers     = 0;
-            prev_pos_measurement         = pos_measurement;
+            prev_pos_measurement     = pos_measurement;
+            prev_ang_measurement     = ang_measurement;
             prev_detection_timestamp = current_time;
         }
         // If rejected, accumulate outliers. Once a threshold is reached we reset to adapt
@@ -173,22 +171,13 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         return std::nullopt;
     }
 
-    // Position State: position x, position y, velocity x, velocity y
-    // Angle State: angle theta, angular velocity w
-
-    bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
-    // this->current_robot_state =
-    //    Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
-    //            filtered_data.orientation, filtered_data.angular_velocity,
-    //            filtered_data.timestamp, breakbeam_tripped);
-
     const Eigen::Vector<double, POS_STATE_SIZE> pos_state = pos_kalman_filter.state_estimate;
     const Eigen::Vector<double, ANG_STATE_SIZE> ang_state = ang_kalman_filter.state_estimate;
     const Point robot_position(pos_state(0), pos_state(1));
     const Vector robot_velocity(pos_state(2), pos_state(3));
     const Angle robot_orientation = Angle::fromRadians(ang_state(0));
     const AngularVelocity robot_angular_velocity = AngularVelocity::fromRadians(ang_state(1));
-
+    bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
     this->current_robot_state = Robot(this->getRobotId(), robot_position, robot_velocity, robot_orientation, robot_angular_velocity, current_time, breakbeam_tripped);
 
     return std::make_optional(this->current_robot_state);
@@ -231,11 +220,39 @@ void RobotFilter::predict(double delta_t)
 bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
                                       const Timestamp& current_time) const
 {
-    // write within max robot speed logic
-    return true;
+    // Without a previous detection there is no interval to reason over, so we have no
+    // grounds to call this one impossible
+    if (!prev_detection_timestamp)
+    {
+        return true;
+    }
+
+    const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
+    const Point predicted_position(pos_kalman_filter.state_estimate(0),
+                                   pos_kalman_filter.state_estimate(1));
+    const double reachable_distance =
+        MAX_BALL_SPEED_M_PER_S * std::max(delta_t, 0.0) + MAX_BALL_SPEED_GATE_TOLERANCE_M;
+
+    return (detection_position - predicted_position).length() <= reachable_distance;
 }
 
 void RobotFilter::reset(const PosMeasurement& pos_measurement, const AngMeasurement& ang_measurement, const Timestamp& current_time)
 {
-    // write reset logic
+    // Start the estimate at rest. Differencing two measurements to seed a velocity
+    // divides vision noise by a very short timestep, and the pair either side of a
+    // rejection streak is the least trustworthy pair to difference. The wide covariance
+    // below lets the next few detections pull the velocity in on their own.
+
+
+    // kalman_filter.state_estimate << measurement(0), measurement(1), 0, 0;
+    // kalman_filter.state_covariance = INITIAL_COVARIANCE;
+
+    consecutive_outliers = 0;
+    // The reset measurement is now what the estimate is built on, so it becomes the
+    // reference for the next timestep. Leaving the old timestamp here would make the
+    // next predict() jump forward by the whole rejection streak.
+    prev_pos_measurement         = pos_measurement;
+    prev_ang_measurement         = ang_measurement;
+    prev_detection_timestamp     = current_time;
+    last_predict_timestamp       = current_time;
 }
