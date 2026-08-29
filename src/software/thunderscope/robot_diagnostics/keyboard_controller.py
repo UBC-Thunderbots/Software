@@ -4,14 +4,14 @@ from pyqtgraph.Qt.QtCore import Qt, QObject, QEvent
 from pyqtgraph.Qt.QtWidgets import QApplication
 
 from software.thunderscope.constants import DiagnosticsConstants
-from software.thunderscope.robot_diagnostics.controller_base import ControllerBase
+from software.thunderscope.robot_diagnostics.controller_base import IControllerBase
 
 
 class _QABCMeta(type(QObject), ABCMeta):
     pass
 
 
-class KeyboardController(QObject, ControllerBase, metaclass=_QABCMeta):
+class KeyboardController(QObject, IControllerBase, metaclass=_QABCMeta):
     """Keyboard input source.
 
     Installs a QApplication-level event filter so key events are captured

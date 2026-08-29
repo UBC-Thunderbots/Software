@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ControllerBase(ABC):
+class IControllerBase(ABC):
     """Abstract base class for controller input sources."""
 
     @abstractmethod

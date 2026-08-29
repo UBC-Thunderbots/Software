@@ -7,10 +7,10 @@ import pygame
 from pygame._sdl2 import controller
 
 from software.thunderscope.constants import DiagnosticsConstants
-from software.thunderscope.robot_diagnostics.controller_base import ControllerBase
+from software.thunderscope.robot_diagnostics.controller_base import IControllerBase
 
 
-class HandheldController(ControllerBase):
+class HandheldController(IControllerBase):
     """Represents a handheld game controller (e.g. an Xbox gamepad) that can be
     used to manually control our robots.
 

@@ -7,7 +7,7 @@ from pyqtgraph.Qt import QtCore, QtWidgets
 import software.python_bindings as tbots_cpp
 
 from software.thunderscope.constants import DiagnosticsConstants
-from software.thunderscope.robot_diagnostics.controller_base import ControllerBase
+from software.thunderscope.robot_diagnostics.controller_base import IControllerBase
 from software.thunderscope.robot_diagnostics.handheld_controller import (
     HandheldController,
 )
@@ -34,7 +34,7 @@ class HandheldControllerWidget(QtWidgets.QWidget):
 
         self.constants = tbots_cpp.createRobotConstants()
 
-        self.handheld_controller: ControllerBase | None = None
+        self.handheld_controller: IControllerBase | None = None
 
         self.motor_control = protos.MotorControl()
         self.dribbler_speed = 0
