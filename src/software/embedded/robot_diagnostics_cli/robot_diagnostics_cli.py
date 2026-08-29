@@ -23,7 +23,7 @@ from typing_extensions import Annotated
 from software.embedded.robot_diagnostics_cli.embedded_communication import (
     EmbeddedCommunication,
 )
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.embedded.constants.py_constants import (
     DEFAULT_PRIMITIVE_DURATION,
     ROBOT_MAX_ANG_SPEED_RAD_PER_S,
@@ -85,7 +85,7 @@ class RobotDiagnosticsCLI:
             def wrapper(self, *args, **kwargs):
                 try:
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
@@ -93,18 +93,18 @@ class RobotDiagnosticsCLI:
                         "[bold yellow] E-Stop Activated: Stopped Primitive Send [/bold yellow]"
                     )
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
                     logging.exception(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
                 finally:
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
 
             return wrapper
@@ -352,7 +352,7 @@ class RobotDiagnosticsCLI:
                 duration_seconds, primitive, description
             )
         else:
-            zero_direct_control_primitive = DirectControlPrimitive(
+            zero_direct_control_primitive = protos.DirectControlPrimitive(
                 motor_control=self.embedded_data.get_zero_motor_control_primitive(),
                 power_control=self.embedded_data.get_zero_power_control_primitive(),
             )
@@ -360,7 +360,7 @@ class RobotDiagnosticsCLI:
             print(description)
             self.embedded_communication.run_primitive_over_time(
                 1,
-                Primitive(direct_control=zero_direct_control_primitive),
+                protos.Primitive(direct_control=zero_direct_control_primitive),
                 "Recharging...",
             )
 

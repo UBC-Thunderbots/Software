@@ -1,7 +1,7 @@
 import time
 
 
-from proto.visualization_pb2 import PassVisualization
+import proto.import_all_protos as protos
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -30,9 +30,9 @@ class GLPassingLayer(GLLayer):
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.pass_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, PassVisualization
+            buffer_size, protos.PassVisualization
         )
-        self.cached_pass_vis = PassVisualization()
+        self.cached_pass_vis = protos.PassVisualization()
         self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
         self.pass_graphics = ObservableList(self._graphics_changed)

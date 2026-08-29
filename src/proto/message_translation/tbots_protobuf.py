@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 import numpy
 import math
@@ -13,7 +13,7 @@ def create_world_state(
     ball_velocity: tbots_cpp.Vector,
     blue_robot_orientations: list[tbots_cpp.Angle] = [],
     blue_robot_velocities: list[tbots_cpp.Vector] = [],
-) -> WorldState:
+) -> protos.WorldState:
     """Initializes the world from a list of robot locations and ball location/velocity.
 
     NOTE: (index is robot id)
@@ -25,17 +25,17 @@ def create_world_state(
     :param blue_robot_orientations: A list of blue robots orientations
     :param blue_robot_velocities: A list of blue robots velocities
     """
-    world_state = WorldState()
+    world_state = protos.WorldState()
 
     if yellow_robot_locations:
-        yellow_robot_states = RobotStates()
+        yellow_robot_states = protos.RobotStates()
         for robot_id, robot_location in enumerate(yellow_robot_locations):
             yellow_robot_states.robot_states[robot_id].CopyFrom(
-                RobotState(
-                    global_position=Point(
+                protos.RobotState(
+                    global_position=protos.Point(
                         x_meters=robot_location.x(), y_meters=robot_location.y()
                     ),
-                    global_orientation=Angle(radians=math.pi),
+                    global_orientation=protos.Angle(radians=math.pi),
                 )
             )
         world_state.yellow_robots.CopyFrom(yellow_robot_states)
@@ -44,7 +44,7 @@ def create_world_state(
         orientation = tbots_cpp.Angle.zero()
         velocity = tbots_cpp.Vector(0, 0)
 
-        blue_robot_states = RobotStates()
+        blue_robot_states = protos.RobotStates()
         for robot_id, robot_location in enumerate(blue_robot_locations):
             try:
                 orientation = blue_robot_orientations[robot_id]
@@ -57,8 +57,8 @@ def create_world_state(
                 pass
 
             blue_robot_states.robot_states[robot_id].CopyFrom(
-                RobotState(
-                    global_position=Point(
+                protos.RobotState(
+                    global_position=protos.Point(
                         x_meters=robot_location.x(), y_meters=robot_location.y()
                     ),
                     global_orientation=tbots_cpp.createAngleProto(orientation),
@@ -68,11 +68,11 @@ def create_world_state(
         world_state.blue_robots.CopyFrom(blue_robot_states)
 
     world_state.ball_state.CopyFrom(
-        BallState(
-            global_position=Point(
+        protos.BallState(
+            global_position=protos.Point(
                 x_meters=ball_location.x(), y_meters=ball_location.y()
             ),
-            global_velocity=Vector(
+            global_velocity=protos.Vector(
                 x_component_meters=ball_velocity.x(),
                 y_component_meters=ball_velocity.y(),
             ),
@@ -82,7 +82,7 @@ def create_world_state(
     return world_state
 
 
-def create_default_world_state(num_robots: int) -> WorldState:
+def create_default_world_state(num_robots: int) -> protos.WorldState:
     """Create a WorldState proto with num_robots yellow and blue robots evenly spaced in two parallel lines on the field.
 
     :param num_robots: Number of robots for the yellow and blue teams

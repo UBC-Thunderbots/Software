@@ -9,9 +9,17 @@ from software.py_constants import (
     MIN_BATTERY_VOLTAGE,
     SECONDS_PER_MILLISECOND,
 )
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.common import common_widgets
-from software.thunderscope.constants import *
+from software.thunderscope.constants import (
+    Colors,
+    IndividualRobotMode,
+    MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+    MAX_ACCEPTABLE_PACKET_LOSS_PERCENT,
+    MAX_LENGTH_PRIMITIVE_SET_STORE,
+    MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+    ROBOT_RADIUS,
+)
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
 from typing import Type, override
@@ -200,7 +208,7 @@ class RobotInfo(QtWidgets.QWidget):
         self.last_robot_status = None
         self.last_robot_statistic = None
 
-    def update_robot_status(self, robot_status: RobotStatus):
+    def update_robot_status(self, robot_status: protos.RobotStatus):
         """Receives a RobotStatus message and updates the UI to reflect the new data
 
         :param robot_status: The latest RobotStatus message for this robot
@@ -218,7 +226,7 @@ class RobotInfo(QtWidgets.QWidget):
             int(DISCONNECT_DURATION_MS), self.__check_for_disconnection
         )
 
-    def update_robot_statistic(self, robot_statistic: RobotStatistic):
+    def update_robot_statistic(self, robot_statistic: protos.RobotStatistic):
         """Receives a RobotStatistic message and updates the UI to reflect the new data
 
         :param robot_statistic: The latest RobotStatistic message for this robot

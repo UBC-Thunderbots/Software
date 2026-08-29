@@ -1,12 +1,16 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-from software.gameplay_tests.validation.robot_enters_region import *
-from software.gameplay_tests.validation.ball_enters_region import *
-from proto.import_all_protos import *
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsAlwaysStaysInRegion,
+)
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallEventuallyExitsRegion,
+    BallNeverEntersRegion,
+)
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -50,24 +54,24 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
         if is_friendly_test:
             simulated_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.KICKOFF, team=Team.BLUE
+                gc_command=protos.Command.Type.KICKOFF, team=SslTeam.BLUE
             )
-            blue_play = PlayName.KickoffFriendlyPlay
-            yellow_play = PlayName.KickoffEnemyPlay
+            blue_play = protos.PlayName.KickoffFriendlyPlay
+            yellow_play = protos.PlayName.KickoffEnemyPlay
         else:
             simulated_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.KICKOFF, team=Team.YELLOW
+                gc_command=protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
             )
-            blue_play = PlayName.KickoffEnemyPlay
-            yellow_play = PlayName.KickoffFriendlyPlay
+            blue_play = protos.PlayName.KickoffEnemyPlay
+            yellow_play = protos.PlayName.KickoffFriendlyPlay
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+            gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)

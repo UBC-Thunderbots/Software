@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -22,7 +22,7 @@ class RobotReceivedBall(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the specific robot has received the ball
 
         :param world: The world msg to validate
@@ -33,11 +33,11 @@ class RobotReceivedBall(Validation):
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.tolerance):
-                    return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+                    return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Highlights the dribbler area of the robot"""
         # TODO (#3637): create better validation geometry
         for robot in world.friendly_team.team_robots:

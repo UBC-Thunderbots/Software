@@ -8,7 +8,7 @@ from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_
 from software.thunderscope.common.proto_parameter_tree_util import get_string_val
 from software.thunderscope.common.common_widgets import display_tooltip
 from typing import Any, override
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 
 class MotorFaultView(QtWidgets.QWidget):
@@ -163,7 +163,7 @@ class MotorFaultView(QtWidgets.QWidget):
         self.enabled = False
         self.update_ui()
 
-    def refresh(self, motor_status: MotorStatus, enum_descriptor: Any) -> None:
+    def refresh(self, motor_status: protos.MotorStatus, enum_descriptor: Any) -> None:
         """Converts the given message into a map of motor name to its fault info
         And calls functions to update the main UI and the tooltip
 
