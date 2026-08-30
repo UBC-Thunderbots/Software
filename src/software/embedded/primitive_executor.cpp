@@ -51,11 +51,11 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
         trajectory_path_ = new_trajectory_path;
         position_controller_.reset();
-        time_since_linear_trajectory_creation_s_ = 0.5;
+        time_since_linear_trajectory_creation_s_ = VISION_TO_ROBOT_DELAY_S;
 
         angular_trajectory_ = new_angular_trajectory;
         orientation_controller_.reset();
-        time_since_angular_trajectory_creation_s_ = 0.5;
+        time_since_angular_trajectory_creation_s_ = VISION_TO_ROBOT_DELAY_S;
     }
 
     const auto update_end = std::chrono::steady_clock::now();
@@ -136,7 +136,7 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
             createAngularVelocity(robot_status.imu_status().angular_velocity())});
     }
 
-    robot_localizer_.step(Vector());
+    robot_localizer_.step(Vector(), delta_time_s);
 
     TbotsProto::PrimitiveExecutorStatus& prim_exec_status =
         *(robot_status.mutable_primitive_executor_status());

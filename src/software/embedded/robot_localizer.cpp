@@ -1,7 +1,5 @@
 #include "robot_localizer.h"
 
-#include <chrono>
-
 RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
     : process_linear_acceleration_noise_variance_(config.process_noise_variance),
       process_angular_acceleration_noise_variance_(config.process_noise_variance)
@@ -16,23 +14,20 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
-
-    last_step_time_ = std::chrono::steady_clock::now();
 }
 
-void RobotLocalizer::step(const Vector& linear_acceleration)
+void RobotLocalizer::step(const Vector& linear_acceleration,
+                          const double delta_time_seconds)
 {
+    current_time_seconds_ += delta_time_seconds;
+
     FilterStep step{
         .prediction       = std::make_optional<FilterStep::Predict>(),
         .update           = std::nullopt,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::steady_clock::now(),
+        .time_seconds     = current_time_seconds_,
     };
-
-    const std::chrono::duration<double> delta_time = step.time - last_step_time_;
-    const double delta_time_seconds                = delta_time.count();
-    last_step_time_                                = step.time;
 
     // clang-format off
     step.prediction->process_model <<
@@ -136,12 +131,10 @@ void RobotLocalizer::update(const VisionData& data)
         return;
     }
 
-    const auto current_time = std::chrono::steady_clock::now();
-    const auto sample_age   = std::chrono::duration<double>(data.age_seconds);
-
     auto rollback_point = std::find_if(
         history.begin(), history.end(),
-        [&](const FilterStep& step) { return (current_time - step.time) >= sample_age; });
+        [&](const FilterStep& step)
+        { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
     if (rollback_point == history.begin())
     {
@@ -231,29 +224,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
         static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
         static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
 
-    // Vision observes pose (position + orientation), not velocity. The velocity states
-    // are observed directly by the wheel encoders (and IMU for angular velocity), which
-    // are accurate. Letting the vision position/orientation correction also adjust the
-    // velocity states through the position<->velocity covariance coupling is unstable
-    // here: the tight vision noise leaves the position correction lagging, and that
-    // persistent lag is fed into the velocity estimate every frame, inflating it (a
-    // robot moving 1 m/s was estimated at ~1.8 m/s, and worse without delay
-    // compensation). So we hold the velocity states fixed across the vision update.
-    const double x_velocity =
-        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::X_VELOCITY));
-    const double y_velocity =
-        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY));
-    const double angular_velocity =
-        filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY));
-
     filter_.update(measurement);
-
-    filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
-        x_velocity;
-    filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
-        y_velocity;
-    filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
-        angular_velocity;
 }
 
 void RobotLocalizer::update(const MotorData& data)
@@ -286,7 +257,7 @@ void RobotLocalizer::update(const MotorData& data)
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::steady_clock::now(),
+        .time_seconds     = current_time_seconds_,
     };
 
     history.push_front(step);
@@ -313,7 +284,7 @@ void RobotLocalizer::update(const ImuData& data)
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
-        .time             = std::chrono::steady_clock::now(),
+        .time_seconds     = current_time_seconds_,
     };
 
     history.push_front(step);

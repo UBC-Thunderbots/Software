@@ -68,11 +68,12 @@ class RobotLocalizer
     explicit RobotLocalizer(const RobotLocalizerConfig& config);
 
     /**
-     * Runs one prediction step using elapsed time since the previous call.
+     * Runs one prediction step over the given elapsed time.
      *
      * @param linear_acceleration The current linear acceleration of the robot
+     * @param delta_time_seconds The elapsed time since the previous step, in seconds
      */
-    void step(const Vector& linear_acceleration);
+    void step(const Vector& linear_acceleration, double delta_time_seconds);
 
     /**
      * Update the robot's position and orientation from data reported by vision.
@@ -162,7 +163,7 @@ class RobotLocalizer
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
-        std::chrono::time_point<std::chrono::steady_clock> time;
+        double time_seconds;
     };
 
     KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
@@ -171,8 +172,8 @@ class RobotLocalizer
     double process_linear_acceleration_noise_variance_;
     double process_angular_acceleration_noise_variance_;
 
-    std::chrono::time_point<std::chrono::steady_clock> last_step_time_;
-
     // History is ordered newest-first (front is the most recent step)
     std::deque<FilterStep> history;
+
+    double current_time_seconds_ = 0.0;
 };

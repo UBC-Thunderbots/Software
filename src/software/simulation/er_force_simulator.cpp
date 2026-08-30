@@ -478,13 +478,13 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
     current_time = current_time + time_step;
 
-    SSLSimulationProto::RobotControl yellow_robot_control = updateSimulatorRobots(
-        yellow_primitive_executor_map, *yellow_team_world_msg, time_step,
-        gameController::Team::YELLOW);
+    SSLSimulationProto::RobotControl yellow_robot_control =
+        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,
+                              time_step, gameController::Team::YELLOW);
 
-    SSLSimulationProto::RobotControl blue_robot_control = updateSimulatorRobots(
-        blue_primitive_executor_map, *blue_team_world_msg, time_step,
-        gameController::Team::BLUE);
+    SSLSimulationProto::RobotControl blue_robot_control =
+        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg,
+                              time_step, gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);

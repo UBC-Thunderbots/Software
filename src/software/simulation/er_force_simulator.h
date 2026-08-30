@@ -28,10 +28,10 @@ class ErForceSimulator
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
      */
-    explicit ErForceSimulator(
-        const TbotsProto::FieldType& field_type,
-        const robot_constants::RobotConstants& robot_constants,
-        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = true);
+    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
+                              const robot_constants::RobotConstants& robot_constants,
+                              std::unique_ptr<RealismConfigErForce>& realism_config,
+                              const bool ramping = true);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
