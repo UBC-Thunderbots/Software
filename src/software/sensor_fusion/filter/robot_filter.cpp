@@ -136,7 +136,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     {
         PosMeasurement pos_measurement(best_robot_detection->position.x(),
                         best_robot_detection->position.y());
-        
+        AngMeasurement revolution_test(best_robot_detection->orientation.toRadians());
         // To keep Kalman filter linear, we must add revolutions. Otherwise, the Kalman filter cannot process
         // a rotation, where it would exceed 2pi and return to 0. 
         if ((prev_ang_measurement.has_value()) && (best_robot_detection->orientation < Angle::quarter()) && (Angle::fromRadians((*prev_ang_measurement)(0)) > Angle::threeQuarter()))
@@ -148,7 +148,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
             --revolutions;
         }
 
-        AngMeasurement ang_measurement(best_robot_detection->orientation.toRadians() + M_PI * revolutions);
+        AngMeasurement ang_measurement(best_robot_detection->orientation.toRadians() + 2 * M_PI * revolutions);
 
         // The first detection is all we know, so we start the estimate on it rather than
         // blending it against a state we never had grounds for
@@ -200,7 +200,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     const Eigen::Vector<double, ANG_STATE_SIZE> ang_state = ang_kalman_filter.state_estimate;
     const Point robot_position(pos_state(0), pos_state(1));
     const Vector robot_velocity(pos_state(2), pos_state(3));
-    const Angle robot_orientation = Angle::fromRadians(ang_state(0));
+    const Angle robot_orientation = Angle::fromRadians(ang_state(0)).mod(Angle::full());
     const AngularVelocity robot_angular_velocity = AngularVelocity::fromRadians(ang_state(1));
     bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
     this->current_robot_state = Robot(this->getRobotId(), robot_position, robot_velocity, robot_orientation, robot_angular_velocity, current_time, breakbeam_tripped);
@@ -257,12 +257,13 @@ void RobotFilter::predict(double delta_t)
     const double ang_correlation_noise = ang_acceleration_variance * delta_t_squared / 2.0;
     const double ang_velocity_noise = ang_acceleration_variance * delta_t;
 
-    // make acceleration variance, position noise, correlation noise, velocity noise
-    // make process covariance
-    pos_kalman_filter.process_covariance << position_noise, 0, correlation_noise, 0, 0,
-        position_noise, 0, correlation_noise, correlation_noise, 0, velocity_noise, 0, 0,
-        correlation_noise, 0, velocity_noise;
-    ang_kalman_filter.process_covariance << angle_noise, ang_correlation_noise,
+    pos_kalman_filter.process_covariance << 
+        position_noise, 0, correlation_noise, 0,
+        0, position_noise, 0, correlation_noise, 
+        correlation_noise, 0, velocity_noise, 0, 
+        0, correlation_noise, 0, velocity_noise;
+    ang_kalman_filter.process_covariance << 
+        angle_noise, ang_correlation_noise,
         ang_correlation_noise, ang_velocity_noise;
 
     // Prediction Steps, which gets new state estimate and state covariance
@@ -298,17 +299,18 @@ void RobotFilter::reset(const PosMeasurement& pos_measurement, const AngMeasurem
 
 
     pos_kalman_filter.state_estimate << pos_measurement(0), pos_measurement(1), 0, 0;
-    ang_kalman_filter.state_estimate << ang_measurement(0), 0;
+    ang_kalman_filter.state_estimate << Angle::fromRadians(ang_measurement(0)).mod(Angle::full()).toRadians(), 0;
     pos_kalman_filter.state_covariance = POS_INITIAL_COVARIANCE;
     ang_kalman_filter.state_covariance = ANG_INITIAL_COVARIANCE;
 
+    revolutions = 0;
     consecutive_outliers = 0;
     expired_frame_count = 0;
     // The reset measurement is now what the estimate is built on, so it becomes the
     // reference for the next timestep. Leaving the old timestamp here would make the
     // next predict() jump forward by the whole rejection streak.
     prev_pos_measurement         = pos_measurement;
-    prev_ang_measurement         = ang_measurement;
+    prev_ang_measurement         = AngMeasurement::Constant(Angle::fromRadians(ang_measurement(0)).mod(Angle::full()).toRadians());
     prev_detection_timestamp     = current_time;
     last_predict_timestamp       = current_time;
 }
