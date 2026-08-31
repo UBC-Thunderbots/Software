@@ -5,6 +5,11 @@ import os
 import sys
 import threading
 
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
+preload_bundled_qt_libs()
+
 import google.protobuf
 from google.protobuf.internal import api_implementation
 
@@ -34,6 +39,11 @@ from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+
+from pyqtgraph.Qt.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+
+print(PYQT_VERSION_STR)
+print(QT_VERSION_STR)
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (

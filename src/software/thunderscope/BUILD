@@ -11,6 +11,11 @@ compile_pip_requirements(
     requirements_txt = "requirements_lock.txt",
 )
 
+py_library(
+    name = "qt_dependency_bootstrap",
+    srcs = ["qt_dependency_bootstrap.py"],
+)
+
 py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
@@ -18,6 +23,7 @@ py_binary(
         ":config",
         ":constants",
         ":estop_helpers",
+        ":qt_dependency_bootstrap",
         ":thunderscope",
         ":util",
         "//software/stats/loggers:stats_logger",
@@ -54,6 +60,8 @@ py_library(
         requirement("numpy"),
         requirement("pyqtdarktheme-fork"),
         requirement("pyqtgraph"),
+        requirement("PyQt6-Qt6"),
+        requirement("pyqt6"),
     ],
 )
 
