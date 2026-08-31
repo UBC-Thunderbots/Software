@@ -21,18 +21,19 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 {
     // Anchor on the centre of the shot cone, then step LEFT/RIGHT along the
     // inflated defense area perimeter for consistent robot spacing.
-    Angle shot_angle_sixth = convexAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
-                                         field.friendlyGoalpostNeg()) /
-                             6.0;
     Angle angle_to_positive_goalpost =
         (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
-    Angle center_angle = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
+    Angle center_angle =
+        angle_to_positive_goalpost +
+        convexAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
+                    field.friendlyGoalpostNeg()) /
+            2.0;
 
     Ray center_ray(enemy_threat_origin, center_angle);
     std::optional<Point> center_position =
         findDefenseAreaIntersection(field, center_ray, robot_obstacle_inflation_factor);
 
-    if (!center_position.has_value())
+    if (!center_position)
     {
         return std::nullopt;
     }
@@ -56,8 +57,24 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
         travel_distance = -step_distance;
     }
 
-    return stepAlongPerimeter(defense_perimeter, center_position.value(),
-                              travel_distance);
+    Point block_point = stepAlongPerimeter(defense_perimeter, center_position.value(),
+                                           travel_distance);
+
+    // Stepping toward the goal can wrap onto the goal-line side of the crease. 
+    // Clamp perimiter stepping to the nearest back corner. 
+    Segment goal_line_side(defense_perimeter.negXPosYCorner(),
+                           defense_perimeter.negXNegYCorner());
+    if (contains(goal_line_side, block_point))
+    {
+        if (distance(block_point, defense_perimeter.negXPosYCorner()) <
+            distance(block_point, defense_perimeter.negXNegYCorner()))
+        {
+            return defense_perimeter.negXPosYCorner();
+        }
+        return defense_perimeter.negXNegYCorner();
+    }
+
+    return block_point;
 }
 
 bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zone)

@@ -145,6 +145,35 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
     EXPECT_GT(threat_point_centre.value().x(), threat_point_right.value().x());
 }
 
+TEST(CreaseDefenderFSMTest, test_find_block_threat_point_clamps_at_goal_line_corner)
+{
+    TbotsProto::RobotNavigationObstacleConfig config;
+    double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
+    Field field                            = Field::createSSLDivisionBField();
+    Rectangle defense_perimeter            = field.friendlyDefenseArea().expand(
+        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor);
+
+    // Clamp +y side of goal
+    Point enemy_threat_origin = Point(-4.45, 2.0);
+
+    auto threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
+        field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::LEFT,
+        robot_obstacle_inflation_factor);
+    ASSERT_TRUE(threat_point_left);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        threat_point_left.value(), defense_perimeter.negXPosYCorner(), 1e-9));
+
+    // -y side: RIGHT would wrap without a clamp.
+    enemy_threat_origin = Point(-4.45, -2.0);
+
+    auto threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
+        field, enemy_threat_origin, TbotsProto::CreaseDefenderAlignment::RIGHT,
+        robot_obstacle_inflation_factor);
+    ASSERT_TRUE(threat_point_right);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        threat_point_right.value(), defense_perimeter.negXNegYCorner(), 1e-9));
+}
+
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
 {
     TbotsProto::RobotNavigationObstacleConfig config;
