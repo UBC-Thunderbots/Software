@@ -23,11 +23,10 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     // inflated defense area perimeter for consistent robot spacing.
     Angle angle_to_positive_goalpost =
         (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
-    Angle center_angle =
-        angle_to_positive_goalpost +
-        convexAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
-                    field.friendlyGoalpostNeg()) /
-            2.0;
+    Angle center_angle = angle_to_positive_goalpost +
+                         convexAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
+                                     field.friendlyGoalpostNeg()) /
+                             2.0;
 
     Ray center_ray(enemy_threat_origin, center_angle);
     std::optional<Point> center_position =
@@ -57,11 +56,11 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
         travel_distance = -step_distance;
     }
 
-    Point block_point = stepAlongPerimeter(defense_perimeter, center_position.value(),
-                                           travel_distance);
+    Point block_point =
+        stepAlongPerimeter(defense_perimeter, center_position.value(), travel_distance);
 
-    // Stepping toward the goal can wrap onto the goal-line side of the crease. 
-    // Clamp perimiter stepping to the nearest back corner. 
+    // Stepping toward the goal can wrap onto the goal-line side of the crease.
+    // Clamp perimiter stepping to the nearest back corner.
     Segment goal_line_side(defense_perimeter.negXPosYCorner(),
                            defense_perimeter.negXNegYCorner());
     if (contains(goal_line_side, block_point))
