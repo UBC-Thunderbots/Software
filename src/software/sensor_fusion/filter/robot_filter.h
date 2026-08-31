@@ -10,19 +10,6 @@
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
-/**
- * A lightweight datatype used to pass filtered robot data
- */
-typedef struct FilteredRobotData_t
-{
-    unsigned int id;
-    Point position;
-    Vector velocity;
-    Angle orientation;
-    AngularVelocity angular_velocity;
-    Timestamp timestamp;
-} FilteredRobotData;
-
 class RobotFilter
 {
    public:
@@ -33,33 +20,13 @@ class RobotFilter
      * @param expiry_buffer_duration the time when the robot is determined to be removed
      * from the field if data about the robot is not received before that time
      */
-    explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
-    explicit RobotFilter(RobotDetection current_robot_state,
-                         Duration expiry_buffer_duration);
-
-    /**
-     * Updates the filter given a new set of data, and returns the most up to date
-     * filtered data for the Robot.
-     *
-     * @param new_robot_data A list of SSLRobot detections containing new robot data.
-     * The data does not all have to be for a particular Robot, the filter will only use
-     * the new Robot data that matches the robot id the filter was constructed with.
-     *
-     * @param breakbeam_tripped_id The id of the robot with the tripped breakbeam
-     * according to sensor fusion filtering logic (or none if no robot has a tripped
-     * beam).
-     *
-     * @return The filtered data for the robot
-     */
-    std::optional<Robot> getFilteredData(
-        const std::vector<RobotDetection>& new_robot_data,
-        const Timestamp& capture_timestamp,
-        const std::optional<RobotId> breakbeam_tripped_id = std::nullopt);
-
+    explicit RobotFilter(Robot current_robot_state);
+    explicit RobotFilter(RobotDetection current_robot_state);
 
     /**
      * Update the filter with the new SSLRobot detections, and returns the new
-     * estimated state of the robot given the new data
+     * estimated state of the robot given the new data. 
+     * 
      *
      * @param new_robot_data A list of SSLRobot detections containing new robot data.
      * The data does not all have to be for a particular Robot, the filter will only use
@@ -70,7 +37,9 @@ class RobotFilter
      * beam).
      * 
      * @return The new Robot based on the estimated state of the Robot given the new data.
-     * If a filtered result cannot be calculated, returns std::nullopt
+     * If there is no robot data for this robot, it will return the prediction of the filter
+     * for a few updates, but if there are (EXPIRED_FRAME_THRESHOLD) consecutive missing frames,
+     * returns std::nullopt
      */
     std::optional<Robot> estimateRobotState(
         const std::vector<RobotDetection>& new_robot_data, const Timestamp& current_time, const std::optional<RobotId> breakbeam_tripped_id = std::nullopt);
@@ -84,7 +53,6 @@ class RobotFilter
 
    private:
     Robot current_robot_state;
-    Duration expiry_buffer_duration;
 
 	// KF Dimensions
 	// Position State: position x, position y, velocity x, velocity y
@@ -103,6 +71,8 @@ class RobotFilter
 
     using PosKalmanFilter = KalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
     using AngKalmanFilter = KalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
+
+    // Will be keeping Position and Angle in double, in units of metres and radians respectively
     using PosMeasurement  = Eigen::Vector<double, POS_MEASUREMENT_SIZE>;
     using AngMeasurement  = Eigen::Vector<double, ANG_MEASUREMENT_SIZE>;
 
@@ -156,4 +126,5 @@ class RobotFilter
     std::optional<AngMeasurement> prev_ang_measurement;
     std::optional<Timestamp> last_predict_timestamp;
     int consecutive_outliers;
+    int expired_frame_count;
 };
