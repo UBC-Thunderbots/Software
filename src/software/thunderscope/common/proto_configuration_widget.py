@@ -10,6 +10,7 @@ from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
 from typing import Any, Callable
 from PyQt6.QtWidgets import *
+from google.protobuf import descriptor_pb2
 
 
 class ProtoConfigurationWidget(QWidget):
@@ -298,6 +299,10 @@ class ProtoConfigurationWidget(QWidget):
         if not current_attr:
             current_attr = "self.proto_to_configure"
 
+        # Fetch file proto once for comment/descriptor lookup
+        file_proto = descriptor_pb2.FileDescriptorProto()
+        message.DESCRIPTOR.file.CopyToProto(file_proto)
+
         for descriptor in message.DESCRIPTOR.fields:
             key = descriptor.name
             value = getattr(message, descriptor.name)
@@ -312,3 +317,11 @@ class ProtoConfigurationWidget(QWidget):
                     exec(f"{current_attr}.{key} = {value}")
             else:
                 self.build_proto(value, f"{current_attr}.{key}")
+
+            # Extract FieldDescriptorProto from file_proto directly
+            msg_proto = next(m for m in file_proto.message_type if m.name == message.DESCRIPTOR.name)
+            field_proto = next(f for f in msg_proto.field if f.name == descriptor.name)
+
+            print("FieldProto name:", field_proto.name)
+
+        print("New message:", message)
