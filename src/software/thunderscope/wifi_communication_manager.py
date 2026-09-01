@@ -281,7 +281,6 @@ class WifiCommunicationManager:
                 resource = creator()
             except tbots_cpp.TbotsNetworkException as error:
                 logger.error(f"Error setting up robot status interface:\n{error}")
-                is_setup_successfully = False
                 return None
             return resource
 

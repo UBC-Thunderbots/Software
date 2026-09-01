@@ -448,30 +448,35 @@ def field_test_runner():
     )
 
     # Launch all binaries
-    with FullSystem(
-        "software/unix_full_system",
-        full_system_runtime_dir=runtime_dir,
-        debug_full_system=debug_full_sys,
-        friendly_colour_yellow=args.run_yellow,
-        should_restart_on_crash=False,
-    ) as friendly_fs, Gamecontroller(
-        # we would be using conventional port if and only if we are playing in robocup.
-        suppress_logs=(not args.show_gamecontroller_logs),
-        use_conventional_port=False,
-    ) as gamecontroller, WifiCommunicationManager(
-        current_proto_unix_io=friendly_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(args.channel),
-        should_setup_full_system=True,
-        interface=args.interface,
-        referee_port=gamecontroller.get_referee_port()
-        if gamecontroller
-        else SSL_REFEREE_PORT,
-    ) as wifi_communication_manager, RobotCommunication(
-        current_proto_unix_io=friendly_proto_unix_io,
-        communication_manager=wifi_communication_manager,
-        estop_mode=estop_mode,
-        estop_path=estop_path,
-    ) as rc_friendly:
+    with (
+        FullSystem(
+            "software/unix_full_system",
+            full_system_runtime_dir=runtime_dir,
+            debug_full_system=debug_full_sys,
+            friendly_colour_yellow=args.run_yellow,
+            should_restart_on_crash=False,
+        ) as friendly_fs,
+        Gamecontroller(
+            # we would be using conventional port if and only if we are playing in robocup.
+            suppress_logs=(not args.show_gamecontroller_logs),
+            use_conventional_port=False,
+        ) as gamecontroller,
+        WifiCommunicationManager(
+            current_proto_unix_io=friendly_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(args.channel),
+            should_setup_full_system=True,
+            interface=args.interface,
+            referee_port=gamecontroller.get_referee_port()
+            if gamecontroller
+            else SSL_REFEREE_PORT,
+        ) as wifi_communication_manager,
+        RobotCommunication(
+            current_proto_unix_io=friendly_proto_unix_io,
+            communication_manager=wifi_communication_manager,
+            estop_mode=estop_mode,
+            estop_path=estop_path,
+        ) as rc_friendly,
+    ):
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
 
         gamecontroller.setup_proto_unix_io(

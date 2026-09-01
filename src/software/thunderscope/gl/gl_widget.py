@@ -265,7 +265,7 @@ class GLWidget(QtWidgets.QWidget):
 
         # Prevents RuntimeError: wrapped C/C++ object of type ___ has been deleted
         # See: https://stackoverflow.com/a/60700622/20199855
-        if self.isVisible() == False:
+        if not self.isVisible():
             return
 
         if self.simulation_control_toolbar:

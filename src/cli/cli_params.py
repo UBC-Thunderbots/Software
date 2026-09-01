@@ -332,7 +332,7 @@ class InteractiveCli:
             return []
         with open(InteractiveCli.HISTORY_FILE) as f:
             lines = [line.strip() for line in f.readlines()]
-        return [l.replace("\\n", "\n") for l in lines if l]
+        return [line.replace("\\n", "\n") for line in lines if line]
 
     @staticmethod
     def save_to_history(cmd_title: str, cmd_str: str):

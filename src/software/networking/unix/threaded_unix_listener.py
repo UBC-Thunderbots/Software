@@ -21,7 +21,7 @@ class ThreadedUnixListener:
         # cleanup the old path if it exists
         try:
             os.remove(unix_path)
-        except:
+        except OSError:
             pass
 
         self.server = socketserver.UnixDatagramServer(

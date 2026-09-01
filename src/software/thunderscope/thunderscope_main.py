@@ -308,26 +308,30 @@ if __name__ == "__main__":
         )
 
         with (
-            Gamecontroller(
-                suppress_logs=(not args.verbose),
-                use_conventional_port=False,
-            )
-            if args.launch_gc
-            else contextlib.nullcontext()
-        ) as gamecontroller, WifiCommunicationManager(
-            current_proto_unix_io=current_proto_unix_io,
-            multicast_channel=getRobotMulticastChannel(args.channel),
-            should_setup_full_system=(args.run_blue or args.run_yellow),
-            interface=args.interface,
-            referee_port=gamecontroller.get_referee_port()
-            if gamecontroller
-            else SSL_REFEREE_PORT,
-        ) as wifi_communication_manager, RobotCommunication(
-            current_proto_unix_io=current_proto_unix_io,
-            communication_manager=wifi_communication_manager,
-            estop_mode=estop_mode,
-            estop_path=estop_path,
-        ) as robot_communication:
+            (
+                Gamecontroller(
+                    suppress_logs=(not args.verbose),
+                    use_conventional_port=False,
+                )
+                if args.launch_gc
+                else contextlib.nullcontext()
+            ) as gamecontroller,
+            WifiCommunicationManager(
+                current_proto_unix_io=current_proto_unix_io,
+                multicast_channel=getRobotMulticastChannel(args.channel),
+                should_setup_full_system=(args.run_blue or args.run_yellow),
+                interface=args.interface,
+                referee_port=gamecontroller.get_referee_port()
+                if gamecontroller
+                else SSL_REFEREE_PORT,
+            ) as wifi_communication_manager,
+            RobotCommunication(
+                current_proto_unix_io=current_proto_unix_io,
+                communication_manager=wifi_communication_manager,
+                estop_mode=estop_mode,
+                estop_path=estop_path,
+            ) as robot_communication,
+        ):
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
                     robot_communication.toggle_keyboard_estop
@@ -418,58 +422,66 @@ if __name__ == "__main__":
         runtime_config = runtime_manager_instance.fetch_runtime_config()
 
         # Launch all binaries
-        with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
-        ) as simulator, FullSystem(
-            path_to_binary=runtime_config.get_blue_runtime_path(),
-            full_system_runtime_dir=args.blue_full_system_runtime_dir,
-            debug_full_system=args.debug_blue_full_system,
-            friendly_colour_yellow=False,
-            should_restart_on_crash=False,
-            run_sudo=args.sudo,
-            running_in_realtime=(not args.ci_mode),
-            log_level=args.log_level,
-        ) as blue_fs, FullSystem(
-            path_to_binary=runtime_config.get_yellow_runtime_path(),
-            full_system_runtime_dir=args.yellow_full_system_runtime_dir,
-            debug_full_system=args.debug_yellow_full_system,
-            friendly_colour_yellow=True,
-            should_restart_on_crash=False,
-            run_sudo=args.sudo,
-            running_in_realtime=(not args.ci_mode),
-            log_level=args.log_level,
-        ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose),
-            automate_referee=args.enable_autogc,
-        ) as gamecontroller, (
-            # Here we only initialize autoref if the --enable_autoref flag is requested.
-            # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
-            # All calls to autoref should be guarded with args.enable_autoref
-            TigersAutoref(
-                ci_mode=True,
-                gc=gamecontroller,
-                suppress_logs=(not args.verbose),
-                tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
-                show_gui=args.show_autoref_gui,
-            )
-            if args.enable_autoref
-            else contextlib.nullcontext()
-        ) as autoref, (
-            StatsLogger(
-                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                record_enemy_stats=True,
+        with (
+            Simulator(
+                args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+            ) as simulator,
+            FullSystem(
+                path_to_binary=runtime_config.get_blue_runtime_path(),
+                full_system_runtime_dir=args.blue_full_system_runtime_dir,
+                debug_full_system=args.debug_blue_full_system,
                 friendly_colour_yellow=False,
-            )
-            if args.record_stats
-            else contextlib.nullcontext()
-        ) as blue_stats_logger, (
-            StatsLogger(
-                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                should_restart_on_crash=False,
+                run_sudo=args.sudo,
+                running_in_realtime=(not args.ci_mode),
+                log_level=args.log_level,
+            ) as blue_fs,
+            FullSystem(
+                path_to_binary=runtime_config.get_yellow_runtime_path(),
+                full_system_runtime_dir=args.yellow_full_system_runtime_dir,
+                debug_full_system=args.debug_yellow_full_system,
                 friendly_colour_yellow=True,
-            )
-            if args.record_stats
-            else contextlib.nullcontext()
-        ) as yellow_stats_logger:
+                should_restart_on_crash=False,
+                run_sudo=args.sudo,
+                running_in_realtime=(not args.ci_mode),
+                log_level=args.log_level,
+            ) as yellow_fs,
+            Gamecontroller(
+                suppress_logs=(not args.verbose),
+                automate_referee=args.enable_autogc,
+            ) as gamecontroller,
+            (
+                # Here we only initialize autoref if the --enable_autoref flag is requested.
+                # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
+                # All calls to autoref should be guarded with args.enable_autoref
+                TigersAutoref(
+                    ci_mode=True,
+                    gc=gamecontroller,
+                    suppress_logs=(not args.verbose),
+                    tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+                    show_gui=args.show_autoref_gui,
+                )
+                if args.enable_autoref
+                else contextlib.nullcontext()
+            ) as autoref,
+            (
+                StatsLogger(
+                    proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    record_enemy_stats=True,
+                    friendly_colour_yellow=False,
+                )
+                if args.record_stats
+                else contextlib.nullcontext()
+            ) as blue_stats_logger,
+            (
+                StatsLogger(
+                    proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    friendly_colour_yellow=True,
+                )
+                if args.record_stats
+                else contextlib.nullcontext()
+            ) as yellow_stats_logger,
+        ):
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()

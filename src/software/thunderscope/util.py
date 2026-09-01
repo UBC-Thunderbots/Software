@@ -150,9 +150,7 @@ def sync_simulation(
         sim_proto_unix_io.send_proto(protos.WorldState, world_state)
 
         try:
-            world_state_received = world_state_received_buffer.get(
-                block=True, timeout=timeout_s
-            )
+            world_state_received_buffer.get(block=True, timeout=timeout_s)
         except queue.Empty:
             # Did not receive a response within timeout period
             continue

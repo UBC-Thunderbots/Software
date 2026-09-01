@@ -290,7 +290,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                              If false, test stops once eventually validation passes and fails if time out
         """
         test_timeout_duration = (
-            test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
+            test_timeout_s[index] if type(test_timeout_s) is list else test_timeout_s
         )
 
         # If thunderscope is enabled, run the test in a thread and show
@@ -573,25 +573,29 @@ def simulated_test_runner():
     test_name = current_test.split("-")[0][:25]
 
     # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}",
-        args.debug_simulator,
-        args.enable_realism,
-    ) as simulator, FullSystem(
-        "software/unix_full_system",
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
-    ) as blue_fs, FullSystem(
-        "software/unix_full_system",
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
-    ) as yellow_fs:
+    with (
+        Simulator(
+            f"{args.simulator_runtime_dir}/test/{test_name}",
+            args.debug_simulator,
+            args.enable_realism,
+        ) as simulator,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+            args.debug_blue_full_system,
+            False,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope and not args.ci_mode,
+        ) as blue_fs,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+            args.debug_yellow_full_system,
+            True,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope and not args.ci_mode,
+        ) as yellow_fs,
+    ):
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs),
             parallelized=True,

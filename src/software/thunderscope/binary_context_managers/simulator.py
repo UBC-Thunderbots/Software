@@ -70,7 +70,7 @@ class Simulator:
         # Setup unix socket directory
         try:
             os.makedirs(self.simulator_runtime_dir)
-        except:
+        except OSError:
             pass
 
         simulator_command = "software/er_force_simulator_main --runtime_dir={}".format(

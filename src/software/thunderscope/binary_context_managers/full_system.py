@@ -105,7 +105,7 @@ class FullSystem:
         # Setup unix socket directory
         try:
             os.makedirs(self.full_system_runtime_dir)
-        except:
+        except OSError:
             pass
 
         supported_flags = self.discover_supported_flags(self.path_to_binary)

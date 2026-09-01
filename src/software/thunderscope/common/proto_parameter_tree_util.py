@@ -166,7 +166,7 @@ def get_string_val(descriptor, value):
     ]:
         return "%.2f" % value
     elif descriptor.type == descriptor.TYPE_ENUM:
-        if type(value) == int:
+        if type(value) is int:
             return descriptor.enum_type.values[value].name
         elif descriptor.label == descriptor.LABEL_REPEATED:
             return str([descriptor.enum_type.values[index].name for index in value])
