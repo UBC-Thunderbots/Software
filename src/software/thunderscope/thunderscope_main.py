@@ -6,15 +6,8 @@ import sys
 import threading
 
 import google.protobuf
+import software.thunderscope.thunderscope_config as config
 from google.protobuf.internal import api_implementation
-
-from software.thunderscope.binary_context_managers.runtime_manager import (
-    runtime_manager_instance,
-)
-from software.stats.loggers.stats_logger import StatsLogger
-
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.constants import LogLevels
 from software.py_constants import (
     DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
     DIV_B_NUM_ROBOTS,
@@ -22,27 +15,31 @@ from software.py_constants import (
     SSL_REFEREE_PORT,
     getRobotMulticastChannel,
 )
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
+from software.stats.loggers.stats_logger import StatsLogger
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.runtime_manager import (
+    runtime_manager_instance,
+)
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 from software.thunderscope.constants import (
+    CI_DURATION_S,
     EstopMode,
+    LogLevels,
     ProtoUnixIOTypes,
 )
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.util import (
     async_sim_ticker,
     exit_poller,
     realtime_sim_ticker,
     sync_simulation,
 )
-
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (

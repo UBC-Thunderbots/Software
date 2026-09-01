@@ -1,17 +1,17 @@
-import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from software.gameplay_tests.validation.robot_speed_threshold import (
-    RobotSpeedEventuallyBelowThreshold,
-)
+from software.gameplay_tests.validation.delay_validation import DelayValidation
 from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
 )
-from software.gameplay_tests.validation.delay_validation import DelayValidation
+from software.gameplay_tests.validation.robot_speed_threshold import (
+    RobotSpeedEventuallyBelowThreshold,
+)
 
 
 def test_crease_defense_play(simulated_test_runner):

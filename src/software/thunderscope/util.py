@@ -1,26 +1,24 @@
 import platform
-from typing import Callable, NoReturn, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, NoReturn
 
 if TYPE_CHECKING:
     from software.thunderscope.thunderscope import Thunderscope
 
+import queue
+import time
+
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from proto.message_translation import tbots_protobuf
+from pyqtgraph.Qt import QtGui
 from software.py_constants import (
-    SECONDS_PER_MILLISECOND,
     NANOSECONDS_PER_MILLISECOND,
+    SECONDS_PER_MILLISECOND,
 )
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
 from software.thunderscope.time_provider import time_provider_instance
-
-import queue
-import time
-
-from pyqtgraph.Qt import QtGui
-import software.python_bindings as tbots_cpp
 
 
 def exit_poller(

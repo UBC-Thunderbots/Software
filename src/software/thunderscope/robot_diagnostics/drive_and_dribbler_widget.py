@@ -1,11 +1,11 @@
-from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.Qt import QtWidgets
-import proto.import_all_protos as protos
 from enum import IntEnum
-import software.python_bindings as tbots_cpp
 
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt.QtCore import Qt
 from software.thunderscope.common import common_widgets
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class ControlMode(IntEnum):

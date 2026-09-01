@@ -1,16 +1,14 @@
-from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
-from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.Qt.QtCore import QTimer, Qt
+from typing import Callable, List, override
 
 import proto.import_all_protos as protos
-from software.thunderscope.gl.helpers.observable_list import ObservableList
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-
-from software.thunderscope.gl.layers.gl_layer import GLLayer
+from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt.QtCore import Qt, QTimer
+from software.thunderscope.binary_context_managers.full_system import ProtoUnixIO
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-
-from typing import Callable, List, override
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class GLDrawPolygonObstacleLayer(GLLayer):

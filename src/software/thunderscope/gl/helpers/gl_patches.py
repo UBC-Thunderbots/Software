@@ -1,6 +1,7 @@
+from typing import Callable
+
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.Qt import QtGui
-from typing import Callable
 
 
 def GLGraphicsItem_setParentItem_patched(self, parent: GLGraphicsItem) -> None:

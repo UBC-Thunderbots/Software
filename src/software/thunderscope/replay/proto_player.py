@@ -1,26 +1,28 @@
-import logging
-import time
-import threading
 import base64
-import os
-import gzip
 import glob
+import gzip
+import logging
+import os
+import pickle
+import threading
+import time
+from typing import Callable, List, Type
+
+import google.protobuf.symbol_database as _symbol_database
 import proto.import_all_protos as protos
-from extlibs.er_force_sim.src.protobuf import world_pb2 as _er_force_world_pb2  # noqa: F401
+import software.python_bindings as tbots_cpp
+from extlibs.er_force_sim.src.protobuf import (
+    world_pb2 as _er_force_world_pb2,  # noqa: F401
+)
+from google.protobuf.message import Message
 from software.py_constants import (
     REPLAY_FILE_EXTENSION,
     REPLAY_FILE_VERSION,
     REPLAY_FILE_VERSION_PREFIX,
     REPLAY_METADATA_DELIMITER,
 )
-
 from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.python_bindings as tbots_cpp
-import google.protobuf.symbol_database as _symbol_database
-from google.protobuf.message import Message
-from typing import Callable, Type, List
-import pickle
 
 
 class ProtoPlayer:

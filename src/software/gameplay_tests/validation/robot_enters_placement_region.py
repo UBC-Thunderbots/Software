@@ -1,13 +1,13 @@
-import software.python_bindings as tbots_cpp
-from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
-import proto.import_all_protos as protos
+from typing import override
 
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-from typing import override
+from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 
 
 class RobotEntersPlacementRegion(Validation):

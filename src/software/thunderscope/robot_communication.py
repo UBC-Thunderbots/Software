@@ -1,24 +1,23 @@
-from typing import Self
-
+import os
 import threading
 import time
-import os
-import software.python_bindings as tbots_cpp
+from typing import Self
 
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.logger.logger import create_logger
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.py_constants import (
     MAX_ROBOT_IDS_PER_SIDE,
     NUM_TIMES_SEND_STOP,
 )
 from software.thunderscope.constants import (
     ROBOT_COMMUNICATIONS_TIMEOUT_S,
-    IndividualRobotMode,
     EstopMode,
+    IndividualRobotMode,
 )
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 
 logger = create_logger(__name__)
 

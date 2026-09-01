@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import os
 import logging
+import os
 import time
-
 from subprocess import Popen
+
 import proto.import_all_protos as protos
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.py_constants import (
     BLUE_PRIMITIVE_SET,
     BLUE_ROBOT_STATUS_PATH,
@@ -21,12 +22,11 @@ from software.py_constants import (
     YELLOW_SSL_WRAPPER_PATH,
     YELLOW_WORLD_PATH,
 )
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.binary_context_managers.util import (
     is_cmd_running,
     kill_cmd_if_running,
 )
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class Simulator:

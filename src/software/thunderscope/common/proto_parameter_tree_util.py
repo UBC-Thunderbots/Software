@@ -1,8 +1,7 @@
+import netifaces
+import proto.import_all_protos as protos
 from pyqtgraph import parametertree
 from thefuzz import fuzz
-import proto.import_all_protos as protos
-import netifaces
-
 
 """
 Instead of the using the generic parameter parsing, this constant can be used to define custom handlers for specific

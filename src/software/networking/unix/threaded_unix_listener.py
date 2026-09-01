@@ -2,9 +2,10 @@ import os
 import queue
 import socketserver
 from threading import Thread
-from software.logger.logger import create_logger
-from software import py_constants
 from typing import override
+
+from software import py_constants
+from software.logger.logger import create_logger
 
 logger = create_logger(__name__)
 

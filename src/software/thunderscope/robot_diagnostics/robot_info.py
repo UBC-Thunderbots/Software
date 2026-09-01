@@ -1,7 +1,12 @@
 from __future__ import annotations
+
+import time as time
+from collections import deque
+from typing import Type, override
+
+import proto.import_all_protos as protos
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
 from software.py_constants import (
     DISCONNECT_DURATION_MS,
     MAX_BATTERY_VOLTAGE,
@@ -9,21 +14,17 @@ from software.py_constants import (
     MIN_BATTERY_VOLTAGE,
     SECONDS_PER_MILLISECOND,
 )
-import proto.import_all_protos as protos
 from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import (
-    Colors,
-    IndividualRobotMode,
     MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
     MAX_ACCEPTABLE_PACKET_LOSS_PERCENT,
     MAX_LENGTH_PRIMITIVE_SET_STORE,
     MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
     ROBOT_RADIUS,
+    Colors,
+    IndividualRobotMode,
 )
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
-import time as time
-from typing import Type, override
-from collections import deque
 
 
 class BreakbeamLabel(QtWidgets.QLabel):

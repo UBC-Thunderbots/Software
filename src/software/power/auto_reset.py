@@ -1,7 +1,7 @@
 Import("env")
-import time
 import os
 import subprocess
+import time
 from enum import Enum
 
 BOOT_GPIO = 24

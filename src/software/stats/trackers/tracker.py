@@ -1,10 +1,11 @@
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+import queue
 from typing import Callable
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-import queue
-from software.stats.logs.event_log import EventType, EventLog
+from software.stats.logs.event_log import EventLog, EventType
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class Tracker:

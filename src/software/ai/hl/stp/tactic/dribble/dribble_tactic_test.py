@@ -1,12 +1,16 @@
+import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-from software.py_constants import DIST_TO_FRONT_OF_ROBOT_METERS, ROBOT_MAX_RADIUS_METERS
-
-import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
+)
+from software.gameplay_tests.validation.delay_validation import (
+    DelayValidation,
 )
 from software.gameplay_tests.validation.excessive_dribbling import (
     EventuallyStartsExcessivelyDribbling,
@@ -18,12 +22,7 @@ from software.gameplay_tests.validation.robot_at_orientation import (
 from software.gameplay_tests.validation.robot_received_ball import (
     RobotEventuallyReceivedBall,
 )
-from software.gameplay_tests.validation.delay_validation import (
-    DelayValidation,
-)
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.py_constants import DIST_TO_FRONT_OF_ROBOT_METERS, ROBOT_MAX_RADIUS_METERS
 
 
 def get_enemy_robot_positions():

@@ -1,8 +1,9 @@
+from typing import override
+
 import proto.import_all_protos as protos
 from software.gameplay_tests.validation.validation import (
     Validation,
 )
-from typing import override
 
 
 class OrValidation(Validation):

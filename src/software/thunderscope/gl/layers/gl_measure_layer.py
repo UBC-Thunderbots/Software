@@ -1,22 +1,19 @@
-from pyqtgraph.Qt import QtGui
-import pyqtgraph.opengl as gl
-
 import math
-import numpy as np
+from typing import override
 
+import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.Qt import QtGui
 from software.thunderscope.constants import (
+    THUNDERSCOPE_UI_FONT_NAME,
     Colors,
     DepthValues,
-    THUNDERSCOPE_UI_FONT_NAME,
 )
-
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
 
 
 class GLMeasureLayer(GLLayer):

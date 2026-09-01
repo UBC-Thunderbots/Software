@@ -1,6 +1,5 @@
-from pyqtgraph.Qt import QtWidgets
-from pyqtgraph.Qt import QtCore
 import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtWidgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 

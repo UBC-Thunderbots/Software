@@ -1,33 +1,30 @@
-import queue
-import time
-import os
-import glob
-import threading
-
-import pytest
 import argparse
+import glob
+import os
+import queue
+import threading
+import time
+from typing import override
+
 import proto.import_all_protos as protos
-
-from software.gameplay_tests.validation import validation
-from software.thunderscope.constants import EstopMode, IndividualRobotMode
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.logger.logger import create_logger
-
-
-from software.thunderscope.thunderscope_config import configure_field_test_view
+import pytest
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.estop_helpers import get_estop_config
+from software.gameplay_tests.validation import validation
+from software.logger.logger import create_logger
 from software.py_constants import (
     MAX_ROBOT_IDS_PER_SIDE,
     SSL_REFEREE_PORT,
     getRobotMulticastChannel,
 )
-from typing import override
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.constants import EstopMode, IndividualRobotMode
+from software.thunderscope.estop_helpers import get_estop_config
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thunderscope_config import configure_field_test_view
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 
 logger = create_logger(__name__)
 

@@ -1,23 +1,21 @@
-import pytest
-
-import software.python_bindings as tbots_cpp
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
-
-from software.gameplay_tests.validation.robot_enters_region import (
-    NumberOfRobotsEventuallyEntersRegion,
-)
-from software.gameplay_tests.validation.robot_at_position import (
-    RobotEventuallyAtPosition,
-)
-from software.gameplay_tests.validation.robot_at_orientation import (
-    RobotEventuallyAtOrientation,
-)
-from proto.message_translation.tbots_protobuf import create_world_state
 import proto.import_all_protos as protos
+import pytest
+import software.python_bindings as tbots_cpp
+from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
+from software.gameplay_tests.validation.robot_at_orientation import (
+    RobotEventuallyAtOrientation,
+)
+from software.gameplay_tests.validation.robot_at_position import (
+    RobotEventuallyAtPosition,
+)
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsEventuallyEntersRegion,
+)
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 @pytest.mark.parametrize(

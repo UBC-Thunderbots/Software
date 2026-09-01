@@ -1,13 +1,13 @@
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-from software.gameplay_tests.validation.robot_enters_region import (
-    NumberOfRobotsEventuallyExitsRegion,
-    NumberOfRobotsEventuallyEntersRegion,
-)
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-import proto.import_all_protos as protos
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsEventuallyEntersRegion,
+    NumberOfRobotsEventuallyExitsRegion,
 )
 
 

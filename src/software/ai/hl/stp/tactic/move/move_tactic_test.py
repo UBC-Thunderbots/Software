@@ -1,27 +1,26 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-from software.gameplay_tests.validation.robot_at_position import (
-    RobotEventuallyAtPosition,
-)
-from software.gameplay_tests.validation.ball_kicked_in_direction import (
-    BallEventuallyKickedInDirection,
-)
-from software.gameplay_tests.validation.robot_at_orientation import (
-    RobotEventuallyAtOrientation,
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
 )
 from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
+    BallEventuallyKickedInDirection,
+)
+from software.gameplay_tests.validation.duration_validation import DurationValidation
 from software.gameplay_tests.validation.robot_at_angular_velocity import (
     RobotEventuallyAtAngularVelocity,
 )
-from software.gameplay_tests.validation.duration_validation import DurationValidation
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
+from software.gameplay_tests.validation.robot_at_orientation import (
+    RobotEventuallyAtOrientation,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
-import proto.import_all_protos as protos
+from software.gameplay_tests.validation.robot_at_position import (
+    RobotEventuallyAtPosition,
+)
 
 
 def test_move_across_field(simulated_test_runner):

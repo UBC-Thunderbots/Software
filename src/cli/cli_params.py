@@ -1,13 +1,12 @@
-from enum import Enum
-from typing import Annotated
-from dataclasses import dataclass
-import questionary
 import os
 import sys
+from dataclasses import dataclass
+from enum import Enum
+from typing import Annotated
 
-from typer import Argument, Option
-
+import questionary
 from cli.multi_option import MultiOption
+from typer import Argument, Option
 
 
 class ActionArgument(str, Enum):

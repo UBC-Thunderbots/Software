@@ -1,37 +1,32 @@
 import time
-
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.Qt import QtWidgets
+from typing import Optional, override
 
 import numpy as np
-from typing import Optional
+import proto.import_all_protos as protos
+import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
+from pyqtgraph.Qt.QtCore import Qt
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
-
+from software.thunderscope.common.toast_msg_helper import success_toast
 from software.thunderscope.constants import (
-    CameraView,
     DEFAULT_EMPTY_FIELD_WORLD,
     ORTHOGRAPHIC_FOV_DEGREES,
+    CameraView,
 )
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import (
     ExtendedGLViewWidget,
     MouseInSceneEvent,
 )
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
+from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.replay.proto_player import ProtoPlayer
+from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-import proto.import_all_protos as protos
-
-from software.thunderscope.common.toast_msg_helper import success_toast
-from typing import override
 
 
 class GLWidget(QtWidgets.QWidget):

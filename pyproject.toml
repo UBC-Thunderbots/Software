@@ -2,4 +2,4 @@
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["ALL"]
+extend-select = ["I", "F403", "F405"]

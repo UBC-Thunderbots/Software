@@ -1,11 +1,12 @@
-from software.stats.trackers.tracker import Tracker
-from typing import override
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.python_bindings as tbots_cpp
-from software.stats.logs.event_log import EventType
 import queue
-from software.py_constants import BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING
+from typing import override
+
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from software.py_constants import BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING
+from software.stats.logs.event_log import EventType
+from software.stats.trackers.tracker import Tracker
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class PossessionTracker(Tracker):
