@@ -319,7 +319,9 @@ class ProtoConfigurationWidget(QWidget):
                 self.build_proto(value, f"{current_attr}.{key}")
 
             # Extract FieldDescriptorProto from file_proto directly
-            msg_proto = next(m for m in file_proto.message_type if m.name == message.DESCRIPTOR.name)
+            msg_proto = next(
+                m for m in file_proto.message_type if m.name == message.DESCRIPTOR.name
+            )
             field_proto = next(f for f in msg_proto.field if f.name == descriptor.name)
 
             print("FieldProto name:", field_proto.name)
