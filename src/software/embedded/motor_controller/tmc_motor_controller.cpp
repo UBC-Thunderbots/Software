@@ -441,9 +441,8 @@ int TmcMotorController::readThenWriteValue(const MotorIndex motor,
         write_tx_[4 - i]     = byte_to_copy;
     }
 
-    readThenWriteSpiTransfer(
-        file_descriptors_[CHIP_SELECTS.at(motor)], read_tx_, write_tx_, read_rx_,
-        TMC4671_SPI_SPEED);
+    readThenWriteSpiTransfer(file_descriptors_[CHIP_SELECTS.at(motor)], read_tx_,
+                             write_tx_, read_rx_, TMC4671_SPI_SPEED);
 
     int32_t value = read_rx_[0];
     for (int i = 1; i < 5; i++)

@@ -194,7 +194,7 @@ class TmcMotorController : public MotorController
     void checkEncoderConnections();
 
     // Trinamics communicate with 5 byte messages
-    static constexpr uint32_t TMC_CMD_MSG_SIZE = 5;
+    static constexpr size_t TMC_CMD_MSG_SIZE = 5;
 
     // Select between driver and controller gpio
     std::unique_ptr<Gpio> spi_demux_select_0_;

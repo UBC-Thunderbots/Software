@@ -22,7 +22,7 @@
  * @param rx the rx buffer, will be updated with data from the full-duplex transfer
  * @param spi_speed the speed to run spi at in Hz
  */
-template <unsigned len>
+template <size_t len>
 void spiTransfer(int fd, const std::array<uint8_t, len>& tx, std::array<uint8_t, len>& rx,
                  uint32_t spi_speed)
 {
@@ -58,7 +58,7 @@ void spiTransfer(int fd, const std::array<uint8_t, len>& tx, std::array<uint8_t,
  * @param read_rx the buffer our read response will be placed in
  * @param spi_speed the speed to run spi at in Hz
  */
-template <uint32_t read_len, uint32_t write_len>
+template <size_t read_len, size_t write_len>
 void readThenWriteSpiTransfer(int fd, const std::array<uint8_t, read_len>& read_tx,
                               const std::array<uint8_t, write_len>& write_tx,
                               std::array<uint8_t, read_len>& read_rx, uint32_t spi_speed)
