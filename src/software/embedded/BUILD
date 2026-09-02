@@ -44,7 +44,7 @@ cc_library(
 
 cc_library(
     name = "spi_utils",
-    hdrs = ["spi_utils.h"],
+    hdrs = ["spi_utils.hpp"],
     deps = [
         "//software/logger",
     ],

@@ -14,7 +14,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/embedded/motor_controller/stspin_types.h"
-#include "software/embedded/spi_utils.h"
+#include "software/embedded/spi_utils.hpp"
 #include "software/logger/logger.h"
 
 // AUTOSAR variant of CRC-8
@@ -280,7 +280,7 @@ void StSpinMotorController::sendAndReceiveFrame(const MotorIndex motor,
 
     populateTx(outgoing_frame, tx);
 
-    spiTransfer<FRAME_LEN>(spi_fds_[motor], tx, rx, SPI_SPEED_HZ);
+    spiTransfer(spi_fds_[motor], tx, rx, SPI_SPEED_HZ);
 
     motor_status_[motor].frame_count++;
 

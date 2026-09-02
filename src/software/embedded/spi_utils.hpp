@@ -6,7 +6,7 @@
 #include <array>
 #include <cstdint>
 
-#include "software/embedded/spi_utils.h"
+#include "software/embedded/spi_utils.hpp"
 #include "software/logger/logger.h"
 
 // TODO: #3747 Wrap in spi_utils namespace
@@ -63,7 +63,7 @@ void readThenWriteSpiTransfer(int fd, const std::array<uint8_t, read_len>& read_
                               const std::array<uint8_t, write_len>& write_tx,
                               std::array<uint8_t, read_len>& read_rx, uint32_t spi_speed)
 {
-    uint8_t write_rx[5] = {};
+    uint8_t write_rx[write_len] = {};
 
     struct spi_ioc_transfer tr[2];
     memset(tr, 0, sizeof(tr));

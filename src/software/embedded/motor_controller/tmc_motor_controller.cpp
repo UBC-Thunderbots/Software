@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/embedded/gpio/gpio_char_dev.h"
-#include "software/embedded/spi_utils.h"
+#include "software/embedded/spi_utils.hpp"
 #include "software/logger/logger.h"
 
 extern "C"
@@ -441,7 +441,7 @@ int TmcMotorController::readThenWriteValue(const MotorIndex motor,
         write_tx_[4 - i]     = byte_to_copy;
     }
 
-    readThenWriteSpiTransfer<TMC_CMD_MSG_SIZE, TMC_CMD_MSG_SIZE>(
+    readThenWriteSpiTransfer(
         file_descriptors_[CHIP_SELECTS.at(motor)], read_tx_, write_tx_, read_rx_,
         TMC4671_SPI_SPEED);
 
@@ -575,7 +575,7 @@ uint8_t TmcMotorController::readWriteByte(const uint8_t motor, const uint8_t dat
             // The first byte should contain the address on a read operation.
             // Trigger a transfer (1 byte) and buffer the response (4 bytes)
             tx_[position_] = data;
-            spiTransfer<5>(file_descriptors_[motor], tx_, rx_, spi_speed);
+            spiTransfer(file_descriptors_[motor], tx_, rx_, spi_speed);
 
             currently_reading_ = true;
             currently_writing_ = false;
@@ -601,7 +601,7 @@ uint8_t TmcMotorController::readWriteByte(const uint8_t motor, const uint8_t dat
     {
         // we have all the bytes for this transfer, lets trigger the transfer and
         // reset state
-        spiTransfer<5>(file_descriptors_[motor], tx_, rx_, spi_speed);
+        spiTransfer(file_descriptors_[motor], tx_, rx_, spi_speed);
         transfer_started_ = false;
     }
 

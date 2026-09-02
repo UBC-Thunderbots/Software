@@ -193,6 +193,9 @@ class TmcMotorController : public MotorController
      */
     void checkEncoderConnections();
 
+    // Trinamics communicate with 5 byte messages
+    static constexpr uint32_t TMC_CMD_MSG_SIZE = 5;
+
     // Select between driver and controller gpio
     std::unique_ptr<Gpio> spi_demux_select_0_;
     std::unique_ptr<Gpio> spi_demux_select_1_;
@@ -202,13 +205,13 @@ class TmcMotorController : public MotorController
     std::unique_ptr<Gpio> reset_gpio_;
 
     // Transfer Buffers for spiTransfer
-    std::array<uint8_t, 5> tx_ = {};
-    std::array<uint8_t, 5> rx_ = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> tx_ = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> rx_ = {};
 
     // Transfer Buffers for readThenWriteSpiTransfer
-    std::array<uint8_t, 5> write_tx_ = {};
-    std::array<uint8_t, 5> read_tx_  = {};
-    std::array<uint8_t, 5> read_rx_  = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> write_tx_ = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> read_tx_  = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> read_rx_  = {};
 
     // Transfer State
     bool transfer_started_  = false;
@@ -267,9 +270,6 @@ class TmcMotorController : public MotorController
     // Number of times that Thunderloop will try to write the configuration to the driver
     // before giving up
     static constexpr int NUM_RETRIES_SPI = 3;
-
-    // Trinamics communicate with 5 byte messages
-    static constexpr uint32_t TMC_CMD_MSG_SIZE = 5;
 
     static constexpr int DRIVE_MOTOR_NUM_POLE_PAIRS    = 8;
     static constexpr int DRIBBLER_MOTOR_NUM_POLE_PAIRS = 1;
