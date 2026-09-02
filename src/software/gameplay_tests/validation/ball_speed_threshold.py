@@ -1,7 +1,12 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
-from software.py_constants import *
-from software.gameplay_tests.validation.speed_threshold_helpers import *
+import proto.import_all_protos as protos
+from software.gameplay_tests.validation.speed_threshold_helpers import (
+    get_ball_speed,
+    get_current_ball_angle,
+    get_current_ball_position,
+    get_validation_centre_position,
+    get_validation_line_endpoints,
+)
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -22,7 +27,7 @@ class BallSpeedThreshold(Validation):
         self.speed_threshold = speed_threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the ball speed is at or above some threshold
 
         :param world: The world msg to validate
@@ -33,12 +38,12 @@ class BallSpeedThreshold(Validation):
             tbots_cpp.createVector(world.ball.current_state.global_velocity).length()
             >= self.speed_threshold
         ):
-            return ValidationStatus.PASSING
+            return protos.ValidationStatus.PASSING
 
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) shows regions to enter"""
         if get_ball_speed(world.ball) == 0:
             return create_validation_geometry([])

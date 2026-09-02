@@ -20,9 +20,13 @@ from software.stats.loggers.stats_logger import StatsLogger
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers import *
-from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_MINUTE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.thunderscope.constants import (
@@ -33,7 +37,12 @@ from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import CI_DURATION_S
-from software.thunderscope.util import *
+from software.thunderscope.util import (
+    async_sim_ticker,
+    exit_poller,
+    realtime_sim_ticker,
+    sync_simulation,
+)
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator

@@ -269,15 +269,25 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
             // previous sequence number
             if (ack_seq_num == current_seq || ack_seq_num == prev_seq)
             {
-                const auto now = std::chrono::steady_clock::now();
-                motor_status_.at(motor).last_message_ack_time = now;
-
                 std::array<uint8_t, MESSAGE_SIZE> message{};
                 std::copy(delimiter_pos, std::next(delimiter_pos, MESSAGE_SIZE),
                           message.begin());
                 processRx(motor, message);
 
-                return;
+                if (ack_seq_num == current_seq)
+                {
+                    // Message with current sequence number has been acknowledged
+                    const auto now = std::chrono::steady_clock::now();
+                    motor_status_.at(motor).last_message_ack_time = now;
+                    return;
+                }
+            }
+            else
+            {
+                LOG(WARNING)
+                    << "Received unexpected sequence number in message from motor "
+                    << motor << " (current seq num is " << static_cast<int>(current_seq)
+                    << " but got seq num " << static_cast<int>(ack_seq_num) << ")";
             }
         }
 
