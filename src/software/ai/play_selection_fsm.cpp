@@ -24,7 +24,14 @@ PlaySelectionFSM::PlaySelectionFSM(
 
 Play& PlaySelectionFSM::getSelectedPlay() const
 {
-    return override_play ? *override_play : *current_play;
+    if (override_play)
+    {
+        return *override_play;
+    }
+    else
+    {
+        return *current_play;
+    }
 }
 
 bool PlaySelectionFSM::gameStateStopped(const Update& event)
