@@ -232,7 +232,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
     std::vector<uint8_t> received_data;
     for (unsigned int attempt = 0; attempt < MAX_SPI_TRANSFER_ATTEMPTS; ++attempt)
     {
-        spiTransfer(spi_fds_[motor], tx.data(), rx.data(), MESSAGE_SIZE, SPI_SPEED_HZ);
+        spiTransfer(spi_fds_[motor], tx, rx, SPI_SPEED_HZ);
         received_data.insert(received_data.end(), rx.begin(), rx.end());
 
         auto delimiter_pos =
