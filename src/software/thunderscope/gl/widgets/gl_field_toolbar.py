@@ -1,7 +1,7 @@
 from typing import Callable, override
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt import QtWidgets
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import (
     CameraView,
@@ -117,7 +117,7 @@ class GLFieldToolbar(GLToolbar):
         self.pause_button.setStyleSheet(self.get_button_style())
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
-        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, protos.SimulationState)
 
         # Setup Toolbars button for toggling visibility of toolbars
         self.toolbars_button = QtWidgets.QPushButton()

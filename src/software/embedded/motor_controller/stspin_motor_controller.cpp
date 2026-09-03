@@ -15,7 +15,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/embedded/motor_controller/stspin_types.h"
-#include "software/embedded/spi_utils.h"
+#include "software/embedded/spi_utils.hpp"
 #include "software/logger/logger.h"
 
 // AUTOSAR variant of CRC-8
@@ -202,7 +202,7 @@ void StSpinMotorController::immediatelyDisable()
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex motor)
 {
-    spi_fds_[motor] = open(SPI_PATHS.at(motor), O_RDWR);
+    spi_fds_[motor] = open(SPI_PATHS.at(motor).c_str(), O_RDWR);
     CHECK(spi_fds_[motor] >= 0)
         << "can't open device: " << motor << "error: " << strerror(errno);
 
@@ -232,7 +232,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
     std::vector<uint8_t> received_data;
     for (unsigned int attempt = 0; attempt < MAX_SPI_TRANSFER_ATTEMPTS; ++attempt)
     {
-        spiTransfer(spi_fds_[motor], tx.data(), rx.data(), MESSAGE_SIZE, SPI_SPEED_HZ);
+        spiTransfer(spi_fds_[motor], tx, rx, SPI_SPEED_HZ);
         received_data.insert(received_data.end(), rx.begin(), rx.end());
 
         auto delimiter_pos =

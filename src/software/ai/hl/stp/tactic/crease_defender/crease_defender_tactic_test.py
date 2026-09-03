@@ -1,12 +1,7 @@
 import pytest
 import software.python_bindings as tbots_cpp
 
-from proto.import_all_protos import (
-    BallStealMode,
-    CreaseDefenderAlignment,
-    CreaseDefenderTactic,
-    MaxAllowedSpeedMode,
-)
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsAlwaysOnGround,
@@ -43,11 +38,11 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: CreaseDefenderTactic(
+                0: protos.CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(enemy_threat_point),
-                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                    ball_steal_mode=BallStealMode.STEAL,
+                    crease_defender_alignment=protos.CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )
@@ -65,19 +60,19 @@ def test_not_bumping_ball_towards_net(simulated_test_runner):
     "enemy_threat_point,crease_alignment,region_index",
     [
         # Enemy threat in front of crease, LEFT
-        (tbots_cpp.Point(1, 2.5), CreaseDefenderAlignment.LEFT, 2),
+        (tbots_cpp.Point(1, 2.5), protos.CreaseDefenderAlignment.LEFT, 2),
         # Enemy threat in front of crease, CENTRE
-        (tbots_cpp.Point(1, -2.5), CreaseDefenderAlignment.CENTRE, 3),
+        (tbots_cpp.Point(1, -2.5), protos.CreaseDefenderAlignment.CENTRE, 3),
         # Enemy threat in front of crease, RIGHT
-        (tbots_cpp.Point(1.5, 2), CreaseDefenderAlignment.RIGHT, 2),
+        (tbots_cpp.Point(1.5, 2), protos.CreaseDefenderAlignment.RIGHT, 2),
         # Enemy threat left side of crease, RIGHT
-        (tbots_cpp.Point(-3.5, 2.5), CreaseDefenderAlignment.RIGHT, 1),
+        (tbots_cpp.Point(-3.5, 2.5), protos.CreaseDefenderAlignment.RIGHT, 1),
         # Enemy threat left side of crease, CENTRE
-        (tbots_cpp.Point(-4, 2.5), CreaseDefenderAlignment.CENTRE, 0),
+        (tbots_cpp.Point(-4, 2.5), protos.CreaseDefenderAlignment.CENTRE, 0),
         # goal Enemy threat right side of crease, RIGHT
-        (tbots_cpp.Point(-4, -2), CreaseDefenderAlignment.RIGHT, 5),
+        (tbots_cpp.Point(-4, -2), protos.CreaseDefenderAlignment.RIGHT, 5),
         # Enemy threat right side of crease, LEFT
-        (tbots_cpp.Point(-4.25, -2), CreaseDefenderAlignment.LEFT, 5),
+        (tbots_cpp.Point(-4.25, -2), protos.CreaseDefenderAlignment.LEFT, 5),
     ],
 )
 def test_crease_region_positioning(
@@ -104,11 +99,11 @@ def test_crease_region_positioning(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: CreaseDefenderTactic(
+                0: protos.CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(enemy_threat_point),
                     crease_defender_alignment=crease_alignment,
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                    ball_steal_mode=BallStealMode.STEAL,
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )
@@ -229,11 +224,11 @@ def test_crease_positioning(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: CreaseDefenderTactic(
+                0: protos.CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                    ball_steal_mode=BallStealMode.STEAL,
+                    crease_defender_alignment=protos.CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )
@@ -339,11 +334,11 @@ def test_crease_autochip(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: CreaseDefenderTactic(
+                0: protos.CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                    ball_steal_mode=BallStealMode.STEAL,
+                    crease_defender_alignment=protos.CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )
@@ -411,11 +406,11 @@ def test_crease_get_ball(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: CreaseDefenderTactic(
+                0: protos.CreaseDefenderTactic(
                     enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                    crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                    ball_steal_mode=BallStealMode.STEAL,
+                    crease_defender_alignment=protos.CreaseDefenderAlignment.CENTRE,
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+                    ball_steal_mode=protos.BallStealMode.STEAL,
                 )
             }
         )

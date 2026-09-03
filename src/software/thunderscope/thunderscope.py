@@ -10,7 +10,13 @@ from pyqtgraph.Qt import QtWidgets
 
 from typing import Callable
 
-from software.thunderscope.constants import *
+from software.thunderscope.constants import (
+    LAST_OPENED_LAYOUT_PATH,
+    LAYOUT_FILE_EXTENSION,
+    SAVED_LAYOUT_PATH,
+    THUNDERSCOPE_HELP_TEXT,
+    THUNDERSCOPE_REFRESH_INTERVAL_MS,
+)
 
 from software.thunderscope.thunderscope_config import TScopeConfig
 

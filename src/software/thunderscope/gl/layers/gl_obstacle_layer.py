@@ -1,4 +1,4 @@
-from proto.visualization_pb2 import ObstacleList
+import proto.import_all_protos as protos
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -25,7 +25,7 @@ class GLObstacleLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, ObstacleList)
+        self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, protos.ObstacleList)
 
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)

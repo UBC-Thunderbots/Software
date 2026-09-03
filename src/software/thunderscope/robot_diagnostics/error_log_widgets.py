@@ -1,11 +1,10 @@
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt import QtGui
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from datetime import datetime
 import textwrap
 import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_constants as error_constants
-from proto.robot_log_msg_pb2 import RobotLog
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.constants import LOG_LEVEL_STR_MAP
 from typing import override
@@ -208,7 +207,7 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
 class RobotCrashLogMessageWidget(RobotLogMessageWithDialogWidget):
     """A robot error log message when a robot has crashed. On click, opens a dialog with last robot status"""
 
-    def __init__(self, crash_message: RobotCrash):
+    def __init__(self, crash_message: protos.RobotCrash):
         """Creates an error message for a crashed robot. Creates a dialog to display the whole crash message
 
         :param crash_message: the crash message containing robot id and other info
@@ -232,7 +231,7 @@ class FatalLogMessageWidget(RobotLogMessageWithDialogWidget):
     opens a dialog with the stack dump + extra info
     """
 
-    def __init__(self, robot_log: RobotLog):
+    def __init__(self, robot_log: protos.RobotLog):
         """Creates an error message for a robot with a fatal log message. Creates a dialog to display the whole log
 
         :param robot_log: the fatal log message
@@ -253,7 +252,7 @@ class RobotFatalLogDialog(QtWidgets.QDialog):
     Displays the message info along with the robot ID and the file / line number that caused it
     """
 
-    def __init__(self, fatal_log: RobotLog, parent=None):
+    def __init__(self, fatal_log: protos.RobotLog, parent=None):
         """Creates a dialog box to display a robot fatal log clearly
 
         :param fatal_log: the fatal log to display

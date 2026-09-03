@@ -1,4 +1,3 @@
-from proto.import_all_protos import *
 from software.py_constants import MILLIMETERS_PER_METER
 from software.thunderscope.constants import SPEED_SEGMENT_SCALE
 import math

@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -22,7 +22,7 @@ class FriendlyHasBallPossession(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if friendly robot has possession of the ball
 
         :param world: The world msg to validate
@@ -34,11 +34,11 @@ class FriendlyHasBallPossession(Validation):
             if self.robot_id is not None and robot.id != self.robot_id:
                 continue
             if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.tolerance):
-                return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+                return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) highlights the dribbler area of the robots"""
         return create_validation_geometry(
             [

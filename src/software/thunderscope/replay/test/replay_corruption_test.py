@@ -18,7 +18,7 @@ import random
 import shutil
 import gzip
 import os
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from google.protobuf.message import Message
 import base64
 from software.py_constants import REPLAY_METADATA_DELIMITER
@@ -39,7 +39,7 @@ def create_random_proto() -> Message:
 
     :return: the proto that we are referencing
     """
-    some_random_proto = RobotId(id=1, team=2)
+    some_random_proto = protos.RobotId(id=1, team=2)
     return some_random_proto
 
 

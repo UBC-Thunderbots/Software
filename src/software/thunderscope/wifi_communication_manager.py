@@ -1,6 +1,6 @@
 from typing import Any, Callable, Self, Type
 
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.logger.logger import create_logger
 import software.python_bindings as tbots_cpp
 from software.py_constants import (
@@ -69,23 +69,23 @@ class WifiCommunicationManager:
         self.receive_ssl_wrapper: tbots_cpp.SSLWrapperPacketProtolistener | None = None
         self.robot_ip_listener: tbots_cpp.RobotIpNotificationProtolistener | None = None
         self.fullsystem_ip_broadcaster: tuple[
-            Lock, tbots_cpp.FullsystemIpBroadcast | None, IpNotification
-        ] = (Lock(), None, IpNotification())
+            Lock, tbots_cpp.FullsystemIpBroadcast | None, protos.IpNotification
+        ] = (Lock(), None, protos.IpNotification())
 
         ## ProtoUnixIO ##
         self.current_proto_unix_io = current_proto_unix_io
 
         ## Network Configuration ##
         self.multicast_channel = multicast_channel
-        self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
+        self.network_config_buffer = ThreadSafeBuffer(1, protos.NetworkConfig)
         self.current_proto_unix_io.register_observer(
-            NetworkConfig, self.network_config_buffer
+            protos.NetworkConfig, self.network_config_buffer
         )
         # Whether to accept the next configuration update. We will be provided a proto configuration from the
         # ProtoConfigurationWidget. If the user provides an interface, we will accept it as the first network
         # configuration and ignore the provided one from the widget. If not, we will wait for this first configuration
         self.accept_next_network_config = True
-        self.current_network_config = NetworkConfig(
+        self.current_network_config = protos.NetworkConfig(
             robot_communication_interface=DISCONNECTED,
             referee_interface=DISCONNECTED,
             vision_interface=DISCONNECTED,
@@ -213,13 +213,13 @@ class WifiCommunicationManager:
             robot_status.adjusted_time_sent.epoch_timestamp_seconds
         )
         self.__forward_to_proto_unix_io(
-            RobotStatistic,
-            RobotStatistic(
+            protos.RobotStatistic,
+            protos.RobotStatistic(
                 robot_id=robot_status.robot_id,
                 round_trip_time_seconds=round_trip_time_seconds,
             ),
         )
-        self.__forward_to_proto_unix_io(RobotStatus, robot_status)
+        self.__forward_to_proto_unix_io(protos.RobotStatus, robot_status)
 
     def __setup_full_system(
         self, referee_interface: str, vision_interface: str
@@ -243,7 +243,7 @@ class WifiCommunicationManager:
                     SSL_REFEREE_ADDRESS,
                     self.referee_port,
                     referee_interface,
-                    lambda data: self.__forward_to_proto_unix_io(Referee, data),
+                    lambda data: self.__forward_to_proto_unix_io(protos.Referee, data),
                     True,
                 )
                 self.current_network_config.referee_interface = referee_interface
@@ -258,7 +258,7 @@ class WifiCommunicationManager:
                     SSL_VISION_PORT,
                     vision_interface,
                     lambda data: self.__forward_to_proto_unix_io(
-                        SSL_WrapperPacket, data
+                        protos.SSL_WrapperPacket, data
                     ),
                     True,
                 )
@@ -299,7 +299,7 @@ class WifiCommunicationManager:
             self.receive_robot_log = setup_network_resource(
                 lambda: tbots_cpp.RobotLogProtoListener(
                     ROBOT_LOGS_PORT,
-                    lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
+                    lambda data: self.__forward_to_proto_unix_io(protos.RobotLog, data),
                 )
             )
 
@@ -320,7 +320,7 @@ class WifiCommunicationManager:
                 self.multicast_channel,
                 ROBOT_CRASH_PORT,
                 robot_communication_interface,
-                lambda data: self.__forward_to_proto_unix_io(RobotCrash, data),
+                lambda data: self.__forward_to_proto_unix_io(protos.RobotCrash, data),
                 True,
             )
         )
@@ -350,7 +350,7 @@ class WifiCommunicationManager:
                 self.fullsystem_ip_broadcaster = (
                     self.fullsystem_ip_broadcaster[0],
                     fullsystem_ip_broadcaster,
-                    IpNotification(ip_address=local_ip),
+                    protos.IpNotification(ip_address=local_ip),
                 )
 
         self.current_network_config.robot_communication_interface = (
@@ -360,7 +360,7 @@ class WifiCommunicationManager:
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.__connect_to_robot(robot_id)
 
-    def __update_robot_ip(self, robot_ip_notification: IpNotification) -> None:
+    def __update_robot_ip(self, robot_ip_notification: protos.IpNotification) -> None:
         """Given a received discovery message from a robot, update the robot's IP address
 
         :param robot_ip_notification: IP notification message from a robot with its IP address
@@ -411,7 +411,7 @@ class WifiCommunicationManager:
             self.accept_next_network_config = True
             self.__print_current_network_config()
 
-    def send_primitive(self, robot_id: int, primitive: Primitive) -> None:
+    def send_primitive(self, robot_id: int, primitive: protos.Primitive) -> None:
         """Send the given primitive to the robot with the given id
 
         :param robot_id: the id of the robot to send the primitive to

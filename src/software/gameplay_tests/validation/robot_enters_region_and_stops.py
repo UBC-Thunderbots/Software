@@ -1,5 +1,5 @@
 import math
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     create_validation_types,
@@ -31,7 +31,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
         self.passing_robot_id = None
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if a robot is in the provided region
         Then checks if that robot is stationary within a threshold for the provided number of ticks
 
@@ -49,7 +49,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
 
         # if a robot is currently in the region
         if (
-            robot_in_region_validation == ValidationStatus.PASSING
+            robot_in_region_validation == protos.ValidationStatus.PASSING
             and self.passing_robot is not None
         ):
             # check if robot speed is less than stationary threshold
@@ -64,12 +64,12 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
                 self.is_stationary = True
                 # if the robot has been stationary for the specified num ticks
                 if self.ticks_so_far >= self.num_ticks:
-                    return ValidationStatus.PASSING
+                    return protos.ValidationStatus.PASSING
             else:
                 # reset the num ticks since robot is moving too fast
                 self.ticks_so_far = 0
                 self.is_stationary = False
-                return ValidationStatus.FAILING
+                return protos.ValidationStatus.FAILING
         else:
             # reset the num ticks since robot is no longer in region
             self.ticks_so_far = 0
@@ -77,7 +77,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
             return robot_in_region_validation
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) shows region to enter"""
         return create_validation_geometry(self.regions)
 
