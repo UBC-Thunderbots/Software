@@ -13,7 +13,7 @@ from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import AutoChipOrKick, KickOrChipTactic
+import proto.import_all_protos as protos
 
 
 @pytest.mark.parametrize(
@@ -80,7 +80,7 @@ def test_kick_or_chip(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: KickOrChipTactic(
+                1: protos.KickOrChipTactic(
                     kick_or_chip_origin=tbots_cpp.createPointProto(ball_position),
                     kick_or_chip_direction=tbots_cpp.createAngleProto(
                         angle_to_kick_or_chip_at

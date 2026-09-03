@@ -3,34 +3,38 @@ import time
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.opengl import *
+from pyqtgraph.Qt import QtWidgets
 
 import numpy as np
 from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
-from software.thunderscope.constants import *
+from software.thunderscope.constants import (
+    CameraView,
+    DEFAULT_EMPTY_FIELD_WORLD,
+    ORTHOGRAPHIC_FOV_DEGREES,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.extended_gl_view_widget import *
+from software.thunderscope.gl.helpers.extended_gl_view_widget import (
+    ExtendedGLViewWidget,
+    MouseInSceneEvent,
+)
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.world_pb2 import SimulationState
-from proto.replay_bookmark_pb2 import ReplayBookmark
-from proto.tbots_timestamp_msg_pb2 import Timestamp
+import proto.import_all_protos as protos
 
 from software.thunderscope.common.toast_msg_helper import success_toast
 from typing import override
 
 
-class GLWidget(QWidget):
+class GLWidget(QtWidgets.QWidget):
     """Widget that handles GLLayers to produce a 3D visualization of the field/world
     and our AI. GLWidget can also provide replay controls.
     """
@@ -65,7 +69,7 @@ class GLWidget(QWidget):
             lambda: self.frame_swap_counter.add_one_datapoint()
         )
 
-        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, protos.SimulationState)
 
         # Connect event handlers
         self.gl_view_widget.mouse_in_scene_pressed_signal.connect(
@@ -82,7 +86,7 @@ class GLWidget(QWidget):
         )
 
         # Setup layout
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(self.layout)
@@ -91,8 +95,8 @@ class GLWidget(QWidget):
         # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
-        self.layers_menu = QMenu()
-        self.toolbars_menu = QMenu()
+        self.layers_menu = QtWidgets.QMenu()
+        self.toolbars_menu = QtWidgets.QMenu()
         self.layers_menu_actions = {}
 
         self.simulation_control_toolbar = GLFieldToolbar(
@@ -121,7 +125,8 @@ class GLWidget(QWidget):
             self.replay_controls = ReplayControls(player=player)
             self.replay_controls.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
             self.replay_controls.setSizePolicy(
-                QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
+                QtWidgets.QSizePolicy.Policy.Preferred,
+                QtWidgets.QSizePolicy.Policy.Fixed,
             )
             self.layout.addWidget(self.replay_controls)
         else:
@@ -330,7 +335,7 @@ class GLWidget(QWidget):
         else:
             self.remove_layer(self.measure_layer)
 
-    def __add_toolbar_toggle(self, toolbar: QWidget, name: str) -> None:
+    def __add_toolbar_toggle(self, toolbar: QtWidgets.QWidget, name: str) -> None:
         """Adds a button to the toolbar menu to toggle the given toolbar
 
         :param toolbar: the toolbar to add the toggle button for
@@ -348,8 +353,8 @@ class GLWidget(QWidget):
         )
 
     def __setup_menu_checkbox(
-        self, name: str, parent: QWidget, checked: bool = True
-    ) -> tuple[QCheckBox, QWidgetAction]:
+        self, name: str, parent: QtWidgets.QWidget, checked: bool = True
+    ) -> tuple[QtWidgets.QCheckBox, QtWidgets.QWidgetAction]:
         """Sets up a clickable menu checkbox with the given name
         attached to the given parent
 
@@ -360,10 +365,10 @@ class GLWidget(QWidget):
         """
         # Not using a checkable QAction in order to prevent menu from closing
         # when an action is pressed
-        layer_checkbox = QCheckBox(name, parent)
+        layer_checkbox = QtWidgets.QCheckBox(name, parent)
         layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
         layer_checkbox.setChecked(checked)
-        layer_action = QWidgetAction(parent)
+        layer_action = QtWidgets.QWidgetAction(parent)
         layer_action.setDefaultWidget(layer_checkbox)
 
         return (layer_checkbox, layer_action)
@@ -391,8 +396,8 @@ class GLWidget(QWidget):
     def add_bookmark(self):
         """Handler for clicking 'add bookmark' button"""
         timestamp = time.time()
-        bookmark = ReplayBookmark(
-            timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
+        bookmark = protos.ReplayBookmark(
+            timestamp=protos.Timestamp(epoch_timestamp_seconds=timestamp)
         )
-        self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
+        self.proto_unix_io.send_proto(protos.ReplayBookmark, bookmark)
         success_toast(self.parentWidget(), "Added bookmark!")

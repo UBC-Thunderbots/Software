@@ -1,10 +1,10 @@
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Callable
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 import queue
-from software.stats.logs.event_log import EventType, Team, EventLog
+from software.stats.logs.event_log import EventType, EventLog
 
 
 class Tracker:
@@ -13,9 +13,9 @@ class Tracker:
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
+        from_team: protos.Team,
         event_queue: queue.Queue,
-        for_team: Team,
+        for_team: protos.Team,
         callback: Callable[[EventType], None] = None,
         buffer_size: int = 5,
     ):
@@ -36,8 +36,8 @@ class Tracker:
         self.callback = callback
 
         self.proto_unix_io = proto_unix_io
-        self.world_buffer = ThreadSafeBuffer(self.buffer_size, World)
-        self.proto_unix_io.register_observer(World, self.world_buffer)
+        self.world_buffer = ThreadSafeBuffer(self.buffer_size, protos.World)
+        self.proto_unix_io.register_observer(protos.World, self.world_buffer)
 
         self.cached_world = None
 

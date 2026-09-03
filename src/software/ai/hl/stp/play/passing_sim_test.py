@@ -1,6 +1,6 @@
 import pytest
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -91,7 +91,7 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    config = PassingConfig()
+    config = protos.PassingConfig()
     config.enemy_proximity_importance = 0.01
     config.enemy_interception_time_multiplier = 5
     config.max_receive_speed_m_per_s = 2.0
@@ -110,7 +110,7 @@ def setup_pass_and_robots(
     # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
     # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[0] = KickOrChipTactic(
+    blue_tactics[0] = protos.KickOrChipTactic(
         kick_or_chip_origin=Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
@@ -125,12 +125,12 @@ def setup_pass_and_robots(
     if receive_pass:
         # arguments for a ReceiverTactic
         receiver_args = {
-            "pass": Pass(
-                passer_point=Point(
+            "pass": protos.Pass(
+                passer_point=protos.Point(
                     x_meters=best_pass.passerPoint().x(),
                     y_meters=best_pass.passerPoint().y(),
                 ),
-                receiver_point=Point(
+                receiver_point=protos.Point(
                     x_meters=best_pass.receiverPoint().x(),
                     y_meters=best_pass.receiverPoint().y(),
                 ),
@@ -139,7 +139,7 @@ def setup_pass_and_robots(
             "disable_one_touch_shot": True,
         }
 
-        blue_tactics[1] = ReceiverTactic(**receiver_args)
+        blue_tactics[1] = protos.ReceiverTactic(**receiver_args)
 
     simulated_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
 

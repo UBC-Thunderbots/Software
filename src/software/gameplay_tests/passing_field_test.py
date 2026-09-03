@@ -1,6 +1,8 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
-from software.gameplay_tests.field_test_fixture import *
+import proto.import_all_protos as protos
+from software.gameplay_tests.field_test_fixture import (
+    WORLD_BUFFER_TIMEOUT,
+)
 from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
@@ -42,7 +44,7 @@ def test_passing(field_test_runner):
     # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
     # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[passer_robot_id] = KickOrChipTactic(
+    blue_tactics[passer_robot_id] = protos.KickOrChipTactic(
         kick_or_chip_origin=Point(
             x_meters=pass_to_test.passerPoint().x(),
             y_meters=pass_to_test.passerPoint().y(),
@@ -57,12 +59,12 @@ def test_passing(field_test_runner):
     if should_receive_pass:
         # arguments for a ReceiverTactic
         receiver_args = {
-            "pass": Pass(
-                passer_point=Point(
+            "pass": protos.Pass(
+                passer_point=protos.Point(
                     x_meters=pass_to_test.passerPoint().x(),
                     y_meters=pass_to_test.passerPoint().y(),
                 ),
-                receiver_point=Point(
+                receiver_point=protos.Point(
                     x_meters=pass_to_test.receiverPoint().x(),
                     y_meters=pass_to_test.receiverPoint().y(),
                 ),
@@ -71,7 +73,7 @@ def test_passing(field_test_runner):
             "disable_one_touch_shot": True,
         }
 
-        blue_tactics[receiver_robot_id] = ReceiverTactic(**receiver_args)
+        blue_tactics[receiver_robot_id] = protos.ReceiverTactic(**receiver_args)
 
     field = tbots_cpp.Field.createSSLDivisionBField()
     tbots_cpp.EighteenZonePitchDivision(field)
@@ -97,8 +99,8 @@ def test_passing(field_test_runner):
     # Send a halt tactic after the test finishes
     field_test_runner.set_tactics(
         blue_tactics={
-            passer_robot_id: HaltTactic(),
-            receiver_robot_id: HaltTactic(),
+            passer_robot_id: protos.HaltTactic(),
+            receiver_robot_id: protos.HaltTactic(),
         },
         yellow_tactics=None,
     )

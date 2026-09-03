@@ -191,6 +191,9 @@ class TmcMotorController : public MotorController
      */
     void checkEncoderConnections();
 
+    // Trinamics communicate with 5 byte messages
+    static constexpr size_t TMC_CMD_MSG_SIZE = 5;
+
     // Select between driver and controller gpio
     std::unique_ptr<Gpio> spi_demux_select_0_;
     std::unique_ptr<Gpio> spi_demux_select_1_;
@@ -200,13 +203,13 @@ class TmcMotorController : public MotorController
     std::unique_ptr<Gpio> reset_gpio_;
 
     // Transfer Buffers for spiTransfer
-    uint8_t tx_[5] = {};
-    uint8_t rx_[5] = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> tx_ = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> rx_ = {};
 
     // Transfer Buffers for readThenWriteSpiTransfer
-    uint8_t write_tx_[5] = {};
-    uint8_t read_tx_[5]  = {};
-    uint8_t read_rx_[5]  = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> write_tx_ = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> read_tx_  = {};
+    std::array<uint8_t, TMC_CMD_MSG_SIZE> read_rx_  = {};
 
     // Transfer State
     bool transfer_started_  = false;
@@ -236,7 +239,7 @@ class TmcMotorController : public MotorController
     static constexpr uint8_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 
     // SPI Trinamic Motor Driver Paths
-    static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
+    static const inline std::unordered_map<MotorIndex, const std::string> SPI_PATHS = {
         {MotorIndex::FRONT_LEFT, "/dev/spidev0.0"},
         {MotorIndex::FRONT_RIGHT, "/dev/spidev0.3"},
         {MotorIndex::BACK_LEFT, "/dev/spidev0.1"},
@@ -265,9 +268,6 @@ class TmcMotorController : public MotorController
     // Number of times that Thunderloop will try to write the configuration to the driver
     // before giving up
     static constexpr int NUM_RETRIES_SPI = 3;
-
-    // Trinamics communicate with 5 byte messages
-    static constexpr uint32_t TMC_CMD_MSG_SIZE = 5;
 
     static constexpr int DRIVE_MOTOR_NUM_POLE_PAIRS    = 8;
     static constexpr int DRIBBLER_MOTOR_NUM_POLE_PAIRS = 1;
