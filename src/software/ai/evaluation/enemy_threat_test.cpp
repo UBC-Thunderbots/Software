@@ -402,6 +402,56 @@ TEST(SortEnemyThreatsTest,
     EXPECT_EQ(threats, expected_result);
 }
 
+TEST(SortEnemyThreatsTest, robot_with_possession_but_no_shot_is_still_the_biggest_threat)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = EnemyThreat{
+        robot1, true, Angle::fromDegrees(25), std::nullopt, std::nullopt, 0, std::nullopt};
+
+    auto threat2 = EnemyThreat{
+        robot2, false, Angle::fromDegrees(19), Angle::fromDegrees(11), Point(-4, 0),
+        1,      robot1};
+
+    // Possession outranks everything else, so robot1 is more threatening even with no
+    // shot at all while robot2 has a clear one
+    std::vector<EnemyThreat> expected_result = {threat1, threat2};
+
+    std::vector<EnemyThreat> threats = {threat2, threat1};
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
+TEST(SortEnemyThreatsTest, both_robots_have_possession_but_only_one_has_a_shot)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = EnemyThreat{
+        robot1, true, Angle::fromDegrees(50), std::nullopt, std::nullopt, 0, std::nullopt};
+
+    auto threat2 = EnemyThreat{
+        robot2, true,        Angle::fromDegrees(30), Angle::fromDegrees(20), Point(-4, 0),
+        0,      std::nullopt};
+
+    // Both robots have possession, so the one that can't shoot at all is the less
+    // threatening of the two
+    std::vector<EnemyThreat> expected_result = {threat2, threat1};
+
+    std::vector<EnemyThreat> threats = {threat1, threat2};
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
 TEST(EnemyThreatTest, no_enemies_on_field)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
@@ -451,6 +501,91 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
         *threat.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
+}
+
+TEST(EnemyThreatTest, enemy_goalie_is_only_evaluated_when_included)
+{
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Robot enemy_goalie =
+        Robot(0, world->field().enemyGoalCenter(), Vector(0, 0), Angle::half(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(2, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_goalie, enemy_robot_1});
+    enemy_team.assignGoalie(0);
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(world,
+                                Point(world->field().friendlyGoalCenter()) +
+                                    Vector(2 - DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+                                Timestamp::fromSeconds(0));
+
+    auto threats_without_goalie =
+        getAllEnemyThreats(world->field(), world->friendlyTeam(), world->enemyTeam(),
+                           world->ball(), false);
+    ASSERT_EQ(threats_without_goalie.size(), 1);
+    EXPECT_EQ(threats_without_goalie.at(0).robot, enemy_robot_1);
+
+    auto threats_with_goalie = getAllEnemyThreats(
+        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(), true);
+    ASSERT_EQ(threats_with_goalie.size(), 2);
+    // The goalie is far from our net, so it is the least threatening of the two
+    EXPECT_EQ(threats_with_goalie.at(0).robot, enemy_robot_1);
+    EXPECT_EQ(threats_with_goalie.at(1).robot, enemy_goalie);
+}
+
+TEST(EnemyThreatTest, enemy_with_ball_is_most_threatening_even_when_its_shot_is_blocked)
+{
+    // Two friendly robots screen the enemy holding the ball, leaving it almost no shot,
+    // while the other enemy is unmarked with a much better view of the net
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(2.3, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(1.9, 1.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2});
+    world->updateEnemyTeamState(enemy_team);
+
+    Robot friendly_goalie =
+        Robot(0, world->field().friendlyGoalCenter() + Vector(0.2, 0), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(1.6, 0.15), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(1.6, -0.15), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromSeconds(1));
+    friendly_team.updateRobots({friendly_goalie, friendly_robot_1, friendly_robot_2});
+    world->updateFriendlyTeamState(friendly_team);
+
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 2);
+
+    // Possession is currently weighted above shot quality, so the screened enemy is
+    // ranked first even though the unmarked enemy has the better shot
+    EXPECT_EQ(result.at(0).robot, enemy_robot_1);
+    EXPECT_TRUE(result.at(0).has_ball);
+    EXPECT_EQ(result.at(1).robot, enemy_robot_2);
+    EXPECT_FALSE(result.at(1).has_ball);
+
+    ASSERT_TRUE(result.at(0).best_shot_angle);
+    ASSERT_TRUE(result.at(1).best_shot_angle);
+    EXPECT_LT(result.at(0).best_shot_angle->toDegrees(),
+              result.at(1).best_shot_angle->toDegrees());
 }
 
 TEST(EnemyThreatTest, three_enemies_vs_one_friendly)

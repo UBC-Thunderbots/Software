@@ -231,6 +231,11 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
 
     std::vector<EnemyThreat> threats;
 
+    // The robot with possession is the same for every threat we evaluate, so we find it
+    // once rather than once per robot
+    auto robot_with_effective_possession =
+        getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+
     for (const auto& robot : enemy_team.getAllRobots())
     {
         bool has_ball = robot.isNearDribbler(ball.position());
@@ -259,8 +264,6 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
         // passer to be an empty optional
         int num_passes              = static_cast<int>(enemy_team.numRobots());
         std::optional<Robot> passer = std::nullopt;
-        auto robot_with_effective_possession =
-            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
         if (robot_with_effective_possession)
         {
             auto pass_data = getNumPassesToRobot(robot_with_effective_possession.value(),
