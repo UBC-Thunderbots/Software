@@ -202,7 +202,7 @@ void StSpinMotorController::immediatelyDisable()
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex motor)
 {
-    spi_fds_[motor] = open(SPI_PATHS.at(motor), O_RDWR);
+    spi_fds_[motor] = open(SPI_PATHS.at(motor).c_str(), O_RDWR);
     CHECK(spi_fds_[motor] >= 0)
         << "can't open device: " << motor << "error: " << strerror(errno);
 
