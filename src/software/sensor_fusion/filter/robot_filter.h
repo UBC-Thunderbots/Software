@@ -84,7 +84,7 @@ class RobotFilter
      *
      * @return The detection to use, or std::nullopt if there is no usable detection
      */
-    static std::optional<RobotDetection> getBestRobotDetection(
+    std::optional<RobotDetection> getBestRobotDetection(
         const std::vector<RobotDetection>& new_robot_detections);
 
     /**
