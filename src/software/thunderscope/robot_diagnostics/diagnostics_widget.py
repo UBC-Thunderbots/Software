@@ -1,5 +1,4 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import *
+from pyqtgraph.Qt import QtWidgets
 from proto.import_all_protos import *
 
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -15,7 +14,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 )
 
 
-class DiagnosticsWidget(QScrollArea):
+class DiagnosticsWidget(QtWidgets.QScrollArea):
     """The DiagnosticsWidget contains all widgets related to manually
     controlling robots in Robot Diagnostics:
 
@@ -51,16 +50,18 @@ class DiagnosticsWidget(QScrollArea):
         )
 
         self.handheld_controller_widget.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum
+            QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Minimum
         )
         self.drive_dribbler_widget.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding
+            QtWidgets.QSizePolicy.Policy.Preferred,
+            QtWidgets.QSizePolicy.Policy.Expanding,
         )
         self.chicker_widget.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding
+            QtWidgets.QSizePolicy.Policy.Preferred,
+            QtWidgets.QSizePolicy.Policy.Expanding,
         )
 
-        diagnostics_widget_vbox_layout = QVBoxLayout()
+        diagnostics_widget_vbox_layout = QtWidgets.QVBoxLayout()
         diagnostics_widget_vbox_layout.addWidget(self.handheld_controller_widget)
         diagnostics_widget_vbox_layout.addWidget(self.drive_dribbler_widget)
         diagnostics_widget_vbox_layout.addWidget(self.chicker_widget)
@@ -69,7 +70,7 @@ class DiagnosticsWidget(QScrollArea):
         # doing so causes no scrolling to happen, and all the components get smaller
         # instead, widgets are added to the layout which is set for a container
         # the container is set as the current QScrollArea's widget
-        self.container = QFrame(self)
+        self.container = QtWidgets.QFrame(self)
         self.container.setLayout(diagnostics_widget_vbox_layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)

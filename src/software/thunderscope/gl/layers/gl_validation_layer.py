@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.opengl import *
 
 import time
 
 from proto.import_all_protos import *
 
-from software.py_constants import *
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer

@@ -263,15 +263,17 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         }
     }
 
+    Timestamp capture_timestamp = Timestamp::fromSeconds(ssl_detection_frame.t_capture());
+
     if (friendly_team_is_yellow)
     {
-        friendly_team = createFriendlyTeam(yellow_team);
-        enemy_team    = createEnemyTeam(blue_team);
+        friendly_team = createFriendlyTeam(yellow_team, capture_timestamp);
+        enemy_team    = createEnemyTeam(blue_team, capture_timestamp);
     }
     else
     {
-        friendly_team = createFriendlyTeam(blue_team);
-        enemy_team    = createEnemyTeam(yellow_team);
+        friendly_team = createFriendlyTeam(blue_team, capture_timestamp);
+        enemy_team    = createEnemyTeam(yellow_team, capture_timestamp);
     }
 
     ball_in_dribbler_timeout--;
@@ -334,7 +336,7 @@ std::optional<Ball> SensorFusion::createBall(
     {
         // Both teams are filtered before the ball is, so these are this frame's robot
         // positions and the ball filter can use them to detect bounces
-        std::vector<Robot> robots = friendly_team.getAllRobots();
+        std::vector<Robot> robots             = friendly_team.getAllRobots();
         const std::vector<Robot> enemy_robots = enemy_team.getAllRobots();
         robots.insert(robots.end(), enemy_robots.begin(), enemy_robots.end());
 
@@ -345,10 +347,12 @@ std::optional<Ball> SensorFusion::createBall(
     return std::nullopt;
 }
 
-Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections)
+Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection>& robot_detections,
+                                      const Timestamp& capture_timestamp)
 {
     Team new_friendly_team = friendly_team_filter.getFilteredData(
-        friendly_team, robot_detections, friendly_robot_id_with_ball_in_dribbler);
+        friendly_team, robot_detections, capture_timestamp,
+        friendly_robot_id_with_ball_in_dribbler);
     return new_friendly_team;
 }
 
@@ -414,10 +418,11 @@ void SensorFusion::updateDribbleDisplacement()
     }
 }
 
-Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections)
+Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
+                                   const Timestamp& capture_timestamp)
 {
-    Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team, robot_detections, false);
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections,
+                                                            capture_timestamp, false);
     return new_enemy_team;
 }
 

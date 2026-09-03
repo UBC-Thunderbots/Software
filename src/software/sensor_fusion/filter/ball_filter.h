@@ -5,17 +5,16 @@
 
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
-#include "software/world/field.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
+#include "software/world/field.h"
 #include "software/world/robot.h"
 
 class BallFilter
 {
    public:
-
     /**
      * Creates a new Ball Filter
      */
@@ -59,18 +58,16 @@ class BallFilter
     Ball forceBallState(const Point& position, const Timestamp& current_time);
 
    private:
-
-	// KF Dimensions
-	// State: position x, position y, veloity x, velocity y
-    static constexpr int STATE_SIZE       = 4;
-	// Measurement: x and y from vision
+    // KF Dimensions
+    // State: position x, position y, veloity x, velocity y
+    static constexpr int STATE_SIZE = 4;
+    // Measurement: x and y from vision
     static constexpr int MEASUREMENT_SIZE = 2;
-	// No control 
-    static constexpr int CONTROL_SIZE     = 1;
+    // No control
+    static constexpr int CONTROL_SIZE = 1;
 
-    using BallKalmanFilter =
-        KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE>;
-    using Measurement = Eigen::Vector<double, MEASUREMENT_SIZE>;
+    using BallKalmanFilter = KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE>;
+    using Measurement      = Eigen::Vector<double, MEASUREMENT_SIZE>;
 
     /**
      * Returns the detection we should treat as the ball this frame, which is the
@@ -176,6 +173,5 @@ class BallFilter
     std::optional<Timestamp> prev_detection_timestamp;
     std::optional<Measurement> prev_measurement;
     std::optional<Timestamp> last_predict_timestamp;
-	int consecutive_in_contact_;
-	
+    int consecutive_in_contact_;
 };

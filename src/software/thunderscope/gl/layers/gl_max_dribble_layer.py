@@ -1,5 +1,3 @@
-from pyqtgraph.opengl import *
-
 from software.thunderscope.constants import DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer

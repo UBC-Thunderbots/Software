@@ -1,5 +1,3 @@
-from pyqtgraph.opengl import *
-
 from collections import deque, defaultdict
 from proto.world_pb2 import World
 from proto.import_all_protos import Team, Robot

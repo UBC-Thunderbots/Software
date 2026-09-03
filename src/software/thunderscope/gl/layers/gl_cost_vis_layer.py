@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pyqtgraph.opengl import *
 import pyqtgraph as pg
 
 import time

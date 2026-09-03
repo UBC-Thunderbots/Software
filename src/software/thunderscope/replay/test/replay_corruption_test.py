@@ -21,7 +21,7 @@ import os
 from proto.import_all_protos import *
 from google.protobuf.message import Message
 import base64
-from software.py_constants import *
+from software.py_constants import REPLAY_METADATA_DELIMITER
 
 from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.replay.proto_player import ProtoPlayer

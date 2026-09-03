@@ -4,7 +4,6 @@ from software.gameplay_tests.simulated_test_fixture import (
 )
 from software.gameplay_tests.validation.avoid_collisions import *
 import software.python_bindings as tbots
-from software.py_constants import *
 from proto.message_translation.tbots_protobuf import create_world_state
 import math
 from proto.import_all_protos import *

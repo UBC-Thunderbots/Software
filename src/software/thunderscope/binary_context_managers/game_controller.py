@@ -19,7 +19,11 @@ from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
-from software.py_constants import *
+from software.py_constants import (
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_NANOSECOND,
+    SSL_REFEREE_PORT,
+)
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common.thread_safe_circular_buffer import (
@@ -567,14 +571,14 @@ class Gamecontroller:
         )
 
         self.__update_robot_count(
-            world_state.blue_robots,
+            world_state.blue_robots.robot_states,
             self.latest_world.friendly_team,
             referee.blue.max_allowed_bots,
             self.blue_removed_robot_ids,
             field_edge_y_meters,
         )
         self.__update_robot_count(
-            world_state.yellow_robots,
+            world_state.yellow_robots.robot_states,
             self.latest_world.enemy_team,
             referee.yellow.max_allowed_bots,
             self.yellow_removed_robot_ids,
@@ -584,7 +588,8 @@ class Gamecontroller:
         # Check if we need to invert the world state
         if referee.blue_team_on_positive_half:
             for robot in itertools.chain(
-                world_state.blue_robots, world_state.yellow_robots
+                world_state.blue_robots.robot_states,
+                world_state.yellow_robots.robot_states,
             ):
                 robot.current_state.global_position.x_meters *= -1
                 robot.current_state.global_position.y_meters *= -1
