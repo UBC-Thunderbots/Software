@@ -25,8 +25,8 @@ class RobotFilter
 
     /**
      * Update the filter with the new SSLRobot detections, and returns the new
-     * estimated state of the robot given the new data. 
-     * 
+     * estimated state of the robot given the new data.
+     *
      *
      * @param new_robot_data A list of SSLRobot detections containing new robot data.
      * The data does not all have to be for a particular Robot, the filter will only use
@@ -35,14 +35,15 @@ class RobotFilter
      * @param breakbeam_tripped_id The id of the robot with the tripped breakbeam
      * according to sensor fusion filtering logic (or none if no robot has a tripped
      * beam).
-     * 
+     *
      * @return The new Robot based on the estimated state of the Robot given the new data.
-     * If there is no robot data for this robot, it will return the prediction of the filter
-     * for a few updates, but if there are (EXPIRED_FRAME_THRESHOLD) consecutive missing frames,
-     * returns std::nullopt
+     * If there is no robot data for this robot, it will return the prediction of the
+     * filter for a few updates, but if there are (EXPIRED_FRAME_THRESHOLD) consecutive
+     * missing frames, returns std::nullopt
      */
     std::optional<Robot> estimateRobotState(
-        const std::vector<RobotDetection>& new_robot_data, const Timestamp& current_time, const std::optional<RobotId> breakbeam_tripped_id = std::nullopt);
+        const std::vector<RobotDetection>& new_robot_data, const Timestamp& current_time,
+        const std::optional<RobotId> breakbeam_tripped_id = std::nullopt);
 
     /**
      * Returns the id of the Robot that this filter is filtering for
@@ -54,31 +55,34 @@ class RobotFilter
    private:
     Robot current_robot_state;
 
-	// KF Dimensions
-	// Position State: position x, position y, velocity x, velocity y
+    // KF Dimensions
+    // Position State: position x, position y, velocity x, velocity y
     // Angle State: angle theta, angular velocity w
-    static constexpr int POS_STATE_SIZE       = 4;
-    static constexpr int ANG_STATE_SIZE       = 2;
-	// Position Measurement: x and y from vision
+    static constexpr int POS_STATE_SIZE = 4;
+    static constexpr int ANG_STATE_SIZE = 2;
+    // Position Measurement: x and y from vision
     // Angle Measurement: theta from vision
     static constexpr int POS_MEASUREMENT_SIZE = 2;
     static constexpr int ANG_MEASUREMENT_SIZE = 1;
-	// No control 
-    static constexpr int CONTROL_SIZE         = 1;
+    // No control
+    static constexpr int CONTROL_SIZE = 1;
 
     // Counter to keep track of revolutions, to unwrap to feed to Kalman filter
     int revolutions = 0;
 
-    using PosKalmanFilter = KalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
-    using AngKalmanFilter = KalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
+    using PosKalmanFilter =
+        KalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
+    using AngKalmanFilter =
+        KalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
 
-    // Will be keeping Position and Angle in double, in units of metres and radians respectively
-    using PosMeasurement  = Eigen::Vector<double, POS_MEASUREMENT_SIZE>;
-    using AngMeasurement  = Eigen::Vector<double, ANG_MEASUREMENT_SIZE>;
+    // Will be keeping Position and Angle in double, in units of metres and radians
+    // respectively
+    using PosMeasurement = Eigen::Vector<double, POS_MEASUREMENT_SIZE>;
+    using AngMeasurement = Eigen::Vector<double, ANG_MEASUREMENT_SIZE>;
 
     /**
      * Returns the detection we should treat as the robot this frame, which is the
-     * highest confidence detection. 
+     * highest confidence detection.
      *
      * @param new_robot_detections The detections to choose from
      *
@@ -108,7 +112,7 @@ class RobotFilter
      * @return whether the detection is within reach of the current estimate
      */
     bool isWithinMaxRobotSpeed(const Point& detection_position,
-                              const Timestamp& current_time) const;
+                               const Timestamp& current_time) const;
 
     /**
      * Discards the filter's current estimate and reinitializes it on the given
@@ -117,7 +121,8 @@ class RobotFilter
      * @param measurement The measurement to reinitialize the estimate on
      * @param current_time The time the measurement was taken at
      */
-    void reset(const PosMeasurement& pos_measurement, const AngMeasurement& ang_measurement, const Timestamp& current_time);
+    void reset(const PosMeasurement& pos_measurement,
+               const AngMeasurement& ang_measurement, const Timestamp& current_time);
 
     PosKalmanFilter pos_kalman_filter;
     AngKalmanFilter ang_kalman_filter;

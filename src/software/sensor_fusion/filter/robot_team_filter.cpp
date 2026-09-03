@@ -16,9 +16,7 @@ Team RobotTeamFilter::getFilteredData(
     {
         if (robot_filters.find(detection.id) == robot_filters.end())
         {
-            robot_filters.insert(
-                {detection.id,
-                 RobotFilter(detection)});
+            robot_filters.insert({detection.id, RobotFilter(detection)});
         }
     }
 
@@ -29,7 +27,7 @@ Team RobotTeamFilter::getFilteredData(
     for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
     {
         auto data = it->second.estimateRobotState(new_robot_detections, capture_timestamp,
-                                               breakbeam_tripped_id);
+                                                  breakbeam_tripped_id);
         if (data)
         {
             new_filtered_robot_data.emplace_back(*data);
