@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,13 +35,9 @@ cc_test(
 py_test(
     name = "example_play_test",
     srcs = ["example_play_test.py"],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

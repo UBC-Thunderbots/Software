@@ -24,23 +24,40 @@ py_library(
 )
 
 py_library(
+    name = "keyboard_controller",
+    srcs = ["keyboard_controller.py"],
+    deps = [
+        ":controller_base",
+        "//software/thunderscope:constants",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "handheld_controller",
     srcs = ["handheld_controller.py"],
+    deps = [
+        ":controller_base",
+        "//software/thunderscope:constants",
+        requirement("pygame"),
+    ],
+)
+
+py_library(
+    name = "controller_base",
+    srcs = ["controller_base.py"],
 )
 
 py_library(
     name = "handheld_controller_widget",
     srcs = ["handheld_controller_widget.py"],
     deps = [
+        ":controller_base",
         ":handheld_controller",
+        ":keyboard_controller",
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
-    ] + select({
-        # TODO: remove this selection when we replace evdev to
-        #   other macos supported libs.
-        "@platforms//os:linux": [requirement("evdev")],
-        "//conditions:default": [],
-    }),
+    ],
 )
 
 py_library(

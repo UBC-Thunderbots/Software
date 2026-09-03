@@ -293,6 +293,12 @@ PYBIND11_MODULE(python_bindings, m)
         .def_readwrite("robot_max_acceleration_m_per_s_2",
                        &robot_constants::RobotConstants::robot_max_acceleration_m_per_s_2)
         .def_readwrite(
+            "robot_trajectory_max_acceleration_m_per_s_2",
+            &robot_constants::RobotConstants::robot_trajectory_max_acceleration_m_per_s_2)
+        .def_readwrite(
+            "robot_trajectory_max_deceleration_m_per_s_2",
+            &robot_constants::RobotConstants::robot_trajectory_max_deceleration_m_per_s_2)
+        .def_readwrite(
             "robot_max_ang_acceleration_rad_per_s_2",
             &robot_constants::RobotConstants::robot_max_ang_acceleration_rad_per_s_2)
         .def_readwrite("indefinite_dribbler_speed_rpm",

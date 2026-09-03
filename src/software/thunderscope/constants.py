@@ -1,8 +1,7 @@
 from pyqtgraph.Qt import QtGui
-from OpenGL.GL import *
-from proto.import_all_protos import *
+from OpenGL import GL
+import proto.import_all_protos as protos
 from enum import Enum, IntEnum, StrEnum
-from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
@@ -61,8 +60,8 @@ LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
 
-DEFAULT_EMPTY_FIELD_WORLD = World(
-    field=Field(
+DEFAULT_EMPTY_FIELD_WORLD = protos.World(
+    field=protos.Field(
         field_x_length=9.0,
         field_y_length=6.0,
         defense_x_length=1.0,
@@ -100,23 +99,23 @@ ORTHOGRAPHIC_FOV_DEGREES = 1.0
 
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
-    LogLevel.DEBUG: "DEBUG",
-    LogLevel.INFO: "INFO",
-    LogLevel.WARNING: "WARNING",
-    LogLevel.FATAL: "FATAL",
-    LogLevel.CONTRACT: "CONTRACT",
+    protos.LogLevel.DEBUG: "DEBUG",
+    protos.LogLevel.INFO: "INFO",
+    protos.LogLevel.WARNING: "WARNING",
+    protos.LogLevel.FATAL: "FATAL",
+    protos.LogLevel.CONTRACT: "CONTRACT",
 }
 
-# Paths to check for estop when running diagnostics
+# Paths to check for estop when running diagnostics, used as a fallback for Linux.
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
-    ErrorCode.HIGH_CAP: "High Cap",
-    ErrorCode.LOW_BATTERY: "Low Battery",
-    ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
-    ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
+    protos.ErrorCode.HIGH_CAP: "High Cap",
+    protos.ErrorCode.LOW_BATTERY: "Low Battery",
+    protos.ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
+    protos.ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
 }
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
@@ -197,7 +196,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 THUNDERSCOPE_UI_FONT_NAME = "Roboto"
 
 
-def is_field_message_empty(field: Field) -> bool:
+def is_field_message_empty(field: protos.Field) -> bool:
     """Checks if a field message is empty
     All values in a field message are required so the message will never be None
     So we have to check if the field itself has 0 length
@@ -264,6 +263,7 @@ class Colors:
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
+    SELECTED_ROBOT_OUTLINE = QtGui.QColor(0, 255, 255, 200)
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
@@ -327,15 +327,6 @@ class TrailValues:
 class DiagnosticsConstants:
     """Constants for Robot Diagnostics"""
 
-    # Device names of the controllers supported for controlling robots
-    SUPPORTED_CONTROLLERS = {
-        "Microsoft Xbox One X pad",
-        "Microsoft X-Box One S pad",
-        "Microsoft X-Box 360 pad",
-        "Microsoft Xbox 360 pad",
-        "Generic X-Box pad",
-    }
-
     BUTTON_PRESSED_THRESHOLD = 0.5
     DEADZONE_PERCENTAGE = 0.20
 
@@ -371,10 +362,10 @@ class CustomGLOptions:
     # This is useful when the graphics are overlaid on top of (e.g.) a
     # yellow robot where the blended colors would not be easily visible.
     OPAQUE_WITH_OUT_DEPTH_TEST = {
-        GL_DEPTH_TEST: False,
-        GL_BLEND: False,
-        GL_ALPHA_TEST: False,
-        GL_CULL_FACE: False,
+        GL.GL_DEPTH_TEST: False,
+        GL.GL_BLEND: False,
+        GL.GL_ALPHA_TEST: False,
+        GL.GL_CULL_FACE: False,
     }
 
 
@@ -404,17 +395,8 @@ class RuntimeManagerConstants:
     EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
 
-    RUNTIME_STATS_DIRECTORY_PATH = "/tmp/tbots/stats"
-    RUNTIME_FRIENDLY_STATS_FILE = "blue.toml"
-    RUNTIME_ENEMY_FROM_FRIENDLY_STATS_FILE = "yellow_from_blue.toml"
-    RUNTIME_ENEMY_STATS_FILE = "yellow.toml"
-    RUNTIME_FRIENDLY_FROM_ENEMY_STATS_FILE = "blue_from_yellow.toml"
-
-    RUNTIME_STATS_SCORE_KEY = "goals"
-    RUNTIME_STATS_RED_CARDS_KEY = "red_cards"
-    RUNTIME_STATS_YELLOW_CARDS_KEY = "yellow_cards"
-    RUNTIME_STATS_SHOTS_ON_NET = "shots_on_net"
-    RUNTIME_STATS_SHOTS_BLOCKED = "shots_blocked"
+    RUNTIME_EVENTS_DIRECTORY_PATH = "/tmp/tbots/stats"
+    RUNTIME_EVENTS_FILE = "game_events.csv"
 
     RELEASES_URL = "https://api.github.com/repos/UBC-Thunderbots/Software/releases"
     DOWNLOAD_URL = "https://github.com/UBC-Thunderbots/Software/releases/download/"

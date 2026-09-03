@@ -39,10 +39,10 @@ EuclideanToWheel::EuclideanToWheel(const robot_constants::RobotConstants& robot_
 
     // clang-format off
     euclidean_to_wheel_velocity_D_ <<
-         std::cos(b_fr), std::sin(b_fr), (fr_x * std::sin(b_fr) - fr_y * std::cos(b_fr)),
-         std::cos(b_fl), std::sin(b_fl), (fl_x * std::sin(b_fl) - fl_y * std::cos(b_fl)),
-         std::cos(b_bl), std::sin(b_bl), (bl_x * std::sin(b_bl) - bl_y * std::cos(b_bl)),
-         std::cos(b_br), std::sin(b_br), (br_x * std::sin(b_br) - br_y * std::cos(b_br));
+         -std::cos(b_fr), -std::sin(b_fr), -(fr_x * std::sin(b_fr) - fr_y * std::cos(b_fr)),
+         -std::cos(b_fl), -std::sin(b_fl), -(fl_x * std::sin(b_fl) - fl_y * std::cos(b_fl)),
+         -std::cos(b_bl), -std::sin(b_bl), -(bl_x * std::sin(b_bl) - bl_y * std::cos(b_bl)),
+         -std::cos(b_br), -std::sin(b_br), -(br_x * std::sin(b_br) - br_y * std::cos(b_br));
     // clang-format on
 
     // Inverse of euclidean to wheel matrix (D) for converting wheel velocity to euclidean

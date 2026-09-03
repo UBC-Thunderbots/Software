@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -28,10 +28,9 @@ cc_library(
 py_test(
     name = "kickoff_friendly_play_test",
     srcs = ["kickoff_friendly_play_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

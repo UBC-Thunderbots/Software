@@ -11,13 +11,17 @@ from google.protobuf.internal import api_implementation
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.thunderscope.log.stats.stats import Stats
+from software.stats.loggers.stats_logger import StatsLogger
 
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers import *
-from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import (
+    DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_MINUTE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 from software.thunderscope.constants import (
@@ -28,7 +32,12 @@ from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import CI_DURATION_S
-from software.thunderscope.util import *
+from software.thunderscope.util import (
+    async_sim_ticker,
+    exit_poller,
+    realtime_sim_ticker,
+    sync_simulation,
+)
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
@@ -449,17 +458,21 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref, (
-            Stats(
+            StatsLogger(
                 proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 record_enemy_stats=True,
+                friendly_colour_yellow=False,
             )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as blue_stats, (
-            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+        ) as blue_stats_logger, (
+            StatsLogger(
+                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                friendly_colour_yellow=True,
+            )
             if args.record_stats
             else contextlib.nullcontext()
-        ) as yellow_stats:
+        ) as yellow_stats_logger:
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
@@ -470,9 +483,9 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
 
-            if args.record_stats:
-                tscope.register_refresh_function(blue_stats.refresh)
-                tscope.register_refresh_function(yellow_stats.refresh)
+            if args.record_stats and blue_stats_logger and yellow_stats_logger:
+                tscope.register_refresh_function(blue_stats_logger.refresh)
+                tscope.register_refresh_function(yellow_stats_logger.refresh)
 
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],

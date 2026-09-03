@@ -2,21 +2,20 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from proto.play_pb2 import PlayName
 
-from software.simulated_tests.validation.robot_enters_region import (
+from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
 )
-from software.simulated_tests.validation.robot_at_position import (
+from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import Command
-from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+import proto.import_all_protos as protos
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 
@@ -136,15 +135,15 @@ def test_penalty_kick_enemy_play_setup(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.HALT, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.HALT, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.PENALTY, team=Team.YELLOW
+            gc_command=protos.Command.Type.PENALTY, team=SslTeam.YELLOW
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.PenaltyKickEnemyPlay,
-            yellow_play=PlayName.HaltPlay,
+            blue_play=protos.PlayName.PenaltyKickEnemyPlay,
+            yellow_play=protos.PlayName.HaltPlay,
         )
 
     # Rectangle behind the ball where 5 non-goalie robots should be positioned

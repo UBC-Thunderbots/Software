@@ -1,20 +1,20 @@
 import pytest
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
-from software.simulated_tests.simulated_test_fixture import (
+import proto.import_all_protos as protos
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.friendly_receives_ball_slow import (
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
-from software.simulated_tests.validation.friendly_has_ball_possession import (
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from software.simulated_tests.validation.ball_moves_in_direction import (
+from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallMovesForwardInRegions,
 )
-from software.simulated_tests.validation.ball_enters_region import (
+from software.gameplay_tests.validation.ball_enters_region import (
     BallEventuallyExitsRegion,
     BallEventuallyEntersRegion,
 )
@@ -91,7 +91,7 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    config = PassingConfig()
+    config = protos.PassingConfig()
     config.enemy_proximity_importance = 0.01
     config.enemy_interception_time_multiplier = 5
     config.max_receive_speed_m_per_s = 2.0
@@ -110,12 +110,12 @@ def setup_pass_and_robots(
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
     # KickTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[0] = KickTactic(
-        kick_origin=Point(
+    blue_tactics[0] = protos.KickTactic(
+        kick_origin=protos.Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
         ),
-        kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
+        kick_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
         kick_speed_meters_per_second=best_pass.speed(),
     )
 
@@ -123,12 +123,12 @@ def setup_pass_and_robots(
     if receive_pass:
         # arguments for a ReceiverTactic
         receiver_args = {
-            "pass": Pass(
-                passer_point=Point(
+            "pass": protos.Pass(
+                passer_point=protos.Point(
                     x_meters=best_pass.passerPoint().x(),
                     y_meters=best_pass.passerPoint().y(),
                 ),
-                receiver_point=Point(
+                receiver_point=protos.Point(
                     x_meters=best_pass.receiverPoint().x(),
                     y_meters=best_pass.receiverPoint().y(),
                 ),
@@ -137,7 +137,7 @@ def setup_pass_and_robots(
             "disable_one_touch_shot": True,
         }
 
-        blue_tactics[1] = ReceiverTactic(**receiver_args)
+        blue_tactics[1] = protos.ReceiverTactic(**receiver_args)
 
     simulated_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
 

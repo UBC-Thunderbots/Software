@@ -4,6 +4,7 @@
 #include <string>
 
 #include "proto/visualization.pb.h"
+#include "shared/constants.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/udp/threaded_udp_sender.h"
 
@@ -20,7 +21,7 @@ class PlotJugglerSink
      *
      * @param interface The interface to send Plotjuggler UDP packets on
      */
-    PlotJugglerSink(const std::string& interface = "lo");
+    PlotJugglerSink(const std::string& interface = LOOPBACK_INTERFACE);
 
     ~PlotJugglerSink() = default;
 

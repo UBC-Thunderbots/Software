@@ -1,4 +1,4 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
@@ -91,10 +91,9 @@ cc_library(
 py_test(
     name = "ball_occlusion_test",
     srcs = ["ball_occlusion_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

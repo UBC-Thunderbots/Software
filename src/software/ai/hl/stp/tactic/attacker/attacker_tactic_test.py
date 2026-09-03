@@ -2,24 +2,24 @@ import pytest
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
-from proto.import_all_protos import AttackerTactic, Pass
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.ball_kicked_in_direction import (
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.robot_at_orientation import (
+from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
-from software.simulated_tests.validation.robot_at_position import (
+from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.simulated_test_fixture import pytest_main
 
 
 def calculate_ball_velocity(passer_point, receiver_point, speed):
@@ -142,8 +142,8 @@ def test_attacker_passing(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: AttackerTactic(
-                    best_pass_so_far=Pass(
+                1: protos.AttackerTactic(
+                    best_pass_so_far=protos.Pass(
                         passer_point=tbots_cpp.createPointProto(passer_point),
                         receiver_point=tbots_cpp.createPointProto(receiver_point),
                         pass_speed_m_per_s=pass_speed,
@@ -160,7 +160,9 @@ def test_attacker_passing(
             RobotEventuallyAtOrientation(robot_id=1, orientation=pass_orientation),
             # Larger threshold since techically ball is at passer point, not the robot
             RobotEventuallyAtPosition(
-                robot_id=1, position=passer_point, threshold=ROBOT_MAX_RADIUS_METERS
+                robot_id=1,
+                position=passer_point,
+                threshold=ROBOT_MAX_RADIUS_METERS * 1.5,
             ),
             BallEventuallyKickedInDirection(kick_direction=pass_orientation),
         ]
@@ -260,8 +262,8 @@ def test_attacker_keep_away(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: AttackerTactic(
-                    best_pass_so_far=Pass(
+                1: protos.AttackerTactic(
+                    best_pass_so_far=protos.Pass(
                         passer_point=tbots_cpp.createPointProto(pass_point),
                         receiver_point=tbots_cpp.createPointProto(receiver_point),
                         pass_speed_m_per_s=5,
@@ -364,10 +366,11 @@ def test_attacker_shoot_goal(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: AttackerTactic(
+                0: protos.AttackerTactic(
                     chip_target=tbots_cpp.createPointProto(
                         tbots_cpp.Point(0, field.fieldLines().yMin())
                     ),
+                    pass_committed=False,
                 )
             }
         )

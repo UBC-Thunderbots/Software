@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
@@ -42,7 +42,7 @@ class GLShape(GLGraphic):
         """
         if fill_color:
             if not self.fill_graphic:
-                self.fill_graphic = GLMeshItem(parentItem=self)
+                self.fill_graphic = gl.GLMeshItem(parentItem=self)
                 self._update_shape_data()
             self.fill_graphic.setColor(fill_color)
         else:

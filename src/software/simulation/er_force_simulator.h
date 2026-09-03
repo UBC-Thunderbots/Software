@@ -7,6 +7,7 @@
 #include "software/embedded/primitive_executor.h"
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
+#include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
 
@@ -27,12 +28,12 @@ class ErForceSimulator
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
      */
-    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
-                              const robot_constants::RobotConstants& robot_constants,
-                              std::unique_ptr<RealismConfigErForce>& realism_config,
-                              const bool ramping = false,
-                              double primitive_executor_time_step_s =
-                                  DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK);
+    explicit ErForceSimulator(
+        const TbotsProto::FieldType& field_type,
+        const robot_constants::RobotConstants& robot_constants,
+        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = true,
+        Duration primitive_executor_time_step_s =
+            Duration::fromSeconds(DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK));
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -143,6 +144,9 @@ class ErForceSimulator
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
    private:
+    // Grants the ramping unit test access to the private getRampedVelocityPrimitive()
+    friend class ErForceSimulatorRampingTest;
+
     /**
      * Sets the primitive being simulated by the robot in simulation
      *
@@ -158,19 +162,20 @@ class ErForceSimulator
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, const Vector& local_velocity,
-        const AngularVelocity angular_velocity);
+        const TbotsProto::World& world_msg, const RobotState& robot_state);
 
     /**
      * Gets a map from robot id to local and angular velocity from repeated sim robots
      *
      * @param sim_robots Repeated er force sim robot protos
+     * @param side Which team the robots belong to. If team is yellow, inverts position
+     * and linear velocity, and adds 180 degrees to orientation.
      *
      * @return a map from robot id to local velocity and angular velocity
      */
-    static std::map<RobotId, std::pair<Vector, AngularVelocity>>
-    getRobotIdToLocalVelocityMap(
-        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
+    static std::map<RobotId, RobotState> getRobotIdToRobotStateMap(
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots,
+        gameController::Team side);
 
     /**
      * Update Simulator Robot and get the latest robot control
@@ -202,7 +207,7 @@ class ErForceSimulator
         const Vector current_local_velocity,
         const AngularVelocity current_local_angular_velocity,
         TbotsProto::DirectControlPrimitive& target_velocity_primitive,
-        const double& time_to_ramp);
+        Duration time_to_ramp);
 
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
@@ -212,7 +217,7 @@ class ErForceSimulator
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
-    double primitive_executor_time_step_s;
+    Duration primitive_executor_time_step;
     unsigned int frame_number;
 
     // The current time.
@@ -229,6 +234,18 @@ class ErForceSimulator
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool ramping;
+
+    struct LocalVelocity
+    {
+        Vector linear;
+        AngularVelocity angular;
+    };
+
+    // The previously commanded velocity for each robot, kept per team. When ramping is
+    // enabled the wheel velocities are ramped open-loop from these setpoints, mirroring
+    // the real motor service
+    std::unordered_map<RobotId, LocalVelocity> blue_prev_ramp_velocities;
+    std::unordered_map<RobotId, LocalVelocity> yellow_prev_ramp_velocities;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

@@ -64,6 +64,10 @@ bool verifyLengthAndCrc(const TbotsProto_PowerFrame& frame)
             expected_length = TbotsProto_PowerStatus_size;
             bytes           = serializeToVector(frame.power_msg.power_status);
             break;
+        case TbotsProto_PowerFrame_dribbler_control_tag:
+            expected_length = TbotsProto_DribblerControl_size;
+            bytes           = serializeToVector(frame.power_msg.dribbler_control);
+            break;
         default:
             return false;
     }

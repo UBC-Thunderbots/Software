@@ -82,7 +82,7 @@ class LoggerSingleton
         // Standalone Simulator:
         // bazel-out/k8-fastbuild/bin/software/simulation/standalone_simulator_main.runfiles/__main__/
         // Simulated
-        // tests:bazel-out/k8-fastbuild/bin/software/simulated_tests/TEST_NAME.runfiles/__main__/
+        // tests:bazel-out/k8-fastbuild/bin/software/gameplay_tests/TEST_NAME.runfiles/__main__/
         //   where TEST_NAME is the name of the simulated test
 
         // Log locations can also be defined by setting the --logging_dir command-line

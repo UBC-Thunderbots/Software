@@ -1,19 +1,19 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import PenaltyKickTactic
+import proto.import_all_protos as protos
 
-from software.simulated_tests.validation.friendly_team_scored import (
+from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.simulated_tests.validation.excessive_dribbling import (
+from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
 )
-from software.simulated_tests.validation.ball_moves_in_direction import (
+from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallAlwaysMovesForward,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.simulated_test_fixture import (
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
 
@@ -69,7 +69,7 @@ def test_penalty_kick(
             ),
         )
 
-        simulated_test_runner.set_tactics(blue_tactics={0: PenaltyKickTactic()})
+        simulated_test_runner.set_tactics(blue_tactics={0: protos.PenaltyKickTactic()})
 
     eventually_validation_sequence_set = [
         [
