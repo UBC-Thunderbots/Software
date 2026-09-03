@@ -456,7 +456,7 @@ int TmcMotorController::readThenWriteValue(const MotorIndex motor,
 void TmcMotorController::openSpiFileDescriptor(const MotorIndex motor_index)
 {
     file_descriptors_[CHIP_SELECTS.at(motor_index)] =
-        open(SPI_PATHS.at(motor_index), O_RDWR);
+        open(SPI_PATHS.at(motor_index).c_str(), O_RDWR);
     CHECK(file_descriptors_[CHIP_SELECTS.at(motor_index)] >= 0)
         << "can't open device: " << motor_index << "error: " << strerror(errno);
 
