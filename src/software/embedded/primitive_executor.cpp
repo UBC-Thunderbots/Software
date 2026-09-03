@@ -121,6 +121,8 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
 
     const auto step_start = std::chrono::steady_clock::now();
 
+    robot_localizer_.step(Vector(), delta_time_s);
+
     if (robot_status.has_motor_status())
     {
         robot_localizer_.update(RobotLocalizer::MotorData{
@@ -135,8 +137,6 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
         robot_localizer_.update(RobotLocalizer::ImuData{
             createAngularVelocity(robot_status.imu_status().angular_velocity())});
     }
-
-    robot_localizer_.step(Vector(), delta_time_s);
 
     TbotsProto::PrimitiveExecutorStatus& prim_exec_status =
         *(robot_status.mutable_primitive_executor_status());
@@ -194,7 +194,7 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
                 stepTargetAngularVelocity(delta_time_s);
 
             // For debugging:
-            // sendLinearMotionToPlotJuggler(local_velocity, delta_time);
+            // sendLinearMotionToPlotJuggler(local_velocity, delta_time_s);
 
             auto prim = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
@@ -255,8 +255,10 @@ void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local
     LOG(PLOTJUGGLER) << *createPlotJugglerValue(
         {{"x", robot_localizer_.getPosition().x()},
          {"y", robot_localizer_.getPosition().y()},
-         {"v_x", target_local_velocity.x()},
-         {"v_y", target_local_velocity.y()},
-         {"a_x", local_acceleration.x()},
-         {"a_y", local_acceleration.y()}});
+         {"v_x", robot_localizer_.getVelocity().x()},
+         {"v_y", robot_localizer_.getVelocity().y()},
+         {"target_v_x", target_local_velocity.x()},
+         {"target_v_y", target_local_velocity.y()},
+         {"target_a_x", local_acceleration.x()},
+         {"target_a_y", local_acceleration.y()}});
 }

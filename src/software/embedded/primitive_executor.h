@@ -117,7 +117,7 @@ class PrimitiveExecutor
     AngularVelocity prev_target_angular_velocity_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.1;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.
