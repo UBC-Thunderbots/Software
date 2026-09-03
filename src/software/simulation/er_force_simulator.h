@@ -132,13 +132,6 @@ class ErForceSimulator
     void resetCurrentTime();
 
     /**
-     * Returns whether the ball is currently visible (i.e. not held by a robot)
-     *
-     * @return true if the ball is visible, false otherwise
-     */
-    bool isBallVisible() const;
-
-    /**
      * Creates the default realism config using erforce simulator's default config
      * @return a pointer to default realism config
      */

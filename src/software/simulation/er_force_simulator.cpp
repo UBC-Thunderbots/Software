@@ -489,14 +489,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     blue_robot_with_ball.reset();
     yellow_robot_with_ball.reset();
-    ball_is_visible = true;
 
     for (const auto& response : yellow_radio_responses)
     {
         if (response.has_ball_detected() && response.ball_detected())
         {
             yellow_robot_with_ball = response.id();
-            ball_is_visible        = false;
         }
     }
 
@@ -505,7 +503,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         if (response.has_ball_detected() && response.ball_detected())
         {
             blue_robot_with_ball = response.id();
-            ball_is_visible      = false;
         }
     }
 
@@ -583,11 +580,6 @@ Timestamp ErForceSimulator::getTimestamp() const
 void ErForceSimulator::resetCurrentTime()
 {
     current_time = Timestamp::fromSeconds(0);
-}
-
-bool ErForceSimulator::isBallVisible() const
-{
-    return ball_is_visible;
 }
 
 std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
