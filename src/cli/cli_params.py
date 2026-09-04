@@ -139,6 +139,7 @@ class BazelFlag(tuple, Enum):
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)
     DEBUG_POWERLOOP = ("--//software/power:debug_powerloop",)
+    SERIAL_TESTS = ("",)
     DISABLE_POWER_SERVICE = ("--//software/embedded:disable_power_service",)
     DISABLE_MOTOR_SERVICE = ("--//software/embedded:disable_motor_service",)
 
