@@ -1,8 +1,7 @@
 from pyqtgraph.Qt import QtWidgets
 from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
 import pyqtgraph.console as pg_console
-from proto.robot_log_msg_pb2 import RobotLog, LogLevel
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.thunderscope import constants
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
@@ -40,7 +39,7 @@ class g3logWidget(QtWidgets.QWidget):
 
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
-        self.log_buffer = ThreadSafeBuffer(buffer_size, RobotLog)
+        self.log_buffer = ThreadSafeBuffer(buffer_size, protos.RobotLog)
 
         self.layout.addWidget(self.console_widget)
         self.layout.addWidget(self.checkbox_widget)
@@ -52,11 +51,11 @@ class g3logWidget(QtWidgets.QWidget):
 
         # LogLevel to string conversion map
         self.log_level_str_map = {
-            LogLevel.DEBUG: "DEBUG",
-            LogLevel.INFO: "INFO",
-            LogLevel.WARNING: "WARNING",
-            LogLevel.FATAL: "FATAL",
-            LogLevel.CONTRACT: "CONTRACT",
+            protos.LogLevel.DEBUG: "DEBUG",
+            protos.LogLevel.INFO: "INFO",
+            protos.LogLevel.WARNING: "WARNING",
+            protos.LogLevel.FATAL: "FATAL",
+            protos.LogLevel.CONTRACT: "CONTRACT",
         }
 
     def refresh(self) -> None:
@@ -70,23 +69,23 @@ class g3logWidget(QtWidgets.QWidget):
         # Checks whether this type of log is enabled from checkboxes
         if (
             (
-                log.log_level == LogLevel.DEBUG
+                log.log_level == protos.LogLevel.DEBUG
                 and self.checkbox_widget.debug_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.INFO
+                log.log_level == protos.LogLevel.INFO
                 and self.checkbox_widget.info_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.WARNING
+                log.log_level == protos.LogLevel.WARNING
                 and self.checkbox_widget.warning_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.CONTRACT
+                log.log_level == protos.LogLevel.CONTRACT
                 and self.checkbox_widget.fatal_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.FATAL
+                log.log_level == protos.LogLevel.FATAL
                 and self.checkbox_widget.fatal_checkbox.isChecked()
             )
         ):

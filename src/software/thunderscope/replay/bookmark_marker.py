@@ -1,7 +1,6 @@
 from collections.abc import Callable
 
 from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
-from software.py_constants import *
 from software.py_constants import MILLISECONDS_PER_SECOND
 from typing import override
 

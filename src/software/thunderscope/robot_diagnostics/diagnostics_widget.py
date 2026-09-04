@@ -1,5 +1,4 @@
 from pyqtgraph.Qt import QtWidgets
-from proto.import_all_protos import *
 
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import (

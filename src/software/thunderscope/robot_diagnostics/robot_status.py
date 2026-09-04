@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtWidgets
 from pyqtgraph import parametertree
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from software.thunderscope.common import proto_parameter_tree_util
 from google.protobuf.message import Message
 from typing import override
@@ -28,7 +28,7 @@ class RobotStatusView(QtWidgets.QWidget):
             name="RobotStatus",
             type="group",
             children=proto_parameter_tree_util.config_proto_to_field_list(
-                RobotStatus(), read_only=True, search_term=None
+                protos.RobotStatus(), read_only=True, search_term=None
             ),
         )
 

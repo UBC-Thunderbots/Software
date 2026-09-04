@@ -9,21 +9,26 @@ import numpy as np
 from typing import Optional
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
-from software.thunderscope.constants import *
+from software.thunderscope.constants import (
+    CameraView,
+    DEFAULT_EMPTY_FIELD_WORLD,
+    ORTHOGRAPHIC_FOV_DEGREES,
+)
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.extended_gl_view_widget import *
+from software.thunderscope.gl.helpers.extended_gl_view_widget import (
+    ExtendedGLViewWidget,
+    MouseInSceneEvent,
+)
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from proto.world_pb2 import SimulationState
-from proto.replay_bookmark_pb2 import ReplayBookmark
-from proto.tbots_timestamp_msg_pb2 import Timestamp
+import proto.import_all_protos as protos
 
 from software.thunderscope.common.toast_msg_helper import success_toast
 from typing import override
@@ -64,7 +69,7 @@ class GLWidget(QtWidgets.QWidget):
             lambda: self.frame_swap_counter.add_one_datapoint()
         )
 
-        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, protos.SimulationState)
 
         # Connect event handlers
         self.gl_view_widget.mouse_in_scene_pressed_signal.connect(
@@ -391,8 +396,8 @@ class GLWidget(QtWidgets.QWidget):
     def add_bookmark(self):
         """Handler for clicking 'add bookmark' button"""
         timestamp = time.time()
-        bookmark = ReplayBookmark(
-            timestamp=Timestamp(epoch_timestamp_seconds=timestamp)
+        bookmark = protos.ReplayBookmark(
+            timestamp=protos.Timestamp(epoch_timestamp_seconds=timestamp)
         )
-        self.proto_unix_io.send_proto(ReplayBookmark, bookmark)
+        self.proto_unix_io.send_proto(protos.ReplayBookmark, bookmark)
         success_toast(self.parentWidget(), "Added bookmark!")

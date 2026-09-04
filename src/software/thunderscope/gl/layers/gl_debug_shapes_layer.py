@@ -4,7 +4,7 @@ import time
 from pyqtgraph.Qt import QtGui
 import pyqtgraph.opengl as gl
 
-from proto.visualization_pb2 import DebugShapes
+import proto.import_all_protos as protos
 
 from software.thunderscope.constants import (
     Colors,
@@ -35,7 +35,7 @@ class GLDebugShapesLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, DebugShapes)
+        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, protos.DebugShapes)
         self.debug_shape_map = {}
 
         self.poly_shape_graphics = ObservableList(self._graphics_changed)
