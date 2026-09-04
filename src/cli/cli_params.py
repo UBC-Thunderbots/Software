@@ -141,6 +141,7 @@ class BazelFlag(tuple, Enum):
     DEBUG_POWERLOOP = ("--//software/power:debug_powerloop",)
     DISABLE_POWER_SERVICE = ("--//software/embedded:disable_power_service",)
     DISABLE_MOTOR_SERVICE = ("--//software/embedded:disable_motor_service",)
+    SERIAL_TESTS = ("",)
 
 
 class InteractiveCli:
