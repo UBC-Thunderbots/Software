@@ -4,9 +4,8 @@ from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
 )
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from proto.play_pb2 import PlayName
-from proto.import_all_protos import Command
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+import proto.import_all_protos as protos
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -48,17 +47,17 @@ def test_example_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+            gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.DIRECT, team=Team.BLUE
+            gc_command=protos.Command.Type.DIRECT, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.ExamplePlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.ExamplePlay, yellow_play=protos.PlayName.HaltPlay
         )
 
     eventually_validations = [

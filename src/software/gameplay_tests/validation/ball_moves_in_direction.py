@@ -1,5 +1,5 @@
 import software.python_bindings as tbots
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -24,7 +24,7 @@ class BallMovesForward(Validation):
         self.tolerance = tolerance
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if ball is moving forward
 
         :param world: The world msg to validate
@@ -39,14 +39,14 @@ class BallMovesForward(Validation):
             current_ball_position > (self.max_displacement_so_far - self.tolerance)
         ):
             self.max_displacement_so_far = current_ball_position
-            return ValidationStatus.PASSING
+            return protos.ValidationStatus.PASSING
 
         # if max displacement is set and current ball is in the wrong direction too far
         # beyond a threshold, return FAILING
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) Shows the last ball position line"""
         return create_validation_geometry(
             [
@@ -84,17 +84,17 @@ class BallMovesForwardInRegions(BallMovesForward):
         self.regions = regions
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         for region in self.regions:
             if tbots.contains(
                 region, tbots.createPoint(world.ball.current_state.global_position)
             ):
                 return super().get_validation_status(world)
 
-        return ValidationStatus.PASSING
+        return protos.ValidationStatus.PASSING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) Shows the last ball position line, and the regions the ball should be moving in"""
         return create_validation_geometry(self.regions)
 

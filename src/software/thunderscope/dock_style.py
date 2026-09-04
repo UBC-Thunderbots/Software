@@ -1,6 +1,3 @@
-from pyqtgraph.dockarea.Dock import Dock, DockLabel
-
-
 def updateDockStylePatched(self):
     """Overrides the style of the dock."""
     border = "#3f4042"
@@ -80,7 +77,3 @@ def updateDockLabelStylePatched(self):
             font-size: 15px;
         }}"""
         self.setStyleSheet(self.hStyle)
-
-
-Dock.updateStyle = updateDockStylePatched
-DockLabel.updateStyle = updateDockLabelStylePatched

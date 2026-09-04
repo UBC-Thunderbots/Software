@@ -1,7 +1,6 @@
-from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from thefuzz import fuzz
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 import netifaces
 
 
@@ -37,8 +36,8 @@ def __create_int_parameter_writable(key, value, descriptor):
 
     try:
         minimum, maximum = (
-            options.Extensions[bounds].min_int_value,
-            options.Extensions[bounds].max_int_value,
+            options.Extensions[protos.bounds].min_int_value,
+            options.Extensions[protos.bounds].max_int_value,
         )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))
@@ -68,8 +67,8 @@ def __create_double_parameter_writable(key, value, descriptor):
 
     try:
         minimum, maximum = (
-            options.Extensions[bounds].min_double_value,
-            options.Extensions[bounds].max_double_value,
+            options.Extensions[protos.bounds].min_double_value,
+            options.Extensions[protos.bounds].max_double_value,
         )
     except KeyError:
         raise KeyError("{} missing ParameterRangeOptions".format(key))

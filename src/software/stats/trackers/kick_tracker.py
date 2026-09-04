@@ -1,13 +1,12 @@
 from typing import Optional
 
 import software.python_bindings as tbots_cpp
-from proto.visualization_pb2 import AttackerVisualization
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from typing import override
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.stats.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.logs.event_log import EventType, Team
+from software.stats.logs.event_log import EventType
 import queue
 
 
@@ -40,8 +39,8 @@ class KickTracker(Tracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):
@@ -65,16 +64,16 @@ class KickTracker(Tracker):
         self.kick_taken = False
 
         self.attacker_vis_buffer = ThreadSafeBuffer(
-            self.buffer_size, AttackerVisualization
+            self.buffer_size, protos.AttackerVisualization
         )
         self.proto_unix_io.register_observer(
-            AttackerVisualization, self.attacker_vis_buffer
+            protos.AttackerVisualization, self.attacker_vis_buffer
         )
 
         self.curr_pass = None
 
     def _get_new_kick_angle(
-        self, origin: Point, target: Point, latest_angle: tbots_cpp.Angle
+        self, origin: protos.Point, target: protos.Point, latest_angle: tbots_cpp.Angle
     ) -> Optional[tbots_cpp.Angle]:
         """For a kick with the given origin and target, return the new kick angle
         IF it is different enough from the latest angle so far
@@ -121,7 +120,7 @@ class KickTracker(Tracker):
         self._refresh_kicks(attacker_vis_msg, self.cached_world)
 
     def _refresh_kicks(
-        self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
+        self, attacker_vis_msg: protos.AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         raise Exception("Not Implemented, please use the appropriate subclass!")
 
@@ -132,8 +131,8 @@ class PassTracker(KickTracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):
@@ -155,7 +154,7 @@ class PassTracker(KickTracker):
 
     @override
     def _refresh_kicks(
-        self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
+        self, attacker_vis_msg: protos.AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the pass tracker with the new attacker visualization
         and the latest state of the world.
@@ -201,8 +200,8 @@ class ShotTracker(KickTracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):
@@ -224,7 +223,7 @@ class ShotTracker(KickTracker):
 
     @override
     def _refresh_kicks(
-        self, attacker_vis_msg: AttackerVisualization, world: tbots_cpp.World
+        self, attacker_vis_msg: protos.AttackerVisualization, world: tbots_cpp.World
     ) -> None:
         """Refreshes the shot tracker with the new attacker visualization
         and the latest state of the world.
