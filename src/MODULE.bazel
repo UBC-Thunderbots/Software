@@ -7,17 +7,19 @@ module(
 ##############################################################
 # Import Dependencies available in the Bazel Central Registry
 ##############################################################
-bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "platforms", version = "0.0.11")
-bazel_dep(name = "pybind11_bazel", version = "2.13.6")
-bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "googletest", version = "1.16.0.bcr.2")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "pybind11_bazel", version = "3.0.1")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "rules_cc", version = "0.2.19")
+bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
-bazel_dep(name = "rules_python", version = "1.4.1")
-bazel_dep(name = "eigen", version = "3.4.0.bcr.3")
-bazel_dep(name = "zlib", version = "1.3.1.bcr.6")
-bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.2")
-bazel_dep(name = "protobuf", version = "31.1")
+bazel_dep(name = "rules_python", version = "2.2.0")
+bazel_dep(name = "eigen", version = "5.0.1.bcr.2")
+bazel_dep(name = "zlib", version = "1.3.1.bcr.7")
+bazel_dep(name = "nanopb", version = "0.4.9.1.bcr.3")
+bazel_dep(name = "protobuf", version = "35.1")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
@@ -47,6 +49,10 @@ pip.parse(
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+    ],
 )
 use_repo(pip, "ansible_deps")
 pip.parse(
@@ -61,6 +67,10 @@ pip.parse(
     python_interpreter = "/opt/tbotspython/bin/python",
     python_version = "3.12",
     requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+    ],
 )
 use_repo(pip, "robot_diagnostics_cli_deps")
 pip.parse(
@@ -92,7 +102,8 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 
 http_archive(
     name = "tomlplusplus",
-    build_file = "@//extlibs:tomlplusplus.BUILD",
+    build_file = "@//extlibs:tomlplusplus.bzl",
+    patches = ["//starlark/patches/tomlplusplus:fix_arm_alignment.patch"],
     sha256 = "8517f65938a4faae9ccf8ebb36631a38c1cadfb5efa85d9a72e15b9e97d25155",
     strip_prefix = "tomlplusplus-3.4.0",
     urls = ["https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz"],
@@ -100,7 +111,7 @@ http_archive(
 
 http_archive(
     name = "g3log",
-    build_file = "@//extlibs:g3log.BUILD",
+    build_file = "@//extlibs:g3log.bzl",
     sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
     strip_prefix = "g3log-2.4",
     url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
@@ -108,7 +119,7 @@ http_archive(
 
 http_archive(
     name = "g3sinks",
-    build_file = "@//extlibs:g3sinks.BUILD",
+    build_file = "@//extlibs:g3sinks.bzl",
     sha256 = "77632432de1ec456987c7d83c6eb163bb42f0eb9df6e0bdf63bcf7961c1f6c70",
     strip_prefix = "g3sinks-1.1.3",
     url = "https://github.com/KjellKod/g3sinks/archive/1.1.3.zip",
@@ -116,7 +127,7 @@ http_archive(
 
 http_archive(
     name = "base64",
-    build_file = "@//extlibs:base64.BUILD",
+    build_file = "@//extlibs:base64.bzl",
     sha256 = "5e5366919938b834ca95fec4c2a80ad0c002872175d43226c933d25e40572883",
     strip_prefix = "cpp-base64-2.rc.08",
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
@@ -125,10 +136,9 @@ http_archive(
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
 archive_override(
     module_name = "rules_boost",
-    # Made with: shasum -a 256  rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz
-    sha256 = "f3125bbcb4adb5863980562d6092f2c07571cc9b2d4510e3b7f829fd43b44607",
-    strip_prefix = "rules_boost-2a003f812e9a13b970e4100d96856b09ee13a582",
-    url = "https://github.com/nelhage/rules_boost/archive/2a003f812e9a13b970e4100d96856b09ee13a582.tar.gz",
+    sha256 = "722178ab4687ebf48c66229a0fe774759bd836257bcede2ed972b0e32ce92c33",
+    strip_prefix = "rules_boost-2811ec9f1e42f784439a7bbecf68b1c8b5f8b0ae",
+    url = "https://github.com/nelhage/rules_boost/archive/2811ec9f1e42f784439a7bbecf68b1c8b5f8b0ae.tar.gz",
 )
 
 non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
@@ -141,6 +151,11 @@ use_repo(
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 archive_override(
     module_name = "hedron_compile_commands",
+    patches = [
+        "//starlark/patches/hedron_compile_commands:add_rules_python_dep.patch",
+        "//starlark/patches/hedron_compile_commands:fix_py_binary.patch",
+        "//starlark/patches/hedron_compile_commands:fix_cc_binary.patch",
+    ],
     sha256 = "ba3feefdf57b6d4c749e3c4abfa86f3673e7db364cb13acfc3496dce6ea801a3",
     strip_prefix = "bazel-compile-commands-extractor-f5fbd4cee671d8d908f37c83abaf70fba5928fc7",
     url = "https://github.com/mikael-s-persson/bazel-compile-commands-extractor/archive/f5fbd4cee671d8d908f37c83abaf70fba5928fc7.tar.gz",
@@ -149,22 +164,23 @@ archive_override(
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
 archive_override(
     module_name = "platformio_rules",
+    patches = ["//starlark/patches/platformio_rules:add_py_binary_load.patch"],
     sha256 = "a80357230e27b8b57b8deffaa82684d3ee88b2284e4a767a9d8a692e9034e125",
     strip_prefix = "platformio_rules-3cd18c7c7bb2482fe3cbb58898245dd675421234",
     url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",
 )
 
-# This is overridden despite being in BCR since it contains protoc v31.1. We can remove this once BCR updates
 archive_override(
-    module_name = "toolchains_protoc",
-    sha256 = "a694e39b16064011c11ce8719207736d1cd2ed5f56a4c73534174da7eea0dd2e",
-    strip_prefix = "toolchains_protoc-ea1a220e47b4c9c654f3bd198107c605ae27cf06",
-    url = "https://github.com/aspect-build/toolchains_protoc/archive/ea1a220e47b4c9c654f3bd198107c605ae27cf06.tar.gz",
+    module_name = "nanopb",
+    patches = ["//starlark/patches/nanopb:fix_protobuf_syspath.patch"],
+    sha256 = "1ae1c26cee315dc8840d6e436d3306c43f8fe41c4326d00dbc193b334658bb82",
+    strip_prefix = "nanopb-d21fa5084287ab67da2f166f4def045bedcb535e",
+    url = "https://github.com/nanopb/nanopb/archive/d21fa5084287ab67da2f166f4def045bedcb535e.tar.gz",
 )
 
 http_archive(
     name = "bullet",
-    build_file = "@//extlibs:bullet.BUILD",
+    build_file = "@//extlibs:bullet.bzl",
     sha256 = "0af974ece80e528182ac47a0c0b1506b5aeeb570fdb7d4fd7044efe67babc7a1",
     strip_prefix = "bullet3-272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2",
     url = "https://github.com/bulletphysics/bullet3/archive/272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2.tar.gz",
@@ -172,7 +188,7 @@ http_archive(
 
 http_archive(
     name = "sml",
-    build_file = "@//extlibs:sml.BUILD",
+    build_file = "@//extlibs:sml.bzl",
     sha256 = "e3a8a76495d81b479fa53f2301b55d07251178ca3d5da781d5709814ec8baec3",
     strip_prefix = "sml-07a503cc3f18de2b861ea15d8357d3b3c0c978d6",
     url = "https://github.com/boost-ext/sml/archive/07a503cc3f18de2b861ea15d8357d3b3c0c978d6.tar.gz",
@@ -180,7 +196,7 @@ http_archive(
 
 http_archive(
     name = "tracy",
-    build_file = "@//extlibs:tracy.BUILD",
+    build_file = "@//extlibs:tracy.bzl",
     sha256 = "c24ce6179df7efb8a114fe409d197e26e4b937c6fc1258bea15840b15b1f79ff",
     strip_prefix = "tracy-37aff70dfa50cf6307b3fee6074d627dc2929143",
     url = "https://github.com/wolfpld/tracy/archive/37aff70dfa50cf6307b3fee6074d627dc2929143.tar.gz",
@@ -188,7 +204,7 @@ http_archive(
 
 http_archive(
     name = "munkres_cpp",
-    build_file = "@//extlibs:munkres_cpp.BUILD",
+    build_file = "@//extlibs:munkres_cpp.bzl",
     sha256 = "a59d8cb17b0776abb2c5b6341f6863e705406deb1f3dfb5a6e07af187c4203f4",
     strip_prefix = "munkres-cpp-61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
     url = "https://github.com/saebyn/munkres-cpp/archive/61086fcf5b3a8ad4bda578cdc2d1dca57b548786.tar.gz",
@@ -207,7 +223,7 @@ use_repo(openocd, "com_openocd")
 
 http_archive(
     name = "LTC4151",
-    build_file = "@//extlibs:LTC4151.BUILD",
+    build_file = "@//extlibs:LTC4151.bzl",
     sha256 = "6aa2dd380a13b08366338cdf0fbbeeeed96887512ac7b0753ee6ea1e8856df31",
     strip_prefix = "LTC4151-729952f10bcdcf359877b6f728565c17a8f17423",
     url = "https://github.com/kerrydwong/LTC4151/archive/729952f10bcdcf359877b6f728565c17a8f17423.tar.gz",
@@ -225,7 +241,7 @@ git_repository(
 
 http_archive(
     name = "trinamic",
-    build_file = "@//extlibs:trinamic.BUILD",
+    build_file = "@//extlibs:trinamic.bzl",
     sha256 = "4c1640a87347afdc4d5954752f0e773f6d9fbb0ea0fb1481dbdb3012ec00ef8b",
     strip_prefix = "TMC-API-0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
     url = "https://github.com/analogdevicesinc/TMC-API/archive/0cd695fab6d43ceb121af4b8608e5d92b14e1ce9.tar.gz",
@@ -233,7 +249,7 @@ http_archive(
 
 http_archive(
     name = "cppcrc",
-    build_file = "@//extlibs:cppcrc.BUILD",
+    build_file = "@//extlibs:cppcrc.bzl",
     strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
     url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
 )
@@ -264,53 +280,85 @@ new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.
 
 new_local_repository(
     name = "linux_k8_gcc",
-    build_file = "@//extlibs:linux_k8_gcc.BUILD",
+    build_file = "@//extlibs:linux_k8_gcc.bzl",
     path = "/",
 )
 
 new_local_repository(
     name = "linux_aarch64_gcc",
-    build_file = "@//extlibs:linux_aarch64_gcc.BUILD",
+    build_file = "@//extlibs:linux_aarch64_gcc.bzl",
     path = "/",
 )
 
 # libclang-dev is installed into the system through setup_software.sh
 new_local_repository(
     name = "libclang",
-    build_file = "@//extlibs:libclang.BUILD",
+    build_file = "@//extlibs:libclang.bzl",
     path = "/usr/lib/llvm-6.0/",
 )
 
 new_local_repository(
     name = "k8_aarch64_linux_gcc",
-    build_file = "@//extlibs:k8_aarch64_linux_gcc.BUILD",
+    build_file = "@//extlibs:k8_aarch64_linux_gcc.bzl",
     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
 )
 
 new_local_repository(
     name = "macos_robot_gcc",
-    build_file = "@//extlibs:macos_robot_gcc.BUILD",
+    build_file = "@//extlibs:macos_robot_gcc.bzl",
     path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
 )
 
 new_local_repository(
     name = "motor_board_gcc",
-    build_file = "@//extlibs:motor_board_gcc.BUILD",
+    build_file = "@//extlibs:motor_board_gcc.bzl",
     path = "/opt/tbotspython/arm-none-eabi-gcc/",
 )
 
 new_local_repository(
     name = "py_cc_toolchain_host",
-    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    build_file = "@//extlibs:py_cc_toolchain.bzl",
     path = "/opt/tbotspython/py_headers/include/python3.12/",
 )
 
 new_local_repository(
     name = "py_cc_toolchain_for_k8_aarch64_linux",
-    build_file = "@//extlibs:py_cc_toolchain.BUILD",
+    build_file = "@//extlibs:py_cc_toolchain.bzl",
     path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
 
 ##############################################
 # Workarounds and Fixes Below (hacks)
 ##############################################
+
+# Bazel 9 compatibility: register rules_cc compatibility proxy for
+# transitive dependencies that haven't been updated.
+cc_compat = use_extension("@rules_cc//cc:extensions.bzl", "compatibility_proxy")
+use_repo(cc_compat, "cc_compatibility_proxy")
+
+# googletest 1.16.0.bcr.2 needs compat proxy registration for Bazel 9.
+single_version_override(
+    module_name = "googletest",
+    patches = ["//starlark/patches/googletest:add_compat_proxy.patch"],
+    version = "1.16.0.bcr.2",
+)
+
+# pybind11_protobuf needs Bazel 9 compat and protobuf 35 API fixes.
+single_version_override(
+    module_name = "pybind11_protobuf",
+    patches = [
+        "//starlark/patches/pybind11_protobuf:add_compat_proxy.patch",
+        "//starlark/patches/pybind11_protobuf:protobuf35_compat.patch",
+    ],
+)
+
+# protobuf's Python extensions pull host headers via @system_python, which
+# breaks aarch64 cross-compilation. Use @rules_python's py_cc_toolchain
+# headers (@rules_python//python/cc:current_py_cc_headers) instead.
+single_version_override(
+    module_name = "protobuf",
+    patches = [
+        "//starlark/patches/protobuf:use_py_cc_toolchain_headers.patch",
+        "//starlark/patches/protobuf:use_py_cc_toolchain_headers_py_extension.patch",
+    ],
+)

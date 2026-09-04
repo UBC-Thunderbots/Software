@@ -56,7 +56,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     std::string config_str = config_ss.str();
 
     google::protobuf::TextFormat::Parser parser;
-    parser.ParseFromString(config_str, &er_force_sim_setup);
+    std::ignore  = parser.ParseFromString(config_str, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);

@@ -3,6 +3,8 @@
 #   matrices, and related algorithms.
 #   http://eigen.tuxfamily.org/index.php?title=Main_Page
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 licenses([
     # Note: Eigen is an MPL2 library that includes GPL v3 and LGPL v2.1+ code.
     #       We've taken special care to not reference any restricted code.

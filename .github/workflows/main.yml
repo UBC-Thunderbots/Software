@@ -155,11 +155,11 @@ jobs:
           # //software/gameplay_tests/...    \
         run: |
           cd src
-          bazel test //software/gameplay_tests:requirements_test
+          bazel test //software/gameplay_tests:requirements.test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
             --test_arg="--ci_mode"            \
             -- //software:unix_full_system       \
-            -//software/gameplay_tests:requirements_test \
+            -//software/gameplay_tests:requirements.test \
             //software/ai/hl/...              \
             //software/ai/navigator/...
             

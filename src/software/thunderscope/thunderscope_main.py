@@ -5,6 +5,11 @@ import os
 import sys
 import threading
 
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
+preload_bundled_qt_libs()
+
 import google.protobuf
 from google.protobuf.internal import api_implementation
 

@@ -36,6 +36,7 @@ build --auto_cpu_environment_group=//toolchains/cc:cpus
 # Use Our Custom Toolchain
 build --crosstool_top=//toolchains/cc:toolchain
 common --features=external_include_paths
+common --features=generated_include_paths
 
 ################# Build Optimizations #################
 
@@ -44,8 +45,9 @@ common --features=external_include_paths
 # See https://docs.bazel.build/versions/master/remote-caching.html#disk-cache
 build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 
-build --experimental_remote_merkle_tree_cache # partial repo caching optimization
 common --incompatible_enable_proto_toolchain_resolution # protoc caching
+common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
+common --incompatible_default_to_explicit_init_py
 
 # Ensure that we don't accidentally build gRPC
 common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
@@ -54,6 +56,7 @@ common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUIL
 ################# Build Configurations #################
 # Lock C++ version
 build --cxxopt="-std=c++2a"
+
 # Warn variable length arrays only when compiling cpp
 build --per_file_copt=.*\.cpp@-Wvla
 
@@ -68,21 +71,21 @@ common --enable_platform_specific_config
 build --incompatible_remove_legacy_whole_archive=False
 
 # Escalate Warnings to fail Compile for Thunderbots code
-build --features=external_include_paths
 build:linux --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
-# TODO: #3492
-# build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
+build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
 
 build --cxxopt="-DG3_DYNAMIC_LOGGING"
 
 build --per_file_copt=.*\.pb\.(h|cc|cpp)$@-w
-build --per_file_copt=./external/.*,./bazel-out/.*@-w
+
+build --per_file_copt=^external/.*,^bazel-out/.*@-w
+build --host_per_file_copt=^external/.*,^bazel-out/.*@-w
 
 # Define Robot Versions
 build --copt="-DCURRENT_ROBOT_VERSION=2026"
 
 # Limit the number of jobs to prevent stalling the machine
-build --local_cpu_resources=HOST_CPUS*0.75
+build --local_resources=cpu=HOST_CPUS*0.75
 
 ############## External Deps Compatibility ##############
 build --noincompatible_disallow_ctx_resolve_tools

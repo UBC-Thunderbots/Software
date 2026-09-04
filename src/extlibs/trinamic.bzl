@@ -1,5 +1,7 @@
 #   This library provides us the interface to trinamic chips
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 cc_library(
     name = "trinamic",
     srcs = [
