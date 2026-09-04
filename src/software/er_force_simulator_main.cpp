@@ -105,10 +105,6 @@ int main(int argc, char** argv)
         TbotsProto::World blue_vision;
         TbotsProto::World yellow_vision;
 
-        // Timestamp of the first vision message received, so that logged timestamps
-        // start at 0
-        double start_timestamp_s = 0.0;
-
         // Outputs
         // SSL Wrapper Output
         auto blue_ssl_wrapper_output =
