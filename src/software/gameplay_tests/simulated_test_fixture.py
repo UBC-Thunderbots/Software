@@ -1,3 +1,8 @@
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
+preload_bundled_qt_libs()
+
 import threading
 import queue
 import argparse
