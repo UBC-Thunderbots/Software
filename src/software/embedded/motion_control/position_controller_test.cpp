@@ -11,7 +11,6 @@ TEST(PositionControllerTest, BasicTest)
     PositionController controller;
     std::shared_ptr trajectory_ptr = std::make_shared<BangBangTrajectory2D>();
     TrajectoryPath trajectory{trajectory_ptr, BangBangTrajectory2D::generator};
-    controller.step(Point{}, trajectory, Duration::fromSeconds(1.0),
-                    Duration::fromSeconds(0.01));
+    controller.step(Point{}, trajectory, 1.0, 0.01);
     controller.reset();
 }

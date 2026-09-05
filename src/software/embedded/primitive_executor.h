@@ -1,78 +1,91 @@
 #pragma once
+
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/embedded/motion_control/orientation_controller.h"
 #include "software/embedded/motion_control/position_controller.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/geom/vector.h"
-#include "software/time/duration.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_types.h"
 
+/**
+ * "Executes" primitives, turning them into the direct control commands that
+ * drive the robot's motors and actuate the kicker/chipper.
+ *
+ * For a MovePrimitive, "execution" is done by planning a trajectory to the destination
+ * and, on each step, tracking that trajectory to compute the target velocities.
+ */
 class PrimitiveExecutor
 {
    public:
     /**
-     * Constructor
-     * @param robot_constants The robot constants for the robot which uses this primitive
+     * Constructs a new PrimitiveExecutor.
+     *
+     * @param robot_constants The robot constants for the robot that uses this primitive
      * executor
      */
     explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants);
 
     /**
-     * Update primitive executor with a new Primitive
-     * @param primitive_msg The primitive to start
+     * Starts executing a new primitive.
+     *
+     * For a Move primitive, this plans the trajectory the robot will follow to
+     * reach its destination.
+     *
+     * @param primitive_msg The primitive to execute
+     * @param robot_status The robot status to update
      */
-    void updatePrimitive(const TbotsProto::Primitive& primitive_msg);
+    void updatePrimitive(const TbotsProto::Primitive& primitive_msg,
+                         TbotsProto::RobotStatus& robot_status);
 
     /**
-     * Update primitive executor with the state of the robot
+     * Advances the current primitive's execution by one step and returns the direct
+     * control command to drive the motors.
      *
-     * @param state The current robot state
+     * For a Move primitive, this tracks the planned trajectory against the latest robot
+     * state estimate to compute the target velocities. A Stop primitive produces zero
+     * velocities, and a DirectControl primitive is passed through unchanged.
+     *
+     * @param status The current robot status, updated with the primitive executor status
+     * @param delta_time_s The elapsed time since the last primitive step
+     *
+     * @return The direct control command to send to the motors
      */
-    void updateState(const RobotState& state);
-
-    /**
-     * Steps the current primitive and returns a direct control primitive with the
-     * target wheel velocities
-     *
-     * @param status The status of the primitive executor, set to false if current
-     * primitive is a Stop primitive
-     * @param delta_time The elapsed time since the last primitive step
-     *
-     * @returns DirectControlPrimitive The direct control primitive msg
-     */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus& status, const Duration& delta_time);
+    TbotsProto::DirectControlPrimitive stepPrimitive(TbotsProto::RobotStatus& status,
+                                                     double delta_time_s);
 
    private:
-    /*
-     * Compute the next target linear _local_ velocity the robot should have.
-     * @param delta_time The elapsed time since last time step
+    /**
+     * Tracks the planned trajectory to compute the robot's next target local linear
+     * velocity, respecting the robot's speed and acceleration limits.
      *
-     * @returns Vector The target linear _local_ velocity
+     * @param delta_time_s The elapsed time since the last step
+     *
+     * @return The target local linear velocity
      */
-    Vector stepTargetLinearVelocity(const Duration& delta_time);
+    Vector stepTargetLinearVelocity(double delta_time_s);
 
-    /*
-     * Compute the next target angular velocity the robot should have.
-     * @param delta_time The elapsed time since last time step
+    /**
+     * Tracks the planned angular trajectory to compute the robot's next target angular
+     * velocity, respecting the robot's angular speed and acceleration limits.
      *
-     * @returns AngularVelocity The target angular velocity
+     * @param delta_time_s The elapsed time since the last step
+     *
+     * @return The target angular velocity
      */
-    AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
+    AngularVelocity stepTargetAngularVelocity(double delta_time_s);
 
     /**
      * Sends the position, local velocity, and local acceleration to PlotJuggler.
      *
      * @param target_local_velocity The local velocity being sent to the next direct
      * control primitive
-     * @param delta_time Used to calculate acceleration.
+     * @param delta_time_s The elapsed time since the last step
      */
     void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       const Duration& delta_time) const;
+                                       double delta_time_s) const;
 
     /**
      * Records the velocities commanded this step so the next step can measure the
@@ -85,15 +98,15 @@ class PrimitiveExecutor
     void setPrevCommandedVelocity(const Vector& local_velocity,
                                   const AngularVelocity& angular_velocity);
 
-    RobotState state_;
+    RobotLocalizer robot_localizer_;
     TbotsProto::Primitive current_primitive_;
     robot_constants::RobotConstants robot_constants_;
 
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
-    Duration time_since_linear_trajectory_creation_;
-    Duration time_since_angular_trajectory_creation_;
+    double time_since_linear_trajectory_creation_s_  = 0.0;
+    double time_since_angular_trajectory_creation_s_ = 0.0;
 
     PositionController position_controller_;
     OrientationController orientation_controller_;
@@ -104,7 +117,7 @@ class PrimitiveExecutor
     AngularVelocity prev_target_angular_velocity_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.1;
 
     // The distance away from the destination at which we start dampening the velocity
     // to avoid jittering around the destination.

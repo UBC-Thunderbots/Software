@@ -8,17 +8,16 @@ import "proto/geometry.proto";
 
 message RobotStatus
 {
-    reserved 8;
-
     uint32 robot_id                                   = 1;
     repeated ErrorCode error_code                     = 2;
     ChipperKickerStatus chipper_kicker_status         = 4;
     MotorStatus motor_status                          = 5;
     NetworkStatus network_status                      = 6;
     PowerStatus power_status                          = 7;
+    ImuStatus imu_status                              = 16;
     ThunderloopStatus thunderloop_status              = 9;
     Timestamp time_sent                               = 10;
-    uint64 last_handled_primitive_set                 = 11;
+    uint64 last_handled_primitive_seq_num             = 11;
     PrimitiveExecutorStatus primitive_executor_status = 12;
     Timestamp adjusted_time_sent                      = 13;
     string thunderloop_version                        = 14;
@@ -32,12 +31,12 @@ message PrimitiveExecutorStatus
 
 message ThunderloopStatus
 {
-    double network_service_poll_time_ms     = 1;
-    double primitive_executor_start_time_ms = 2;
-    double primitive_executor_step_time_ms  = 3;
-    double motor_service_poll_time_ms       = 4;
-    double power_service_poll_time_ms       = 5;
-    double iteration_time_ms                = 6;
+    double network_service_poll_time_ms      = 1;
+    double primitive_executor_update_time_ms = 2;
+    double primitive_executor_step_time_ms   = 3;
+    double motor_service_poll_time_ms        = 4;
+    double power_service_poll_time_ms        = 5;
+    double iteration_time_ms                 = 6;
 }
 
 /* Data about the status of the chipper and kicker */
@@ -145,4 +144,11 @@ message PowerStatus
     Geneva.Slot geneva_slot = 4;
     uint32 sequence_num     = 5;
     bool breakbeam_tripped  = 6;
+}
+
+message ImuStatus
+{
+    AngularVelocity angular_velocity         = 1;
+    AngularAcceleration angular_acceleration = 2;
+    Vector linear_acceleration               = 3;
 }

@@ -19,11 +19,9 @@
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping,
-                                   Duration primitive_executor_time_step)
+                                   const bool ramping)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
-      primitive_executor_time_step(primitive_executor_time_step),
       frame_number(0),
       euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
@@ -304,15 +302,12 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const auto robot_map =
         getRobotIdToRobotStateMap(sim_robots, gameController::Team::YELLOW);
 
-    yellow_team_world_msg               = std::move(world_msg);
-    const TbotsProto::World world_proto = *yellow_team_world_msg;
+    yellow_team_world_msg = std::move(world_msg);
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         if (robot_map.contains(robot_id))
         {
-            const auto& robot_state = robot_map.at(robot_id);
-            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, robot_state);
+            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map);
         }
     }
 }
@@ -326,16 +321,13 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const auto robot_map =
         getRobotIdToRobotStateMap(sim_robots, gameController::Team::BLUE);
 
-    blue_team_world_msg                 = std::move(world_msg);
-    const TbotsProto::World world_proto = *blue_team_world_msg;
+    blue_team_world_msg = std::move(world_msg);
 
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         if (robot_map.contains(robot_id))
         {
-            const auto& robot_state = robot_map.at(robot_id);
-            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                              world_proto, robot_state);
+            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map);
         }
     }
 }
@@ -343,18 +335,16 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-        robot_primitive_executor_map,
-    const TbotsProto::World& world_msg, const RobotState& robot_state)
+        robot_primitive_executor_map)
 {
-    // Set to NEG_X because the world msg in this simulator is normalized
-    // correctly
     auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);
 
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
-        primitive_executor->updateState(robot_state);
-        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
+        TbotsProto::RobotStatus robot_status;
+        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id),
+                                            robot_status);
     }
     else
     {
@@ -366,7 +356,8 @@ void ErForceSimulator::setRobotPrimitive(
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg, gameController::Team side)
+    const TbotsProto::World& world_msg, const Duration& time_step,
+    gameController::Team side)
 {
     SSLSimulationProto::RobotControl robot_control;
 
@@ -380,11 +371,23 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     {
         std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control;
 
-        TbotsProto::PrimitiveExecutorStatus status;  // Added for compilation
+        TbotsProto::RobotStatus robot_status;
+        if (auto robot_state_it = robot_map.find(robot_id);
+            robot_state_it != robot_map.end())
+        {
+            const RobotState& robot_state = robot_state_it->second;
+            *(robot_status.mutable_motor_status()->mutable_local_velocity()) =
+                *createVectorProto(robot_state.localVelocity());
+            *(robot_status.mutable_motor_status()->mutable_angular_velocity()) =
+                *createAngularVelocityProto(robot_state.angularVelocity());
+            *(robot_status.mutable_imu_status()->mutable_angular_velocity()) =
+                *createAngularVelocityProto(robot_state.angularVelocity());
+        }
+
         if (ramping)
         {
             auto direct_control_no_ramp =
-                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
+                primitive_executor->stepPrimitive(robot_status, time_step.toSeconds());
 
             auto* prev_ramp_velocities = &yellow_prev_ramp_velocities;
             if (side == gameController::Team::BLUE)
@@ -405,8 +408,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             }
 
             direct_control = getRampedVelocityPrimitive(
-                prev_it->second.linear, prev_it->second.angular, *direct_control_no_ramp,
-                primitive_executor_time_step);
+                prev_it->second.linear, prev_it->second.angular, direct_control_no_ramp,
+                time_step);
 
             // Persist the ramped command as the setpoint to ramp from next tick.
             const auto& ramped =
@@ -419,8 +422,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         }
         else
         {
-            direct_control =
-                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
+            direct_control = std::make_unique<TbotsProto::DirectControlPrimitive>(
+                primitive_executor->stepPrimitive(robot_status, time_step.toSeconds()));
         }
 
         auto command = *getRobotCommandFromDirectControl(
@@ -479,10 +482,11 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,
-                              gameController::Team::YELLOW);
+                              time_step, gameController::Team::YELLOW);
 
-    SSLSimulationProto::RobotControl blue_robot_control = updateSimulatorRobots(
-        blue_primitive_executor_map, *blue_team_world_msg, gameController::Team::BLUE);
+    SSLSimulationProto::RobotControl blue_robot_control =
+        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg,
+                              time_step, gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);

@@ -28,12 +28,10 @@ class ErForceSimulator
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
      */
-    explicit ErForceSimulator(
-        const TbotsProto::FieldType& field_type,
-        const robot_constants::RobotConstants& robot_constants,
-        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = true,
-        Duration primitive_executor_time_step_s =
-            Duration::fromSeconds(DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK));
+    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
+                              const robot_constants::RobotConstants& robot_constants,
+                              std::unique_ptr<RealismConfigErForce>& realism_config,
+                              const bool ramping = true);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -148,21 +146,17 @@ class ErForceSimulator
     friend class ErForceSimulatorRampingTest;
 
     /**
-     * Sets the primitive being simulated by the robot in simulation
+     * Sets the primitive being simulated by the robot in simulation.
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_set_msg The primitive to run on the robot
+     * @param primitive_set_msg The primitive set containing the primitive to run
      * @param robot_primitive_executor_map The robot primitive executors to send the
      * primitive set to
-     * @param world_msg The world message
-     * @param local_velocity The local velocity
-     * @param angular_velocity The angular velocity
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-            robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, const RobotState& robot_state);
+            robot_primitive_executor_map);
 
     /**
      * Gets a map from robot id to local and angular velocity from repeated sim robots
@@ -183,13 +177,15 @@ class ErForceSimulator
      * @param robot_primitive_executor_map Map of robot IDs to the robot's primitive
      * executor
      * @param world_msg The world msg for this team of robots
+     * @param time_step The time step to advance the primitive executors by
      *
      * @return robot control
      */
     SSLSimulationProto::RobotControl updateSimulatorRobots(
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
-        const TbotsProto::World& world_msg, gameController::Team side);
+        const TbotsProto::World& world_msg, const Duration& time_step,
+        gameController::Team side);
 
     /**
      * Takes in current velocity and angular velocity and a target Direct Control
@@ -217,7 +213,6 @@ class ErForceSimulator
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
-    Duration primitive_executor_time_step;
     unsigned int frame_number;
 
     // The current time.

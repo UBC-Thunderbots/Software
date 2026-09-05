@@ -1,53 +1,85 @@
 #include "software/embedded/services/network/network.h"
 
+#include <Tracy.hpp>
+
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 
-NetworkService::NetworkService(const RobotId& robot_id, const std::string& ip_address,
-                               unsigned short primitive_listener_port,
-                               unsigned short robot_status_sender_port,
-                               unsigned short full_system_to_robot_ip_notification_port,
-                               unsigned short robot_to_full_system_ip_notification_port,
-                               unsigned short robot_logs_port,
-                               const std::string& interface)
-    : interface(interface),
-      robot_status_sender_port(robot_status_sender_port),
-      primitive_tracker(ProtoTracker("primitive set"))
+NetworkService::NetworkService(const NetworkConfig& config)
+    : multicast_ip(config.multicast_ip),
+      interface(config.interface),
+      robot_status_sender_port(config.robot_status_sender_port)
 {
+    waitForNetworkUp();
+
     try
     {
         fullsystem_to_robot_ip_listener =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
-                ip_address, full_system_to_robot_ip_notification_port, interface,
-                std::bind(&NetworkService::onFullSystemIpNotification, this,
-                          std::placeholders::_1),
+                config.multicast_ip, config.full_system_to_robot_ip_notification_port,
+                config.interface,
+                [&](const TbotsProto::IpNotification& ip_notification)
+                { onFullSystemIpNotification(ip_notification); },
                 true);
 
         robot_to_fullsystem_ip_sender =
             std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
-                ip_address, robot_to_full_system_ip_notification_port, interface, false);
-
+                config.multicast_ip, config.robot_to_full_system_ip_notification_port,
+                config.interface, false);
 
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
-                primitive_listener_port,
-                [&](TbotsProto::Primitive primitive) { primitiveCallback(primitive); });
+                config.primitive_listener_port,
+                [&](const TbotsProto::Primitive& prim) { primitiveCallback(prim); });
     }
     catch (const TbotsNetworkException& e)
     {
         LOG(FATAL) << e.what();
     }
 
-    robot_ip_notification_msg.set_robot_id(robot_id);
-    std::optional<std::string> local_ip = getLocalIp(interface);
-    if (local_ip)
+    robot_ip_notification_msg.set_robot_id(static_cast<int>(config.robot_id));
+    if (std::optional<std::string> local_ip = getLocalIp(config.interface))
     {
         robot_ip_notification_msg.set_ip_address(*local_ip);
     }
     else
     {
-        LOG(FATAL) << "Failed to get IP addresses associated with " << interface;
+        LOG(FATAL) << "Failed to get IP addresses associated with " << config.interface;
     }
+}
+
+void NetworkService::waitForNetworkUp()
+{
+    std::unique_ptr<ThreadedUdpSender> network_tester;
+    try
+    {
+        network_tester = std::make_unique<ThreadedUdpSender>(
+            multicast_ip, NETWORK_COMM_TEST_PORT, interface, true);
+    }
+    catch (TbotsNetworkException& e)
+    {
+        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
+    }
+
+    // Send an empty packet on the specific network interface to ensure that
+    // we're connected to the network. Keep trying until successful
+    while (true)
+    {
+        try
+        {
+            network_tester->sendString("");
+            break;
+        }
+        catch (std::exception& e)
+        {
+            // Resend the message after a delay
+            LOG(WARNING) << "Thunderloop cannot connect to network!"
+                         << "Waiting for connection...";
+            sleep(PING_RETRY_DELAY_S);
+        }
+    }
+
+    LOG(INFO) << "Thunderloop connected to network!";
 }
 
 void NetworkService::onFullSystemIpNotification(
@@ -88,55 +120,132 @@ void NetworkService::onFullSystemIpNotification(
     }
 }
 
-TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status)
+std::optional<TbotsProto::Primitive> NetworkService::poll(
+    TbotsProto::RobotStatus& robot_status, const double time_elapsed_since_last_poll_s)
 {
-    std::scoped_lock lock{primitive_mutex};
+    ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
+
+    const auto poll_start = std::chrono::steady_clock::now();
+
+    const std::optional<TbotsProto::Primitive> primitive_to_return =
+        getPrimitiveToExecute(time_elapsed_since_last_poll_s);
+
+    updateNetworkStatus(robot_status);
+    sendRobotStatusIfNeeded(robot_status, time_elapsed_since_last_poll_s);
+    sendIpNotificationIfNeeded(time_elapsed_since_last_poll_s);
+
+    const auto poll_end    = std::chrono::steady_clock::now();
+    using Millis           = std::chrono::duration<double, std::milli>;
+    const Millis poll_time = std::chrono::duration_cast<Millis>(poll_end - poll_start);
+
+    robot_status.mutable_thunderloop_status()->set_network_service_poll_time_ms(
+        poll_time.count());
+
+    return primitive_to_return;
+}
+
+void NetworkService::updateNetworkStatus(TbotsProto::RobotStatus& robot_status)
+{
+    float packet_loss;
+    {
+        std::scoped_lock lock(primitive_tracker_mutex);
+        packet_loss = primitive_tracker.getPrimitiveLossRate();
+    }
 
     robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
-        static_cast<unsigned int>(primitive_tracker.getLossRate() * 100));
+        static_cast<unsigned int>(packet_loss * 100));
 
-    // Rate limit sending of proto based on thunderloop freq
-    if (shouldSendNewRobotStatus(robot_status))
+    robot_status.mutable_network_status()->set_ms_since_last_primitive_received(
+        time_since_last_primitive_received_s_ * MILLISECONDS_PER_SECOND);
+}
+
+void NetworkService::sendRobotStatusIfNeeded(TbotsProto::RobotStatus& robot_status,
+                                             const double time_elapsed_since_last_poll_s)
+{
+    time_since_last_robot_status_sent_s_ += time_elapsed_since_last_poll_s;
+
+    if (!shouldSendNewRobotStatus(robot_status))
     {
-        last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
-        updatePrimitiveLog(robot_status);
-        sendRobotStatus(robot_status);
-        network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
+        return;
     }
 
-    if (ip_notification_ticks == 0)
+    time_since_last_robot_status_sent_s_ = 0.0;
+    last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
     {
-        robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
+        std::scoped_lock lock(primitive_tracker_mutex);
+        primitive_tracker.updatePrimitiveLog(robot_status);
     }
-    ip_notification_ticks =
-        (ip_notification_ticks + 1) % IP_DISCOVERY_NOTIFICATION_RATE_HZ;
+    sendRobotStatus(robot_status);
+}
 
-    thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
-    return primitive_msg;
+void NetworkService::sendIpNotificationIfNeeded(
+    const double time_elapsed_since_last_poll_s)
+{
+    time_since_last_ip_notification_sent_s_ += time_elapsed_since_last_poll_s;
+
+    if (time_since_last_ip_notification_sent_s_ < IP_NOTIFICATION_SEND_INTERVAL_S)
+    {
+        return;
+    }
+
+    time_since_last_ip_notification_sent_s_ = 0.0;
+    robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
+}
+
+std::optional<TbotsProto::Primitive> NetworkService::getPrimitiveToExecute(
+    const double time_elapsed_since_last_poll_s)
+{
+    std::optional<TbotsProto::Primitive> latest_primitive;
+    {
+        std::scoped_lock lock(primitive_tracker_mutex);
+        latest_primitive = primitive_tracker.getLatestPrimitive();
+    }
+
+    if (latest_primitive.has_value())
+    {
+        time_since_last_primitive_received_s_ = 0.0;
+        return latest_primitive;
+    }
+
+    time_since_last_primitive_received_s_ += time_elapsed_since_last_poll_s;
+
+    // If we haven't received a primitive recently, stop the robot
+    if (time_since_last_primitive_received_s_ >= PRIMITIVE_RECEIVE_TIMEOUT_S)
+    {
+        TbotsProto::Primitive stop_primitive;
+        stop_primitive.mutable_stop();
+        return stop_primitive;
+    }
+
+    return std::nullopt;
 }
 
 bool NetworkService::shouldSendNewRobotStatus(
     const TbotsProto::RobotStatus& robot_status) const
 {
-    bool has_motor_fault =
+    const bool has_motor_fault =
         robot_status.motor_status().front_left().motor_faults_size() > 0 ||
         robot_status.motor_status().front_right().motor_faults_size() > 0 ||
         robot_status.motor_status().back_left().motor_faults_size() > 0 ||
         robot_status.motor_status().back_right().motor_faults_size() > 0;
 
-    bool has_breakbeam_status_changed =
+    const bool has_breakbeam_status_changed =
         robot_status.has_power_status() &&
         robot_status.power_status().breakbeam_tripped() != last_breakbeam_state_sent;
 
-    bool require_heartbeat_status_update = (network_ticks / (thunderloop_ticks + 1.0)) <=
-                                           ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO;
+    const bool require_heartbeat_status_update =
+        time_since_last_robot_status_sent_s_ >= ROBOT_STATUS_SEND_INTERVAL_S;
 
     return has_motor_fault || has_breakbeam_status_changed ||
            require_heartbeat_status_update;
 }
 
-void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status)
+void NetworkService::sendRobotStatus(TbotsProto::RobotStatus& robot_status)
 {
+    const auto epoch_time = std::chrono::steady_clock::now().time_since_epoch();
+    robot_status.mutable_time_sent()->set_epoch_timestamp_seconds(
+        std::chrono::duration_cast<std::chrono::duration<double>>(epoch_time).count());
+
     std::scoped_lock lock(robot_status_sender_mutex);
 
     if (robot_status_sender)
@@ -147,72 +256,6 @@ void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status
 
 void NetworkService::primitiveCallback(const TbotsProto::Primitive& input)
 {
-    std::scoped_lock<std::mutex> lock(primitive_mutex);
-    const uint64_t seq_num = input.sequence_number();
-
-    logNewPrimitive(input);
-
-    primitive_tracker.send(seq_num);
-    if (primitive_tracker.isLastValid())
-    {
-        primitive_msg = input;
-    }
-}
-
-void NetworkService::logNewPrimitive(const TbotsProto::Primitive& new_primitive)
-{
-    if (primitive_rtt.size() >= PRIMITIVE_DEQUE_MAX_SIZE)
-    {
-        LOG(WARNING)
-            << "Too many primitive sets logged for round-trip calculations, halting log process";
-        return;
-    }
-
-    if (!primitive_rtt.empty() &&
-        new_primitive.sequence_number() <= primitive_rtt.back().primitive_sequence_num)
-    {
-        // If the proto is older than the last received proto, then ignore it
-        return;
-    }
-
-    NetworkService::RoundTripTime current_round_trip_time;
-    current_round_trip_time.primitive_sequence_num = new_primitive.sequence_number();
-    current_round_trip_time.thunderscope_sent_time_seconds =
-        new_primitive.time_sent().epoch_timestamp_seconds();
-    current_round_trip_time.thunderloop_recieved_time_seconds =
-        getCurrentEpochTimeInSeconds();
-
-    primitive_rtt.emplace_back(current_round_trip_time);
-}
-
-void NetworkService::updatePrimitiveLog(TbotsProto::RobotStatus& robot_status)
-{
-    uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (!primitive_rtt.empty())
-    {
-        if (primitive_rtt.front().primitive_sequence_num == seq_num)
-        {
-            double received_epoch_time_seconds =
-                primitive_rtt.front().thunderloop_recieved_time_seconds;
-            double processing_time_seconds =
-                getCurrentEpochTimeInSeconds() - received_epoch_time_seconds;
-
-            robot_status.mutable_adjusted_time_sent()->set_epoch_timestamp_seconds(
-                primitive_rtt.front().thunderscope_sent_time_seconds +
-                processing_time_seconds);
-            return;
-        }
-        primitive_rtt.pop_front();
-    }
-}
-
-double NetworkService::getCurrentEpochTimeInSeconds()
-{
-    const auto clock_time = std::chrono::system_clock::now();
-    double time_in_seconds =
-        static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
-                                clock_time.time_since_epoch())
-                                .count()) *
-        SECONDS_PER_MICROSECOND;
-    return time_in_seconds;
+    std::scoped_lock lock(primitive_tracker_mutex);
+    primitive_tracker.track(input);
 }
