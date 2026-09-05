@@ -234,6 +234,7 @@ class ErForceSimulator
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool ramping;
+    bool ball_is_visible = true;
 
     struct LocalVelocity
     {
