@@ -45,12 +45,12 @@ def test_passing(field_test_runner):
     # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
     blue_tactics[passer_robot_id] = protos.KickOrChipTactic(
-        kick_or_chip_origin=Point(
+        kick_or_chip_origin=protos.Point(
             x_meters=pass_to_test.passerPoint().x(),
             y_meters=pass_to_test.passerPoint().y(),
         ),
-        kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
-        auto_chip_or_kick=AutoChipOrKick(
+        kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=protos.AutoChipOrKick(
             autokick_speed_m_per_s=pass_to_test.speed(),
         ),
     )

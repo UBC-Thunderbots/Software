@@ -19,8 +19,8 @@ import proto.import_all_protos as protos
 @pytest.mark.parametrize(
     "auto_chip_or_kick",
     [
-        AutoChipOrKick(autokick_speed_m_per_s=5.0),
-        AutoChipOrKick(autochip_distance_meters=2.0),
+        protos.AutoChipOrKick(autokick_speed_m_per_s=5.0),
+        protos.AutoChipOrKick(autochip_distance_meters=2.0),
     ],
     ids=["autokick", "autochip"],
 )

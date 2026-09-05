@@ -111,12 +111,12 @@ def setup_pass_and_robots(
     # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
     blue_tactics[0] = protos.KickOrChipTactic(
-        kick_or_chip_origin=Point(
+        kick_or_chip_origin=protos.Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
         ),
-        kick_or_chip_direction=Angle(radians=kick_vec.orientation().toRadians()),
-        auto_chip_or_kick=AutoChipOrKick(
+        kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=protos.AutoChipOrKick(
             autokick_speed_m_per_s=best_pass.speed(),
         ),
     )
