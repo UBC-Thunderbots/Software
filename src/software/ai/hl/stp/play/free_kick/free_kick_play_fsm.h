@@ -205,6 +205,15 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
      */
     bool chipDone(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(setupDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shotFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shotDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(shouldAbortPass, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passFound, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(passDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(chipDone, FreeKickPlayFSM)
+    DEFINE_SML_GUARD_CLASS(timeExpired, FreeKickPlayFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -217,13 +226,6 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(setupPosition)
-        DEFINE_SML_ACTION(shootBall)
-        DEFINE_SML_ACTION(startLookingForPass)
-        DEFINE_SML_ACTION(lookForPass)
-        DEFINE_SML_ACTION(passBall)
-        DEFINE_SML_ACTION(chipBall)
-
         DEFINE_SML_GUARD(setupDone)
         DEFINE_SML_GUARD(shotFound)
         DEFINE_SML_GUARD(shotDone)
@@ -232,6 +234,13 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
         DEFINE_SML_GUARD(passDone)
         DEFINE_SML_GUARD(chipDone)
         DEFINE_SML_GUARD(timeExpired)
+
+        DEFINE_SML_ACTION(setupPosition)
+        DEFINE_SML_ACTION(shootBall)
+        DEFINE_SML_ACTION(startLookingForPass)
+        DEFINE_SML_ACTION(lookForPass)
+        DEFINE_SML_ACTION(passBall)
+        DEFINE_SML_ACTION(chipBall)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

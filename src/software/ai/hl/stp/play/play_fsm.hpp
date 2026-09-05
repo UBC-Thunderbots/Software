@@ -75,6 +75,8 @@ class PlayFSM
 
     explicit PlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
+    PlayFSM() = delete;
+
    protected:
     // A shared pointer to the ai configuration to configure ai behaviour, shared by all
     // Plays, Tactics, and FSMs

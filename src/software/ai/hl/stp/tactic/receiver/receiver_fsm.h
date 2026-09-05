@@ -141,6 +141,11 @@ struct ReceiverFSM : TacticFSM<ReceiverFSM>
      */
     bool strayPass(const Update& event);
 
+    DEFINE_SML_GUARD_CLASS(onetouchPossible, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(passStarted, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(passFinished, ReceiverFSM)
+    DEFINE_SML_GUARD_CLASS(strayPass, ReceiverFSM)
+
     auto operator()()
     {
         using namespace boost::sml;
