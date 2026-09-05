@@ -290,46 +290,25 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
 
-        std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-            .position =
-                robot_with_ball_in_dribbler->position() +
-                Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                               BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-            .distance_from_ground = 0,
-            .timestamp            = capture_timestamp,
-            .confidence           = 1}};
+        const Point ball_in_dribbler_position =
+            robot_with_ball_in_dribbler->position() +
+            Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                           BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING);
 
-        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
-
-        if (new_ball)
-        {
-            updateBall(*new_ball);
-        }
+        // The breakbeam is trusted over the filter's own estimate, so the estimate is
+        // forced onto this position rather than offered to it as a detection. Feeding it
+        // through the detection path instead would leave the filter's state and the ball
+        // we report here describing two different balls.
+        updateBall(ball_filter.forceBallState(
+            ball_in_dribbler_position,
+            Timestamp::fromSeconds(ssl_detection_frame.t_capture())));
     }
     else
     {
-        std::optional<Ball> new_ball = createBall(ball_detections);
-        if (new_ball)
-        {
-            // If vision detected a new ball, then use that one
-            updateBall(*new_ball);
-        }
-        else if (ball)
-        {
-            // If we already have a ball from a previous frame, but is occluded this frame
-            std::optional<Robot> closest_enemy =
-                enemy_team.getNearestRobot(ball->position());
-
-            if (closest_enemy.has_value())
-            {
-                ball = Ball(closest_enemy->position() +
-                                Vector::createFromAngle(closest_enemy->orientation())
-                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                            Vector(0, 0), closest_enemy->timestamp());
-            }
-        }
-
+        std::optional<Ball> new_ball = createBall(
+            ball_detections, Timestamp::fromSeconds(ssl_detection_frame.t_capture()));
+        updateBall(*new_ball);
         // we shouldn't trust breakbeam so we reset the dribbler and its associated
         // variables
         friendly_robot_id_with_ball_in_dribbler = std::nullopt;
@@ -351,12 +330,18 @@ void SensorFusion::updateBall(Ball new_ball)
 }
 
 std::optional<Ball> SensorFusion::createBall(
-    const std::vector<BallDetection>& ball_detections)
+    const std::vector<BallDetection>& ball_detections, const Timestamp& current_time)
 {
     if (field)
     {
-        std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
+        // Both teams are filtered before the ball is, so these are this frame's robot
+        // positions and the ball filter can use them to detect bounces
+        std::vector<Robot> robots             = friendly_team.getAllRobots();
+        const std::vector<Robot> enemy_robots = enemy_team.getAllRobots();
+        robots.insert(robots.end(), enemy_robots.begin(), enemy_robots.end());
+
+        std::optional<Ball> new_ball = ball_filter.estimateBallState(
+            ball_detections, field.value(), robots, current_time);
         return new_ball;
     }
     return std::nullopt;
