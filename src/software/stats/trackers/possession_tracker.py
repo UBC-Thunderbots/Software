@@ -1,11 +1,12 @@
-from software.stats.trackers.tracker import Tracker
-from typing import override
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.import_all_protos import *
-import software.python_bindings as tbots_cpp
-from software.stats.logs.event_log import EventType, Team
 import queue
+from typing import override
+
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.py_constants import BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING
+from software.stats.logs.event_log import EventType
+from software.stats.trackers.tracker import Tracker
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class PossessionTracker(Tracker):
@@ -14,8 +15,8 @@ class PossessionTracker(Tracker):
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
-        for_team: Team,
+        from_team: protos.Team,
+        for_team: protos.Team,
         event_queue: queue.Queue,
         **kwargs,
     ):
@@ -84,13 +85,13 @@ class PossessionTracker(Tracker):
         # mark the end of the last possession since it has changed
         if self.curr_possession:
             self.write_event(event_type=EventType.FRIENDLY_POSSESSION_END)
-        elif self.curr_possession == False:
+        elif self.curr_possession is False:
             self.write_event(event_type=EventType.ENEMY_POSSESSION_END)
 
         # log the start of the new, changed possession
         if new_possession:
             self.write_event(event_type=EventType.FRIENDLY_POSSESSION_START)
-        elif new_possession == False:
+        elif new_possession is False:
             self.write_event(event_type=EventType.ENEMY_POSSESSION_START)
 
         self.curr_possession = new_possession

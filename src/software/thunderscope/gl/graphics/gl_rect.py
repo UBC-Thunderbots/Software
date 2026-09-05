@@ -1,13 +1,11 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.thunderscope.constants import Colors, LINE_WIDTH
-from software.thunderscope.gl.graphics.gl_shape import GLShape
-
 from typing import Optional, override
 
 import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import LINE_WIDTH, Colors
+from software.thunderscope.gl.graphics.gl_shape import GLShape
 
 
 class GLRect(GLShape):
@@ -77,5 +75,5 @@ class GLRect(GLShape):
 
         if self.fill_graphic:
             faces = [[0, 1, 2], [2, 3, 4]]
-            meshdata = MeshData(vertexes=self.points, faces=np.array(faces))
+            meshdata = gl.MeshData(vertexes=self.points, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)

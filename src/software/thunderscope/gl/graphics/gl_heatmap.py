@@ -1,14 +1,13 @@
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-import pyqtgraph as pg
-
 from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
+import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 
-class GLHeatmap(GLMeshItem):
+class GLHeatmap(gl.GLMeshItem):
     """Displays a heatmap on the cartesian plane (i.e. x-y plane)"""
 
     # Float between 0.0 - 1.0 representing alpha transparency of heatmap
@@ -28,7 +27,7 @@ class GLHeatmap(GLMeshItem):
         self.x_length = 0
         self.y_length = 0
         self.color_map = color_map if color_map else pg.colormap.get("CET-L1")
-        self.meshdata = MeshData()
+        self.meshdata = gl.MeshData()
 
         super().__init__(
             parentItem=parent_item,

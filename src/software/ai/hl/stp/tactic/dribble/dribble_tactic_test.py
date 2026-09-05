@@ -1,12 +1,16 @@
+import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-from software.py_constants import DIST_TO_FRONT_OF_ROBOT_METERS, ROBOT_MAX_RADIUS_METERS
-
-from proto.import_all_protos import DribbleTactic
 from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
+)
+from software.gameplay_tests.validation.delay_validation import (
+    DelayValidation,
 )
 from software.gameplay_tests.validation.excessive_dribbling import (
     EventuallyStartsExcessivelyDribbling,
@@ -18,12 +22,7 @@ from software.gameplay_tests.validation.robot_at_orientation import (
 from software.gameplay_tests.validation.robot_received_ball import (
     RobotEventuallyReceivedBall,
 )
-from software.gameplay_tests.validation.delay_validation import (
-    DelayValidation,
-)
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.py_constants import DIST_TO_FRONT_OF_ROBOT_METERS, ROBOT_MAX_RADIUS_METERS
 
 
 def get_enemy_robot_positions():
@@ -144,7 +143,7 @@ def test_dribble(
             )
         )
 
-        dribble_params = DribbleTactic(
+        dribble_params = protos.DribbleTactic(
             allow_excessive_dribbling=False,
         )
         if dribble_dest:
@@ -311,7 +310,7 @@ def test_excessive_dribbling_without_enemies(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: DribbleTactic(
+                0: protos.DribbleTactic(
                     dribble_destination=tbots_cpp.createPointProto(dribble_destination),
                     final_dribble_orientation=tbots_cpp.createAngleProto(
                         final_dribble_orientation
@@ -360,7 +359,7 @@ def test_dribble_with_excessive_dribbling(simulated_test_runner):
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: DribbleTactic(
+                1: protos.DribbleTactic(
                     dribble_destination=tbots_cpp.createPointProto(dribble_destination),
                     final_dribble_orientation=tbots_cpp.createAngleProto(
                         dribble_orientation
@@ -410,7 +409,7 @@ def test_run_into_enemy_robot_knock_ball_away(
             )
         )
 
-        dribble_params = DribbleTactic(
+        dribble_params = protos.DribbleTactic(
             allow_excessive_dribbling=False,
             dribble_destination=tbots_cpp.createPointProto(dribble_destination),
             final_dribble_orientation=tbots_cpp.createAngleProto(dribble_orientation),
@@ -461,7 +460,7 @@ def test_robot_not_bumping_ball_when_turning(
             )
         )
 
-        dribble_params = DribbleTactic(allow_excessive_dribbling=False)
+        dribble_params = protos.DribbleTactic(allow_excessive_dribbling=False)
         simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     eventually_validations = [

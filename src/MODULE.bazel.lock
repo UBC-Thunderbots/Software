@@ -2667,9 +2667,6 @@
             "https://files.pythonhosted.org/packages/4a/c0/89fe6215b443b919cb98a5002e107cb5026854ed1ccb6b5833e0768419d1/docutils-0.22.2.tar.gz": "9fdb771707c8784c8f2728b67cb2c691305933d68137ef95a75db5f4dfbc213d",
             "https://files.pythonhosted.org/packages/66/dd/f95350e853a4468ec37478414fc04ae2d61dad7a947b3015c3dcc51a09b9/docutils-0.22.2-py3-none-any.whl": "b0e98d679283fc3bb0ead8a5da7f501baa632654e7056e9c5846842213d674d8"
           },
-          "evdev": {
-            "https://files.pythonhosted.org/packages/f3/0c/c87b141250a650ee53d4e9957e905b17c144cda6dc4187cbe89a641a1b34/evdev-1.7.0.tar.gz": "95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870"
-          },
           "gevent": {
             "https://files.pythonhosted.org/packages/08/10/ed04ef203bdc681b7fe1422b088d2eb89bfc4574ea455b319c113443b0f9/gevent-22.8.0-cp310-cp310-musllinux_1_1_x86_64.whl": "646777ee668f745cad7671fa20ca5384b2baa2709562399caf433f4a52967081",
             "https://files.pythonhosted.org/packages/14/ad/ba24b96f66175f1fffeaef9c159fc7d3385b476e9a9385b3cf785163d6d6/gevent-22.8.0-pp37-pypy37_pp73-win_amd64.whl": "79c2b6980e9380ba3915d1f5619acbf7a78e592e47e6e3bdb18f7874f4c959d6",

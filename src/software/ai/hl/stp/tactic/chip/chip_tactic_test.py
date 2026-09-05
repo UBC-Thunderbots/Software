@@ -1,19 +1,17 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
-from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import ChipTactic
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 @pytest.mark.parametrize(
@@ -67,7 +65,7 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: ChipTactic(
+                1: protos.ChipTactic(
                     chip_origin=tbots_cpp.createPointProto(ball_position),
                     chip_direction=tbots_cpp.createAngleProto(angle_to_chip_at),
                     chip_distance_meters=2.0,

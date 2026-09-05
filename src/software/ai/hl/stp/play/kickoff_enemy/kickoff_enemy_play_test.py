@@ -1,20 +1,18 @@
 import threading
 
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-
-from software.gameplay_tests.validation.robot_enters_region import (
-    NumberOfRobotsEventuallyEntersRegion,
-    NumberOfRobotsAlwaysStaysInRegion,
-    RobotNeverEntersRegion,
-)
-from software.gameplay_tests.validation.or_validation import OrValidation
-from software.gameplay_tests.validation.ball_enters_region import BallNeverEntersRegion
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import Command
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.ball_enters_region import BallNeverEntersRegion
+from software.gameplay_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsAlwaysStaysInRegion,
+    NumberOfRobotsEventuallyEntersRegion,
+    RobotNeverEntersRegion,
 )
 
 
@@ -51,23 +49,23 @@ def test_kickoff_enemy_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.KICKOFF, team=Team.YELLOW
+            gc_command=protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
         )
 
         # Let robots get ready before starting kickoff
         threading.Timer(
             4.0,
             lambda: simulated_test_runner.send_gamecontroller_command(
-                gc_command=Command.Type.NORMAL_START, team=Team.YELLOW
+                gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.YELLOW
             ),
         ).start()
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.KickoffEnemyPlay,
-            yellow_play=PlayName.KickoffFriendlyPlay,
+            blue_play=protos.PlayName.KickoffEnemyPlay,
+            yellow_play=protos.PlayName.KickoffFriendlyPlay,
         )
 
     # Two friendly robots in position to shadow enemy robots. Rectangles are

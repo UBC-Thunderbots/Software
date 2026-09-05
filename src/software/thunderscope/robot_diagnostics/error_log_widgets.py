@@ -1,17 +1,16 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.Qt import QtGui
-from proto.import_all_protos import *
-from datetime import datetime
 import textwrap
-import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_constants as error_constants
-from proto.robot_log_msg_pb2 import RobotLog
-from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
-from software.thunderscope.constants import LOG_LEVEL_STR_MAP
+from datetime import datetime
 from typing import override
 
+import proto.import_all_protos as protos
+import software.thunderscope.robot_diagnostics.robot_error_log_icons.error_log_constants as error_constants
+from pyqtgraph.Qt import QtGui, QtWidgets
+from pyqtgraph.Qt.QtCore import Qt
+from software.thunderscope.constants import LOG_LEVEL_STR_MAP
+from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 
-class RobotLogMessageWidget(QFrame):
+
+class RobotLogMessageWidget(QtWidgets.QFrame):
     """A single error message from a robot.
 
     Displays an icon corresponding to the type of error, the robot id, the message
@@ -33,8 +32,8 @@ class RobotLogMessageWidget(QFrame):
         # if true, the log is in the log widget and hasn't been cleared
         self.log_open = True
 
-        self.layout = QHBoxLayout()
-        self.icon = QLabel()
+        self.layout = QtWidgets.QHBoxLayout()
+        self.icon = QtWidgets.QLabel()
 
         # setting up the icon
         self.icon_size = int(self.width() / 15)
@@ -45,41 +44,41 @@ class RobotLogMessageWidget(QFrame):
         )
 
         # info layout contains the robot id and message
-        self.info_layout = QVBoxLayout()
+        self.info_layout = QtWidgets.QVBoxLayout()
         self.info_layout.setContentsMargins(
             0, int(self.icon_size / 4), 0, int(self.icon_size / 3)
         )
 
         # robot id displayed more prominently
-        self.robot_id = QLabel(f"Robot {robot_id}")
+        self.robot_id = QtWidgets.QLabel(f"Robot {robot_id}")
         self.robot_id.setStyleSheet(
             "font-weight: bold;" f"font-size: {int(self.height() / 25)}px;"
         )
 
         # message of the error
-        self.message = QLabel(message)
+        self.message = QtWidgets.QLabel(message)
         self.message.setStyleSheet(f"font-size: {int(self.height() / 35)}px;")
 
         self.info_layout.addWidget(self.robot_id)
         self.info_layout.addWidget(self.message)
 
         # layout for timestamp info
-        self.time_layout = QVBoxLayout()
+        self.time_layout = QtWidgets.QVBoxLayout()
         self.time_layout.setContentsMargins(
             0, int(self.icon_size / 4), 0, int(self.icon_size / 3)
         )
 
         # the timestamp the error took place
         self.timestamp = timestamp if timestamp else datetime.now()
-        self.timestamp_label = QLabel(self.timestamp.strftime("%H:%M:%S.%f"))
+        self.timestamp_label = QtWidgets.QLabel(self.timestamp.strftime("%H:%M:%S.%f"))
         # time since the error was logged (easier to understand than timestamp)
-        self.time_since_label = QLabel(str(0))
+        self.time_since_label = QtWidgets.QLabel(str(0))
 
         self.time_layout.addWidget(self.timestamp_label)
         self.time_layout.addWidget(self.time_since_label)
 
         # close button to clear log
-        self.close_button = QPushButton("X")
+        self.close_button = QtWidgets.QPushButton("X")
         self.close_button.setStyleSheet("padding: 0")
         self.close_button.setFixedHeight(int(self.icon_size / 2))
         self.close_button.setFixedWidth(int(self.icon_size / 2))
@@ -208,7 +207,7 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
 class RobotCrashLogMessageWidget(RobotLogMessageWithDialogWidget):
     """A robot error log message when a robot has crashed. On click, opens a dialog with last robot status"""
 
-    def __init__(self, crash_message: RobotCrash):
+    def __init__(self, crash_message: protos.RobotCrash):
         """Creates an error message for a crashed robot. Creates a dialog to display the whole crash message
 
         :param crash_message: the crash message containing robot id and other info
@@ -232,7 +231,7 @@ class FatalLogMessageWidget(RobotLogMessageWithDialogWidget):
     opens a dialog with the stack dump + extra info
     """
 
-    def __init__(self, robot_log: RobotLog):
+    def __init__(self, robot_log: protos.RobotLog):
         """Creates an error message for a robot with a fatal log message. Creates a dialog to display the whole log
 
         :param robot_log: the fatal log message
@@ -247,13 +246,13 @@ class FatalLogMessageWidget(RobotLogMessageWithDialogWidget):
         self.dialog = RobotFatalLogDialog(self.log)
 
 
-class RobotFatalLogDialog(QDialog):
+class RobotFatalLogDialog(QtWidgets.QDialog):
     """Dialog to show information about a fatal robot log message
 
     Displays the message info along with the robot ID and the file / line number that caused it
     """
 
-    def __init__(self, fatal_log: RobotLog, parent=None):
+    def __init__(self, fatal_log: protos.RobotLog, parent=None):
         """Creates a dialog box to display a robot fatal log clearly
 
         :param fatal_log: the fatal log to display
@@ -263,22 +262,26 @@ class RobotFatalLogDialog(QDialog):
 
         self.setWindowTitle("Fatal Log Alert")
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok
+        )
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
-        self.robot_id = QLabel(f"Robot ID: {fatal_log.robot_id}")
+        self.robot_id = QtWidgets.QLabel(f"Robot ID: {fatal_log.robot_id}")
         formatted_date = datetime.fromtimestamp(
             fatal_log.created_timestamp.epoch_timestamp_seconds
         ).strftime("%H:%M:%S %f")
-        self.timestamp = QLabel(f"Timestamp: {formatted_date}")
-        self.log_level = QLabel(f"Log Level: {LOG_LEVEL_STR_MAP[fatal_log.log_level]}")
-        self.file_info = QLabel(
+        self.timestamp = QtWidgets.QLabel(f"Timestamp: {formatted_date}")
+        self.log_level = QtWidgets.QLabel(
+            f"Log Level: {LOG_LEVEL_STR_MAP[fatal_log.log_level]}"
+        )
+        self.file_info = QtWidgets.QLabel(
             f"File Info: {fatal_log.file_name} at Line {fatal_log.line_number}"
         )
-        self.message = QLabel(f"Message: {fatal_log.log_msg}")
+        self.message = QtWidgets.QLabel(f"Message: {fatal_log.log_msg}")
 
         self.layout.addWidget(self.robot_id)
         self.layout.addWidget(self.timestamp)
@@ -290,7 +293,7 @@ class RobotFatalLogDialog(QDialog):
         self.setLayout(self.layout)
 
 
-class RobotCrashDialog(QDialog):
+class RobotCrashDialog(QtWidgets.QDialog):
     """Dialog to show information about a robot before it crashed,
 
     Displays the message and RobotStatus.
@@ -307,12 +310,14 @@ class RobotCrashDialog(QDialog):
 
         self.setWindowTitle("Robot Crash")
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok
+        )
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.layout = QVBoxLayout()
-        self.message = QLabel(message)
+        self.layout = QtWidgets.QVBoxLayout()
+        self.message = QtWidgets.QLabel(message)
         self.layout.addWidget(self.message)
         self.robot_status = RobotStatusView()
         if robot_status is not None:

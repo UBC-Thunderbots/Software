@@ -1,23 +1,21 @@
 import logging
 import time
+from typing import override
 
+import proto.import_all_protos as protos
+import pyqtgraph.opengl as gl
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-
-from proto.visualization_pb2 import DebugShapes
-
 from software.thunderscope.constants import (
+    THUNDERSCOPE_UI_FONT_NAME,
     Colors,
     DepthValues,
-    THUNDERSCOPE_UI_FONT_NAME,
 )
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLDebugShapesLayer(GLLayer):
@@ -35,7 +33,7 @@ class GLDebugShapesLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, DebugShapes)
+        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, protos.DebugShapes)
         self.debug_shape_map = {}
 
         self.poly_shape_graphics = ObservableList(self._graphics_changed)
@@ -94,7 +92,7 @@ class GLDebugShapesLayer(GLLayer):
         )
         self.poly_shape_name_graphics.resize(
             len(poly_named_shapes),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.DEBUG_SHAPES_COLOR,
             ),
@@ -106,7 +104,7 @@ class GLDebugShapesLayer(GLLayer):
         )
         self.circle_shape_name_graphics.resize(
             len(circle_named_shapes),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.DEBUG_SHAPES_COLOR,
             ),
@@ -118,7 +116,7 @@ class GLDebugShapesLayer(GLLayer):
         )
         self.stadium_shape_name_graphics.resize(
             len(stadium_named_shapes),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.DEBUG_SHAPES_COLOR,
             ),

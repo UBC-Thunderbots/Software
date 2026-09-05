@@ -1,26 +1,24 @@
-import threading
-import queue
 import argparse
-import time
-import sys
 import os
+import queue
+import sys
+import threading
+import time
+from typing import override
 
+import proto.import_all_protos as protos
 import pytest
-from proto.import_all_protos import *
-
-from software.gameplay_tests.validation import validation
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.gameplay_tests.validation import validation
+from software.logger.logger import create_logger
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.thunderscope_config import configure_simulated_test_view
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-from software.logger.logger import create_logger
-from typing import override
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thunderscope_config import configure_simulated_test_view
 
 logger = create_logger(__name__)
 
@@ -64,12 +62,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.ci_mode = ci_mode
 
     @override
-    def set_world_state(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: protos.WorldState):
         """Sets the simulation worldstate
 
         :param worldstate: proto containing the desired worldstate
         """
-        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
+        self.simulator_proto_unix_io.send_proto(protos.WorldState, worldstate)
 
     def excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
@@ -99,9 +97,11 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param setup: Function that sets up the world state
         :param param: Parameter passed into setup
         """
-        world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+        world_state_received_buffer = ThreadSafeBuffer(
+            1, protos.WorldStateReceivedTrigger
+        )
         self.simulator_proto_unix_io.register_observer(
-            WorldStateReceivedTrigger, world_state_received_buffer
+            protos.WorldStateReceivedTrigger, world_state_received_buffer
         )
 
         while True:
@@ -162,8 +162,10 @@ class SimulatedTestRunner(TbotsTestRunner):
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
-            tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
-            self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+            tick = protos.SimulatorTick(
+                milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND
+            )
+            self.simulator_proto_unix_io.send_proto(protos.SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 
             while True:
@@ -190,10 +192,10 @@ class SimulatedTestRunner(TbotsTestRunner):
                     robot_status = self.robot_status_buffer.get(block=False)
 
                     self.blue_full_system_proto_unix_io.send_proto(
-                        SSL_WrapperPacket, ssl_wrapper
+                        protos.SSL_WrapperPacket, ssl_wrapper
                     )
                     self.blue_full_system_proto_unix_io.send_proto(
-                        RobotStatus, robot_status
+                        protos.RobotStatus, robot_status
                     )
 
             # get the time difference after we get the primitive (after any blocking that happened)
@@ -225,17 +227,17 @@ class SimulatedTestRunner(TbotsTestRunner):
             # for visualization and logging for replays.
             if self.is_yellow_friendly:
                 self.yellow_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, eventually_validation_proto_set
+                    protos.ValidationProtoSet, eventually_validation_proto_set
                 )
                 self.yellow_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, always_validation_proto_set
+                    protos.ValidationProtoSet, always_validation_proto_set
                 )
             else:
                 self.blue_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, eventually_validation_proto_set
+                    protos.ValidationProtoSet, eventually_validation_proto_set
                 )
                 self.blue_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, always_validation_proto_set
+                    protos.ValidationProtoSet, always_validation_proto_set
                 )
 
             # Check that all always validations are always valid
@@ -288,7 +290,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                              If false, test stops once eventually validation passes and fails if time out
         """
         test_timeout_duration = (
-            test_timeout_s[index] if type(test_timeout_s) == list else test_timeout_s
+            test_timeout_s[index] if type(test_timeout_s) is list else test_timeout_s
         )
 
         # If thunderscope is enabled, run the test in a thread and show
@@ -571,25 +573,29 @@ def simulated_test_runner():
     test_name = current_test.split("-")[0][:25]
 
     # Launch all binaries
-    with Simulator(
-        f"{args.simulator_runtime_dir}/test/{test_name}",
-        args.debug_simulator,
-        args.enable_realism,
-    ) as simulator, FullSystem(
-        "software/unix_full_system",
-        f"{args.blue_full_system_runtime_dir}/test/{test_name}",
-        args.debug_blue_full_system,
-        False,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
-    ) as blue_fs, FullSystem(
-        "software/unix_full_system",
-        f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
-        args.debug_yellow_full_system,
-        True,
-        should_restart_on_crash=False,
-        running_in_realtime=args.enable_thunderscope and not args.ci_mode,
-    ) as yellow_fs:
+    with (
+        Simulator(
+            f"{args.simulator_runtime_dir}/test/{test_name}",
+            args.debug_simulator,
+            args.enable_realism,
+        ) as simulator,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.blue_full_system_runtime_dir}/test/{test_name}",
+            args.debug_blue_full_system,
+            False,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope and not args.ci_mode,
+        ) as blue_fs,
+        FullSystem(
+            "software/unix_full_system",
+            f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
+            args.debug_yellow_full_system,
+            True,
+            should_restart_on_crash=False,
+            running_in_realtime=args.enable_thunderscope and not args.ci_mode,
+        ) as yellow_fs,
+    ):
         with Gamecontroller(
             suppress_logs=(not args.show_gamecontroller_logs),
             parallelized=True,

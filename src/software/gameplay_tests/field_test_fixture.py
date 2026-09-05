@@ -1,29 +1,30 @@
-import queue
-import time
-import os
-import glob
-import threading
-
-import pytest
 import argparse
-from proto.import_all_protos import *
+import glob
+import os
+import queue
+import threading
+import time
+from typing import override
 
+import proto.import_all_protos as protos
+import pytest
+from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.gameplay_tests.validation import validation
-from software.thunderscope.constants import EstopMode, IndividualRobotMode
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.logger.logger import create_logger
+from software.py_constants import (
+    MAX_ROBOT_IDS_PER_SIDE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-from software.logger.logger import create_logger
-
-
-from software.thunderscope.thunderscope_config import configure_field_test_view
-from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
-from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.constants import EstopMode, IndividualRobotMode
 from software.thunderscope.estop_helpers import get_estop_config
-from software.py_constants import *
-from typing import override
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.thunderscope_config import configure_field_test_view
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 
 logger = create_logger(__name__)
 
@@ -111,8 +112,8 @@ class FieldTestRunner(TbotsTestRunner):
     @override
     def send_gamecontroller_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
+        gc_command: protos.Command,
+        team: protos.Team,
         final_ball_placement_point=None,
     ):
         """Send a command to the gamecontroller
@@ -190,10 +191,10 @@ class FieldTestRunner(TbotsTestRunner):
 
                     # Send out the validation proto to thunderscope
                     self.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set
+                        protos.ValidationProtoSet, eventually_validation_proto_set
                     )
                     self.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, always_validation_proto_set
+                        protos.ValidationProtoSet, always_validation_proto_set
                     )
 
                 # Check that all always validations are always valid
@@ -447,30 +448,35 @@ def field_test_runner():
     )
 
     # Launch all binaries
-    with FullSystem(
-        "software/unix_full_system",
-        full_system_runtime_dir=runtime_dir,
-        debug_full_system=debug_full_sys,
-        friendly_colour_yellow=args.run_yellow,
-        should_restart_on_crash=False,
-    ) as friendly_fs, Gamecontroller(
-        # we would be using conventional port if and only if we are playing in robocup.
-        suppress_logs=(not args.show_gamecontroller_logs),
-        use_conventional_port=False,
-    ) as gamecontroller, WifiCommunicationManager(
-        current_proto_unix_io=friendly_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(args.channel),
-        should_setup_full_system=True,
-        interface=args.interface,
-        referee_port=gamecontroller.get_referee_port()
-        if gamecontroller
-        else SSL_REFEREE_PORT,
-    ) as wifi_communication_manager, RobotCommunication(
-        current_proto_unix_io=friendly_proto_unix_io,
-        communication_manager=wifi_communication_manager,
-        estop_mode=estop_mode,
-        estop_path=estop_path,
-    ) as rc_friendly:
+    with (
+        FullSystem(
+            "software/unix_full_system",
+            full_system_runtime_dir=runtime_dir,
+            debug_full_system=debug_full_sys,
+            friendly_colour_yellow=args.run_yellow,
+            should_restart_on_crash=False,
+        ) as friendly_fs,
+        Gamecontroller(
+            # we would be using conventional port if and only if we are playing in robocup.
+            suppress_logs=(not args.show_gamecontroller_logs),
+            use_conventional_port=False,
+        ) as gamecontroller,
+        WifiCommunicationManager(
+            current_proto_unix_io=friendly_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(args.channel),
+            should_setup_full_system=True,
+            interface=args.interface,
+            referee_port=gamecontroller.get_referee_port()
+            if gamecontroller
+            else SSL_REFEREE_PORT,
+        ) as wifi_communication_manager,
+        RobotCommunication(
+            current_proto_unix_io=friendly_proto_unix_io,
+            communication_manager=wifi_communication_manager,
+            estop_mode=estop_mode,
+            estop_path=estop_path,
+        ) as rc_friendly,
+    ):
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
 
         gamecontroller.setup_proto_unix_io(
@@ -520,7 +526,7 @@ def field_test_runner():
             is_yellow_friendly=args.run_yellow,
         )
 
-        friendly_proto_unix_io.register_observer(World, runner.world_buffer)
+        friendly_proto_unix_io.register_observer(protos.World, runner.world_buffer)
 
         # Print the proto log path up front, before the test's blocking Thunderscope Qt event loop starts.
         print_proto_log_replay_command(runtime_dir, args.run_yellow)

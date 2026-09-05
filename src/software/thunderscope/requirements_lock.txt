@@ -111,9 +111,6 @@ darkdetect==0.7.1 \
     --hash=sha256:3efe69f8ecd5f1b7f4fbb0d1d93f656b0e493c45cc49222380ffe2a529cbc866 \
     --hash=sha256:47be3cf5134432ddb616bbffc927237718407914993c82809983e7ccebf49013
     # via pyqtdarktheme-fork
-evdev==1.7.0 ; sys_platform == "linux" \
-    --hash=sha256:95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870
-    # via -r software/thunderscope/requirements.in
 idna==3.18 \
     --hash=sha256:7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2 \
     --hash=sha256:ffb385a7e039654cef1ab9ef32c6fafe283c0c0467bba1d9029738ce4a14a848

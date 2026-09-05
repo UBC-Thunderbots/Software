@@ -30,29 +30,6 @@ config_setting(
     },
 )
 
-config_setting(
-    name = "build_trinamic",
-    flag_values = {
-        ":motor_board": "TRINAMIC",
-    },
-)
-
-config_setting(
-    name = "build_stspin",
-    flag_values = {
-        ":motor_board": "STSPIN",
-    },
-)
-
-string_flag(
-    name = "motor_board",
-    build_setting_default = "STSPIN",
-    values = [
-        "TRINAMIC",
-        "STSPIN",
-    ],
-)
-
 cc_library(
     name = "primitive_executor",
     srcs = ["primitive_executor.cpp"],
@@ -74,10 +51,7 @@ cc_library(
 
 cc_library(
     name = "spi_utils",
-    srcs = ["spi_utils.cpp"],
-    hdrs = ["spi_utils.h"],
-    # Uses Linux kernel headers (linux/spi/spidev.h); robot-only.
-    target_compatible_with = ["@platforms//os:linux"],
+    hdrs = ["spi_utils.hpp"],
     deps = [
         "//software/logger",
     ],

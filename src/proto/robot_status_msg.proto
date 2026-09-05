@@ -81,40 +81,19 @@ enum ErrorCode
 
 enum MotorFault
 {
-    /*********** TMC Faults ************/
-    // Refer to Trinamic 6100 datasheet for precise definitions of motor faults.
-    // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf
-    // (Section 5.1, p22-23)
-    RESET                             = 0;
-    DRIVER_OVERTEMPERATURE_PREWARNING = 1;
-    DRIVER_OVERTEMPERATURE            = 2;
-    UNDERVOLTAGE_CHARGEPUMP           = 3;
-    PHASE_U_SHORT_COUNTER_DETECTED    = 4;
-    PHASE_U_SHORT_TO_GND_DETECTED     = 5;
-    PHASE_U_SHORT_TO_VS_DETECTED      = 6;
-    // for the sake of consistency with the TMC 6100, "7" is unused
-    PHASE_V_SHORT_COUNTER_DETECTED = 8;
-    PHASE_V_SHORT_TO_GND_DETECTED  = 9;
-    PHASE_V_SHORT_TO_VS_DETECTED   = 10;
-    // for the sake of consistency with the TMC 6100, "11" is unused
-    PHASE_W_SHORT_COUNTER_DETECTED = 12;
-    PHASE_W_SHORT_TO_GND_DETECTED  = 13;
-    PHASE_W_SHORT_TO_VS_DETECTED   = 14;
-
-    // TODO: #3749 Move this to its own proto.
-    /*********** STSPIN Faults ************/
-    NO_FAULT     = 15;
-    DURATION     = 16;
-    OVER_VOLT    = 17;
-    UNDER_VOLT   = 18;
-    OVER_TEMP    = 19;
-    START_UP     = 20;
-    SPEED_FDBK   = 21;
-    OVER_CURR    = 22;
-    SW_ERROR     = 23;
-    SAMPLE_FAULT = 24;
-    OVERCURR_SW  = 25;
-    DP_FAULT     = 26;
+    reserved 13 to 26;
+    NO_FAULT     = 0;
+    DURATION     = 1;
+    OVER_VOLT    = 2;
+    UNDER_VOLT   = 3;
+    OVER_TEMP    = 4;
+    START_UP     = 5;
+    SPEED_FDBK   = 6;
+    OVER_CURR    = 7;
+    SW_ERROR     = 8;
+    SAMPLE_FAULT = 9;
+    OVERCURR_SW  = 10;
+    DP_FAULT     = 11;
 }
 
 message DriveUnit

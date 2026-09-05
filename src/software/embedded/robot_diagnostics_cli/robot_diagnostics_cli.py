@@ -1,28 +1,36 @@
-import subprocess
 import logging
-import typer as Typer
-from typer.main import get_command
-from rich import print
-from rich.live import Live
-from rich.table import Table
-from rich.console import Console
-from rich.logging import RichHandler
-from software.py_constants import *
-from typer_shell import make_typer_shell
+import subprocess
 from functools import wraps
 from typing import List, Optional
-from typing_extensions import Annotated
+
+import proto.import_all_protos as protos
+import typer as Typer
+from rich import print
+from rich.console import Console
+from rich.live import Live
+from rich.logging import RichHandler
+from rich.table import Table
+from software.embedded.constants.py_constants import (
+    DEFAULT_PRIMITIVE_DURATION,
+    MAX_FORCE_DRIBBLER_SPEED_RPM,
+    ROBOT_MAX_ANG_SPEED_RAD_PER_S,
+    ROBOT_MAX_SPEED_M_PER_S,
+)
 from software.embedded.robot_diagnostics_cli.embedded_communication import (
     EmbeddedCommunication,
 )
-from proto.import_all_protos import *
-from software.embedded.constants.py_constants import (
-    DEFAULT_PRIMITIVE_DURATION,
-    ROBOT_MAX_ANG_SPEED_RAD_PER_S,
-    ROBOT_MAX_SPEED_M_PER_S,
-    MAX_FORCE_DRIBBLER_SPEED_RPM,
+from software.py_constants import (
+    ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY,
+    ROBOT_ID_CONFIG_KEY,
+    ROBOT_KICK_CONSTANT_CONFIG_KEY,
+    ROBOT_KICK_EXP_COEFF_CONFIG_KEY,
+    ROBOT_MULTICAST_CHANNEL_CONFIG_KEY,
+    ROBOT_NETWORK_INTERFACE_CONFIG_KEY,
+    WHEEL_ROTATION_MAX_SPEED_M_PER_S,
 )
-from software.py_constants import WHEEL_ROTATION_MAX_SPEED_M_PER_S
+from typer.main import get_command
+from typer_shell import make_typer_shell
+from typing_extensions import Annotated
 
 
 class RobotDiagnosticsCLI:
@@ -78,7 +86,7 @@ class RobotDiagnosticsCLI:
             def wrapper(self, *args, **kwargs):
                 try:
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
                     return func(self, *args, **kwargs)
                 except KeyboardInterrupt:
@@ -86,18 +94,18 @@ class RobotDiagnosticsCLI:
                         "[bold yellow] E-Stop Activated: Stopped Primitive Send [/bold yellow]"
                     )
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
                     raise Typer.Exit(code=exit_code)
                 except Exception as e:
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
                     logging.exception(f"Unknown Exception: {e}")
                     raise Typer.Exit(code=exit_code)
                 finally:
                     self.embedded_communication.send_primitive(
-                        Primitive(stop=StopPrimitive())
+                        protos.Primitive(stop=protos.StopPrimitive())
                     )
 
             return wrapper
@@ -345,7 +353,7 @@ class RobotDiagnosticsCLI:
                 duration_seconds, primitive, description
             )
         else:
-            zero_direct_control_primitive = DirectControlPrimitive(
+            zero_direct_control_primitive = protos.DirectControlPrimitive(
                 motor_control=self.embedded_data.get_zero_motor_control_primitive(),
                 power_control=self.embedded_data.get_zero_power_control_primitive(),
             )
@@ -353,7 +361,7 @@ class RobotDiagnosticsCLI:
             print(description)
             self.embedded_communication.run_primitive_over_time(
                 1,
-                Primitive(direct_control=zero_direct_control_primitive),
+                protos.Primitive(direct_control=zero_direct_control_primitive),
                 "Recharging...",
             )
 

@@ -1,12 +1,12 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.thunderscope.constants import Colors, LINE_WIDTH
 from typing import Optional
 
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import LINE_WIDTH, Colors
 
-class GLGraphic(GLLinePlotItem):
+
+class GLGraphic(gl.GLLinePlotItem):
     """Abstract base class for 1D and 2D graphics on the cartesian plane (i.e. x-y plane)"""
 
     def __init__(

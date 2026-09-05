@@ -1,10 +1,11 @@
+import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
-
-from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team
 from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
@@ -12,9 +13,7 @@ from software.gameplay_tests.validation.ball_enters_region import (
 from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyExitsRegion,
 )
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 
 
 @pytest.mark.parametrize(
@@ -124,18 +123,19 @@ def ball_placement_play_setup(
 
     # Game Controller Setup
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
     )
     # Pass in placement point here - not required for all play tests
     simulated_test_runner.send_gamecontroller_command(
-        gc_command=Command.Type.BALL_PLACEMENT,
-        team=Team.BLUE,
+        gc_command=protos.Command.Type.BALL_PLACEMENT,
+        team=SslTeam.BLUE,
         final_ball_placement_point=ball_placement_point,
     )
 
     # Force play override here
     simulated_test_runner.set_plays(
-        blue_play=PlayName.BallPlacementPlay, yellow_play=PlayName.HaltPlay
+        blue_play=protos.PlayName.BallPlacementPlay,
+        yellow_play=protos.PlayName.HaltPlay,
     )
 
 

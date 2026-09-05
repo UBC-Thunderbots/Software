@@ -1,16 +1,12 @@
-from pyqtgraph.opengl import *
-
-from collections import deque, defaultdict
-from proto.world_pb2 import World
-from proto.import_all_protos import Team, Robot
-
-from software.thunderscope.constants import Colors, DepthValues, TrailValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
-
-from software.thunderscope.gl.helpers.observable_list import ObservableList
+from collections import defaultdict, deque
 from typing import override
+
+import proto.import_all_protos as protos
+from software.thunderscope.constants import Colors, DepthValues, TrailValues
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLTrailLayer(GLLayer):
@@ -26,10 +22,10 @@ class GLTrailLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
         self.trail_graphics_head = ObservableList(self._graphics_changed)
         self.robot_trail_queues = defaultdict(lambda: deque([], self.max_trail_length))
-        self.cached_world = World()
+        self.cached_world = protos.World()
 
         self.max_trail_length = TrailValues.DEFAULT_TRAIL_LENGTH
         self.refresh_interval = TrailValues.DEFAULT_TRAIL_SAMPLING_RATE
@@ -53,7 +49,7 @@ class GLTrailLayer(GLLayer):
 
         self.refresh_count -= 1
 
-    def __update_trail_points(self, robot: Robot) -> None:
+    def __update_trail_points(self, robot: protos.Robot) -> None:
         """Stores the robot's current global position in its trail history in the world
 
         :param robot: the given robot whose position is to be stored
@@ -61,7 +57,7 @@ class GLTrailLayer(GLLayer):
         self.robot_trail_queues[robot.id].append(robot.current_state.global_position)
 
     def __update_trail_graphics(
-        self, team: Team, queues_dict: dict, color: Colors
+        self, team: protos.Team, queues_dict: dict, color: Colors
     ) -> None:
         """Updates the onscreen visualizations of the past robot positions correlating
         to the given team.

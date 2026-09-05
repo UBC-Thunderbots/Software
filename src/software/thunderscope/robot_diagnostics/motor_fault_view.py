@@ -1,17 +1,18 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import Qt, QByteArray, QBuffer, QIODeviceBase, QEvent
+from typing import Any, override
+
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt.QtCore import QBuffer, QByteArray, QEvent, QIODeviceBase, Qt
+from software.thunderscope.common.common_widgets import display_tooltip
+from software.thunderscope.common.proto_parameter_tree_util import get_string_val
 from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_loader import (
     get_no_fault_icon,
     get_stopped_icon,
     get_warning_icon,
 )
-from software.thunderscope.common.proto_parameter_tree_util import get_string_val
-from software.thunderscope.common.common_widgets import display_tooltip
-from typing import Any, override
-from proto.import_all_protos import *
 
 
-class MotorFaultView(QWidget):
+class MotorFaultView(QtWidgets.QWidget):
     """Class to visualise information about motor faults from robot status
 
     Displays if any of the motors have a fault and / or are disabled
@@ -25,7 +26,7 @@ class MotorFaultView(QWidget):
         Initialises the main label and the fault count notification label
         """
         super().__init__()
-        self.layout = QHBoxLayout()
+        self.layout = QtWidgets.QHBoxLayout()
 
         self.enabled = False
         self.fault_count = 0
@@ -38,10 +39,10 @@ class MotorFaultView(QWidget):
         }
         self.motor_fault_tooltip = ""
 
-        self.motor_fault_display = QLabel()
+        self.motor_fault_display = QtWidgets.QLabel()
         self.motor_fault_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.fault_count_label = QLabel(self.motor_fault_display)
+        self.fault_count_label = QtWidgets.QLabel(self.motor_fault_display)
         self.fault_count_label.setFixedWidth(self.fault_count_label.sizeHint().height())
         self.fault_count_label.setStyleSheet(
             "color: white;"
@@ -163,7 +164,7 @@ class MotorFaultView(QWidget):
         self.enabled = False
         self.update_ui()
 
-    def refresh(self, motor_status: MotorStatus, enum_descriptor: Any) -> None:
+    def refresh(self, motor_status: protos.MotorStatus, enum_descriptor: Any) -> None:
         """Converts the given message into a map of motor name to its fault info
         And calls functions to update the main UI and the tooltip
 
