@@ -1,7 +1,10 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
-from software.py_constants import *
-from software.gameplay_tests.validation.speed_threshold_helpers import *
+import proto.import_all_protos as protos
+from software.gameplay_tests.validation.speed_threshold_helpers import (
+    get_current_robot_position,
+    get_validation_centre_position,
+    get_validation_line_endpoints,
+)
 from typing import override
 
 
@@ -23,7 +26,7 @@ class RobotSpeedThreshold(Validation):
         self.speed_threshold = speed_threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the friendly robots' speed is at or above some threshold
 
         :param world: The world msg to validate
@@ -35,11 +38,11 @@ class RobotSpeedThreshold(Validation):
                 tbots_cpp.createVector(robot.current_state.global_velocity).length()
                 < self.speed_threshold
             ):
-                return ValidationStatus.FAILING
-        return ValidationStatus.PASSING
+                return protos.ValidationStatus.FAILING
+        return protos.ValidationStatus.PASSING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) shows regions to enter"""
         segments = []
         for robot in world.friendly_team.team_robots:

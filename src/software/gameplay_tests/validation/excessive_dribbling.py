@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import ValidationStatus, ValidationGeometry
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -19,7 +19,7 @@ class ExcessivelyDribbling(Validation):
         self.dribbling_error_margin = 0.05
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball past the max dribble displacement
         minus the dribbling error margin
 
@@ -40,15 +40,15 @@ class ExcessivelyDribbling(Validation):
                 ).length() > (
                     self.max_dribbling_displacement - self.dribbling_error_margin
                 ):
-                    return ValidationStatus.FAILING
-                return ValidationStatus.PASSING
+                    return protos.ValidationStatus.FAILING
+                return protos.ValidationStatus.PASSING
 
         # Reset the dribbling validation start point if no robots are near the ball
         self.continuous_dribbling_start_point = None
-        return ValidationStatus.PASSING
+        return protos.ValidationStatus.PASSING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) Shows the max allowed dribbling circle"""
         return create_validation_geometry(
             [

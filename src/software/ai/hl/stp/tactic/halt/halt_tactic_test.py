@@ -1,9 +1,7 @@
 import software.python_bindings as tbots_cpp
 import pytest
 
-from proto.import_all_protos import (
-    HaltTactic,
-)
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
@@ -43,7 +41,7 @@ def test_robot_halt(blue_robot_locations, blue_robot_velocities, simulated_test_
             )
         )
 
-        simulated_test_runner.set_tactics(blue_tactics={1: HaltTactic()})
+        simulated_test_runner.set_tactics(blue_tactics={1: protos.HaltTactic()})
 
     robot_stopped_validation = RobotSpeedEventuallyBelowThreshold(speed_threshold=0.001)
 

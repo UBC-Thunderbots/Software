@@ -15,7 +15,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/embedded/gpio/gpio_char_dev.h"
 #include "software/embedded/motor_controller/stspin_types.h"
-#include "software/embedded/spi_utils.h"
+#include "software/embedded/spi_utils.hpp"
 #include "software/logger/logger.h"
 
 // AUTOSAR variant of CRC-8
@@ -202,7 +202,7 @@ void StSpinMotorController::immediatelyDisable()
 
 void StSpinMotorController::openSpiFileDescriptor(const MotorIndex motor)
 {
-    spi_fds_[motor] = open(SPI_PATHS.at(motor), O_RDWR);
+    spi_fds_[motor] = open(SPI_PATHS.at(motor).c_str(), O_RDWR);
     CHECK(spi_fds_[motor] >= 0)
         << "can't open device: " << motor << "error: " << strerror(errno);
 
@@ -232,7 +232,7 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
     std::vector<uint8_t> received_data;
     for (unsigned int attempt = 0; attempt < MAX_SPI_TRANSFER_ATTEMPTS; ++attempt)
     {
-        spiTransfer(spi_fds_[motor], tx.data(), rx.data(), MESSAGE_SIZE, SPI_SPEED_HZ);
+        spiTransfer(spi_fds_[motor], tx, rx, SPI_SPEED_HZ);
         received_data.insert(received_data.end(), rx.begin(), rx.end());
 
         auto delimiter_pos =
@@ -269,15 +269,25 @@ void StSpinMotorController::sendAndReceiveMessage(const MotorIndex motor,
             // previous sequence number
             if (ack_seq_num == current_seq || ack_seq_num == prev_seq)
             {
-                const auto now = std::chrono::steady_clock::now();
-                motor_status_.at(motor).last_message_ack_time = now;
-
                 std::array<uint8_t, MESSAGE_SIZE> message{};
                 std::copy(delimiter_pos, std::next(delimiter_pos, MESSAGE_SIZE),
                           message.begin());
                 processRx(motor, message);
 
-                return;
+                if (ack_seq_num == current_seq)
+                {
+                    // Message with current sequence number has been acknowledged
+                    const auto now = std::chrono::steady_clock::now();
+                    motor_status_.at(motor).last_message_ack_time = now;
+                    return;
+                }
+            }
+            else
+            {
+                LOG(WARNING)
+                    << "Received unexpected sequence number in message from motor "
+                    << motor << " (current seq num is " << static_cast<int>(current_seq)
+                    << " but got seq num " << static_cast<int>(ack_seq_num) << ")";
             }
         }
 

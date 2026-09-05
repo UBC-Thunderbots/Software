@@ -2,14 +2,12 @@ import math
 
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from proto.geometry_pb2 import Point, Vector, Angle, AngularVelocity
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 
 
 def test_shoot_or_chip_play(simulated_test_runner):
@@ -39,26 +37,29 @@ def test_shoot_or_chip_play(simulated_test_runner):
             ball_velocity=ball_initial_vel,
         )
 
-        last_robot = RobotState(
-            global_position=Point(x_meters=1, y_meters=2),
-            global_velocity=Vector(x_component_meters=-4.6, y_component_meters=0),
-            global_orientation=Angle(radians=math.pi),
-            global_angular_velocity=AngularVelocity(radians_per_second=0),
+        last_robot = protos.RobotState(
+            global_position=protos.Point(x_meters=1, y_meters=2),
+            global_velocity=protos.Vector(
+                x_component_meters=-4.6, y_component_meters=0
+            ),
+            global_orientation=protos.Angle(radians=math.pi),
+            global_angular_velocity=protos.AngularVelocity(radians_per_second=0),
         )
 
-        world_state.yellow_robots[5].CopyFrom(last_robot)
+        world_state.yellow_robots.robot_states[5].CopyFrom(last_robot)
 
         simulated_test_runner.set_world_state(world_state)
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.ShootOrChipPlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.ShootOrChipPlay,
+            yellow_play=protos.PlayName.HaltPlay,
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
     # TODO (#3651): add validations

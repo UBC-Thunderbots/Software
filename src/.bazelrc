@@ -81,6 +81,9 @@ build --per_file_copt=./external/.*,./bazel-out/.*@-w
 # Define Robot Versions
 build --copt="-DCURRENT_ROBOT_VERSION=2026"
 
+# Limit the number of jobs to prevent stalling the machine
+build --local_cpu_resources=HOST_CPUS*0.75
+
 ############## External Deps Compatibility ##############
 build --noincompatible_disallow_ctx_resolve_tools
 build --check_direct_dependencies=off

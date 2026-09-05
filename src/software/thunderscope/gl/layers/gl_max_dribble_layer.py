@@ -1,15 +1,13 @@
-from pyqtgraph.opengl import *
-
 from software.thunderscope.constants import DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from pyqtgraph.Qt import QtGui
-from software.thunderscope.util import *
+from software.thunderscope.util import color_from_gradient
 from typing import override
 
 
@@ -26,7 +24,7 @@ class GLMaxDribbleLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
 
         self.color = QtGui.QColor(255, 0, 0, 127)
 

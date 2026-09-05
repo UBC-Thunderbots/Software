@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -33,7 +33,7 @@ class BallKickedInDirection(Validation):
         )
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the ball has been kicked in the expected direction
 
         :param world: The world msg to validate
@@ -53,11 +53,11 @@ class BallKickedInDirection(Validation):
         if ball.hasBallBeenKicked(
             self.kick_direction, self.min_kick_speed, self.max_angle_difference
         ):
-            return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+            return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Returns arrow geometry showing the expected kick direction
 
         :param world: The world msg to create validation geometry from

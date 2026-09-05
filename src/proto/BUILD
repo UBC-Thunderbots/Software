@@ -251,7 +251,10 @@ py_library(
         "import_all_protos.py",
     ],
     deps = [
+        ":estop_state_py_proto",
         ":software_py_proto",
         ":tbots_py_proto",
+        ":validation_py_proto",
+        ":visualization_py_proto",
     ],
 )

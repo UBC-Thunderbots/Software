@@ -2,7 +2,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
-from proto.import_all_protos import KickTactic
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
@@ -57,7 +57,7 @@ def test_kick(ball_offset_from_robot, angle_to_kick_at, simulated_test_runner):
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: KickTactic(
+                1: protos.KickTactic(
                     kick_origin=tbots_cpp.createPointProto(ball_position),
                     kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
                     kick_speed_meters_per_second=5.0,

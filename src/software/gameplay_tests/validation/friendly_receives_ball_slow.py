@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     create_validation_types,
@@ -24,7 +24,7 @@ class FriendlyReceivesBallSlow(FriendlyHasBallPossession):
         self.max_receive_speed = max_receive_speed
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the specified robot receives the ball too fast
 
         :param world: The world msg to validate
@@ -33,13 +33,13 @@ class FriendlyReceivesBallSlow(FriendlyHasBallPossession):
                  PASSING if the ball is not near the dribbler, or if it is near
                          the dribbler at a speed slower than the max
         """
-        if super().get_validation_status(world) == ValidationStatus.PASSING:
+        if super().get_validation_status(world) == protos.ValidationStatus.PASSING:
             ball_velocity = tbots_cpp.createVector(
                 world.ball.current_state.global_velocity
             )
             if ball_velocity.length() - self.max_receive_speed > 0.2:
-                return ValidationStatus.FAILING
-        return ValidationStatus.PASSING
+                return protos.ValidationStatus.FAILING
+        return protos.ValidationStatus.PASSING
 
     @override
     def __repr__(self):

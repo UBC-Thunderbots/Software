@@ -1,4 +1,3 @@
-from PyQt6.QtGui import QFont, QColor
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.Qt import QtCore, QtGui
 
@@ -14,8 +13,8 @@ class GLLabel(GLPainter):
     def __init__(
         self,
         parent_item: Optional[GLGraphicsItem] = None,
-        font: QFont = QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
-        text_color: QColor = Colors.PRIMARY_TEXT_COLOR,
+        font: QtGui.QFont = QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
+        text_color: QtGui.QColor = Colors.PRIMARY_TEXT_COLOR,
         offset: tuple[int, int] = (0, 0),
         text: str = "",
     ) -> None:

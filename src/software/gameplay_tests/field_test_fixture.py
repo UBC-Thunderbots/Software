@@ -6,7 +6,7 @@ import threading
 
 import pytest
 import argparse
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation import validation
 from software.thunderscope.constants import EstopMode, IndividualRobotMode
@@ -22,7 +22,11 @@ from software.thunderscope.thunderscope_config import configure_field_test_view
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.estop_helpers import get_estop_config
-from software.py_constants import *
+from software.py_constants import (
+    MAX_ROBOT_IDS_PER_SIDE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
 from typing import override
 
 logger = create_logger(__name__)
@@ -111,8 +115,8 @@ class FieldTestRunner(TbotsTestRunner):
     @override
     def send_gamecontroller_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
-        team: proto.ssl_gc_common_pb2.Team,
+        gc_command: protos.Command,
+        team: protos.Team,
         final_ball_placement_point=None,
     ):
         """Send a command to the gamecontroller
@@ -190,10 +194,10 @@ class FieldTestRunner(TbotsTestRunner):
 
                     # Send out the validation proto to thunderscope
                     self.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, eventually_validation_proto_set
+                        protos.ValidationProtoSet, eventually_validation_proto_set
                     )
                     self.blue_full_system_proto_unix_io.send_proto(
-                        ValidationProtoSet, always_validation_proto_set
+                        protos.ValidationProtoSet, always_validation_proto_set
                     )
 
                 # Check that all always validations are always valid
@@ -520,7 +524,7 @@ def field_test_runner():
             is_yellow_friendly=args.run_yellow,
         )
 
-        friendly_proto_unix_io.register_observer(World, runner.world_buffer)
+        friendly_proto_unix_io.register_observer(protos.World, runner.world_buffer)
 
         # Print the proto log path up front, before the test's blocking Thunderscope Qt event loop starts.
         print_proto_log_replay_command(runtime_dir, args.run_yellow)

@@ -70,6 +70,15 @@ function run_ruff() {
         printf "\n***Failed to lint/format Python files!***\n\n"
         exit 1
     fi
+
+    # F403: https://docs.astral.sh/ruff/rules/undefined-local-with-import-star/
+    # F405: https://docs.astral.sh/ruff/rules/undefined-local-with-import-star-usage/
+    /opt/tbotspython/bin/python3 -m ruff check $BAZEL_ROOT_DIR --select F403,F405
+
+    if [[ "$?" != 0 ]]; then
+        printf "\n***Wildcard imports should not be used (F403/F405)!***\n\n"
+        exit 1
+    fi
 }
 
 function run_code_spell(){

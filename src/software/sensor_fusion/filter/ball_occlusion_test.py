@@ -2,11 +2,10 @@ import pytest
 import math
 
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
 
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.import_all_protos import Command
-from proto.ssl_gc_common_pb2 import Team
+import proto.import_all_protos as protos
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -184,11 +183,11 @@ def test_ball_occlusion(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.HALT, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.HALT, team=SslTeam.UNKNOWN
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.HaltPlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.HaltPlay, yellow_play=protos.PlayName.HaltPlay
         )
 
     # This test validates that the ball tracking/filter handles occlusion correctly.

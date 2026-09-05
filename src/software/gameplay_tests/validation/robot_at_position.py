@@ -1,9 +1,8 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
-    ValidationStatus,
     create_validation_geometry,
     create_validation_types,
 )
@@ -27,7 +26,7 @@ class RobotAtPosition(Validation):
         self.threshold = threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the robot is at the target position
 
         :param world: The world msg to validate
@@ -39,13 +38,13 @@ class RobotAtPosition(Validation):
                 robot_pos = tbots_cpp.createPoint(robot.current_state.global_position)
                 distance = (robot_pos - self.position).length()
                 if distance <= self.threshold:
-                    return ValidationStatus.PASSING
+                    return protos.ValidationStatus.PASSING
                 break
 
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) shows the target position"""
         circle = tbots_cpp.Circle(self.position, self.threshold)
         return create_validation_geometry([circle])

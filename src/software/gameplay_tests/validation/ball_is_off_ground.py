@@ -1,5 +1,5 @@
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -21,7 +21,7 @@ class BallIsOffGround(Validation):
         self.threshold = threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the ball has is threshold meters off the ground
 
         :param world: The world msg to validate
@@ -29,12 +29,12 @@ class BallIsOffGround(Validation):
                  PASSING when the ball has a positive threshold distance off the ground
         """
         if world.ball.current_state.distance_from_ground > self.threshold:
-            return ValidationStatus.PASSING
+            return protos.ValidationStatus.PASSING
         else:
-            return ValidationStatus.FAILING
+            return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create validation geometry from

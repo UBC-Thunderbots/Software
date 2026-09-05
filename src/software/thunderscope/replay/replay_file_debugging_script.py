@@ -4,8 +4,7 @@ import gzip
 import os
 import argparse
 
-from proto.import_all_protos import *
-from software.py_constants import *
+from software.py_constants import REPLAY_FILE_EXTENSION
 
 from software.thunderscope.replay.proto_player import ProtoPlayer
 

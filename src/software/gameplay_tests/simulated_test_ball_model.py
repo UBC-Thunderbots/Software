@@ -1,15 +1,14 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from software.gameplay_tests.validation.robot_enters_region import *
-from software.gameplay_tests.validation.ball_enters_region import *
-from software.gameplay_tests.validation.ball_moves_in_direction import *
-from software.gameplay_tests.validation.friendly_has_ball_possession import *
-from software.gameplay_tests.validation.ball_speed_threshold import *
-from software.gameplay_tests.validation.robot_speed_threshold import *
-from software.gameplay_tests.validation.ball_stops_in_region import *
-from software.gameplay_tests.validation.excessive_dribbling import *
+from software.gameplay_tests.validation.ball_stops_in_region import (
+    BallEventuallyStopsInRegion,
+)
+from software.gameplay_tests.validation.excessive_dribbling import (
+    NeverExcessivelyDribbles,
+)
 from proto.message_translation.tbots_protobuf import create_world_state
+import proto.import_all_protos as protos
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
@@ -50,7 +49,7 @@ def test_simulator_move_ball(
 ):
     # Setup Ball
     simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+        protos.WorldState,
         create_world_state(
             [],
             blue_robot_locations=[],
@@ -60,16 +59,16 @@ def test_simulator_move_ball(
     )
 
     # Setup Tactic
-    params = AssignedTacticPlayControlParams()
+    params = protos.AssignedTacticPlayControlParams()
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
+        protos.AssignedTacticPlayControlParams, params
     )
 
     # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
+    params = protos.AssignedTacticPlayControlParams()
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
+        protos.AssignedTacticPlayControlParams, params
     )
 
     # expected ball position
@@ -118,7 +117,7 @@ def test_ball_robot_collision(simulated_test_runner):
 
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+        protos.WorldState,
         create_world_state(
             [],
             blue_robot_locations=[robot_position],
@@ -129,7 +128,7 @@ def test_ball_robot_collision(simulated_test_runner):
 
     # Setup Ball
     simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+        protos.WorldState,
         create_world_state(
             [],
             blue_robot_locations=[],
@@ -139,16 +138,16 @@ def test_ball_robot_collision(simulated_test_runner):
     )
 
     # Setup Tactic
-    params = AssignedTacticPlayControlParams()
+    params = protos.AssignedTacticPlayControlParams()
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
+        protos.AssignedTacticPlayControlParams, params
     )
 
     # Setup no tactics on the enemy side
-    params = AssignedTacticPlayControlParams()
+    params = protos.AssignedTacticPlayControlParams()
     simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, params
+        protos.AssignedTacticPlayControlParams, params
     )
 
     # expected ball position

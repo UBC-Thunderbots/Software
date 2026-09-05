@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import Pass, ReceiverTactic
+import proto.import_all_protos as protos
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
@@ -208,7 +208,7 @@ def test_receiver(
 
         # Necessary since pass is a python keyword
         receiver_args = {
-            "pass": Pass(
+            "pass": protos.Pass(
                 passer_point=tbots_cpp.createPointProto(passer_point),
                 receiver_point=tbots_cpp.createPointProto(receiver_point),
                 pass_speed_m_per_s=pass_speed,
@@ -217,7 +217,7 @@ def test_receiver(
         }
 
         simulated_test_runner.set_tactics(
-            blue_tactics={1: ReceiverTactic(**receiver_args)}
+            blue_tactics={1: protos.ReceiverTactic(**receiver_args)}
         )
 
     eventually_validation_sequence_set = [

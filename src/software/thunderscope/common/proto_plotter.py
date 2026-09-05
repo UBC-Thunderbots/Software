@@ -5,14 +5,14 @@ from typing import Type, Callable
 from google.protobuf.message import Message
 
 import pyqtgraph as pg
-from pyqtgraph.Qt.QtWidgets import *
+from pyqtgraph.Qt import QtWidgets
 from pyqtgraph.Qt import QtGui
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import override
 
 
-class ProtoPlotter(QWidget):
+class ProtoPlotter(QtWidgets.QWidget):
     """Plot the protobuf data in a pyqtgraph plot
 
     In-order to make the plotter as flexible as possible, we need dependency
@@ -67,7 +67,7 @@ class ProtoPlotter(QWidget):
         :param plot_rate_hz: How many times per second to update the plot
         :param buffer_size: The size of the buffer to use for plotting.
         """
-        QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
 
         self.win = pg.PlotWidget()
         self.win.disableAutoRange()

@@ -2,9 +2,9 @@ import logging
 import time
 
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
+import pyqtgraph.opengl as gl
 
-from proto.visualization_pb2 import DebugShapes
+import proto.import_all_protos as protos
 
 from software.thunderscope.constants import (
     Colors,
@@ -35,7 +35,7 @@ class GLDebugShapesLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, DebugShapes)
+        self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, protos.DebugShapes)
         self.debug_shape_map = {}
 
         self.poly_shape_graphics = ObservableList(self._graphics_changed)
@@ -94,7 +94,7 @@ class GLDebugShapesLayer(GLLayer):
         )
         self.poly_shape_name_graphics.resize(
             len(poly_named_shapes),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.DEBUG_SHAPES_COLOR,
             ),
@@ -106,7 +106,7 @@ class GLDebugShapesLayer(GLLayer):
         )
         self.circle_shape_name_graphics.resize(
             len(circle_named_shapes),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.DEBUG_SHAPES_COLOR,
             ),
@@ -118,7 +118,7 @@ class GLDebugShapesLayer(GLLayer):
         )
         self.stadium_shape_name_graphics.resize(
             len(stadium_named_shapes),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.DEBUG_SHAPES_COLOR,
             ),

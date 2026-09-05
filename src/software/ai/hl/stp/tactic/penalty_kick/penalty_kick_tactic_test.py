@@ -1,7 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import PenaltyKickTactic
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
@@ -69,7 +69,7 @@ def test_penalty_kick(
             ),
         )
 
-        simulated_test_runner.set_tactics(blue_tactics={0: PenaltyKickTactic()})
+        simulated_test_runner.set_tactics(blue_tactics={0: protos.PenaltyKickTactic()})
 
     eventually_validation_sequence_set = [
         [

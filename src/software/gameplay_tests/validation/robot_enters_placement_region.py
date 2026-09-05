@@ -1,6 +1,6 @@
 import software.python_bindings as tbots_cpp
 from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
 
 from software.gameplay_tests.validation.validation import (
     Validation,
@@ -26,7 +26,7 @@ class RobotEntersPlacementRegion(Validation):
         )
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if robots enter the ball placement region
 
         :param world: The world msg to validate
@@ -50,15 +50,15 @@ class RobotEntersPlacementRegion(Validation):
                         world.time_sent.epoch_timestamp_seconds - self.first_enter_time
                         > self.stay_in_region_threshold_sec
                     ):
-                        return ValidationStatus.PASSING
+                        return protos.ValidationStatus.PASSING
                 break
         else:
             self.first_enter_time = None
 
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) shows regions to enter"""
         segment = tbots_cpp.Segment(
             self.placement_point,
