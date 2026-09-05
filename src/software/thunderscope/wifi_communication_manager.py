@@ -1,8 +1,13 @@
+import logging
+import time
+from threading import Lock, Thread
 from typing import Any, Callable, Self, Type
 
 import proto.import_all_protos as protos
-from software.logger.logger import create_logger
 import software.python_bindings as tbots_cpp
+from colorama import Fore, Style
+from google.protobuf.message import Message
+from software.logger.logger import create_logger
 from software.py_constants import (
     FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
     MAX_ROBOT_IDS_PER_SIDE,
@@ -18,13 +23,6 @@ from software.py_constants import (
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-from google.protobuf.message import Message
-
-from colorama import Fore, Style
-import logging
-from threading import Lock, Thread
-import time
 
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""
@@ -283,7 +281,6 @@ class WifiCommunicationManager:
                 resource = creator()
             except tbots_cpp.TbotsNetworkException as error:
                 logger.error(f"Error setting up robot status interface:\n{error}")
-                is_setup_successfully = False
                 return None
             return resource
 

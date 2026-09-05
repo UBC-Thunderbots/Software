@@ -1,13 +1,12 @@
 from pyqtgraph.Qt.QtWidgets import (
+    QComboBox,
     QDialog,
-    QWidget,
-    QVBoxLayout,
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QComboBox,
+    QVBoxLayout,
+    QWidget,
 )
-
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )

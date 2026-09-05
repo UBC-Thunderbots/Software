@@ -1,8 +1,8 @@
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt import QtWidgets
-from software.py_constants import CHICKER_TIMEOUT
-import proto.import_all_protos as protos
 from enum import Enum
+
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtWidgets
+from software.py_constants import CHICKER_TIMEOUT
 from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.proto_unix_io import ProtoUnixIO

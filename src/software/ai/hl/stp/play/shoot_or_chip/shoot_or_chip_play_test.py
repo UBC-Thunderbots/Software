@@ -1,13 +1,12 @@
 import math
 
-
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-import proto.import_all_protos as protos
-from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team as SslTeam
 
 
 def test_shoot_or_chip_play(simulated_test_runner):

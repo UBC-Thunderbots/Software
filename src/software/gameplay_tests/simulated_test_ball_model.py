@@ -1,16 +1,15 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
 from software.gameplay_tests.validation.ball_stops_in_region import (
     BallEventuallyStopsInRegion,
 )
 from software.gameplay_tests.validation.excessive_dribbling import (
     NeverExcessivelyDribbles,
-)
-from proto.message_translation.tbots_protobuf import create_world_state
-import proto.import_all_protos as protos
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
 )
 
 # the friction model currently used in the er-force simulator

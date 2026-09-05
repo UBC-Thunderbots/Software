@@ -1,6 +1,7 @@
 from collections import defaultdict
-from pyqtgraph.Qt import QtWidgets
+
 import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtWidgets
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

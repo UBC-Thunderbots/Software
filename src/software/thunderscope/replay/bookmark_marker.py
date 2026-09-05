@@ -1,8 +1,8 @@
 from collections.abc import Callable
+from typing import override
 
 from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
 from software.py_constants import MILLISECONDS_PER_SECOND
-from typing import override
 
 
 class BookmarkMarker(QtWidgets.QPushButton):

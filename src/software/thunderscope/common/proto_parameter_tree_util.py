@@ -1,8 +1,7 @@
+import netifaces
+import proto.import_all_protos as protos
 from pyqtgraph import parametertree
 from thefuzz import fuzz
-import proto.import_all_protos as protos
-import netifaces
-
 
 """
 Instead of the using the generic parameter parsing, this constant can be used to define custom handlers for specific
@@ -167,7 +166,7 @@ def get_string_val(descriptor, value):
     ]:
         return "%.2f" % value
     elif descriptor.type == descriptor.TYPE_ENUM:
-        if type(value) == int:
+        if type(value) is int:
             return descriptor.enum_type.values[value].name
         elif descriptor.label == descriptor.LABEL_REPEATED:
             return str([descriptor.enum_type.values[index].name for index in value])

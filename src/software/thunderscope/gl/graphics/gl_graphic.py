@@ -1,9 +1,9 @@
-from pyqtgraph.Qt import QtGui
+from typing import Optional
+
 import pyqtgraph.opengl as gl
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.thunderscope.constants import Colors, LINE_WIDTH
-from typing import Optional
+from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import LINE_WIDTH, Colors
 
 
 class GLGraphic(gl.GLLinePlotItem):
