@@ -30,13 +30,60 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
  */
 #define DEFINE_SML_EVENT(EVENT) const auto EVENT##_E = boost::sml::event<EVENT>;
 
-/**
- * Defines lambda wrapper around a function that can be used as an SML guard
- *
- * @param FUNCTION The function to turn into a lambda
- */
 #define DEFINE_SML_GUARD(FUNCTION)                                                       \
-    const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
+const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
+
+/**
+ * Unimplemented stub. Doesn't expose type so that use will throw an error.
+ *
+ * @tparam T Any type
+ */
+template <typename T>
+struct SMLCallbackTraits;
+
+/**
+ * Specializes against callback functions meant for Boost::SML and exposes their trait typenames
+ * The three template values make up the declaration of a function.
+ * const variant below
+ *
+ * @tparam FSMClass The FSM class the function belongs to
+ * @tparam Ret The return value
+ * @tparam Event The type of event being processed.
+ */
+template<typename FSMClass, typename Ret, typename Event>
+struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&)> {
+    using FSMType = FSMClass;
+    using EventType = Event;
+    using ReturnType = Ret;
+};
+template<typename FSMClass, typename Ret, typename Event>
+struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&) const> {
+    using FSMType = FSMClass;
+    using EventType = Event;
+    using ReturnType = Ret;
+};
+
+/**
+ * Callable wrapper around FSM member function that can be used as an SML guard.
+ *
+ * @tparam GuardFn The function to turn into a guard.
+ */
+template <auto GuardFn>
+class SMLGuard
+{
+    using Traits = SMLCallbackTraits<decltype(GuardFn)>;
+    static_assert(std::is_same_v<typename Traits::ReturnType, bool>,
+                  "an SML guard must return bool");
+
+  public:
+    explicit SMLGuard(Traits::FSMType* fsm) : fsm_(fsm) {}
+    bool operator()(const Traits::EventType& event) const {
+        return (fsm_->*GuardFn)(event);
+    }
+  private:
+    Traits::FSMType* fsm_;
+};
+
 
 /**
  * Defines lambda wrapper around a function that can be used as an SML action
