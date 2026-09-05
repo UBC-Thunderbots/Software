@@ -29,7 +29,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
 
 std::optional<World> SensorFusion::getWorld() const
 {
-    if (field && ball)
+    if (field)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
