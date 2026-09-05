@@ -4,8 +4,7 @@
 
 #include "software/test_util/test_util.h"
 
-// TODO (#2473): fix and re-enable
-TEST(PenaltyKickFSM, DISABLED_test_transitions)
+TEST(PenaltyKickFSM, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, world->field().friendlyPenaltyMark(),
@@ -14,7 +13,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
 
     FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(std::make_shared<TbotsProto::AiConfig>()),
                             DribbleFSM(std::make_shared<TbotsProto::AiConfig>()),
-                            KickFSM(std::make_shared<TbotsProto::AiConfig>()),
+                            KickOrChipFSM(std::make_shared<TbotsProto::AiConfig>()),
                             GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     PenaltyKickFSM::ControlParams control_params{};
@@ -38,20 +37,18 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickOrChipFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickOrChipFSM>)>(
         boost::sml::state<GetBehindBallFSM>));
 
     ::TestUtil::setBallPosition(world, position + Vector(0.1, 0),
                                 Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
-        boost::sml::state<KickFSM::KickState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickOrChipFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickOrChipFSM>)>(
+        boost::sml::state<KickOrChipFSM::KickOrChipState>));
 
-    ::TestUtil::setBallPosition(world, world->field().enemyGoalCenter(),
-                                Timestamp::fromSeconds(4));
     ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(4));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

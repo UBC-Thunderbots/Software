@@ -17,7 +17,6 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/geom:line",

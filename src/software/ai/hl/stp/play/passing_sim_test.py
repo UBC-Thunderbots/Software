@@ -107,16 +107,18 @@ def setup_pass_and_robots(
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
+    # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
+    # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[0] = protos.KickTactic(
-        kick_origin=protos.Point(
+    blue_tactics[0] = protos.KickOrChipTactic(
+        kick_or_chip_origin=protos.Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
         ),
-        kick_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
-        kick_speed_meters_per_second=best_pass.speed(),
+        kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=protos.AutoChipOrKick(
+            autokick_speed_m_per_s=best_pass.speed(),
+        ),
     )
 
     # if we want a friendly robot to receive the pass

@@ -2,7 +2,7 @@
 
 PenaltyKickTactic::PenaltyKickTactic(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
-    : TacticBase<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>(
+    : TacticBase<PenaltyKickFSM, DribbleFSM, KickOrChipFSM, GetBehindBallFSM>(
           {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick},
           ai_config_ptr)
 {

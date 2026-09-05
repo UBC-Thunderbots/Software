@@ -7,35 +7,40 @@
 /**
  * Finite State Machine class for Kicks
  */
-struct KickFSM : TacticFSM<KickFSM>
+struct KickOrChipFSM : TacticFSM<KickOrChipFSM>
 {
-    class KickState;
+    class KickOrChipState;
 
     struct ControlParams
     {
+        // Control params for kick
         // The location where the kick will be taken from
-        Point kick_origin;
+        Point kick_or_chip_origin;
         // The direction the Robot will kick in
-        Angle kick_direction;
-        // How fast the Robot will kick the ball in meters per second
-        double kick_speed_meters_per_second;
+        Angle kick_or_chip_direction;
+
+        // How the robot will chip or kick the ball and its associated parameter for that
+        // mode. For example, if the mode is AUTOKICK, then the parameter will be the
+        // speed of the kick, and if the mode is AUTOCHIP, then the parameter will be the
+        // distance of the chip.
+        AutoChipOrKick auto_chip_or_kick;
     };
 
-    using Update = TacticFSM<KickFSM>::Update;
+    using Update = TacticFSM<KickOrChipFSM>::Update;
 
     /**
      * Constructor for KickFSM
      *
      * @param ai_config_ptr shared pointer to ai_config
      */
-    explicit KickFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+    explicit KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
 
     /**
-     * Action that updates the MovePrimitive
+     * Action that updates the primitive to kick or chip the ball
      *
      * @param event KickFSM::Update event
      */
-    void updateKick(const Update& event);
+    void kickOrChipBall(const Update& event);
 
     /**
      * Action that updates the GetBehindBallFSM
@@ -66,28 +71,31 @@ struct KickFSM : TacticFSM<KickFSM>
     bool shouldRealignWithBall(const Update& event);
 
 
+
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(GetBehindBallFSM)
-        DEFINE_SML_STATE(KickState)
+        DEFINE_SML_STATE(KickOrChipState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_GUARD(shouldRealignWithBall)
-        DEFINE_SML_ACTION(updateKick)
+
+        DEFINE_SML_ACTION(kickOrChipBall)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallFSM_S = KickState_S,
+            GetBehindBallFSM_S = KickOrChipState_S,
 
-            KickState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
-                GetBehindBallFSM_S,
-            KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
-            KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
+            KickOrChipState_S + Update_E[shouldRealignWithBall_G] /
+                                    updateGetBehindBall_A = GetBehindBallFSM_S,
+            KickOrChipState_S + Update_E[!ballChicked_G] / kickOrChipBall_A =
+                KickOrChipState_S,
+            KickOrChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                                = X);
     }
 };

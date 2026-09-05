@@ -20,10 +20,6 @@ void MotionConstraintVisitor::visit(const ShadowEnemyTactic& tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveTactic& tactic) {}
 
-void MotionConstraintVisitor::visit(const ChipTactic& tactic) {}
-
-void MotionConstraintVisitor::visit(const KickTactic& tactic) {}
-
 void MotionConstraintVisitor::visit(const PivotKickTactic& tactic) {}
 
 void MotionConstraintVisitor::visit(const KickoffChipTactic& tactic)
@@ -106,6 +102,8 @@ void MotionConstraintVisitor::visit(const AvoidInterferenceTactic& tactic)
 {
     current_motion_constraints.clear();
 }
+
+void MotionConstraintVisitor::visit(const KickOrChipTactic& tactic) {}
 
 void MotionConstraintVisitor::visit(const PassDefenderTactic& tactic) {}
 
