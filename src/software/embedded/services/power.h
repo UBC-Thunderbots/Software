@@ -63,38 +63,43 @@ class PowerService
     void writePowerFrame(const TbotsProto_PowerFrame& frame) const;
 
     /**
-     * Updates the power control command and the power status in robot_status.
+     * Updates the power control command to execute with the one in the given
+     * DirectControlPrimitive, and updates the given robot status with the latest
+     * power status.
      *
-     * @param direct_control the direct control primitive to execute
-     * @param robot_status the robot status to update
+     * @param direct_control DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with the current power status
      */
     void updatePowerControlAndStatus(
         const TbotsProto::DirectControlPrimitive& direct_control,
         TbotsProto::RobotStatus& robot_status);
 
     /**
-     * Populates robot_status with any power-related error codes.
+     * Populates the given robot status with any power-related error codes.
      *
-     * @param direct_control the direct control primitive to execute
-     * @param robot_status the robot status to update
+     * @param direct_control DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with error codes
      */
     void updateErrorCodes(const TbotsProto::DirectControlPrimitive& direct_control,
                           TbotsProto::RobotStatus& robot_status);
 
     /**
-     * Updates the chicker/kicker status in robot_status.
+     * Updates the chicker/kicker status in the given robot status.
      *
-     * @param direct_control the direct control primitive to execute
-     * @param robot_status the robot status to update
+     * @param direct_control DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with the current
+     *                     chicker/kicker status
      */
     void updateChickerStatus(const TbotsProto::DirectControlPrimitive& direct_control,
                              TbotsProto::RobotStatus& robot_status);
 
     /**
-     * Updates the dribbler command and status in robot_status.
+     * Updates the dribbler command to execute with the one in the given
+     * DirectControlPrimitive, and updates the given robot status with the latest
+     * dribbler status.
      *
-     * @param direct_control the direct control primitive to execute
-     * @param robot_status the robot status to update
+     * @param direct_control DirectControlPrimitive to execute
+     * @param robot_status RobotStatus message to modify with the current dribbler status
      */
     void updateDribblerStatus(const TbotsProto::DirectControlPrimitive& direct_control,
                               TbotsProto::RobotStatus& robot_status);
