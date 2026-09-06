@@ -93,13 +93,6 @@ class Thunderloop
     void timespecNorm(struct timespec& ts);
 
     /**
-     * Get the CPU temp thunderloop is running on
-     *
-     * @return The CPU temp.
-     */
-    double getCpuTemperature();
-
-    /**
      * Converts the given timespec value to milliseconds
      * @return The time in milliseconds
      */
@@ -110,21 +103,6 @@ class Thunderloop
      * @return The time in nanoseconds
      */
     double getNanoseconds(timespec time);
-
-    /**
-     * Updates ErrorCodes for BAT, CAP, CPU TEMP if over thresholds
-     */
-    void updateErrorCodes();
-
-    /**
-     * Poll the power service, sending it the given control command and writing the
-     * resulting power status into robot_status_.
-     *
-     * @param direct_control The control command to send to the power board
-     *
-     * @return The time taken to poll the service, in milliseconds
-     */
-    double pollPowerService(const TbotsProto::DirectControlPrimitive& direct_control);
 
     /**
      * Wait for networking communication to be established. This function is blocking.
@@ -158,28 +136,14 @@ class Thunderloop
     inline PrimitiveStepResult stepActivePrimitive(const Duration& delta_time);
 
     /**
-     * Tracks chipper/kicker firing events from the given control command.
-     *
-     * @param direct_control The control command issued this iteration
-     *
-     * @return The chipper/kicker status (time since last kick/chip)
-     */
-    inline TbotsProto::ChipperKickerStatus trackChicker(
-        const TbotsProto::DirectControlPrimitive& direct_control);
-
-    /**
      * Composes the outgoing robot_status_ from the per-stage results. This is the single
      * place where the aggregate status is assembled.
      *
      * @param network The result of the network poll stage
      * @param primitive The result of the primitive execution stage
-     * @param chicker_status The status from the chicker tracking stage
-     * @param power_poll_time_ms Power service poll time, or nullopt if disabled
      */
     inline void assembleRobotStatus(const NetworkPollResult& network,
-                                    const PrimitiveStepResult& primitive,
-                                    const TbotsProto::ChipperKickerStatus& chicker_status,
-                                    std::optional<double> power_poll_time_ms);
+                                    const PrimitiveStepResult& primitive);
 
 
     // The current primitive being executed.
@@ -222,13 +186,3 @@ class Thunderloop
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
 };
-
-/*
- * reads from the kernel ring buffer, likely /var/log/dmesg file, to see if the power
- * is stable
- *
- * This is not defined in Thunderloop to allow it to be unit tested easily
- *
- * @return True if the power is stable, false otherwise
- */
-bool isPowerStable(std::ifstream& log_file);

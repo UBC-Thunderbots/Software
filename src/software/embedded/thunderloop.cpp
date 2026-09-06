@@ -227,12 +227,6 @@ void Thunderloop::runLoop()
             // producing the control command for this iteration
             const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time);
 
-            // Chicker: track time since the last kick/chip event
-            const TbotsProto::ChipperKickerStatus chicker_status =
-                trackChicker(primitive_result.direct_control);
-
-            std::optional<double> power_poll_time_ms;
-
 #ifndef DISABLE_MOTOR_SERVICE
             // Motor Service: execute the motor control command
             motor_service_->poll(primitive_result.direct_control, robot_status_,
@@ -241,12 +235,11 @@ void Thunderloop::runLoop()
 
 #ifndef DISABLE_POWER_SERVICE
             // Power Service: execute the power control command
-            power_poll_time_ms = pollPowerService(primitive_result.direct_control);
+            power_service_->poll(primitive_result.direct_control, robot_status_);
 #endif
 
             // Robot Status: compose the per-stage results into the outgoing status
-            assembleRobotStatus(network_result, primitive_result, chicker_status,
-                                power_poll_time_ms);
+            assembleRobotStatus(network_result, primitive_result);
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -399,47 +392,8 @@ inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
     return result;
 }
 
-inline TbotsProto::ChipperKickerStatus Thunderloop::trackChicker(
-    const TbotsProto::DirectControlPrimitive& direct_control)
-{
-    TbotsProto::ChipperKickerStatus chicker_status;
-    struct timespec current_time;
-    struct timespec time_diff;
-
-    clock_gettime(CLOCK_MONOTONIC, &current_time);
-
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_kicker_fired_, &time_diff);
-    chicker_status.set_ms_since_kicker_fired(getMilliseconds(time_diff));
-
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_chipper_fired_, &time_diff);
-    chicker_status.set_ms_since_chipper_fired(getMilliseconds(time_diff));
-
-    // if a kick proto is sent or if autokick is on
-    if (direct_control.power_control().chicker().has_kick_speed_m_per_s() ||
-        direct_control.power_control()
-            .chicker()
-            .auto_chip_or_kick()
-            .has_autokick_speed_m_per_s())
-    {
-        clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired_);
-    }
-    // if a chip proto is sent or if autochip is on
-    else if (direct_control.power_control().chicker().has_chip_distance_meters() ||
-             direct_control.power_control()
-                 .chicker()
-                 .auto_chip_or_kick()
-                 .has_autochip_distance_meters())
-    {
-        clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired_);
-    }
-
-    return chicker_status;
-}
-
 inline void Thunderloop::assembleRobotStatus(
-    const NetworkPollResult& network, const PrimitiveStepResult& primitive,
-    const TbotsProto::ChipperKickerStatus& chicker_status,
-    std::optional<double> power_poll_time_ms)
+    const NetworkPollResult& network, const PrimitiveStepResult& primitive)
 {
     // Fold the per-stage timing into the sticky telemetry. Fields whose stage did not run
     // this iteration (a new primitive start, a disabled service) keep their last value.
@@ -450,10 +404,6 @@ inline void Thunderloop::assembleRobotStatus(
             network.primitive_start_time_ms.value());
     }
     thunderloop_status_.set_primitive_executor_step_time_ms(primitive.step_time_ms);
-    if (power_poll_time_ms.has_value())
-    {
-        thunderloop_status_.set_power_service_poll_time_ms(power_poll_time_ms.value());
-    }
 
     struct timespec current_time;
     clock_gettime(CLOCK_MONOTONIC, &current_time);
@@ -467,10 +417,7 @@ inline void Thunderloop::assembleRobotStatus(
     *(robot_status_.mutable_time_sent())                 = time_sent;
     *(robot_status_.mutable_thunderloop_status())        = thunderloop_status_;
     *(robot_status_.mutable_network_status())            = network.network_status;
-    *(robot_status_.mutable_chipper_kicker_status())     = chicker_status;
     *(robot_status_.mutable_primitive_executor_status()) = primitive.executor_status;
-
-    updateErrorCodes();
 }
 
 double Thunderloop::getMilliseconds(timespec time)
@@ -491,93 +438,6 @@ void Thunderloop::timespecNorm(struct timespec& ts)
     {
         ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
         ts.tv_sec++;
-    }
-}
-
-double Thunderloop::getCpuTemperature()
-{
-    // Get the CPU temperature
-    std::ifstream cpu_temp_file(CPU_TEMP_FILE_PATH);
-    if (cpu_temp_file.is_open())
-    {
-        std::string cpu_temp_str;
-        std::getline(cpu_temp_file, cpu_temp_str);
-        cpu_temp_file.close();
-
-        // Convert the temperature to a double
-        // The temperature returned is in millicelcius
-        double cpu_temp = std::stod(cpu_temp_str) / 1000.0;
-        return cpu_temp;
-    }
-    else
-    {
-        LOG(WARNING) << "Could not open CPU temperature file";
-        return 0.0;
-    }
-}
-
-double Thunderloop::pollPowerService(
-    const TbotsProto::DirectControlPrimitive& direct_control)
-{
-    struct timespec poll_time;
-    {
-        ScopedTimespecTimer timer(&poll_time);
-
-        ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
-
-        power_service_->poll(direct_control, robot_status_);
-    }
-
-    return getMilliseconds(poll_time);
-}
-
-bool isPowerStable(std::ifstream& log_file)
-{
-    // if the log file cannot be open, we would return false. Chances are, the battery
-    // power supply is indeed stable
-    if (!log_file.is_open())
-    {
-        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
-        return true;
-    }
-
-    std::string line;
-    while (std::getline(log_file, line))
-    {
-        // if this lines exist, we know for sure that the battery is not stable!
-        if (line.find("soctherm: OC ALARM 0x00000001") != std::string::npos)
-        {
-            return false;
-        }
-    }
-
-    // We have reached the end of the line with the while loop from above. Therefore, we
-    // need to run std::ifstream::clear so that std::getline would return the new lines in
-    // the file stream.
-    log_file.clear();
-
-    return true;
-}
-
-void Thunderloop::updateErrorCodes()
-{
-    // Clear existing codes
-    robot_status_.clear_error_code();
-
-    // Updates error status
-    if (robot_status_.power_status().battery_voltage() <= BATTERY_WARNING_VOLTAGE)
-    {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
-    }
-    if (robot_status_.power_status().capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
-    {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-    }
-
-    if (!isPowerStable(log_file))
-    {
-        robot_status_.mutable_error_code()->Add(
-            TbotsProto::ErrorCode::UNSTABLE_POWER_SUPPLY);
     }
 }
 
