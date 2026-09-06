@@ -1,12 +1,12 @@
-import software.python_bindings as tbots
-import proto.import_all_protos as protos
+from typing import override
 
+import proto.import_all_protos as protos
+import software.python_bindings as tbots
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-from typing import override
 
 
 class BallMovesForward(Validation):

@@ -1,8 +1,8 @@
 import os
-from serial.tools import list_ports
 
+from serial.tools import list_ports
 from software.py_constants import ESTOP_USB_DEVICE_IDS
-from software.thunderscope.constants import EstopMode, ESTOP_PATH_1, ESTOP_PATH_2
+from software.thunderscope.constants import ESTOP_PATH_1, ESTOP_PATH_2, EstopMode
 
 
 def get_estop_path() -> str | None:

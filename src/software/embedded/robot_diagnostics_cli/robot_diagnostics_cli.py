@@ -1,12 +1,24 @@
-import subprocess
 import logging
+import subprocess
+from functools import wraps
+from typing import List, Optional
+
+import proto.import_all_protos as protos
 import typer as Typer
-from typer.main import get_command
 from rich import print
-from rich.live import Live
-from rich.table import Table
 from rich.console import Console
+from rich.live import Live
 from rich.logging import RichHandler
+from rich.table import Table
+from software.embedded.constants.py_constants import (
+    DEFAULT_PRIMITIVE_DURATION,
+    MAX_FORCE_DRIBBLER_SPEED_RPM,
+    ROBOT_MAX_ANG_SPEED_RAD_PER_S,
+    ROBOT_MAX_SPEED_M_PER_S,
+)
+from software.embedded.robot_diagnostics_cli.embedded_communication import (
+    EmbeddedCommunication,
+)
 from software.py_constants import (
     ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY,
     ROBOT_ID_CONFIG_KEY,
@@ -16,20 +28,9 @@ from software.py_constants import (
     ROBOT_NETWORK_INTERFACE_CONFIG_KEY,
     WHEEL_ROTATION_MAX_SPEED_M_PER_S,
 )
+from typer.main import get_command
 from typer_shell import make_typer_shell
-from functools import wraps
-from typing import List, Optional
 from typing_extensions import Annotated
-from software.embedded.robot_diagnostics_cli.embedded_communication import (
-    EmbeddedCommunication,
-)
-import proto.import_all_protos as protos
-from software.embedded.constants.py_constants import (
-    DEFAULT_PRIMITIVE_DURATION,
-    ROBOT_MAX_ANG_SPEED_RAD_PER_S,
-    ROBOT_MAX_SPEED_M_PER_S,
-    MAX_FORCE_DRIBBLER_SPEED_RPM,
-)
 
 
 class RobotDiagnosticsCLI:

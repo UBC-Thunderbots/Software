@@ -1,15 +1,12 @@
-import time
-import shelve
 import logging
-import pathlib
 import os
-
-import pyqtgraph
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt import QtWidgets
-
+import pathlib
+import shelve
+import time
 from typing import Callable
 
+import pyqtgraph
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
 from software.thunderscope.constants import (
     LAST_OPENED_LAYOUT_PATH,
     LAYOUT_FILE_EXTENSION,
@@ -17,7 +14,6 @@ from software.thunderscope.constants import (
     THUNDERSCOPE_HELP_TEXT,
     THUNDERSCOPE_REFRESH_INTERVAL_MS,
 )
-
 from software.thunderscope.thunderscope_config import TScopeConfig
 
 

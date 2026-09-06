@@ -1,13 +1,12 @@
-from collections import deque, defaultdict
-import proto.import_all_protos as protos
-
-from software.thunderscope.constants import Colors, DepthValues, TrailValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
-
-from software.thunderscope.gl.helpers.observable_list import ObservableList
+from collections import defaultdict, deque
 from typing import override
+
+import proto.import_all_protos as protos
+from software.thunderscope.constants import Colors, DepthValues, TrailValues
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLTrailLayer(GLLayer):

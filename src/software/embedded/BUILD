@@ -1,4 +1,4 @@
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -24,29 +24,6 @@ config_setting(
     flag_values = {
         ":disable_motor_service": "True",
     },
-)
-
-config_setting(
-    name = "build_trinamic",
-    flag_values = {
-        ":motor_board": "TRINAMIC",
-    },
-)
-
-config_setting(
-    name = "build_stspin",
-    flag_values = {
-        ":motor_board": "STSPIN",
-    },
-)
-
-string_flag(
-    name = "motor_board",
-    build_setting_default = "STSPIN",
-    values = [
-        "TRINAMIC",
-        "STSPIN",
-    ],
 )
 
 cc_library(

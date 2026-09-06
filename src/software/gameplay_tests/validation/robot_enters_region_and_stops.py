@@ -1,14 +1,14 @@
 import math
-import proto.import_all_protos as protos
+from typing import override
 
-from software.gameplay_tests.validation.validation import (
-    create_validation_types,
-    create_validation_geometry,
-)
+import proto.import_all_protos as protos
 from software.gameplay_tests.validation.robot_enters_region import (
     RobotEntersRegion,
 )
-from typing import override
+from software.gameplay_tests.validation.validation import (
+    create_validation_geometry,
+    create_validation_types,
+)
 
 
 class RobotEntersRegionAndStops(RobotEntersRegion):

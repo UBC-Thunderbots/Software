@@ -1,11 +1,7 @@
 import numpy
-
 import proto.import_all_protos as protos
-from pyqtgraph.Qt import QtCore, QtWidgets
-
-
 import software.python_bindings as tbots_cpp
-
+from pyqtgraph.Qt import QtCore, QtWidgets
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.controller_base import IControllerBase
 from software.thunderscope.robot_diagnostics.handheld_controller import (

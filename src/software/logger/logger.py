@@ -1,4 +1,4 @@
-from logging import Logger, basicConfig, getLogger, INFO
+from logging import INFO, Logger, basicConfig, getLogger
 
 
 def create_logger(name, log_level: int = INFO) -> Logger:
