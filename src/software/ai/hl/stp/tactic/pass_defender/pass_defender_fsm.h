@@ -105,35 +105,33 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(BlockPassState)
-        DEFINE_SML_STATE(InterceptBallState)
+        // clang-format off
+        constexpr auto BlockPassState_S      = boost::sml::state<BlockPassState>;
+        constexpr auto InterceptBallState_S  = boost::sml::state<InterceptBallState>;
 
-        DEFINE_SML_EVENT(Update)
+        constexpr auto Update_E              = boost::sml::event<Update>;
 
-        DEFINE_SML_GUARD(passStarted)
-        DEFINE_SML_GUARD(ballDeflected)
+        const auto passStarted_G             = SMLGuard<&PassDefenderFSM::passStarted>{this};
+        const auto ballDeflected_G           = SMLGuard<&PassDefenderFSM::ballDeflected>{this};
+        const auto ballNearbyWithoutThreat_G = SMLGuard<&PassDefenderFSM::ballNearbyWithoutThreat>{this};
 
-        DEFINE_SML_ACTION(blockPass)
-        DEFINE_SML_ACTION(interceptBall)
+        const auto blockPass_A               = SMLAction<&PassDefenderFSM::blockPass>{this};
+        const auto interceptBall_A           = SMLAction<&PassDefenderFSM::interceptBall>{this};
 
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
+        constexpr auto DribbleFSM_S          = boost::sml::state<DribbleFSM>;
+        const auto prepareGetPossession_A    = SMLSubFSMUpdateAction<&PassDefenderFSM::prepareGetPossession>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
-                InterceptBallState_S,
-            BlockPassState_S + Update_E / blockPass_A,
-            InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
-                BlockPassState_S,
-            InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] /
-                                       prepareGetPossession_A = DribbleFSM_S,
-            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A =
-                BlockPassState_S,
-            DribbleFSM_S + Update_E / prepareGetPossession_A,
-            InterceptBallState_S + Update_E / interceptBall_A,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            *BlockPassState_S    + Update_E[passStarted_G]              / interceptBall_A           = InterceptBallState_S,
+            BlockPassState_S     + Update_E                             / blockPass_A,
+            InterceptBallState_S + Update_E[ballDeflected_G]            / blockPass_A               = BlockPassState_S,
+            InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G]  / prepareGetPossession_A    = DribbleFSM_S,
+            DribbleFSM_S         + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A               = BlockPassState_S,
+            DribbleFSM_S         + Update_E                             / prepareGetPossession_A,
+            InterceptBallState_S + Update_E                             / interceptBall_A,
+            X                    + Update_E                             / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 
    private:

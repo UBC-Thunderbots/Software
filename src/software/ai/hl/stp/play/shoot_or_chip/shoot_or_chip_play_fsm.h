@@ -28,17 +28,21 @@ struct ShootOrChipPlayFSM : PlayFSM<ShootOrChipPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(ShootOrChipState)
-        DEFINE_SML_EVENT(Update)
-        DEFINE_SML_ACTION(updateShootOrChip)
-        DEFINE_SML_GUARD(attackerDone)
+        // clang-format off
+        constexpr auto ShootOrChipState_S = boost::sml::state<ShootOrChipState>;
+
+        constexpr auto Update_E           = boost::sml::event<Update>;
+
+        const auto attackerDone_G         = SMLGuard<&ShootOrChipPlayFSM::attackerDone>{this};
+
+        const auto updateShootOrChip_A    = SMLAction<&ShootOrChipPlayFSM::updateShootOrChip>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *ShootOrChipState_S + Update_E[!attackerDone_G] / updateShootOrChip_A =
-                ShootOrChipState_S,
-            ShootOrChipState_S + Update_E[attackerDone_G] / updateShootOrChip_A = X,
-            X + Update_E                                                        = X);
+            *ShootOrChipState_S + Update_E[!attackerDone_G] / updateShootOrChip_A = ShootOrChipState_S,
+            ShootOrChipState_S  + Update_E[attackerDone_G]  / updateShootOrChip_A = X,
+            X                   + Update_E                                        = X);
+        // clang-format on
     }
 
    private:

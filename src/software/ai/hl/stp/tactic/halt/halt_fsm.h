@@ -40,16 +40,21 @@ struct HaltFSM : TacticFSM<HaltFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(StopState)
-        DEFINE_SML_EVENT(Update)
-        DEFINE_SML_GUARD(stopDone)
-        DEFINE_SML_ACTION(updateStop)
+        // clang-format off
+        constexpr auto StopState_S = boost::sml::state<StopState>;
+
+        constexpr auto Update_E    = boost::sml::event<Update>;
+
+        const auto stopDone_G      = SMLGuard<&HaltFSM::stopDone>{this};
+
+        const auto updateStop_A    = SMLAction<&HaltFSM::updateStop>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *StopState_S + Update_E[!stopDone_G] / updateStop_A = StopState_S,
-            StopState_S + Update_E[stopDone_G] / updateStop_A   = X,
-            X + Update_E[!stopDone_G] / updateStop_A            = StopState_S,
-            X + Update_E[stopDone_G] / updateStop_A             = X);
+            StopState_S  + Update_E[stopDone_G]  / updateStop_A = X,
+            X            + Update_E[!stopDone_G] / updateStop_A = StopState_S,
+            X            + Update_E[stopDone_G]  / updateStop_A = X);
+        // clang-format on
     }
 };

@@ -104,25 +104,29 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_STATE(KickFSM)
+        // clang-format off
+        constexpr auto Update_E               = boost::sml::event<Update>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto takePenaltyShot_G          = SMLGuard<&PenaltyKickFSM::takePenaltyShot>{this};
+        const auto timeOutApproach_G          = SMLGuard<&PenaltyKickFSM::timeOutApproach>{this};
 
-        DEFINE_SML_GUARD(takePenaltyShot)
-        DEFINE_SML_GUARD(timeOutApproach)
+        constexpr auto KickFSM_S              = boost::sml::state<KickFSM>;
+        const auto shoot_A                    = SMLSubFSMUpdateAction<&PenaltyKickFSM::shoot>{this};
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(adjustOrientationForShot, DribbleFSM)
+        constexpr auto DribbleFSM_S           = boost::sml::state<DribbleFSM>;
+        const auto updateApproachKeeper_A     = SMLSubFSMUpdateAction<&PenaltyKickFSM::updateApproachKeeper>{this};
+        const auto adjustOrientationForShot_A = SMLSubFSMUpdateAction<&PenaltyKickFSM::adjustOrientationForShot>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
             *DribbleFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
-            DribbleFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickFSM_S,
-            DribbleFSM_S + Update_E / adjustOrientationForShot_A,
-            DribbleFSM_S = KickFSM_S, KickFSM_S + Update_E / shoot_A, KickFSM_S = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            DribbleFSM_S  + Update_E[timeOutApproach_G]  / shoot_A                    = KickFSM_S,
+            DribbleFSM_S  + Update_E                     / adjustOrientationForShot_A,
+            DribbleFSM_S                                                              = KickFSM_S,
+            KickFSM_S     + Update_E                     / shoot_A,
+            KickFSM_S                                                                 = X,
+            X             + Update_E                     / SET_STOP_PRIMITIVE_ACTION  = X);
+        // clang-format on
     };
 
    private:

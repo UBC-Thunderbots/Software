@@ -64,24 +64,26 @@ struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetupPositionState)
-        DEFINE_SML_STATE(PerformKickState)
+        // clang-format off
+        constexpr auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
+        constexpr auto PerformKickState_S   = boost::sml::state<PerformKickState>;
 
-        DEFINE_SML_EVENT(Update)
+        constexpr auto Update_E             = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(setupPosition)
-        DEFINE_SML_ACTION(performKick)
+        const auto setupPositionDone_G      = SMLGuard<&PenaltyKickPlayFSM::setupPositionDone>{this};
+        const auto kickDone_G               = SMLGuard<&PenaltyKickPlayFSM::kickDone>{this};
 
-        DEFINE_SML_GUARD(setupPositionDone)
-        DEFINE_SML_GUARD(kickDone)
+        const auto setupPosition_A          = SMLAction<&PenaltyKickPlayFSM::setupPosition>{this};
+        const auto performKick_A            = SMLAction<&PenaltyKickPlayFSM::performKick>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *SetupPositionState_S + Update_E[!setupPositionDone_G] / setupPosition_A =
-                SetupPositionState_S,
-            SetupPositionState_S + Update_E[setupPositionDone_G] = PerformKickState_S,
-            PerformKickState_S + Update_E[!kickDone_G] / performKick_A,
-            PerformKickState_S + Update_E[kickDone_G] = X, X + Update_E = X);
+            *SetupPositionState_S + Update_E[!setupPositionDone_G] / setupPosition_A = SetupPositionState_S,
+            SetupPositionState_S  + Update_E[setupPositionDone_G]                    = PerformKickState_S,
+            PerformKickState_S    + Update_E[!kickDone_G]          / performKick_A,
+            PerformKickState_S    + Update_E[kickDone_G]                             = X,
+            X                     + Update_E                                         = X);
+        // clang-format on
     }
 
    private:

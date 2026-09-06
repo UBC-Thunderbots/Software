@@ -61,21 +61,27 @@ struct PivotKickFSM : TacticFSM<PivotKickFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(StartState)
-        DEFINE_SML_STATE(KickState)
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_EVENT(Update)
+        // clang-format off
+        constexpr auto StartState_S        = boost::sml::state<StartState>;
+        constexpr auto KickState_S         = boost::sml::state<KickState>;
 
-        DEFINE_SML_GUARD(ballKicked)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleFSM)
-        DEFINE_SML_ACTION(kickBall)
+        constexpr auto Update_E            = boost::sml::event<Update>;
+
+        const auto ballKicked_G            = SMLGuard<&PivotKickFSM::ballKicked>{this};
+
+        const auto kickBall_A              = SMLAction<&PivotKickFSM::kickBall>{this};
+
+        constexpr auto DribbleFSM_S        = boost::sml::state<DribbleFSM>;
+        const auto getPossessionAndPivot_A = SMLSubFSMUpdateAction<&PivotKickFSM::getPossessionAndPivot>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E / getPossessionAndPivot_A = DribbleFSM_S,
-            DribbleFSM_S + Update_E / getPossessionAndPivot_A, DribbleFSM_S = KickState_S,
-            KickState_S + Update_E[!ballKicked_G] / kickBall_A,
-            KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                         = X);
+            *StartState_S + Update_E                / getPossessionAndPivot_A   = DribbleFSM_S,
+            DribbleFSM_S  + Update_E                / getPossessionAndPivot_A,
+            DribbleFSM_S                                                        = KickState_S,
+            KickState_S   + Update_E[!ballKicked_G] / kickBall_A,
+            KickState_S   + Update_E[ballKicked_G]  / SET_STOP_PRIMITIVE_ACTION = X,
+            X             + Update_E                / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

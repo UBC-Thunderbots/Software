@@ -145,34 +145,33 @@ struct ReceiverFSM : TacticFSM<ReceiverFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(ReceiveAndDribbleState)
-        DEFINE_SML_STATE(OneTouchShotState)
-        DEFINE_SML_STATE(WaitingForPassState)
-        DEFINE_SML_EVENT(Update)
+        // clang-format off
+        constexpr auto ReceiveAndDribbleState_S = boost::sml::state<ReceiveAndDribbleState>;
+        constexpr auto OneTouchShotState_S      = boost::sml::state<OneTouchShotState>;
+        constexpr auto WaitingForPassState_S    = boost::sml::state<WaitingForPassState>;
 
-        DEFINE_SML_GUARD(onetouchPossible)
-        DEFINE_SML_GUARD(passStarted)
-        DEFINE_SML_GUARD(passFinished)
-        DEFINE_SML_GUARD(strayPass)
+        constexpr auto Update_E                 = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(updateOnetouch)
-        DEFINE_SML_ACTION(updateReceive)
-        DEFINE_SML_ACTION(adjustReceive)
+        const auto onetouchPossible_G           = SMLGuard<&ReceiverFSM::onetouchPossible>{this};
+        const auto passStarted_G                = SMLGuard<&ReceiverFSM::passStarted>{this};
+        const auto passFinished_G               = SMLGuard<&ReceiverFSM::passFinished>{this};
+        const auto strayPass_G                  = SMLGuard<&ReceiverFSM::strayPass>{this};
+
+        const auto updateOnetouch_A             = SMLAction<&ReceiverFSM::updateOnetouch>{this};
+        const auto updateReceive_A              = SMLAction<&ReceiverFSM::updateReceive>{this};
+        const auto adjustReceive_A              = SMLAction<&ReceiverFSM::adjustReceive>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *WaitingForPassState_S + Update_E[!passStarted_G] / updateReceive_A,
-            WaitingForPassState_S + Update_E[passStarted_G && onetouchPossible_G] /
-                                        updateOnetouch_A = OneTouchShotState_S,
-            WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
-                                        updateReceive_A = ReceiveAndDribbleState_S,
-            ReceiveAndDribbleState_S + Update_E[!passFinished_G] / adjustReceive_A,
-            OneTouchShotState_S +
-                Update_E[!passFinished_G && !strayPass_G] / updateOnetouch_A,
-            OneTouchShotState_S + Update_E[!passFinished_G && strayPass_G] /
-                                      adjustReceive_A = ReceiveAndDribbleState_S,
-            ReceiveAndDribbleState_S + Update_E[passFinished_G] / adjustReceive_A = X,
-            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
+            *WaitingForPassState_S   + Update_E[!passStarted_G]                       / updateReceive_A,
+            WaitingForPassState_S    + Update_E[passStarted_G && onetouchPossible_G]  / updateOnetouch_A          = OneTouchShotState_S,
+            WaitingForPassState_S    + Update_E[passStarted_G && !onetouchPossible_G] / updateReceive_A           = ReceiveAndDribbleState_S,
+            ReceiveAndDribbleState_S + Update_E[!passFinished_G]                      / adjustReceive_A,
+            OneTouchShotState_S      + Update_E[!passFinished_G && !strayPass_G]      / updateOnetouch_A,
+            OneTouchShotState_S      + Update_E[!passFinished_G && strayPass_G]       / adjustReceive_A           = ReceiveAndDribbleState_S,
+            ReceiveAndDribbleState_S + Update_E[passFinished_G]                       / adjustReceive_A           = X,
+            OneTouchShotState_S      + Update_E[passFinished_G]                       / updateOnetouch_A          = X,
+            X                        + Update_E                                       / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

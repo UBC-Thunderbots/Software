@@ -3,6 +3,7 @@
 #include <functional>
 #include <include/boost/sml.hpp>
 #include <queue>
+#include <type_traits>
 
 #include "software/util/typename/typename.h"
 
@@ -17,46 +18,125 @@ template <class T>
 using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
 
 /**
- * Defines an SML state wrapper around a class/struct
+ * Unimplemented stub. Doesn't expose type so that use will throw an error.
  *
- * @param STATE The state class/struct
+ * @tparam T Any type
  */
-#define DEFINE_SML_STATE(STATE) const auto STATE##_S = boost::sml::state<STATE>;
+template <typename T>
+struct SMLCallbackTraits;
 
 /**
- * Defines an SML event wrapper around a class/struct
+ * Specializes against callback functions meant for Boost::SML and exposes their trait
+ * typenames The three template values make up the declaration of a function. const
+ * variant below
  *
- * @param EVENT The event class/struct
+ * @tparam FSMClass The FSM class the function belongs to
+ * @tparam Ret The return value
+ * @tparam Event The type of event being processed.
  */
-#define DEFINE_SML_EVENT(EVENT) const auto EVENT##_E = boost::sml::event<EVENT>;
+template <typename FSMClass, typename Ret, typename Event>
+struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&)>
+{
+    using FSMType    = FSMClass;
+    using EventType  = Event;
+    using ReturnType = Ret;
+};
+template <typename FSMClass, typename Ret, typename Event>
+struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&) const>
+{
+    using FSMType    = FSMClass;
+    using EventType  = Event;
+    using ReturnType = Ret;
+};
 
 /**
- * Defines lambda wrapper around a function that can be used as an SML guard
+ * Callable wrapper around FSM member function that can be used as an SML guard.
  *
- * @param FUNCTION The function to turn into a lambda
+ * @tparam GuardFn The function to turn into a guard.
  */
-#define DEFINE_SML_GUARD(FUNCTION)                                                       \
-    const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
+template <auto GuardFn>
+class SMLGuard
+{
+    using Traits = SMLCallbackTraits<decltype(GuardFn)>;
+    static_assert(std::is_same_v<typename Traits::ReturnType, bool>,
+                  "an SML guard must return bool");
+
+   public:
+    explicit SMLGuard(Traits::FSMType* fsm) : fsm_(fsm) {}
+    bool operator()(const Traits::EventType& event) const
+    {
+        return (fsm_->*GuardFn)(event);
+    }
+
+   private:
+    Traits::FSMType* fsm_;
+};
 
 /**
- * Defines lambda wrapper around a function that can be used as an SML action
+ * Callable wrapper around FSM member function that can be used as an SML action.
  *
- * @param FUNCTION The function to turn into a lambda
+ * @tparam ActionFn The function to turn into an action.
  */
-#define DEFINE_SML_ACTION(FUNCTION)                                                      \
-    const auto FUNCTION##_A = [this](auto event) { FUNCTION(event); };
+template <auto ActionFn>
+class SMLAction
+{
+    using Traits = SMLCallbackTraits<decltype(ActionFn)>;
+    static_assert(std::is_void_v<typename Traits::ReturnType>,
+                  "an SML action must return void");
+
+   public:
+    explicit SMLAction(Traits::FSMType* fsm) : fsm_(fsm) {}
+    void operator()(const Traits::EventType& event) const
+    {
+        (fsm_->*ActionFn)(event);
+    }
+
+   private:
+    Traits::FSMType* fsm_;
+};
 
 /**
- * Defines lambda wrapper around a function that can be used as an SML action for updating
- * a sub fsm
+ * Specializes against callback functions meant for Boost::SML and exposes their trait
+ * typenames The three template values make up the declaration of a function. In
+ * particular, this class is for actions that utilize subFSMs.
  *
- * @param FUNCTION The function to turn into a lambda
- * @param SUB_FSM The sub fsm to update
+ * @tparam FSMClass The FSM class the function belongs to.
+ * @tparam Event The type of event from the FSM that must be processed.
+ * @tparam SubEvent The type of event from the subFSM that must be processed.
  */
-#define DEFINE_SML_SUB_FSM_UPDATE_ACTION(FUNCTION, SUB_FSM)                              \
-    const auto FUNCTION##_A =                                                            \
-        [this](auto event, back::process<SUB_FSM::Update> processEvent)                  \
-    { FUNCTION(event, processEvent); };
+template <typename FSMClass, typename Event, typename SubEvent>
+struct SMLCallbackTraits<void (FSMClass::*)(const Event&,
+                                            boost::sml::back::process<SubEvent>)>
+{
+    using FSMType      = FSMClass;
+    using EventType    = Event;
+    using SubEventType = SubEvent;
+    using ReturnType   = void;
+};
+
+/**
+ * Callable wrapper around FSM member function that can be used as an SML action for
+ * updating a sub fsm
+ * @tparam ActionFn The function to turn into an subFSM update action.
+ */
+template <auto ActionFn>
+class SMLSubFSMUpdateAction
+{
+    using Traits = SMLCallbackTraits<decltype(ActionFn)>;
+
+   public:
+    explicit SMLSubFSMUpdateAction(Traits::FSMType* fsm) : fsm_(fsm) {}
+
+    void operator()(
+        const Traits::EventType& event,
+        boost::sml::back::process<typename Traits::SubEventType> processEvent) const
+    {
+        (fsm_->*ActionFn)(event, processEvent);
+    }
+
+   private:
+    Traits::FSMType* fsm_;
+};
 
 /**
  * Strips extraneous information such as boost::sml template information to return

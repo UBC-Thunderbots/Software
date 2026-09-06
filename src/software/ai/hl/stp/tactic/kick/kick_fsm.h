@@ -70,24 +70,27 @@ struct KickFSM : TacticFSM<KickFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallFSM)
-        DEFINE_SML_STATE(KickState)
-        DEFINE_SML_EVENT(Update)
+        // clang-format off
+        constexpr auto KickState_S         = boost::sml::state<KickState>;
 
-        DEFINE_SML_GUARD(ballChicked)
-        DEFINE_SML_GUARD(shouldRealignWithBall)
-        DEFINE_SML_ACTION(updateKick)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
+        constexpr auto Update_E            = boost::sml::event<Update>;
+
+        const auto ballChicked_G           = SMLGuard<&KickFSM::ballChicked>{this};
+        const auto shouldRealignWithBall_G = SMLGuard<&KickFSM::shouldRealignWithBall>{this};
+
+        const auto updateKick_A            = SMLAction<&KickFSM::updateKick>{this};
+
+        constexpr auto GetBehindBallFSM_S  = boost::sml::state<GetBehindBallFSM>;
+        const auto updateGetBehindBall_A   = SMLSubFSMUpdateAction<&KickFSM::updateGetBehindBall>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallFSM_S = KickState_S,
-
-            KickState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
-                GetBehindBallFSM_S,
-            KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
-            KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
+            *GetBehindBallFSM_S + Update_E                          / updateGetBehindBall_A,
+            GetBehindBallFSM_S                                                                  = KickState_S,
+            KickState_S         + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A     = GetBehindBallFSM_S,
+            KickState_S         + Update_E[!ballChicked_G]          / updateKick_A              = KickState_S,
+            KickState_S         + Update_E[ballChicked_G]           / SET_STOP_PRIMITIVE_ACTION = X,
+            X                   + Update_E                          / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

@@ -57,23 +57,24 @@ struct PenaltyKickEnemyPlayFSM : PlayFSM<PenaltyKickEnemyPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetupPositionState)
-        DEFINE_SML_STATE(DefendKickState)
+        // clang-format off
+        constexpr auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
+        constexpr auto DefendKickState_S    = boost::sml::state<DefendKickState>;
 
-        DEFINE_SML_EVENT(Update)
+        constexpr auto Update_E             = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(setupPosition)
-        DEFINE_SML_ACTION(defendKick)
+        const auto setupPositionDone_G      = SMLGuard<&PenaltyKickEnemyPlayFSM::setupPositionDone>{this};
 
-        DEFINE_SML_GUARD(setupPositionDone)
+        const auto setupPosition_A          = SMLAction<&PenaltyKickEnemyPlayFSM::setupPosition>{this};
+        const auto defendKick_A             = SMLAction<&PenaltyKickEnemyPlayFSM::defendKick>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *SetupPositionState_S + Update_E[!setupPositionDone_G] / setupPosition_A =
-                SetupPositionState_S,
-            SetupPositionState_S + Update_E[setupPositionDone_G] / defendKick_A =
-                DefendKickState_S,
-            DefendKickState_S + Update_E / defendKick_A, X + Update_E = X);
+            *SetupPositionState_S + Update_E[!setupPositionDone_G] / setupPosition_A = SetupPositionState_S,
+            SetupPositionState_S  + Update_E[setupPositionDone_G]  / defendKick_A    = DefendKickState_S,
+            DefendKickState_S     + Update_E                       / defendKick_A,
+            X                     + Update_E                                         = X);
+        // clang-format on
     }
 
    private:

@@ -36,17 +36,18 @@ struct HaltPlayFSM : PlayFSM<HaltPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(HaltState)
+        // clang-format off
+        constexpr auto HaltState_S = boost::sml::state<HaltState>;
 
-        DEFINE_SML_EVENT(Update)
+        constexpr auto Update_E    = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(updateStop)
+        const auto updateStop_A    = SMLAction<&HaltPlayFSM::updateStop>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *HaltState_S + Update_E / updateStop_A = HaltState_S,
-
-            X + Update_E / updateStop_A = X);
+            X            + Update_E / updateStop_A = X);
+        // clang-format on
     }
 
    private:

@@ -147,46 +147,46 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(StartState)
-        DEFINE_SML_STATE(KickOffWallState)
-        DEFINE_SML_STATE(AlignPlacementState)
-        DEFINE_SML_STATE(PlaceBallState)
-        DEFINE_SML_STATE(WaitState)
-        DEFINE_SML_STATE(RetreatState)
-        DEFINE_SML_EVENT(Update)
+        // clang-format off
+        constexpr auto StartState_S          = boost::sml::state<StartState>;
+        constexpr auto KickOffWallState_S    = boost::sml::state<KickOffWallState>;
+        constexpr auto AlignPlacementState_S = boost::sml::state<AlignPlacementState>;
+        constexpr auto PlaceBallState_S      = boost::sml::state<PlaceBallState>;
+        constexpr auto WaitState_S           = boost::sml::state<WaitState>;
+        constexpr auto RetreatState_S        = boost::sml::state<RetreatState>;
 
-        DEFINE_SML_ACTION(alignPlacement)
-        DEFINE_SML_ACTION(placeBall)
-        DEFINE_SML_ACTION(kickOffWall)
-        DEFINE_SML_ACTION(startWait)
-        DEFINE_SML_ACTION(retreat)
+        constexpr auto Update_E              = boost::sml::event<Update>;
 
-        DEFINE_SML_GUARD(shouldKickOffWall)
-        DEFINE_SML_GUARD(alignDone)
-        DEFINE_SML_GUARD(kickDone)
-        DEFINE_SML_GUARD(ballPlaced)
-        DEFINE_SML_GUARD(waitDone)
-        DEFINE_SML_GUARD(retreatDone)
+        const auto shouldKickOffWall_G       = SMLGuard<&BallPlacementPlayFSM::shouldKickOffWall>{this};
+        const auto alignDone_G               = SMLGuard<&BallPlacementPlayFSM::alignDone>{this};
+        const auto kickDone_G                = SMLGuard<&BallPlacementPlayFSM::kickDone>{this};
+        const auto ballPlaced_G              = SMLGuard<&BallPlacementPlayFSM::ballPlaced>{this};
+        const auto waitDone_G                = SMLGuard<&BallPlacementPlayFSM::waitDone>{this};
+        const auto retreatDone_G             = SMLGuard<&BallPlacementPlayFSM::retreatDone>{this};
+
+        const auto alignPlacement_A          = SMLAction<&BallPlacementPlayFSM::alignPlacement>{this};
+        const auto placeBall_A               = SMLAction<&BallPlacementPlayFSM::placeBall>{this};
+        const auto kickOffWall_A             = SMLAction<&BallPlacementPlayFSM::kickOffWall>{this};
+        const auto startWait_A               = SMLAction<&BallPlacementPlayFSM::startWait>{this};
+        const auto retreat_A                 = SMLAction<&BallPlacementPlayFSM::retreat>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
-                AlignPlacementState_S,
-            StartState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
-            KickOffWallState_S + Update_E[!kickDone_G && shouldKickOffWall_G] /
-                                     kickOffWall_A                = KickOffWallState_S,
-            KickOffWallState_S + Update_E[kickDone_G]             = KickOffWallState_S,
-            KickOffWallState_S + Update_E[!kickDone_G]            = AlignPlacementState_S,
-            AlignPlacementState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
-            AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
-                AlignPlacementState_S,
-            AlignPlacementState_S + Update_E[alignDone_G]            = PlaceBallState_S,
-            PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
-            PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = WaitState_S,
-            WaitState_S + Update_E[!waitDone_G]                      = WaitState_S,
-            WaitState_S + Update_E[waitDone_G]                       = RetreatState_S,
-            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S);
+            *StartState_S         + Update_E[!shouldKickOffWall_G]               / alignPlacement_A = AlignPlacementState_S,
+            StartState_S          + Update_E[shouldKickOffWall_G]                                   = KickOffWallState_S,
+            KickOffWallState_S    + Update_E[!kickDone_G && shouldKickOffWall_G] / kickOffWall_A    = KickOffWallState_S,
+            KickOffWallState_S    + Update_E[kickDone_G]                                            = KickOffWallState_S,
+            KickOffWallState_S    + Update_E[!kickDone_G]                                           = AlignPlacementState_S,
+            AlignPlacementState_S + Update_E[shouldKickOffWall_G]                                   = KickOffWallState_S,
+            AlignPlacementState_S + Update_E[!alignDone_G]                       / alignPlacement_A = AlignPlacementState_S,
+            AlignPlacementState_S + Update_E[alignDone_G]                                           = PlaceBallState_S,
+            PlaceBallState_S      + Update_E[!ballPlaced_G]                      / placeBall_A      = PlaceBallState_S,
+            PlaceBallState_S      + Update_E[ballPlaced_G]                       / startWait_A      = WaitState_S,
+            WaitState_S           + Update_E[!waitDone_G]                                           = WaitState_S,
+            WaitState_S           + Update_E[waitDone_G]                                            = RetreatState_S,
+            RetreatState_S        + Update_E[retreatDone_G && ballPlaced_G]                         = X,
+            RetreatState_S        + Update_E[ballPlaced_G]                       / retreat_A        = RetreatState_S);
+        // clang-format on
     }
 
    private:

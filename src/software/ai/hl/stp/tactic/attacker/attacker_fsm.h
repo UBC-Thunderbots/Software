@@ -65,22 +65,28 @@ struct AttackerFSM : TacticFSM<AttackerFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(PivotKickFSM)
-        DEFINE_SML_STATE(KeepAwayFSM)
-        DEFINE_SML_STATE(DribbleFSM)
+        // clang-format off
+        constexpr auto DribbleFSM_S   = boost::sml::state<DribbleFSM>;
 
-        DEFINE_SML_EVENT(Update)
+        constexpr auto Update_E       = boost::sml::event<Update>;
 
-        DEFINE_SML_GUARD(shouldKick)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
+        const auto shouldKick_G       = SMLGuard<&AttackerFSM::shouldKick>{this};
+
+        constexpr auto PivotKickFSM_S = boost::sml::state<PivotKickFSM>;
+        const auto pivotKick_A        = SMLSubFSMUpdateAction<&AttackerFSM::pivotKick>{this};
+
+        constexpr auto KeepAwayFSM_S  = boost::sml::state<KeepAwayFSM>;
+        const auto keepAway_A         = SMLSubFSMUpdateAction<&AttackerFSM::keepAway>{this};
 
         return make_transition_table(
-            *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
-            DribbleFSM_S + Update_E[!shouldKick_G] / keepAway_A  = KeepAwayFSM_S,
-            KeepAwayFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,
-            KeepAwayFSM_S + Update_E / keepAway_A, KeepAwayFSM_S    = DribbleFSM_S,
-            PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            *DribbleFSM_S  + Update_E[shouldKick_G]  / pivotKick_A               = PivotKickFSM_S,
+            DribbleFSM_S   + Update_E[!shouldKick_G] / keepAway_A                = KeepAwayFSM_S,
+            KeepAwayFSM_S  + Update_E[shouldKick_G]  / pivotKick_A               = PivotKickFSM_S,
+            KeepAwayFSM_S  + Update_E                / keepAway_A,
+            KeepAwayFSM_S                                                        = DribbleFSM_S,
+            PivotKickFSM_S + Update_E                / pivotKick_A,
+            PivotKickFSM_S                                                       = X,
+            X              + Update_E                / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

@@ -173,30 +173,35 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetPossession)
-        DEFINE_SML_STATE(Dribble)
-        DEFINE_SML_STATE(LoseBall)
-        DEFINE_SML_EVENT(Update)
-        DEFINE_SML_GUARD(havePossession)
-        DEFINE_SML_GUARD(lostPossession)
-        DEFINE_SML_GUARD(dribblingDone)
-        DEFINE_SML_GUARD(shouldLoseBall)
-        DEFINE_SML_ACTION(loseBall)
-        DEFINE_SML_ACTION(getPossession)
-        DEFINE_SML_ACTION(dribble)
+        // clang-format off
+        constexpr auto GetPossession_S = boost::sml::state<GetPossession>;
+        constexpr auto Dribble_S       = boost::sml::state<Dribble>;
+        constexpr auto LoseBall_S      = boost::sml::state<LoseBall>;
+
+        constexpr auto Update_E        = boost::sml::event<Update>;
+
+        const auto havePossession_G    = SMLGuard<&DribbleFSM::havePossession>{this};
+        const auto lostPossession_G    = SMLGuard<&DribbleFSM::lostPossession>{this};
+        const auto dribblingDone_G     = SMLGuard<&DribbleFSM::dribblingDone>{this};
+        const auto shouldLoseBall_G    = SMLGuard<&DribbleFSM::shouldLoseBall>{this};
+
+        const auto loseBall_A          = SMLAction<&DribbleFSM::loseBall>{this};
+        const auto getPossession_A     = SMLAction<&DribbleFSM::getPossession>{this};
+        const auto dribble_A           = SMLAction<&DribbleFSM::dribble>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetPossession_S + Update_E[havePossession_G] / dribble_A = Dribble_S,
-            GetPossession_S + Update_E[!havePossession_G] / getPossession_A,
-            Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
-            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
-            Dribble_S + Update_E[!dribblingDone_G] / dribble_A,
-            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
-            LoseBall_S + Update_E[shouldLoseBall_G] / loseBall_A,
-            LoseBall_S + Update_E[!shouldLoseBall_G] / getPossession_A = GetPossession_S,
-            X + Update_E[lostPossession_G] / getPossession_A           = GetPossession_S,
-            X + Update_E[!dribblingDone_G] / dribble_A                 = Dribble_S,
-            X + Update_E / dribble_A                                   = X);
+            *GetPossession_S + Update_E[havePossession_G]  / dribble_A       = Dribble_S,
+            GetPossession_S  + Update_E[!havePossession_G] / getPossession_A,
+            Dribble_S        + Update_E[shouldLoseBall_G]  / loseBall_A      = LoseBall_S,
+            Dribble_S        + Update_E[lostPossession_G]  / getPossession_A = GetPossession_S,
+            Dribble_S        + Update_E[!dribblingDone_G]  / dribble_A,
+            Dribble_S        + Update_E[dribblingDone_G]   / dribble_A       = X,
+            LoseBall_S       + Update_E[shouldLoseBall_G]  / loseBall_A,
+            LoseBall_S       + Update_E[!shouldLoseBall_G] / getPossession_A = GetPossession_S,
+            X                + Update_E[lostPossession_G]  / getPossession_A = GetPossession_S,
+            X                + Update_E[!dribblingDone_G]  / dribble_A       = Dribble_S,
+            X                + Update_E                    / dribble_A       = X);
+        // clang-format on
     }
 };

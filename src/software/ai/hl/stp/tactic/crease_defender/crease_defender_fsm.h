@@ -88,24 +88,27 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(MoveFSM)
-        DEFINE_SML_EVENT(Update)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
+        // clang-format off
+        constexpr auto Update_E              = boost::sml::event<Update>;
+
+        const auto ballNearbyWithoutThreat_G = SMLGuard<&CreaseDefenderFSM::ballNearbyWithoutThreat>{this};
+
+        constexpr auto MoveFSM_S             = boost::sml::state<MoveFSM>;
+        const auto blockThreat_A             = SMLSubFSMUpdateAction<&CreaseDefenderFSM::blockThreat>{this};
+
+        constexpr auto DribbleFSM_S          = boost::sml::state<DribbleFSM>;
+        const auto prepareGetPossession_A    = SMLSubFSMUpdateAction<&CreaseDefenderFSM::prepareGetPossession>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-                DribbleFSM_S,
-            MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
-            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
-                MoveFSM_S,
-            DribbleFSM_S + Update_E / prepareGetPossession_A,
-            X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-                DribbleFSM_S,
-            X + Update_E / blockThreat_A = MoveFSM_S);
+            *MoveFSM_S   + Update_E[ballNearbyWithoutThreat_G]  / prepareGetPossession_A = DribbleFSM_S,
+            MoveFSM_S    + Update_E                             / blockThreat_A,
+            MoveFSM_S                                                                    = X,
+            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A          = MoveFSM_S,
+            DribbleFSM_S + Update_E                             / prepareGetPossession_A,
+            X            + Update_E[ballNearbyWithoutThreat_G]  / prepareGetPossession_A = DribbleFSM_S,
+            X            + Update_E                             / blockThreat_A          = MoveFSM_S);
+        // clang-format on
     }
 
    private:

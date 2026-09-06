@@ -50,18 +50,21 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallState)
-        DEFINE_SML_EVENT(Update)
+        // clang-format off
+        constexpr auto GetBehindBallState_S = boost::sml::state<GetBehindBallState>;
 
-        DEFINE_SML_GUARD(behindBall)
-        DEFINE_SML_ACTION(updateMove)
+        constexpr auto Update_E             = boost::sml::event<Update>;
 
+        const auto behindBall_G             = SMLGuard<&GetBehindBallFSM::behindBall>{this};
+
+        const auto updateMove_A             = SMLAction<&GetBehindBallFSM::updateMove>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *GetBehindBallState_S + Update_E[!behindBall_G] / updateMove_A,
-            GetBehindBallState_S + Update_E[behindBall_G] / updateMove_A = X,
-            X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION   = X);
+            GetBehindBallState_S  + Update_E[behindBall_G]  / updateMove_A              = X,
+            X                     + Update_E[!behindBall_G] / updateMove_A              = GetBehindBallState_S,
+            X                     + Update_E                / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

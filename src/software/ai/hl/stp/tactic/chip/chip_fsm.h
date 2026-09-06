@@ -66,24 +66,27 @@ struct ChipFSM : TacticFSM<ChipFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallFSM)
-        DEFINE_SML_STATE(ChipState)
-        DEFINE_SML_EVENT(Update)
+        // clang-format off
+        constexpr auto ChipState_S         = boost::sml::state<ChipState>;
 
-        DEFINE_SML_GUARD(ballChicked)
-        DEFINE_SML_GUARD(shouldRealignWithBall)
-        DEFINE_SML_ACTION(updateChip)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
+        constexpr auto Update_E            = boost::sml::event<Update>;
+
+        const auto ballChicked_G           = SMLGuard<&ChipFSM::ballChicked>{this};
+        const auto shouldRealignWithBall_G = SMLGuard<&ChipFSM::shouldRealignWithBall>{this};
+
+        const auto updateChip_A            = SMLAction<&ChipFSM::updateChip>{this};
+
+        constexpr auto GetBehindBallFSM_S  = boost::sml::state<GetBehindBallFSM>;
+        const auto updateGetBehindBall_A   = SMLSubFSMUpdateAction<&ChipFSM::updateGetBehindBall>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallFSM_S = ChipState_S,
-
-            ChipState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
-                GetBehindBallFSM_S,
-            ChipState_S + Update_E[!ballChicked_G] / updateChip_A = ChipState_S,
-            ChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
+            *GetBehindBallFSM_S + Update_E                          / updateGetBehindBall_A,
+            GetBehindBallFSM_S                                                                  = ChipState_S,
+            ChipState_S         + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A     = GetBehindBallFSM_S,
+            ChipState_S         + Update_E[!ballChicked_G]          / updateChip_A              = ChipState_S,
+            ChipState_S         + Update_E[ballChicked_G]           / SET_STOP_PRIMITIVE_ACTION = X,
+            X                   + Update_E                          / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

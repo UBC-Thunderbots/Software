@@ -132,39 +132,41 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(MoveFSM)
-        DEFINE_SML_STATE(BlockPassState)
-        DEFINE_SML_STATE(GoAndStealState)
-        DEFINE_SML_STATE(StealAndPullState)
+        // clang-format off
+        constexpr auto BlockPassState_S    = boost::sml::state<BlockPassState>;
+        constexpr auto GoAndStealState_S   = boost::sml::state<GoAndStealState>;
+        constexpr auto StealAndPullState_S = boost::sml::state<StealAndPullState>;
 
-        DEFINE_SML_EVENT(Update)
+        constexpr auto Update_E            = boost::sml::event<Update>;
 
-        DEFINE_SML_GUARD(enemyThreatHasBall)
-        DEFINE_SML_GUARD(contestedBall)
-        DEFINE_SML_GUARD(blockedShot)
+        const auto enemyThreatHasBall_G    = SMLGuard<&ShadowEnemyFSM::enemyThreatHasBall>{this};
+        const auto contestedBall_G         = SMLGuard<&ShadowEnemyFSM::contestedBall>{this};
+        const auto blockedShot_G           = SMLGuard<&ShadowEnemyFSM::blockedShot>{this};
 
-        DEFINE_SML_ACTION(blockPass)
-        DEFINE_SML_ACTION(goAndSteal)
-        DEFINE_SML_ACTION(stealAndPull)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveFSM)
+        const auto blockPass_A             = SMLAction<&ShadowEnemyFSM::blockPass>{this};
+        const auto goAndSteal_A            = SMLAction<&ShadowEnemyFSM::goAndSteal>{this};
+        const auto stealAndPull_A          = SMLAction<&ShadowEnemyFSM::stealAndPull>{this};
+
+        constexpr auto MoveFSM_S           = boost::sml::state<MoveFSM>;
+        const auto blockShot_A             = SMLSubFSMUpdateAction<&ShadowEnemyFSM::blockShot>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            MoveFSM_S + Update_E[blockedShot_G] / goAndSteal_A = GoAndStealState_S,
-            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = GoAndStealState_S,
-            BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
-            BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
-            GoAndStealState_S +
-                Update_E[enemyThreatHasBall_G && !contestedBall_G] / goAndSteal_A,
-            GoAndStealState_S + Update_E[enemyThreatHasBall_G && contestedBall_G] /
-                                    goAndSteal_A = StealAndPullState_S,
-            GoAndStealState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
-            StealAndPullState_S + Update_E[enemyThreatHasBall_G] / stealAndPull_A,
-            StealAndPullState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
-            X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
+            *MoveFSM_S          + Update_E[!enemyThreatHasBall_G]                    / blockPass_A               = BlockPassState_S,
+            MoveFSM_S           + Update_E[blockedShot_G]                            / goAndSteal_A              = GoAndStealState_S,
+            MoveFSM_S           + Update_E                                           / blockShot_A,
+            MoveFSM_S                                                                                            = GoAndStealState_S,
+            BlockPassState_S    + Update_E[!enemyThreatHasBall_G]                    / blockPass_A,
+            BlockPassState_S    + Update_E[enemyThreatHasBall_G]                     / blockShot_A               = MoveFSM_S,
+            GoAndStealState_S   + Update_E[enemyThreatHasBall_G && !contestedBall_G] / goAndSteal_A,
+            GoAndStealState_S   + Update_E[enemyThreatHasBall_G && contestedBall_G]  / goAndSteal_A              = StealAndPullState_S,
+            GoAndStealState_S   + Update_E[!enemyThreatHasBall_G]                    / blockPass_A               = X,
+            StealAndPullState_S + Update_E[enemyThreatHasBall_G]                     / stealAndPull_A,
+            StealAndPullState_S + Update_E[!enemyThreatHasBall_G]                    / blockPass_A               = X,
+            X                   + Update_E[!enemyThreatHasBall_G]                    / blockPass_A               = BlockPassState_S,
+            X                   + Update_E[enemyThreatHasBall_G]                     / blockShot_A               = MoveFSM_S,
+            X                   + Update_E                                           / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 
    private:
