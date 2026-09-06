@@ -222,6 +222,8 @@ void Thunderloop::runLoop()
         const TbotsProto::DirectControlPrimitive direct_control_primitive =
             primitive_executor_->stepPrimitive(robot_status_, delta_time);
 
+        imu_service_->poll(robot_status_);
+
 #ifndef DISABLE_MOTOR_SERVICE
         motor_service_->poll(direct_control_primitive, robot_status_, delta_time);
 #endif
