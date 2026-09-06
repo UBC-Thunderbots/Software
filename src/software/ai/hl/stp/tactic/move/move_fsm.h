@@ -62,19 +62,21 @@ struct MoveFSM : TacticFSM<MoveFSM>
     {
         using namespace boost::sml;
 
-        // MoveState_S is the _state_ used in the transition table
+        // clang-format off
         constexpr auto MoveState_S = boost::sml::state<MoveState>;
-        // Update_E is the _event_ that the MoveFSM responds to
-        constexpr auto Update_E = boost::sml::event<Update>;
 
-        const auto moveDone_G   = SMLGuard<&MoveFSM::moveDone>{this};
-        const auto updateMove_A = SMLAction<&MoveFSM::updateMove>{this};
+        constexpr auto Update_E    = boost::sml::event<Update>;
+
+        const auto moveDone_G      = SMLGuard<&MoveFSM::moveDone>{this};
+
+        const auto updateMove_A    = SMLAction<&MoveFSM::updateMove>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveState_S + Update_E[!moveDone_G] / updateMove_A = MoveState_S,
-            MoveState_S + Update_E[moveDone_G] / updateMove_A   = X,
-            X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S,
-            X + Update_E / updateMove_A                         = X);
+            MoveState_S  + Update_E[moveDone_G]  / updateMove_A = X,
+            X            + Update_E[!moveDone_G] / updateMove_A = MoveState_S,
+            X            + Update_E              / updateMove_A = X);
+        // clang-format on
     }
 };

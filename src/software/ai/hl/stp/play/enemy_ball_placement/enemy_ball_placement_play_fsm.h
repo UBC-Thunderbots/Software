@@ -104,35 +104,29 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayFSM>
     {
         using namespace boost::sml;
 
-        constexpr auto WaitState_S    = boost::sml::state<WaitState>;
-        constexpr auto AvoidState_S   = boost::sml::state<AvoidState>;
-        constexpr auto DefenseState_S = boost::sml::state<DefenseState>;
+        // clang-format off
+        constexpr auto WaitState_S           = boost::sml::state<WaitState>;
+        constexpr auto AvoidState_S          = boost::sml::state<AvoidState>;
+        constexpr auto DefenseState_S        = boost::sml::state<DefenseState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E              = boost::sml::event<Update>;
 
-        const auto setPlacementPoint_A =
-            SMLAction<&EnemyBallPlacementPlayFSM::setPlacementPoint>{this};
-        const auto avoid_A = SMLAction<&EnemyBallPlacementPlayFSM::avoid>{this};
-        const auto enterDefensiveFormation_A =
-            SMLAction<&EnemyBallPlacementPlayFSM::enterDefensiveFormation>{this};
+        const auto hasPlacementPoint_G       = SMLGuard<&EnemyBallPlacementPlayFSM::hasPlacementPoint>{this};
+        const auto isNearlyPlaced_G          = SMLGuard<&EnemyBallPlacementPlayFSM::isNearlyPlaced>{this};
 
-        const auto hasPlacementPoint_G =
-            SMLGuard<&EnemyBallPlacementPlayFSM::hasPlacementPoint>{this};
-        const auto isNearlyPlaced_G =
-            SMLGuard<&EnemyBallPlacementPlayFSM::isNearlyPlaced>{this};
+        const auto setPlacementPoint_A       = SMLAction<&EnemyBallPlacementPlayFSM::setPlacementPoint>{this};
+        const auto avoid_A                   = SMLAction<&EnemyBallPlacementPlayFSM::avoid>{this};
+        const auto enterDefensiveFormation_A = SMLAction<&EnemyBallPlacementPlayFSM::enterDefensiveFormation>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *WaitState_S + Update_E[hasPlacementPoint_G] / setPlacementPoint_A =
-                AvoidState_S,
-            WaitState_S + Update_E[!hasPlacementPoint_G] = WaitState_S,
-
-            AvoidState_S + Update_E[!isNearlyPlaced_G] / avoid_A = AvoidState_S,
-            AvoidState_S + Update_E[isNearlyPlaced_G]            = DefenseState_S,
-
-            DefenseState_S + Update_E[isNearlyPlaced_G] / enterDefensiveFormation_A =
-                DefenseState_S,
-            DefenseState_S + Update_E[!isNearlyPlaced_G] = AvoidState_S);
+            *WaitState_S   + Update_E[hasPlacementPoint_G]  / setPlacementPoint_A       = AvoidState_S,
+            WaitState_S    + Update_E[!hasPlacementPoint_G]                             = WaitState_S,
+            AvoidState_S   + Update_E[!isNearlyPlaced_G]    / avoid_A                   = AvoidState_S,
+            AvoidState_S   + Update_E[isNearlyPlaced_G]                                 = DefenseState_S,
+            DefenseState_S + Update_E[isNearlyPlaced_G]     / enterDefensiveFormation_A = DefenseState_S,
+            DefenseState_S + Update_E[!isNearlyPlaced_G]                                = AvoidState_S);
+        // clang-format on
     }
 
    private:

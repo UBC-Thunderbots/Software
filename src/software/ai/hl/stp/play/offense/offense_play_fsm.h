@@ -64,28 +64,25 @@ struct OffensePlayFSM : PlayFSM<OffensePlayFSM>
     {
         using namespace boost::sml;
 
-        constexpr auto OffensiveState_S = boost::sml::state<OffensiveState>;
-        constexpr auto DefensiveState_S = boost::sml::state<DefensiveState>;
+        // clang-format off
+        constexpr auto OffensiveState_S     = boost::sml::state<OffensiveState>;
+        constexpr auto DefensiveState_S     = boost::sml::state<DefensiveState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E             = boost::sml::event<Update>;
 
-        const auto enemyHasPossession_G =
-            SMLGuard<&OffensePlayFSM::enemyHasPossession>{this};
+        const auto enemyHasPossession_G     = SMLGuard<&OffensePlayFSM::enemyHasPossession>{this};
 
-        const auto setupOffensiveStrategy_A =
-            SMLAction<&OffensePlayFSM::setupOffensiveStrategy>{this};
-        const auto setupDefensiveStrategy_A =
-            SMLAction<&OffensePlayFSM::setupDefensiveStrategy>{this};
+        const auto setupOffensiveStrategy_A = SMLAction<&OffensePlayFSM::setupOffensiveStrategy>{this};
+        const auto setupDefensiveStrategy_A = SMLAction<&OffensePlayFSM::setupDefensiveStrategy>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *OffensiveState_S + Update_E[enemyHasPossession_G] /
-                                    setupDefensiveStrategy_A       = DefensiveState_S,
-            OffensiveState_S + Update_E / setupOffensiveStrategy_A = OffensiveState_S,
-            DefensiveState_S + Update_E[!enemyHasPossession_G] /
-                                   setupOffensiveStrategy_A        = OffensiveState_S,
-            DefensiveState_S + Update_E / setupDefensiveStrategy_A = DefensiveState_S,
-            X + Update_E                                           = X);
+            *OffensiveState_S + Update_E[enemyHasPossession_G]  / setupDefensiveStrategy_A = DefensiveState_S,
+            OffensiveState_S  + Update_E                        / setupOffensiveStrategy_A = OffensiveState_S,
+            DefensiveState_S  + Update_E[!enemyHasPossession_G] / setupOffensiveStrategy_A = OffensiveState_S,
+            DefensiveState_S  + Update_E                        / setupDefensiveStrategy_A = DefensiveState_S,
+            X                 + Update_E                                                   = X);
+        // clang-format on
     }
 
    private:

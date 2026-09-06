@@ -86,30 +86,25 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     {
         using namespace boost::sml;
 
-        constexpr auto DefenseState_S = boost::sml::state<DefenseState>;
-        constexpr auto AggressiveDefenseState_S =
-            boost::sml::state<AggressiveDefenseState>;
+        // clang-format off
+        constexpr auto DefenseState_S           = boost::sml::state<DefenseState>;
+        constexpr auto AggressiveDefenseState_S = boost::sml::state<AggressiveDefenseState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E                 = boost::sml::event<Update>;
 
-        const auto shouldDefendAggressively_G =
-            SMLGuard<&DefensePlayFSM::shouldDefendAggressively>{this};
+        const auto shouldDefendAggressively_G   = SMLGuard<&DefensePlayFSM::shouldDefendAggressively>{this};
 
-        const auto blockShots_A = SMLAction<&DefensePlayFSM::blockShots>{this};
-        const auto shadowAndBlockShots_A =
-            SMLAction<&DefensePlayFSM::shadowAndBlockShots>{this};
+        const auto blockShots_A                 = SMLAction<&DefensePlayFSM::blockShots>{this};
+        const auto shadowAndBlockShots_A        = SMLAction<&DefensePlayFSM::shadowAndBlockShots>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-
-            *DefenseState_S + Update_E[shouldDefendAggressively_G] /
-                                  shadowAndBlockShots_A = AggressiveDefenseState_S,
-            DefenseState_S + Update_E / blockShots_A    = DefenseState_S,
-            AggressiveDefenseState_S +
-                Update_E[!shouldDefendAggressively_G] / blockShots_A = DefenseState_S,
-            AggressiveDefenseState_S + Update_E / shadowAndBlockShots_A =
-                AggressiveDefenseState_S,
-            X + Update_E = X);
+            *DefenseState_S          + Update_E[shouldDefendAggressively_G]  / shadowAndBlockShots_A = AggressiveDefenseState_S,
+            DefenseState_S           + Update_E                              / blockShots_A          = DefenseState_S,
+            AggressiveDefenseState_S + Update_E[!shouldDefendAggressively_G] / blockShots_A          = DefenseState_S,
+            AggressiveDefenseState_S + Update_E                              / shadowAndBlockShots_A = AggressiveDefenseState_S,
+            X                        + Update_E                                                      = X);
+        // clang-format on
     }
 
    private:

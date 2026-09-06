@@ -42,17 +42,17 @@ struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
     {
         using namespace boost::sml;
 
+        // clang-format off
         constexpr auto BlockEnemyKickerState_S = boost::sml::state<BlockEnemyKickerState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E                = boost::sml::event<Update>;
 
-        const auto blockEnemyKicker_A =
-            SMLAction<&EnemyFreeKickPlayFSM::blockEnemyKicker>{this};
+        const auto blockEnemyKicker_A          = SMLAction<&EnemyFreeKickPlayFSM::blockEnemyKicker>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *BlockEnemyKickerState_S + Update_E / blockEnemyKicker_A =
-                BlockEnemyKickerState_S,
-            X + Update_E = X);
+            *BlockEnemyKickerState_S + Update_E / blockEnemyKicker_A = BlockEnemyKickerState_S,
+            X                        + Update_E                      = X);
+        // clang-format on
     }
 };

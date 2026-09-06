@@ -44,16 +44,17 @@ struct StopPlayFSM
     {
         using namespace boost::sml;
 
-        constexpr auto StopState_S = boost::sml::state<StopState>;
+        // clang-format off
+        constexpr auto StopState_S      = boost::sml::state<StopState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E         = boost::sml::event<Update>;
 
-        const auto updateStopPosition_A =
-            SMLAction<&StopPlayFSM::updateStopPosition>{this};
+        const auto updateStopPosition_A = SMLAction<&StopPlayFSM::updateStopPosition>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *StopState_S + Update_E / updateStopPosition_A = StopState_S);
+        // clang-format on
     }
 
    private:

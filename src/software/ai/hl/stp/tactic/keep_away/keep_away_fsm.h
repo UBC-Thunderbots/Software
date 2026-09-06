@@ -33,12 +33,17 @@ struct KeepAwayFSM : TacticFSM<KeepAwayFSM>
     auto operator()()
     {
         using namespace boost::sml;
+
+        // clang-format off
         constexpr auto Update_E     = boost::sml::event<Update>;
+
         constexpr auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
         const auto keepAway_A       = SMLSubFSMUpdateAction<&KeepAwayFSM::keepAway>{this};
 
-        return make_transition_table(*DribbleFSM_S + Update_E / keepAway_A,
-                                     DribbleFSM_S                             = X,
-                                     X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+        return make_transition_table(
+            *DribbleFSM_S + Update_E / keepAway_A,
+            DribbleFSM_S                                         = X,
+            X             + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+        // clang-format on
     }
 };

@@ -39,15 +39,18 @@ struct ExamplePlayFSM : PlayFSM<ExamplePlayFSM>
     {
         using namespace boost::sml;
 
-        constexpr auto MoveState_S = boost::sml::state<MoveState>;
+        // clang-format off
+        constexpr auto MoveState_S  = boost::sml::state<MoveState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E     = boost::sml::event<Update>;
 
         const auto moveToPosition_A = SMLAction<&ExamplePlayFSM::moveToPosition>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveState_S + Update_E / moveToPosition_A = MoveState_S, X + Update_E = X);
+            *MoveState_S + Update_E / moveToPosition_A = MoveState_S,
+            X            + Update_E                    = X);
+        // clang-format on
     }
 
    private:

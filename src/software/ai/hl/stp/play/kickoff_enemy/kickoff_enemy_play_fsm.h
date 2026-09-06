@@ -90,16 +90,17 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
     {
         using namespace boost::sml;
 
+        // clang-format off
         constexpr auto SetupState_S = boost::sml::state<SetupState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E     = boost::sml::event<Update>;
 
-        const auto kickoff_A = SMLAction<&KickoffEnemyPlayFSM::kickoff>{this};
-
+        const auto kickoff_A        = SMLAction<&KickoffEnemyPlayFSM::kickoff>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *SetupState_S + Update_E / kickoff_A = SetupState_S);
+        // clang-format on
     }
 
    private:

@@ -209,59 +209,52 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
     {
         using namespace boost::sml;
 
+        // clang-format off
         constexpr auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
         constexpr auto ShootState_S         = boost::sml::state<ShootState>;
         constexpr auto AttemptPassState_S   = boost::sml::state<AttemptPassState>;
         constexpr auto PassState_S          = boost::sml::state<PassState>;
         constexpr auto ChipState_S          = boost::sml::state<ChipState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E             = boost::sml::event<Update>;
 
-        const auto setupPosition_A = SMLAction<&FreeKickPlayFSM::setupPosition>{this};
-        const auto shootBall_A     = SMLAction<&FreeKickPlayFSM::shootBall>{this};
-        const auto startLookingForPass_A =
-            SMLAction<&FreeKickPlayFSM::startLookingForPass>{this};
-        const auto lookForPass_A = SMLAction<&FreeKickPlayFSM::lookForPass>{this};
-        const auto passBall_A    = SMLAction<&FreeKickPlayFSM::passBall>{this};
-        const auto chipBall_A    = SMLAction<&FreeKickPlayFSM::chipBall>{this};
+        const auto setupDone_G              = SMLGuard<&FreeKickPlayFSM::setupDone>{this};
+        const auto shotFound_G              = SMLGuard<&FreeKickPlayFSM::shotFound>{this};
+        const auto shotDone_G               = SMLGuard<&FreeKickPlayFSM::shotDone>{this};
+        const auto shouldAbortPass_G        = SMLGuard<&FreeKickPlayFSM::shouldAbortPass>{this};
+        const auto passFound_G              = SMLGuard<&FreeKickPlayFSM::passFound>{this};
+        const auto passDone_G               = SMLGuard<&FreeKickPlayFSM::passDone>{this};
+        const auto chipDone_G               = SMLGuard<&FreeKickPlayFSM::chipDone>{this};
+        const auto timeExpired_G            = SMLGuard<&FreeKickPlayFSM::timeExpired>{this};
 
-        const auto setupDone_G       = SMLGuard<&FreeKickPlayFSM::setupDone>{this};
-        const auto shotFound_G       = SMLGuard<&FreeKickPlayFSM::shotFound>{this};
-        const auto shotDone_G        = SMLGuard<&FreeKickPlayFSM::shotDone>{this};
-        const auto shouldAbortPass_G = SMLGuard<&FreeKickPlayFSM::shouldAbortPass>{this};
-        const auto passFound_G       = SMLGuard<&FreeKickPlayFSM::passFound>{this};
-        const auto passDone_G        = SMLGuard<&FreeKickPlayFSM::passDone>{this};
-        const auto chipDone_G        = SMLGuard<&FreeKickPlayFSM::chipDone>{this};
-        const auto timeExpired_G     = SMLGuard<&FreeKickPlayFSM::timeExpired>{this};
+        const auto setupPosition_A          = SMLAction<&FreeKickPlayFSM::setupPosition>{this};
+        const auto shootBall_A              = SMLAction<&FreeKickPlayFSM::shootBall>{this};
+        const auto startLookingForPass_A    = SMLAction<&FreeKickPlayFSM::startLookingForPass>{this};
+        const auto lookForPass_A            = SMLAction<&FreeKickPlayFSM::lookForPass>{this};
+        const auto passBall_A               = SMLAction<&FreeKickPlayFSM::passBall>{this};
+        const auto chipBall_A               = SMLAction<&FreeKickPlayFSM::chipBall>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             // Start with setting up the position of the kicker
-            *SetupPositionState_S + Update_E[!setupDone_G] / setupPosition_A =
-                SetupPositionState_S,
-
+            *SetupPositionState_S + Update_E[!setupDone_G]      / setupPosition_A       = SetupPositionState_S,
             // Shoot towards the enemy net directly if there is a clear shot
-            SetupPositionState_S + Update_E[shotFound_G]       = ShootState_S,
-            ShootState_S + Update_E[!shotDone_G] / shootBall_A = ShootState_S,
-            ShootState_S + Update_E[shotDone_G]                = X,
-
+            SetupPositionState_S  + Update_E[shotFound_G]                               = ShootState_S,
+            ShootState_S          + Update_E[!shotDone_G]       / shootBall_A           = ShootState_S,
+            ShootState_S          + Update_E[shotDone_G]                                = X,
             // Otherwise, start looking for a pass
-            SetupPositionState_S + Update_E / startLookingForPass_A = AttemptPassState_S,
-
+            SetupPositionState_S  + Update_E                    / startLookingForPass_A = AttemptPassState_S,
             // If the time to look for a pass is over, chip the ball towards the enemy net
-            AttemptPassState_S + Update_E[timeExpired_G] = ChipState_S,
-
+            AttemptPassState_S    + Update_E[timeExpired_G]                             = ChipState_S,
             // Keep looking for a pass
-            AttemptPassState_S + Update_E[!passFound_G] / lookForPass_A =
-                AttemptPassState_S,
-            AttemptPassState_S + Update_E[passFound_G] = PassState_S,
-
-            PassState_S + Update_E[shouldAbortPass_G]        = AttemptPassState_S,
-            PassState_S + Update_E[!passDone_G] / passBall_A = PassState_S,
-            PassState_S + Update_E[passDone_G]               = X,
-
-            ChipState_S + Update_E[!chipDone_G] / chipBall_A = ChipState_S,
-            ChipState_S + Update_E[chipDone_G]               = X);
+            AttemptPassState_S    + Update_E[!passFound_G]      / lookForPass_A         = AttemptPassState_S,
+            AttemptPassState_S    + Update_E[passFound_G]                               = PassState_S,
+            PassState_S           + Update_E[shouldAbortPass_G]                         = AttemptPassState_S,
+            PassState_S           + Update_E[!passDone_G]       / passBall_A            = PassState_S,
+            PassState_S           + Update_E[passDone_G]                                = X,
+            ChipState_S           + Update_E[!chipDone_G]       / chipBall_A            = ChipState_S,
+            ChipState_S           + Update_E[chipDone_G]                                = X);
+        // clang-format on
     }
 
    private:

@@ -88,24 +88,25 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
     {
         using namespace boost::sml;
 
+        // clang-format off
         constexpr auto SetupState_S = boost::sml::state<SetupState>;
         constexpr auto ChipState_S  = boost::sml::state<ChipState>;
 
-        constexpr auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E     = boost::sml::event<Update>;
 
-        const auto setupKickoff_A =
-            SMLAction<&KickoffFriendlyPlayFSM::setupKickoff>{this};
-        const auto chipBall_A = SMLAction<&KickoffFriendlyPlayFSM::chipBall>{this};
+        const auto isSetupDone_G    = SMLGuard<&KickoffFriendlyPlayFSM::isSetupDone>{this};
+        const auto isPlaying_G      = SMLGuard<&KickoffFriendlyPlayFSM::isPlaying>{this};
 
-        const auto isSetupDone_G = SMLGuard<&KickoffFriendlyPlayFSM::isSetupDone>{this};
-        const auto isPlaying_G   = SMLGuard<&KickoffFriendlyPlayFSM::isPlaying>{this};
+        const auto setupKickoff_A   = SMLAction<&KickoffFriendlyPlayFSM::setupKickoff>{this};
+        const auto chipBall_A       = SMLAction<&KickoffFriendlyPlayFSM::chipBall>{this};
+
         return make_transition_table(
             *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
-            SetupState_S + Update_E[isSetupDone_G]                    = ChipState_S,
-            ChipState_S + Update_E[!isPlaying_G] / chipBall_A         = ChipState_S,
-            ChipState_S + Update_E[isPlaying_G]                       = X,
-
-            X + Update_E = X);
+            SetupState_S  + Update_E[isSetupDone_G]                   = ChipState_S,
+            ChipState_S   + Update_E[!isPlaying_G]   / chipBall_A     = ChipState_S,
+            ChipState_S   + Update_E[isPlaying_G]                     = X,
+            X             + Update_E                                  = X);
+        // clang-format on
     }
 
    private:
