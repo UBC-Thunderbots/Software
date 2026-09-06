@@ -8,7 +8,6 @@ TEST(OrientationControllerTest, BasicTest)
 {
     OrientationController controller;
     BangBangTrajectory1DAngular trajectory;
-    controller.step(Angle::zero(), trajectory, Duration::fromSeconds(1.0),
-                    Duration::fromSeconds(0.01));
+    controller.step(Angle::zero(), trajectory, 1.0, 0.01);
     controller.reset();
 }

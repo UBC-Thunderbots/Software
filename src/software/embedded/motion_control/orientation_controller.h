@@ -5,7 +5,6 @@
 #include "software/embedded/motion_control/pid_controller.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
-#include "software/time/duration.h"
 
 class OrientationController
     : public MotionController<Angle, BangBangTrajectory1DAngular, AngularVelocity>
@@ -23,12 +22,12 @@ class OrientationController
      *
      * @param orientation The actual orientation.
      * @param target_trajectory The target angular trajectory.
-     * @param elapsed_time The elapsed time since the trajectory was created.
-     * @param delta_time The time passed since last time step.
+     * @param elapsed_time_s The elapsed time since the trajectory was created in seconds.
+     * @param delta_time_s The time passed since last time step in seconds.
      */
     AngularVelocity step(const Angle& orientation,
                          const BangBangTrajectory1DAngular& target_trajectory,
-                         Duration elapsed_time, Duration delta_time) override;
+                         double elapsed_time_s, double delta_time_s) override;
 
     /**
      * Resets the state of this orientation controller.
