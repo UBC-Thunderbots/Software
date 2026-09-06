@@ -22,72 +22,76 @@
 #include "software/tracy/tracy_constants.h"
 #include "software/world/robot_state.h"
 
-// signal handling is done by csignal which requires a function pointer with C linkage
-extern "C"
+namespace
 {
-    static MotorService* g_motor_service         = NULL;
-    static TbotsProto::RobotStatus* robot_status = NULL;
-    static int channel_id;
-    static std::string network_interface;
-    static int robot_id;
+/**
+ * Stuff that the signal handler needs to stop the motors and send a crash message.
+ *
+ * The signal handler must be a free function with C linkage, so it cannot reach
+ * Thunderloop's members directly. Instead, we populate a global CrashContext during
+ * Thunderloop initialization with everything necessary to handle a crash.
+ */
+struct CrashContext
+{
+    MotorService* motor_service           = nullptr;
+    TbotsProto::RobotStatus* robot_status = nullptr;
+    int channel_id                        = 0;
+    std::string network_interface;
+    RobotId robot_id = 0;
+};
 
-    /**
-     * Handles process signals
-     *
-     * @param the signal value (SIGINT, SIGABRT, SIGTERN, etc)
-     */
-    void tbotsExit(int signal_num)
+CrashContext crash_context;
+}  // namespace
+
+/**
+ * Handles a termination signal. Stops the motors, sends a crash message with the
+ * stack dump, and exits.
+ *
+ * Must have C linkage to be registered with std::signal.
+ *
+ * @param signal_num the signal number that triggered the handler
+ */
+extern "C" void tbotsExit(const int signal_num)
+{
+    if (crash_context.motor_service)
     {
-        if (g_motor_service)
-        {
-            g_motor_service->reset();
-        }
-
-        // by now g3log may have died due to the termination signal, so it isn't reliable
-        // to log messages
-        std::cerr << "\n\n!!!\nReceived termination signal: "
-                  << g3::signalToStr(signal_num) << std::endl;
-        std::cerr << "Thunderloop shutting down\n!!!\n" << std::endl;
-
-        TbotsProto::RobotCrash crash_msg;
-        auto dump = g3::internal::stackdump();
-        crash_msg.set_robot_id(robot_id);
-        crash_msg.set_stack_dump(dump);
-        crash_msg.set_exit_signal(g3::signalToStr(signal_num));
-        *(crash_msg.mutable_status()) = *robot_status;
-
-        auto sender = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), ROBOT_CRASH_PORT,
-            network_interface, true);
-        sender.sendProto(crash_msg);
-        std::cerr << "Broadcasting robot crash msg";
-
-        exit(signal_num);
+        crash_context.motor_service->reset();
     }
+
+    // g3log may have died due to the termination signal, so it isn't reliable to LOG
+    std::cerr << "\n\n!!!\nReceived termination signal: " << g3::signalToStr(signal_num)
+              << std::endl;
+    std::cerr << "Thunderloop shutting down\n!!!\n" << std::endl;
+
+    TbotsProto::RobotCrash crash_msg;
+    const auto dump = g3::internal::stackdump();
+    crash_msg.set_robot_id(crash_context.robot_id);
+    crash_msg.set_stack_dump(dump);
+    crash_msg.set_exit_signal(g3::signalToStr(signal_num));
+    *(crash_msg.mutable_status()) = *crash_context.robot_status;
+
+    auto sender = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
+        std::string(ROBOT_MULTICAST_CHANNELS.at(crash_context.channel_id)),
+        ROBOT_CRASH_PORT, crash_context.network_interface, true);
+    sender.sendProto(crash_msg);
+    std::cerr << "Broadcasting robot crash msg";
+
+    exit(signal_num);
 }
 
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
-                         bool enable_log_merging, const int loop_hz)
+                         const bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
-      robot_constants_(robot_constants),
-      robot_id_(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY))),
-      channel_id_(
-          std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY))),
-      network_interface_(toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY)),
-      loop_hz_(loop_hz),
-      primitive_executor_(robot_constants),
-      robot_localizer_(RobotLocalizer::RobotLocalizerConfig{
-          robot_constants.kalman_process_noise_variance_rad_per_s_4,
-          robot_constants.kalman_vision_noise_variance_rad_2,
-          robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2})
+      loop_hz_(loop_hz)
 {
-    waitForNetworkUp();
+    const RobotId robot_id = std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY));
+    const int channel_id =
+        std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY));
+    const std::string network_interface =
+        toml_config_client_->get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY);
 
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging,
-                                             network_interface_);
 
-    // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
     std::signal(SIGTERM, tbotsExit);
     std::signal(SIGABRT, tbotsExit);
@@ -95,48 +99,69 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     std::signal(SIGINT, tbotsExit);
     std::signal(SIGILL, tbotsExit);
 
-    // Initialize values for udp sender in signal handler
-    robot_status      = &robot_status_;
-    channel_id        = channel_id_;
-    network_interface = network_interface_;
-    robot_id          = robot_id_;
+    // Initialize the crash context used by the signal handler
+    crash_context.robot_status      = &robot_status_;
+    crash_context.channel_id        = channel_id;
+    crash_context.network_interface = network_interface;
+    crash_context.robot_id          = robot_id;
 
-    LOG(INFO)
-        << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
+    NetworkLoggerSingleton::initializeLogger(robot_id, enable_log_merging,
+                                             network_interface);
+
+    waitForNetworkUp(channel_id, network_interface);
 
     network_service_ = std::make_unique<NetworkService>(
-        robot_id, std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
+        robot_id, std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), PRIMITIVE_PORT,
         ROBOT_STATUS_PORT, FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
         ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, ROBOT_LOGS_PORT, network_interface);
-    LOG(INFO)
-        << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
+    LOG(INFO) << "THUNDERLOOP: Network Service initialized!";
 
 #ifndef DISABLE_POWER_SERVICE
     power_service_ = std::make_unique<PowerService>(
         std::stod(toml_config_client_->get(ROBOT_KICK_EXP_COEFF_CONFIG_KEY)),
         std::stoi(toml_config_client_->get(ROBOT_KICK_CONSTANT_CONFIG_KEY)),
         std::stoi(toml_config_client_->get(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)));
-    LOG(INFO)
-        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+    LOG(INFO) << "THUNDERLOOP: Power Service initialized!";
 #else
-    LOG(INFO) << "THUNDERLOOP: Power Service DISABLED! Next initializing Motor Service";
+    LOG(INFO) << "THUNDERLOOP: Power Service DISABLED!";
 #endif
 
 #ifndef DISABLE_MOTOR_SERVICE
-    motor_service_  = std::make_unique<MotorService>(robot_constants);
-    g_motor_service = motor_service_.get();
+    motor_service_              = std::make_unique<MotorService>(robot_constants);
+    crash_context.motor_service = motor_service_.get();
     motor_service_->setup();
 
-    LOG(INFO) << "THUNDERLOOP: Motor Service initialized! Next initializing IMU Service";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 #else
-    LOG(INFO) << "THUNDERLOOP: Motor Service DISABLED! Next initializing IMU Service";
+    LOG(INFO) << "THUNDERLOOP: Motor Service DISABLED!";
 #endif
 
     imu_service_ = std::make_unique<ImuService>();
 
-    LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
-              << ", CHANNEL ID: " << channel_id_
-              << ", and NETWORK INTERFACE: " << network_interface_;
+    robot_localizer_ =
+        std::make_unique<RobotLocalizer>(RobotLocalizer::RobotLocalizerConfig{
+            robot_constants.kalman_process_noise_variance_rad_per_s_4,
+            robot_constants.kalman_vision_noise_variance_rad_2,
+            robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2});
+
+    primitive_executor_ = std::make_unique<PrimitiveExecutor>(robot_constants);
+
+    // Initial version setup
+    std::string thunderloop_hash, thunderloop_date_flashed;
+    std::ifstream hashFile("~/thunderbots_hashes/thunderloop.hash");
+    std::ifstream dateFile("~/thunderbots_hashes/thunderloop.date");
+    std::getline(hashFile, thunderloop_hash);
+    std::getline(dateFile, thunderloop_date_flashed);
+    hashFile.close();
+    dateFile.close();
+
+    robot_status_.set_robot_id(robot_id);
+    robot_status_.set_thunderloop_version(thunderloop_hash);
+    robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
+
+    LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id
+              << ", CHANNEL ID: " << channel_id
+              << ", and NETWORK INTERFACE: " << network_interface;
     LOG(INFO)
         << "THUNDERLOOP: to update Thunderloop configuration, edit TOML config file and restart Thunderloop";
 }
@@ -161,20 +186,6 @@ void Thunderloop::runLoop()
 
     last_primitive_received_time_ = std::chrono::steady_clock::now();
 
-    // Initial version setup
-    std::string thunderloop_hash, thunderloop_date_flashed;
-    std::ifstream hashFile("~/thunderbots_hashes/thunderloop.hash");
-    std::ifstream dateFile("~/thunderbots_hashes/thunderloop.date");
-    std::getline(hashFile, thunderloop_hash);
-    std::getline(dateFile, thunderloop_date_flashed);
-    hashFile.close();
-    dateFile.close();
-
-    robot_status_.set_thunderloop_version(thunderloop_hash);
-    robot_status_.set_thunderloop_date_flashed(thunderloop_date_flashed);
-    *(robot_status_.mutable_motor_status()) = TbotsProto::MotorStatus();
-    *(robot_status_.mutable_power_status()) = TbotsProto::PowerStatus();
-
     for (;;)
     {
         std::this_thread::sleep_until(next_shot);
@@ -192,7 +203,7 @@ void Thunderloop::runLoop()
 
         // Robot Localizer: fuse sensor measurements into a robot state estimate
         // and hand it to the primitive executor
-        primitive_executor_.updateState(updateLocalization());
+        primitive_executor_->updateState(updateLocalization());
 
         // Primitive Executor: run the last primitive if we have not timed out,
         // producing the control command for this iteration
@@ -270,7 +281,7 @@ inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
             const Angle orientation =
                 createAngle(primitive_.move().w_traj_params().start_angle());
 
-            robot_localizer_.update(
+            robot_localizer_->update(
                 RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
         }
 
@@ -278,7 +289,7 @@ inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
 
         // Start new primitive
         const auto start = std::chrono::steady_clock::now();
-        primitive_executor_.updatePrimitive(primitive_);
+        primitive_executor_->updatePrimitive(primitive_);
         result.primitive_start_time_ms = std::chrono::duration<double, std::milli>(
                                              std::chrono::steady_clock::now() - start)
                                              .count();
@@ -294,7 +305,7 @@ inline RobotState Thunderloop::updateLocalization()
     // IMU: feed the measured angular velocity to the localizer
     if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
     {
-        robot_localizer_.update(
+        robot_localizer_->update(
             RobotLocalizer::ImuData{imu_poll->angular_velocity.value()});
     }
 
@@ -304,9 +315,9 @@ inline RobotState Thunderloop::updateLocalization()
     {
         const auto status = robot_status_.motor_status();
 
-        robot_localizer_.update(RobotLocalizer::MotorData{
+        robot_localizer_->update(RobotLocalizer::MotorData{
             localToGlobalVelocity(createVector(status.local_velocity()),
-                                  robot_localizer_.getOrientation()),
+                                  robot_localizer_->getOrientation()),
             createAngularVelocity(status.angular_velocity())});
     }
 
@@ -321,12 +332,12 @@ inline RobotState Thunderloop::updateLocalization()
     }
 #endif
 
-    robot_localizer_.step(linear_acceleration);
+    robot_localizer_->step(linear_acceleration);
 
     // Hand the fused state estimate to the primitive executor
-    return RobotState(robot_localizer_.getPosition(), robot_localizer_.getVelocity(),
-                      robot_localizer_.getOrientation(),
-                      robot_localizer_.getAngularVelocity());
+    return RobotState(robot_localizer_->getPosition(), robot_localizer_->getVelocity(),
+                      robot_localizer_->getOrientation(),
+                      robot_localizer_->getAngularVelocity());
 }
 
 inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
@@ -344,11 +355,11 @@ inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
     if (time_since_last_primitive_received >
         std::chrono::nanoseconds(static_cast<long>(PACKET_TIMEOUT_NS)))
     {
-        primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
+        primitive_executor_->updatePrimitive(*createStopPrimitiveProto());
     }
 
     result.direct_control =
-        *primitive_executor_.stepPrimitive(result.executor_status, delta_time);
+        *primitive_executor_->stepPrimitive(result.executor_status, delta_time);
 
     const auto poll_end = std::chrono::steady_clock::now();
     result.step_time_ms =
@@ -377,7 +388,6 @@ inline void Thunderloop::assembleRobotStatus(const NetworkPollResult& network,
 
     // Compose the outgoing status. Note: motor_status and power_status are written into
     // robot_status_ directly by the motor/power services during their poll.
-    robot_status_.set_robot_id(robot_id_);
     robot_status_.set_last_handled_primitive_set(primitive_.sequence_number());
     *(robot_status_.mutable_time_sent())                 = time_sent;
     *(robot_status_.mutable_thunderloop_status())        = thunderloop_status_;
@@ -385,14 +395,15 @@ inline void Thunderloop::assembleRobotStatus(const NetworkPollResult& network,
     *(robot_status_.mutable_primitive_executor_status()) = primitive.executor_status;
 }
 
-void Thunderloop::waitForNetworkUp()
+void Thunderloop::waitForNetworkUp(const int channel_id,
+                                   const std::string& network_interface)
 {
     std::unique_ptr<ThreadedUdpSender> network_tester;
     try
     {
         network_tester = std::make_unique<ThreadedUdpSender>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), NETWORK_COMM_TEST_PORT,
-            network_interface_, true);
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), NETWORK_COMM_TEST_PORT,
+            network_interface, true);
     }
     catch (TbotsNetworkException& e)
     {
