@@ -172,7 +172,7 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
                 stepTargetAngularVelocity(delta_time);
 
             // For debugging:
-            sendLinearMotionToPlotJuggler(local_velocity, delta_time);
+            // sendLinearMotionToPlotJuggler(local_velocity, delta_time);
 
             auto prim = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
