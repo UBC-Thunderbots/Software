@@ -38,17 +38,12 @@ load(
 )
 load(
     "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
-    "action_config",
-    "env_entry",
-    "env_set",
     "feature",
-    "feature_set",
     "flag_group",
     "flag_set",
-    "tool",
     "tool_path",
-    "variable_with_value",
 )
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 
 ACTION_NAMES = struct(
     c_compile = C_COMPILE_ACTION_NAME,
@@ -332,6 +327,57 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["external_include_paths"] = feature(
+        name = "external_include_paths",
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.linkstamp_compile,
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.clif_match,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-isystem", "%{external_include_paths}"],
+                        iterate_over = "external_include_paths",
+                        expand_if_available = "external_include_paths",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    # Treat the bin directory (bazel-bin) as a system include directory.
+    # The purpose of this is to suppress warnings coming from generated headers
+    # (e.g. compiled protobufs) which are output in the bin directory.
+    # Our own headers are found through -iquote and are NOT affected by this,
+    # so our own code stays fully checked.
+    result["generated_include_paths"] = feature(
+        name = "generated_include_paths",
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.linkstamp_compile,
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.clif_match,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-isystem", ctx.bin_dir.path],
+                    ),
+                ],
+            ),
+        ],
+    )
+
     result["has_configured_linker_path_feature"] = feature(name = "has_configured_linker_path")
 
     result["copy_dynamic_libraries_to_binary_feature"] = \
@@ -609,7 +655,6 @@ cc_toolchain_config_fullsystem = rule(
         "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
     },
-    provides = [CcToolchainConfigInfo],
     executable = True,
 )
 
@@ -797,7 +842,6 @@ cc_toolchain_config_stm32 = rule(
         "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
     },
-    provides = [CcToolchainConfigInfo],
 )
 
 def _k8_aarch64_linux_impl(ctx):
@@ -926,6 +970,5 @@ cc_toolchain_config_k8_aarch64_linux = rule(
         "toolchain_identifier": attr.string(),
         "extra_features": attr.string_list(),
     },
-    provides = [CcToolchainConfigInfo],
     executable = True,
 )
