@@ -16,7 +16,6 @@
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
-#include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 #include "software/physics/velocity_conversion_util.h"
@@ -109,12 +108,19 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     NetworkLoggerSingleton::initializeLogger(robot_id, enable_log_merging,
                                              network_interface);
 
-    waitForNetworkUp(channel_id, network_interface);
+    const NetworkService::NetworkConfig network_config{
+        .robot_id                 = static_cast<RobotId>(robot_id),
+        .multicast_ip             = std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)),
+        .primitive_listener_port  = PRIMITIVE_PORT,
+        .robot_status_sender_port = ROBOT_STATUS_PORT,
+        .full_system_to_robot_ip_notification_port =
+            FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+        .robot_to_full_system_ip_notification_port =
+            ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
+        .interface = network_interface,
+    };
 
-    network_service_ = std::make_unique<NetworkService>(
-        robot_id, std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), PRIMITIVE_PORT,
-        ROBOT_STATUS_PORT, FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
-        ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, ROBOT_LOGS_PORT, network_interface);
+    network_service_ = std::make_unique<NetworkService>(network_config);
     LOG(INFO) << "THUNDERLOOP: Network Service initialized!";
 
 #ifndef DISABLE_POWER_SERVICE
@@ -199,7 +205,14 @@ void Thunderloop::runLoop()
 
         robot_status_.clear_error_code();
 
-        pollNetwork();
+        const std::optional<TbotsProto::Primitive> primitive =
+            network_service_->poll(robot_status_, delta_time);
+
+        if (primitive.has_value())
+        {
+            updateRobotLocalizer(primitive.value());
+            primitive_executor_->updatePrimitive(primitive.value(), robot_status_);
+        }
 
         robot_localizer_->step(Vector(), delta_time);
         updateRobotLocalizer(robot_status_);
@@ -235,57 +248,6 @@ void Thunderloop::runLoop()
             next_shot = iter_end_time;
         }
     }
-}
-
-void Thunderloop::pollNetwork()
-{
-    ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
-
-    const TbotsProto::Primitive new_primitive = network_service_->poll(robot_status_);
-
-    if (new_primitive.time_sent().epoch_timestamp_seconds() >
-        primitive_.time_sent().epoch_timestamp_seconds())
-    {
-        primitive_ = new_primitive;
-        updateRobotLocalizer(primitive_);
-        primitive_executor_->updatePrimitive(primitive_, robot_status_);
-    }
-}
-
-void Thunderloop::waitForNetworkUp(const int channel_id,
-                                   const std::string& network_interface)
-{
-    std::unique_ptr<ThreadedUdpSender> network_tester;
-    try
-    {
-        network_tester = std::make_unique<ThreadedUdpSender>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), NETWORK_COMM_TEST_PORT,
-            network_interface, true);
-    }
-    catch (TbotsNetworkException& e)
-    {
-        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
-    }
-
-    // Send an empty packet on the specific network interface to
-    // ensure wifi is connected. Keeps trying until successful
-    while (true)
-    {
-        try
-        {
-            network_tester->sendString("");
-            break;
-        }
-        catch (std::exception& e)
-        {
-            // Resend the message after a delay
-            LOG(WARNING) << "Thunderloop cannot connect to network!"
-                         << "Waiting for connection...";
-            sleep(1);
-        }
-    }
-
-    LOG(INFO) << "Thunderloop connected to network!";
 }
 
 void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
