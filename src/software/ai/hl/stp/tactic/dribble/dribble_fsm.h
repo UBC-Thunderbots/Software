@@ -173,17 +173,17 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetPossession)
-        DEFINE_SML_STATE(Dribble)
-        DEFINE_SML_STATE(LoseBall)
-        DEFINE_SML_EVENT(Update)
+        const auto GetPossession_S = boost::sml::state<GetPossession>;
+        const auto Dribble_S = boost::sml::state<Dribble>;
+        const auto LoseBall_S = boost::sml::state<LoseBall>;
+        const auto Update_E = boost::sml::event<Update>;
         const auto havePossession_G = SMLGuard<&DribbleFSM::havePossession>{this};
         const auto lostPossession_G = SMLGuard<&DribbleFSM::lostPossession>{this};
         const auto dribblingDone_G  = SMLGuard<&DribbleFSM::dribblingDone>{this};
         const auto shouldLoseBall_G = SMLGuard<&DribbleFSM::shouldLoseBall>{this};
-        DEFINE_SML_ACTION(loseBall)
-        DEFINE_SML_ACTION(getPossession)
-        DEFINE_SML_ACTION(dribble)
+        const auto loseBall_A       = SMLAction<&DribbleFSM::loseBall>{this};
+        const auto getPossession_A  = SMLAction<&DribbleFSM::getPossession>{this};
+        const auto dribble_A        = SMLAction<&DribbleFSM::dribble>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

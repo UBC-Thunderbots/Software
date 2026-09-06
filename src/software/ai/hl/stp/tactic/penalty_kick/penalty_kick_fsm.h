@@ -104,17 +104,19 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_STATE(KickFSM)
+        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
+        const auto KickFSM_S = boost::sml::state<KickFSM>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto takePenaltyShot_G = SMLGuard<&PenaltyKickFSM::takePenaltyShot>{this};
         const auto timeOutApproach_G = SMLGuard<&PenaltyKickFSM::timeOutApproach>{this};
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(adjustOrientationForShot, DribbleFSM)
+        const auto shoot_A = SMLSubFSMUpdateAction<&PenaltyKickFSM::shoot>{this};
+        const auto updateApproachKeeper_A =
+            SMLSubFSMUpdateAction<&PenaltyKickFSM::updateApproachKeeper>{this};
+        const auto adjustOrientationForShot_A =
+            SMLSubFSMUpdateAction<&PenaltyKickFSM::adjustOrientationForShot>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state

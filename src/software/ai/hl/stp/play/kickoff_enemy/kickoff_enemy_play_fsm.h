@@ -90,11 +90,11 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetupState)
+        const auto SetupState_S = boost::sml::state<SetupState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(kickoff)
+        const auto kickoff_A = SMLAction<&KickoffEnemyPlayFSM::kickoff>{this};
 
 
         return make_transition_table(

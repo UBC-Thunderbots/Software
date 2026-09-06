@@ -65,15 +65,15 @@ struct AttackerFSM : TacticFSM<AttackerFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(PivotKickFSM)
-        DEFINE_SML_STATE(KeepAwayFSM)
-        DEFINE_SML_STATE(DribbleFSM)
+        const auto PivotKickFSM_S = boost::sml::state<PivotKickFSM>;
+        const auto KeepAwayFSM_S = boost::sml::state<KeepAwayFSM>;
+        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto shouldKick_G = SMLGuard<&AttackerFSM::shouldKick>{this};
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
+        const auto pivotKick_A  = SMLSubFSMUpdateAction<&AttackerFSM::pivotKick>{this};
+        const auto keepAway_A   = SMLSubFSMUpdateAction<&AttackerFSM::keepAway>{this};
 
         return make_transition_table(
             *DribbleFSM_S + Update_E[shouldKick_G] / pivotKick_A = PivotKickFSM_S,

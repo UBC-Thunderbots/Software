@@ -40,10 +40,10 @@ struct HaltFSM : TacticFSM<HaltFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(StopState)
-        DEFINE_SML_EVENT(Update)
-        const auto stopDone_G = SMLGuard<&HaltFSM::stopDone>{this};
-        DEFINE_SML_ACTION(updateStop)
+        const auto StopState_S = boost::sml::state<StopState>;
+        const auto Update_E = boost::sml::event<Update>;
+        const auto stopDone_G   = SMLGuard<&HaltFSM::stopDone>{this};
+        const auto updateStop_A = SMLAction<&HaltFSM::updateStop>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

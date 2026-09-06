@@ -88,13 +88,14 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetupState)
-        DEFINE_SML_STATE(ChipState)
+        const auto SetupState_S = boost::sml::state<SetupState>;
+        const auto ChipState_S = boost::sml::state<ChipState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(setupKickoff)
-        DEFINE_SML_ACTION(chipBall)
+        const auto setupKickoff_A =
+            SMLAction<&KickoffFriendlyPlayFSM::setupKickoff>{this};
+        const auto chipBall_A = SMLAction<&KickoffFriendlyPlayFSM::chipBall>{this};
 
         const auto isSetupDone_G = SMLGuard<&KickoffFriendlyPlayFSM::isSetupDone>{this};
         const auto isPlaying_G   = SMLGuard<&KickoffFriendlyPlayFSM::isPlaying>{this};

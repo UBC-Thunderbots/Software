@@ -86,16 +86,17 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(DefenseState)
-        DEFINE_SML_STATE(AggressiveDefenseState)
+        const auto DefenseState_S = boost::sml::state<DefenseState>;
+        const auto AggressiveDefenseState_S = boost::sml::state<AggressiveDefenseState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto shouldDefendAggressively_G =
             SMLGuard<&DefensePlayFSM::shouldDefendAggressively>{this};
 
-        DEFINE_SML_ACTION(blockShots)
-        DEFINE_SML_ACTION(shadowAndBlockShots)
+        const auto blockShots_A = SMLAction<&DefensePlayFSM::blockShots>{this};
+        const auto shadowAndBlockShots_A =
+            SMLAction<&DefensePlayFSM::shadowAndBlockShots>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

@@ -209,20 +209,21 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetupPositionState)
-        DEFINE_SML_STATE(ShootState)
-        DEFINE_SML_STATE(AttemptPassState)
-        DEFINE_SML_STATE(PassState)
-        DEFINE_SML_STATE(ChipState)
+        const auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
+        const auto ShootState_S = boost::sml::state<ShootState>;
+        const auto AttemptPassState_S = boost::sml::state<AttemptPassState>;
+        const auto PassState_S = boost::sml::state<PassState>;
+        const auto ChipState_S = boost::sml::state<ChipState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(setupPosition)
-        DEFINE_SML_ACTION(shootBall)
-        DEFINE_SML_ACTION(startLookingForPass)
-        DEFINE_SML_ACTION(lookForPass)
-        DEFINE_SML_ACTION(passBall)
-        DEFINE_SML_ACTION(chipBall)
+        const auto setupPosition_A = SMLAction<&FreeKickPlayFSM::setupPosition>{this};
+        const auto shootBall_A     = SMLAction<&FreeKickPlayFSM::shootBall>{this};
+        const auto startLookingForPass_A =
+            SMLAction<&FreeKickPlayFSM::startLookingForPass>{this};
+        const auto lookForPass_A = SMLAction<&FreeKickPlayFSM::lookForPass>{this};
+        const auto passBall_A    = SMLAction<&FreeKickPlayFSM::passBall>{this};
+        const auto chipBall_A    = SMLAction<&FreeKickPlayFSM::chipBall>{this};
 
         const auto setupDone_G       = SMLGuard<&FreeKickPlayFSM::setupDone>{this};
         const auto shotFound_G       = SMLGuard<&FreeKickPlayFSM::shotFound>{this};

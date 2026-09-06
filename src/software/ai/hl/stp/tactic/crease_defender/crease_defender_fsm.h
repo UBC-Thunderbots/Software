@@ -88,13 +88,15 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(MoveFSM)
-        DEFINE_SML_EVENT(Update)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
-        DEFINE_SML_STATE(DribbleFSM)
+        const auto MoveFSM_S = boost::sml::state<MoveFSM>;
+        const auto Update_E = boost::sml::event<Update>;
+        const auto blockThreat_A =
+            SMLSubFSMUpdateAction<&CreaseDefenderFSM::blockThreat>{this};
+        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
         const auto ballNearbyWithoutThreat_G =
             SMLGuard<&CreaseDefenderFSM::ballNearbyWithoutThreat>{this};
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
+        const auto prepareGetPossession_A =
+            SMLSubFSMUpdateAction<&CreaseDefenderFSM::prepareGetPossession>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

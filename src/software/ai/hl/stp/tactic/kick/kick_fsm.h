@@ -70,15 +70,16 @@ struct KickFSM : TacticFSM<KickFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallFSM)
-        DEFINE_SML_STATE(KickState)
-        DEFINE_SML_EVENT(Update)
+        const auto GetBehindBallFSM_S = boost::sml::state<GetBehindBallFSM>;
+        const auto KickState_S = boost::sml::state<KickState>;
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto ballChicked_G = SMLGuard<&KickFSM::ballChicked>{this};
         const auto shouldRealignWithBall_G =
             SMLGuard<&KickFSM::shouldRealignWithBall>{this};
-        DEFINE_SML_ACTION(updateKick)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
+        const auto updateKick_A = SMLAction<&KickFSM::updateKick>{this};
+        const auto updateGetBehindBall_A =
+            SMLSubFSMUpdateAction<&KickFSM::updateGetBehindBall>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

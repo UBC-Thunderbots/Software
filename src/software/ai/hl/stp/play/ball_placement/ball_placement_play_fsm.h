@@ -147,19 +147,20 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(StartState)
-        DEFINE_SML_STATE(KickOffWallState)
-        DEFINE_SML_STATE(AlignPlacementState)
-        DEFINE_SML_STATE(PlaceBallState)
-        DEFINE_SML_STATE(WaitState)
-        DEFINE_SML_STATE(RetreatState)
-        DEFINE_SML_EVENT(Update)
+        const auto StartState_S = boost::sml::state<StartState>;
+        const auto KickOffWallState_S = boost::sml::state<KickOffWallState>;
+        const auto AlignPlacementState_S = boost::sml::state<AlignPlacementState>;
+        const auto PlaceBallState_S = boost::sml::state<PlaceBallState>;
+        const auto WaitState_S = boost::sml::state<WaitState>;
+        const auto RetreatState_S = boost::sml::state<RetreatState>;
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(alignPlacement)
-        DEFINE_SML_ACTION(placeBall)
-        DEFINE_SML_ACTION(kickOffWall)
-        DEFINE_SML_ACTION(startWait)
-        DEFINE_SML_ACTION(retreat)
+        const auto alignPlacement_A =
+            SMLAction<&BallPlacementPlayFSM::alignPlacement>{this};
+        const auto placeBall_A   = SMLAction<&BallPlacementPlayFSM::placeBall>{this};
+        const auto kickOffWall_A = SMLAction<&BallPlacementPlayFSM::kickOffWall>{this};
+        const auto startWait_A   = SMLAction<&BallPlacementPlayFSM::startWait>{this};
+        const auto retreat_A     = SMLAction<&BallPlacementPlayFSM::retreat>{this};
 
         const auto shouldKickOffWall_G =
             SMLGuard<&BallPlacementPlayFSM::shouldKickOffWall>{this};

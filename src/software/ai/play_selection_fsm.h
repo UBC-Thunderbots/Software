@@ -67,10 +67,10 @@ struct PlaySelectionFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetPlay)
-        DEFINE_SML_STATE(Halt)
-        DEFINE_SML_STATE(Playing)
-        DEFINE_SML_STATE(Stop)
+        const auto SetPlay_S = boost::sml::state<SetPlay>;
+        const auto Halt_S = boost::sml::state<Halt>;
+        const auto Playing_S = boost::sml::state<Playing>;
+        const auto Stop_S = boost::sml::state<Stop>;
 
         const auto gameStateStopped_G =
             SMLGuard<&PlaySelectionFSM::gameStateStopped>{this};
@@ -80,13 +80,14 @@ struct PlaySelectionFSM
         const auto gameStateSetupRestart_G =
             SMLGuard<&PlaySelectionFSM::gameStateSetupRestart>{this};
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(setupSetPlay)
-        DEFINE_SML_ACTION(setupStopPlay)
-        DEFINE_SML_ACTION(setupHaltPlay)
-        DEFINE_SML_ACTION(setupOffensePlay)
-        DEFINE_SML_ACTION(resetSetPlay)
+        const auto setupSetPlay_A  = SMLAction<&PlaySelectionFSM::setupSetPlay>{this};
+        const auto setupStopPlay_A = SMLAction<&PlaySelectionFSM::setupStopPlay>{this};
+        const auto setupHaltPlay_A = SMLAction<&PlaySelectionFSM::setupHaltPlay>{this};
+        const auto setupOffensePlay_A =
+            SMLAction<&PlaySelectionFSM::setupOffensePlay>{this};
+        const auto resetSetPlay_A = SMLAction<&PlaySelectionFSM::resetSetPlay>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

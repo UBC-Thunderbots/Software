@@ -132,22 +132,22 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(MoveFSM)
-        DEFINE_SML_STATE(BlockPassState)
-        DEFINE_SML_STATE(GoAndStealState)
-        DEFINE_SML_STATE(StealAndPullState)
+        const auto MoveFSM_S = boost::sml::state<MoveFSM>;
+        const auto BlockPassState_S = boost::sml::state<BlockPassState>;
+        const auto GoAndStealState_S = boost::sml::state<GoAndStealState>;
+        const auto StealAndPullState_S = boost::sml::state<StealAndPullState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto enemyThreatHasBall_G =
             SMLGuard<&ShadowEnemyFSM::enemyThreatHasBall>{this};
         const auto contestedBall_G = SMLGuard<&ShadowEnemyFSM::contestedBall>{this};
         const auto blockedShot_G   = SMLGuard<&ShadowEnemyFSM::blockedShot>{this};
 
-        DEFINE_SML_ACTION(blockPass)
-        DEFINE_SML_ACTION(goAndSteal)
-        DEFINE_SML_ACTION(stealAndPull)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveFSM)
+        const auto blockPass_A    = SMLAction<&ShadowEnemyFSM::blockPass>{this};
+        const auto goAndSteal_A   = SMLAction<&ShadowEnemyFSM::goAndSteal>{this};
+        const auto stealAndPull_A = SMLAction<&ShadowEnemyFSM::stealAndPull>{this};
+        const auto blockShot_A = SMLSubFSMUpdateAction<&ShadowEnemyFSM::blockShot>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

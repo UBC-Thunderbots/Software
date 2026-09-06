@@ -66,15 +66,16 @@ struct ChipFSM : TacticFSM<ChipFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallFSM)
-        DEFINE_SML_STATE(ChipState)
-        DEFINE_SML_EVENT(Update)
+        const auto GetBehindBallFSM_S = boost::sml::state<GetBehindBallFSM>;
+        const auto ChipState_S = boost::sml::state<ChipState>;
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto ballChicked_G = SMLGuard<&ChipFSM::ballChicked>{this};
         const auto shouldRealignWithBall_G =
             SMLGuard<&ChipFSM::shouldRealignWithBall>{this};
-        DEFINE_SML_ACTION(updateChip)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
+        const auto updateChip_A = SMLAction<&ChipFSM::updateChip>{this};
+        const auto updateGetBehindBall_A =
+            SMLSubFSMUpdateAction<&ChipFSM::updateGetBehindBall>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

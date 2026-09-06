@@ -104,15 +104,17 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(WaitState)
-        DEFINE_SML_STATE(AvoidState)
-        DEFINE_SML_STATE(DefenseState)
+        const auto WaitState_S = boost::sml::state<WaitState>;
+        const auto AvoidState_S = boost::sml::state<AvoidState>;
+        const auto DefenseState_S = boost::sml::state<DefenseState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(setPlacementPoint)
-        DEFINE_SML_ACTION(avoid)
-        DEFINE_SML_ACTION(enterDefensiveFormation)
+        const auto setPlacementPoint_A =
+            SMLAction<&EnemyBallPlacementPlayFSM::setPlacementPoint>{this};
+        const auto avoid_A = SMLAction<&EnemyBallPlacementPlayFSM::avoid>{this};
+        const auto enterDefensiveFormation_A =
+            SMLAction<&EnemyBallPlacementPlayFSM::enterDefensiveFormation>{this};
 
         const auto hasPlacementPoint_G =
             SMLGuard<&EnemyBallPlacementPlayFSM::hasPlacementPoint>{this};

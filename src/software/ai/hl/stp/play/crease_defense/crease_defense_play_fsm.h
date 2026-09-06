@@ -49,11 +49,12 @@ struct CreaseDefensePlayFSM : PlayFSM<CreaseDefensePlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(DefenseState)
+        const auto DefenseState_S = boost::sml::state<DefenseState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
-        DEFINE_SML_ACTION(defendDefenseArea)
+        const auto defendDefenseArea_A =
+            SMLAction<&CreaseDefensePlayFSM::defendDefenseArea>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

@@ -145,19 +145,19 @@ struct ReceiverFSM : TacticFSM<ReceiverFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(ReceiveAndDribbleState)
-        DEFINE_SML_STATE(OneTouchShotState)
-        DEFINE_SML_STATE(WaitingForPassState)
-        DEFINE_SML_EVENT(Update)
+        const auto ReceiveAndDribbleState_S = boost::sml::state<ReceiveAndDribbleState>;
+        const auto OneTouchShotState_S = boost::sml::state<OneTouchShotState>;
+        const auto WaitingForPassState_S = boost::sml::state<WaitingForPassState>;
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto onetouchPossible_G = SMLGuard<&ReceiverFSM::onetouchPossible>{this};
         const auto passStarted_G      = SMLGuard<&ReceiverFSM::passStarted>{this};
         const auto passFinished_G     = SMLGuard<&ReceiverFSM::passFinished>{this};
         const auto strayPass_G        = SMLGuard<&ReceiverFSM::strayPass>{this};
 
-        DEFINE_SML_ACTION(updateOnetouch)
-        DEFINE_SML_ACTION(updateReceive)
-        DEFINE_SML_ACTION(adjustReceive)
+        const auto updateOnetouch_A = SMLAction<&ReceiverFSM::updateOnetouch>{this};
+        const auto updateReceive_A  = SMLAction<&ReceiverFSM::updateReceive>{this};
+        const auto adjustReceive_A  = SMLAction<&ReceiverFSM::adjustReceive>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

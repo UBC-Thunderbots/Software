@@ -64,16 +64,18 @@ struct OffensePlayFSM : PlayFSM<OffensePlayFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(OffensiveState)
-        DEFINE_SML_STATE(DefensiveState)
+        const auto OffensiveState_S = boost::sml::state<OffensiveState>;
+        const auto DefensiveState_S = boost::sml::state<DefensiveState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto enemyHasPossession_G =
             SMLGuard<&OffensePlayFSM::enemyHasPossession>{this};
 
-        DEFINE_SML_ACTION(setupOffensiveStrategy)
-        DEFINE_SML_ACTION(setupDefensiveStrategy)
+        const auto setupOffensiveStrategy_A =
+            SMLAction<&OffensePlayFSM::setupOffensiveStrategy>{this};
+        const auto setupDefensiveStrategy_A =
+            SMLAction<&OffensePlayFSM::setupDefensiveStrategy>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

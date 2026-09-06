@@ -105,21 +105,22 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(BlockPassState)
-        DEFINE_SML_STATE(InterceptBallState)
+        const auto BlockPassState_S = boost::sml::state<BlockPassState>;
+        const auto InterceptBallState_S = boost::sml::state<InterceptBallState>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto passStarted_G   = SMLGuard<&PassDefenderFSM::passStarted>{this};
         const auto ballDeflected_G = SMLGuard<&PassDefenderFSM::ballDeflected>{this};
 
-        DEFINE_SML_ACTION(blockPass)
-        DEFINE_SML_ACTION(interceptBall)
+        const auto blockPass_A     = SMLAction<&PassDefenderFSM::blockPass>{this};
+        const auto interceptBall_A = SMLAction<&PassDefenderFSM::interceptBall>{this};
 
-        DEFINE_SML_STATE(DribbleFSM)
+        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
         const auto ballNearbyWithoutThreat_G =
             SMLGuard<&PassDefenderFSM::ballNearbyWithoutThreat>{this};
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
+        const auto prepareGetPossession_A =
+            SMLSubFSMUpdateAction<&PassDefenderFSM::prepareGetPossession>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

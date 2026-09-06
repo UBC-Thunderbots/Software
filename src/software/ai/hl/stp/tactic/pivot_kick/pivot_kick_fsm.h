@@ -61,14 +61,15 @@ struct PivotKickFSM : TacticFSM<PivotKickFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(StartState)
-        DEFINE_SML_STATE(KickState)
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_EVENT(Update)
+        const auto StartState_S = boost::sml::state<StartState>;
+        const auto KickState_S = boost::sml::state<KickState>;
+        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto ballKicked_G = SMLGuard<&PivotKickFSM::ballKicked>{this};
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleFSM)
-        DEFINE_SML_ACTION(kickBall)
+        const auto getPossessionAndPivot_A =
+            SMLSubFSMUpdateAction<&PivotKickFSM::getPossessionAndPivot>{this};
+        const auto kickBall_A = SMLAction<&PivotKickFSM::kickBall>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

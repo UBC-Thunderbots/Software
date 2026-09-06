@@ -188,13 +188,13 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(Panic)
-        DEFINE_SML_STATE(PivotKickFSM)
-        DEFINE_SML_STATE(PositionToBlock)
-        DEFINE_SML_STATE(MoveToGoalLine)
-        DEFINE_SML_STATE(DribbleFSM)
+        const auto Panic_S = boost::sml::state<Panic>;
+        const auto PivotKickFSM_S = boost::sml::state<PivotKickFSM>;
+        const auto PositionToBlock_S = boost::sml::state<PositionToBlock>;
+        const auto MoveToGoalLine_S = boost::sml::state<MoveToGoalLine>;
+        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
 
-        DEFINE_SML_EVENT(Update)
+        const auto Update_E = boost::sml::event<Update>;
 
         const auto ballInInflatedDefenseArea_G =
             SMLGuard<&GoalieFSM::ballInInflatedDefenseArea>{this};
@@ -207,11 +207,13 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
             SMLGuard<&GoalieFSM::shouldMoveToGoalLine>{this};
         const auto retrieveDone_G = SMLGuard<&GoalieFSM::retrieveDone>{this};
 
-        DEFINE_SML_ACTION(panic)
-        DEFINE_SML_ACTION(positionToBlock)
-        DEFINE_SML_ACTION(moveToGoalLine)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updatePivotKick, PivotKickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(retrieveFromDeadZone, DribbleFSM)
+        const auto panic_A           = SMLAction<&GoalieFSM::panic>{this};
+        const auto positionToBlock_A = SMLAction<&GoalieFSM::positionToBlock>{this};
+        const auto moveToGoalLine_A  = SMLAction<&GoalieFSM::moveToGoalLine>{this};
+        const auto updatePivotKick_A =
+            SMLSubFSMUpdateAction<&GoalieFSM::updatePivotKick>{this};
+        const auto retrieveFromDeadZone_A =
+            SMLSubFSMUpdateAction<&GoalieFSM::retrieveFromDeadZone>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
