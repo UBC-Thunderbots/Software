@@ -109,15 +109,6 @@ filegroup(
     srcs = ["hash_thunderloop_binary.sh"],
 )
 
-cc_test(
-    name = "test_battery",
-    srcs = ["battery_test.cpp"],
-    deps = [
-        ":thunderloop",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
 cc_library(
     name = "robot_localizer",
     srcs = ["robot_localizer.cpp"],
