@@ -1,7 +1,5 @@
 #pragma once
 
-#include "software/time/duration.h"
-
 /**
  * A generic interface for a motion controller.
  *
@@ -19,12 +17,12 @@ class MotionController
      *
      * @param current_state The actual measured current state.
      * @param target_trajectory The target trajectory of motion.
-     * @param elapsed_time The total elapsed time since the trajectory was created.
-     * @param delta_time The elapsed time since the last time step.
+     * @param elapsed_time_s The elapsed time since the trajectory was created in seconds.
+     * @param delta_time_s The elapsed time since the last time step in seconds.
      */
     virtual OutputType step(const StateType& current_state,
                             const TrajectoryType& target_trajectory,
-                            Duration elapsed_time, Duration delta_time) = 0;
+                            double elapsed_time_s, double delta_time_s) = 0;
 
     /**
      * Resets the internal state of the motion controller. For example, any

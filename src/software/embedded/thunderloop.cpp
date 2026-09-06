@@ -212,8 +212,8 @@ void Thunderloop::runLoop()
 
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
-            const Duration delta_time = Duration::fromSeconds(
-                getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND);
+            const double delta_time_s =
+                getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
 
             // Network Service: receive newest primitives and send out the last
             // robot status
@@ -225,12 +225,12 @@ void Thunderloop::runLoop()
 
             // Primitive Executor: run the last primitive if we have not timed out,
             // producing the control command for this iteration
-            const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time);
+            const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time_s);
 
 #ifndef DISABLE_MOTOR_SERVICE
             // Motor Service: execute the motor control command
             motor_service_->poll(primitive_result.direct_control, robot_status_,
-                                 delta_time.toSeconds());
+                                 delta_time_s);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
@@ -358,7 +358,7 @@ inline RobotState Thunderloop::updateLocalization()
 }
 
 inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
-    const Duration& delta_time)
+    double delta_time_s)
 {
     PrimitiveStepResult result;
     struct timespec poll_time;
@@ -384,7 +384,7 @@ inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
         }
 
         result.direct_control =
-            *primitive_executor_.stepPrimitive(result.executor_status, delta_time);
+            *primitive_executor_.stepPrimitive(result.executor_status, delta_time_s);
     }
 
     result.step_time_ms = getMilliseconds(poll_time);

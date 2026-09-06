@@ -133,7 +133,7 @@ class Thunderloop
      *
      * @return The control command, executor status, and timing telemetry for this step
      */
-    inline PrimitiveStepResult stepActivePrimitive(const Duration& delta_time);
+    inline PrimitiveStepResult stepActivePrimitive(double delta_time_s);
 
     /**
      * Composes the outgoing robot_status_ from the per-stage results. This is the single

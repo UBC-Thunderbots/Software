@@ -384,7 +384,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         if (ramping)
         {
             auto direct_control_no_ramp =
-                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
+                primitive_executor->stepPrimitive(status, primitive_executor_time_step.toSeconds());
 
             auto* prev_ramp_velocities = &yellow_prev_ramp_velocities;
             if (side == gameController::Team::BLUE)
@@ -420,7 +420,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         else
         {
             direct_control =
-                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
+                primitive_executor->stepPrimitive(status, primitive_executor_time_step.toSeconds());
         }
 
         auto command = *getRobotCommandFromDirectControl(
