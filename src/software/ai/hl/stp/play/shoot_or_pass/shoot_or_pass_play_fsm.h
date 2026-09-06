@@ -122,10 +122,11 @@ struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayFSM>
         DEFINE_SML_ACTION(startLookingForPass)
         DEFINE_SML_ACTION(takePass)
 
-        DEFINE_SML_GUARD(passFound)
-        DEFINE_SML_GUARD(shouldAbortPass)
-        DEFINE_SML_GUARD(passCompleted)
-        DEFINE_SML_GUARD(tookShot)
+        const auto passFound_G = SMLGuard<&ShootOrPassPlayFSM::passFound>{this};
+        const auto shouldAbortPass_G =
+            SMLGuard<&ShootOrPassPlayFSM::shouldAbortPass>{this};
+        const auto passCompleted_G = SMLGuard<&ShootOrPassPlayFSM::passCompleted>{this};
+        const auto tookShot_G      = SMLGuard<&ShootOrPassPlayFSM::tookShot>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

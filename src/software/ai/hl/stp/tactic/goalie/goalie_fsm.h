@@ -196,13 +196,16 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(ballInInflatedDefenseArea)
-        DEFINE_SML_GUARD(panicDone)
-        DEFINE_SML_GUARD(shouldEvacuateCrease)
-        DEFINE_SML_GUARD(shouldPivotChip)
-        DEFINE_SML_GUARD(shouldPanic)
-        DEFINE_SML_GUARD(shouldMoveToGoalLine)
-        DEFINE_SML_GUARD(retrieveDone)
+        const auto ballInInflatedDefenseArea_G =
+            SMLGuard<&GoalieFSM::ballInInflatedDefenseArea>{this};
+        const auto panicDone_G = SMLGuard<&GoalieFSM::panicDone>{this};
+        const auto shouldEvacuateCrease_G =
+            SMLGuard<&GoalieFSM::shouldEvacuateCrease>{this};
+        const auto shouldPivotChip_G = SMLGuard<&GoalieFSM::shouldPivotChip>{this};
+        const auto shouldPanic_G     = SMLGuard<&GoalieFSM::shouldPanic>{this};
+        const auto shouldMoveToGoalLine_G =
+            SMLGuard<&GoalieFSM::shouldMoveToGoalLine>{this};
+        const auto retrieveDone_G = SMLGuard<&GoalieFSM::retrieveDone>{this};
 
         DEFINE_SML_ACTION(panic)
         DEFINE_SML_ACTION(positionToBlock)

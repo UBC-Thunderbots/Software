@@ -31,7 +31,7 @@ struct ShootOrChipPlayFSM : PlayFSM<ShootOrChipPlayFSM>
         DEFINE_SML_STATE(ShootOrChipState)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_ACTION(updateShootOrChip)
-        DEFINE_SML_GUARD(attackerDone)
+        const auto attackerDone_G = SMLGuard<&ShootOrChipPlayFSM::attackerDone>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

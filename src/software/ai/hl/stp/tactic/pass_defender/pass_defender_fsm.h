@@ -110,14 +110,15 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(passStarted)
-        DEFINE_SML_GUARD(ballDeflected)
+        const auto passStarted_G   = SMLGuard<&PassDefenderFSM::passStarted>{this};
+        const auto ballDeflected_G = SMLGuard<&PassDefenderFSM::ballDeflected>{this};
 
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
         DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+        const auto ballNearbyWithoutThreat_G =
+            SMLGuard<&PassDefenderFSM::ballNearbyWithoutThreat>{this};
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
 
         return make_transition_table(

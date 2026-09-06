@@ -66,7 +66,7 @@ struct PivotKickFSM : TacticFSM<PivotKickFSM>
         DEFINE_SML_STATE(DribbleFSM)
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(ballKicked)
+        const auto ballKicked_G = SMLGuard<&PivotKickFSM::ballKicked>{this};
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleFSM)
         DEFINE_SML_ACTION(kickBall)
 

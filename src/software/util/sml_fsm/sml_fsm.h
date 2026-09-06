@@ -30,9 +30,6 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
  */
 #define DEFINE_SML_EVENT(EVENT) const auto EVENT##_E = boost::sml::event<EVENT>;
 
-#define DEFINE_SML_GUARD(FUNCTION)                                                       \
-const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
-
 /**
  * Unimplemented stub. Doesn't expose type so that use will throw an error.
  *

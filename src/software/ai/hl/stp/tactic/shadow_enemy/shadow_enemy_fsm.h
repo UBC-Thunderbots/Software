@@ -139,9 +139,10 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(enemyThreatHasBall)
-        DEFINE_SML_GUARD(contestedBall)
-        DEFINE_SML_GUARD(blockedShot)
+        const auto enemyThreatHasBall_G =
+            SMLGuard<&ShadowEnemyFSM::enemyThreatHasBall>{this};
+        const auto contestedBall_G = SMLGuard<&ShadowEnemyFSM::contestedBall>{this};
+        const auto blockedShot_G   = SMLGuard<&ShadowEnemyFSM::blockedShot>{this};
 
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(goAndSteal)

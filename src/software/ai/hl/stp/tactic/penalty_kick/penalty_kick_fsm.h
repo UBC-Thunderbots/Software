@@ -109,8 +109,8 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(takePenaltyShot)
-        DEFINE_SML_GUARD(timeOutApproach)
+        const auto takePenaltyShot_G = SMLGuard<&PenaltyKickFSM::takePenaltyShot>{this};
+        const auto timeOutApproach_G = SMLGuard<&PenaltyKickFSM::timeOutApproach>{this};
 
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleFSM)

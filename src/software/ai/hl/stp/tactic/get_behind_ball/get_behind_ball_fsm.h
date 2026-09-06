@@ -53,7 +53,7 @@ struct GetBehindBallFSM : TacticFSM<GetBehindBallFSM>
         DEFINE_SML_STATE(GetBehindBallState)
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(behindBall)
+        const auto behindBall_G = SMLGuard<&GetBehindBallFSM::behindBall>{this};
         DEFINE_SML_ACTION(updateMove)
 
 

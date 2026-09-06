@@ -75,14 +75,14 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
      *
      * @param event the FreeKickPlayFSM Update event
      */
-    static bool isSetupDone(const Update& event);
+    bool isSetupDone(const Update& event);
 
     /**
      * Guard that checks if game has started (ball kicked).
      *
      * @param event the FreeKickPlayFSM Update event
      */
-    static bool isPlaying(const Update& event);
+    bool isPlaying(const Update& event);
 
     auto operator()()
     {
@@ -96,8 +96,8 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
         DEFINE_SML_ACTION(setupKickoff)
         DEFINE_SML_ACTION(chipBall)
 
-        DEFINE_SML_GUARD(isSetupDone)
-        DEFINE_SML_GUARD(isPlaying)
+        const auto isSetupDone_G = SMLGuard<&KickoffFriendlyPlayFSM::isSetupDone>{this};
+        const auto isPlaying_G   = SMLGuard<&KickoffFriendlyPlayFSM::isPlaying>{this};
         return make_transition_table(
             *SetupState_S + Update_E[!isSetupDone_G] / setupKickoff_A = SetupState_S,
             SetupState_S + Update_E[isSetupDone_G]                    = ChipState_S,

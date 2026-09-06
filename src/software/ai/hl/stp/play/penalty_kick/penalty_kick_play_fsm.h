@@ -72,8 +72,9 @@ struct PenaltyKickPlayFSM : PlayFSM<PenaltyKickPlayFSM>
         DEFINE_SML_ACTION(setupPosition)
         DEFINE_SML_ACTION(performKick)
 
-        DEFINE_SML_GUARD(setupPositionDone)
-        DEFINE_SML_GUARD(kickDone)
+        const auto setupPositionDone_G =
+            SMLGuard<&PenaltyKickPlayFSM::setupPositionDone>{this};
+        const auto kickDone_G = SMLGuard<&PenaltyKickPlayFSM::kickDone>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

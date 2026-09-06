@@ -71,7 +71,7 @@ struct AttackerFSM : TacticFSM<AttackerFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(shouldKick)
+        const auto shouldKick_G = SMLGuard<&AttackerFSM::shouldKick>{this};
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(keepAway, KeepAwayFSM)
 

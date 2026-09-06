@@ -67,7 +67,7 @@ struct MoveFSM : TacticFSM<MoveFSM>
         // Update_E is the _event_ that the MoveFSM responds to
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(moveDone)
+        const auto moveDone_G = SMLGuard<&MoveFSM::moveDone>{this};
         DEFINE_SML_ACTION(updateMove)
 
         return make_transition_table(

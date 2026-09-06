@@ -74,8 +74,9 @@ struct KickFSM : TacticFSM<KickFSM>
         DEFINE_SML_STATE(KickState)
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(ballChicked)
-        DEFINE_SML_GUARD(shouldRealignWithBall)
+        const auto ballChicked_G = SMLGuard<&KickFSM::ballChicked>{this};
+        const auto shouldRealignWithBall_G =
+            SMLGuard<&KickFSM::shouldRealignWithBall>{this};
         DEFINE_SML_ACTION(updateKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 

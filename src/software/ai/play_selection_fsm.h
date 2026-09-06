@@ -72,10 +72,13 @@ struct PlaySelectionFSM
         DEFINE_SML_STATE(Playing)
         DEFINE_SML_STATE(Stop)
 
-        DEFINE_SML_GUARD(gameStateStopped)
-        DEFINE_SML_GUARD(gameStateHalted)
-        DEFINE_SML_GUARD(gameStatePlaying)
-        DEFINE_SML_GUARD(gameStateSetupRestart)
+        const auto gameStateStopped_G =
+            SMLGuard<&PlaySelectionFSM::gameStateStopped>{this};
+        const auto gameStateHalted_G = SMLGuard<&PlaySelectionFSM::gameStateHalted>{this};
+        const auto gameStatePlaying_G =
+            SMLGuard<&PlaySelectionFSM::gameStatePlaying>{this};
+        const auto gameStateSetupRestart_G =
+            SMLGuard<&PlaySelectionFSM::gameStateSetupRestart>{this};
 
         DEFINE_SML_EVENT(Update)
 

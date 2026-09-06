@@ -161,12 +161,13 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
         DEFINE_SML_ACTION(startWait)
         DEFINE_SML_ACTION(retreat)
 
-        DEFINE_SML_GUARD(shouldKickOffWall)
-        DEFINE_SML_GUARD(alignDone)
-        DEFINE_SML_GUARD(kickDone)
-        DEFINE_SML_GUARD(ballPlaced)
-        DEFINE_SML_GUARD(waitDone)
-        DEFINE_SML_GUARD(retreatDone)
+        const auto shouldKickOffWall_G =
+            SMLGuard<&BallPlacementPlayFSM::shouldKickOffWall>{this};
+        const auto alignDone_G   = SMLGuard<&BallPlacementPlayFSM::alignDone>{this};
+        const auto kickDone_G    = SMLGuard<&BallPlacementPlayFSM::kickDone>{this};
+        const auto ballPlaced_G  = SMLGuard<&BallPlacementPlayFSM::ballPlaced>{this};
+        const auto waitDone_G    = SMLGuard<&BallPlacementPlayFSM::waitDone>{this};
+        const auto retreatDone_G = SMLGuard<&BallPlacementPlayFSM::retreatDone>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

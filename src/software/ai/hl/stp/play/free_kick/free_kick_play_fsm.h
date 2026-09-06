@@ -224,14 +224,14 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
         DEFINE_SML_ACTION(passBall)
         DEFINE_SML_ACTION(chipBall)
 
-        DEFINE_SML_GUARD(setupDone)
-        DEFINE_SML_GUARD(shotFound)
-        DEFINE_SML_GUARD(shotDone)
-        DEFINE_SML_GUARD(shouldAbortPass)
-        DEFINE_SML_GUARD(passFound)
-        DEFINE_SML_GUARD(passDone)
-        DEFINE_SML_GUARD(chipDone)
-        DEFINE_SML_GUARD(timeExpired)
+        const auto setupDone_G       = SMLGuard<&FreeKickPlayFSM::setupDone>{this};
+        const auto shotFound_G       = SMLGuard<&FreeKickPlayFSM::shotFound>{this};
+        const auto shotDone_G        = SMLGuard<&FreeKickPlayFSM::shotDone>{this};
+        const auto shouldAbortPass_G = SMLGuard<&FreeKickPlayFSM::shouldAbortPass>{this};
+        const auto passFound_G       = SMLGuard<&FreeKickPlayFSM::passFound>{this};
+        const auto passDone_G        = SMLGuard<&FreeKickPlayFSM::passDone>{this};
+        const auto chipDone_G        = SMLGuard<&FreeKickPlayFSM::chipDone>{this};
+        const auto timeExpired_G     = SMLGuard<&FreeKickPlayFSM::timeExpired>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

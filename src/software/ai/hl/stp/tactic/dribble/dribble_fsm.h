@@ -177,10 +177,10 @@ struct DribbleFSM : TacticFSM<DribbleFSM>
         DEFINE_SML_STATE(Dribble)
         DEFINE_SML_STATE(LoseBall)
         DEFINE_SML_EVENT(Update)
-        DEFINE_SML_GUARD(havePossession)
-        DEFINE_SML_GUARD(lostPossession)
-        DEFINE_SML_GUARD(dribblingDone)
-        DEFINE_SML_GUARD(shouldLoseBall)
+        const auto havePossession_G = SMLGuard<&DribbleFSM::havePossession>{this};
+        const auto lostPossession_G = SMLGuard<&DribbleFSM::lostPossession>{this};
+        const auto dribblingDone_G  = SMLGuard<&DribbleFSM::dribblingDone>{this};
+        const auto shouldLoseBall_G = SMLGuard<&DribbleFSM::shouldLoseBall>{this};
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getPossession)
         DEFINE_SML_ACTION(dribble)

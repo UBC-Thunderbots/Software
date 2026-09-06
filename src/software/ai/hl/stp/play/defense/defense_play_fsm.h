@@ -91,7 +91,8 @@ struct DefensePlayFSM : public DefensePlayFSMBase
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(shouldDefendAggressively)
+        const auto shouldDefendAggressively_G =
+            SMLGuard<&DefensePlayFSM::shouldDefendAggressively>{this};
 
         DEFINE_SML_ACTION(blockShots)
         DEFINE_SML_ACTION(shadowAndBlockShots)

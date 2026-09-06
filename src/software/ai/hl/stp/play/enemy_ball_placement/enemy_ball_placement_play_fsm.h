@@ -114,8 +114,10 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayFSM>
         DEFINE_SML_ACTION(avoid)
         DEFINE_SML_ACTION(enterDefensiveFormation)
 
-        DEFINE_SML_GUARD(hasPlacementPoint)
-        DEFINE_SML_GUARD(isNearlyPlaced)
+        const auto hasPlacementPoint_G =
+            SMLGuard<&EnemyBallPlacementPlayFSM::hasPlacementPoint>{this};
+        const auto isNearlyPlaced_G =
+            SMLGuard<&EnemyBallPlacementPlayFSM::isNearlyPlaced>{this};
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

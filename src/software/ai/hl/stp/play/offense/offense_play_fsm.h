@@ -69,7 +69,8 @@ struct OffensePlayFSM : PlayFSM<OffensePlayFSM>
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(enemyHasPossession)
+        const auto enemyHasPossession_G =
+            SMLGuard<&OffensePlayFSM::enemyHasPossession>{this};
 
         DEFINE_SML_ACTION(setupOffensiveStrategy)
         DEFINE_SML_ACTION(setupDefensiveStrategy)
