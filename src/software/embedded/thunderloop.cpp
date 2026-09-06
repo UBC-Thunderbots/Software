@@ -231,13 +231,12 @@ void Thunderloop::runLoop()
             const TbotsProto::ChipperKickerStatus chicker_status =
                 trackChicker(primitive_result.direct_control);
 
-            std::optional<double> motor_poll_time_ms;
             std::optional<double> power_poll_time_ms;
 
 #ifndef DISABLE_MOTOR_SERVICE
             // Motor Service: execute the motor control command
-            motor_poll_time_ms =
-                pollMotorService(primitive_result.direct_control, time_since_prev_iter);
+            motor_service_->poll(primitive_result.direct_control, robot_status_,
+                                 delta_time.toSeconds());
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
@@ -247,7 +246,7 @@ void Thunderloop::runLoop()
 
             // Robot Status: compose the per-stage results into the outgoing status
             assembleRobotStatus(network_result, primitive_result, chicker_status,
-                                motor_poll_time_ms, power_poll_time_ms);
+                                power_poll_time_ms);
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -440,7 +439,7 @@ inline TbotsProto::ChipperKickerStatus Thunderloop::trackChicker(
 inline void Thunderloop::assembleRobotStatus(
     const NetworkPollResult& network, const PrimitiveStepResult& primitive,
     const TbotsProto::ChipperKickerStatus& chicker_status,
-    std::optional<double> motor_poll_time_ms, std::optional<double> power_poll_time_ms)
+    std::optional<double> power_poll_time_ms)
 {
     // Fold the per-stage timing into the sticky telemetry. Fields whose stage did not run
     // this iteration (a new primitive start, a disabled service) keep their last value.
@@ -451,10 +450,6 @@ inline void Thunderloop::assembleRobotStatus(
             network.primitive_start_time_ms.value());
     }
     thunderloop_status_.set_primitive_executor_step_time_ms(primitive.step_time_ms);
-    if (motor_poll_time_ms.has_value())
-    {
-        thunderloop_status_.set_motor_service_poll_time_ms(motor_poll_time_ms.value());
-    }
     if (power_poll_time_ms.has_value())
     {
         thunderloop_status_.set_power_service_poll_time_ms(power_poll_time_ms.value());
@@ -519,25 +514,6 @@ double Thunderloop::getCpuTemperature()
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
     }
-}
-
-double Thunderloop::pollMotorService(
-    const TbotsProto::DirectControlPrimitive& direct_control,
-    const struct timespec& time_since_prev_iteration)
-{
-    struct timespec poll_time;
-    {
-        ScopedTimespecTimer timer(&poll_time);
-
-        ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
-
-        double time_since_prev_iteration_s =
-            getMilliseconds(time_since_prev_iteration) * SECONDS_PER_MILLISECOND;
-
-        motor_service_->poll(direct_control, robot_status_, time_since_prev_iteration_s);
-    }
-
-    return getMilliseconds(poll_time);
 }
 
 double Thunderloop::pollPowerService(
