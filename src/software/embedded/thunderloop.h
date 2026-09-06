@@ -83,27 +83,6 @@ class Thunderloop
         double step_time_ms = 0.0;
     };
 
-    /*
-     * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
-     * are getting bigger than 1000000000 (= 1 second) the variable containing
-     * seconds has to be incremented and the nanoseconds decremented by 1000000000.
-     *
-     * @param ts timespec to modify
-     */
-    void timespecNorm(struct timespec& ts);
-
-    /**
-     * Converts the given timespec value to milliseconds
-     * @return The time in milliseconds
-     */
-    double getMilliseconds(timespec time);
-
-    /**
-     * Converts the given timespec value to nanoseconds
-     * @return The time in nanoseconds
-     */
-    double getNanoseconds(timespec time);
-
     /**
      * Wait for networking communication to be established. This function is blocking.
      */
@@ -169,9 +148,7 @@ class Thunderloop
 
     // Loop timing state tracked across iterations. Initialized at the start of runLoop()
     // and updated by the stage helpers as the corresponding events occur.
-    struct timespec last_primitive_received_time_;
-    struct timespec last_chipper_fired_;
-    struct timespec last_kicker_fired_;
+    std::chrono::steady_clock::time_point last_primitive_received_time_;
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;

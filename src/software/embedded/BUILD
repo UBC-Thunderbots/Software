@@ -76,7 +76,6 @@ cc_library(
         "//software/logger:network_logger",
         "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
-        "//software/util/scoped_timespec_timer",
         "@tracy",
     ],
 )
@@ -122,7 +121,6 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/sensor_fusion/filter:kalman_filter",
-        "//software/util/scoped_timespec_timer",
         "@eigen",
     ],
 )

@@ -1,7 +1,9 @@
 #include "software/embedded/thunderloop.h"
 
 #include <Tracy.hpp>
+#include <chrono>
 #include <fstream>
+#include <thread>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
@@ -18,15 +20,7 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/tracy/tracy_constants.h"
-#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
-
-/**
- * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
- * using clock_nanosleep of librt
- */
-extern int clock_nanosleep(clockid_t __clock_id, int __flags,
-                           __const struct timespec* __req, struct timespec* __rem);
 
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
@@ -159,26 +153,13 @@ Thunderloop::~Thunderloop() {}
  */
 void Thunderloop::runLoop()
 {
-    // Timing local to the loop. Cross-iteration timing state lives in members
-    // (last_primitive_received_time_, last_chipper_fired_, last_kicker_fired_) so the
-    // stage helpers can read and update it without threading it through their signatures.
-    struct timespec next_shot;
-    struct timespec iteration_time;
-    struct timespec current_time;
-    struct timespec prev_iter_start_time;
+    const auto interval = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::duration<double>(1.0 / static_cast<double>(loop_hz_)));
 
-    // Loop interval
-    int interval =
-        static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
+    auto prev_iter_start_time = std::chrono::steady_clock::now();
+    auto next_shot            = prev_iter_start_time;
 
-    // Get current time
-    // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
-    // CLOCK_REALTIME can jump backwards
-    clock_gettime(CLOCK_MONOTONIC, &next_shot);
-    clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time_);
-    clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired_);
-    clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired_);
-    clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
+    last_primitive_received_time_ = std::chrono::steady_clock::now();
 
     // Initial version setup
     std::string thunderloop_hash, thunderloop_date_flashed;
@@ -196,89 +177,82 @@ void Thunderloop::runLoop()
 
     for (;;)
     {
-        struct timespec time_since_prev_iter;
-        clock_gettime(CLOCK_MONOTONIC, &current_time);
-        ScopedTimespecTimer::timespecDiff(&current_time, &prev_iter_start_time,
-                                          &time_since_prev_iter);
-        prev_iter_start_time = current_time;
-        {
-            // Wait until next shot
-            //
-            // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
-            // CLOCK_REALTIME can jump backwards
-            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+        std::this_thread::sleep_until(next_shot);
 
-            FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+        const auto iter_start_time      = std::chrono::steady_clock::now();
+        const auto time_since_prev_iter = iter_start_time - prev_iter_start_time;
+        const Duration delta_time       = Duration::fromSeconds(
+                  std::chrono::duration<double>(time_since_prev_iter).count());
 
-            ScopedTimespecTimer iteration_timer(&iteration_time);
+        FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
-            const Duration delta_time = Duration::fromSeconds(
-                getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND);
+        // Network Service: receive newest primitives and send out the last
+        // robot status
+        const NetworkPollResult network_result = pollNetwork();
 
-            // Network Service: receive newest primitives and send out the last
-            // robot status
-            const NetworkPollResult network_result = pollNetwork();
+        // Robot Localizer: fuse sensor measurements into a robot state estimate
+        // and hand it to the primitive executor
+        primitive_executor_.updateState(updateLocalization());
 
-            // Robot Localizer: fuse sensor measurements into a robot state estimate
-            // and hand it to the primitive executor
-            primitive_executor_.updateState(updateLocalization());
-
-            // Primitive Executor: run the last primitive if we have not timed out,
-            // producing the control command for this iteration
-            const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time);
+        // Primitive Executor: run the last primitive if we have not timed out,
+        // producing the control command for this iteration
+        const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time);
 
 #ifndef DISABLE_MOTOR_SERVICE
-            // Motor Service: execute the motor control command
-            motor_service_->poll(primitive_result.direct_control, robot_status_,
-                                 delta_time);
+        // Motor Service: execute the motor control command
+        motor_service_->poll(primitive_result.direct_control, robot_status_, delta_time);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
-            // Power Service: execute the power control command
-            power_service_->poll(primitive_result.direct_control, robot_status_);
+        // Power Service: execute the power control command
+        power_service_->poll(primitive_result.direct_control, robot_status_);
 #endif
 
-            // Robot Status: compose the per-stage results into the outgoing status
-            assembleRobotStatus(network_result, primitive_result);
-        }
-
-        auto loop_duration_ns = getNanoseconds(iteration_time);
-        thunderloop_status_.set_iteration_time_ms(loop_duration_ns /
-                                                  NANOSECONDS_PER_MILLISECOND);
-
-        // Calculate next shot (which is an absolute time)
-        next_shot.tv_nsec += interval;
-        timespecNorm(next_shot);
+        // Robot Status: compose the per-stage results into the outgoing status
+        assembleRobotStatus(network_result, primitive_result);
 
         FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+
+        const auto iter_end_time = std::chrono::steady_clock::now();
+        const auto iter_duration = iter_end_time - iter_start_time;
+        robot_status_.mutable_thunderloop_status()->set_iteration_time_ms(
+            std::chrono::duration<double, std::milli>(iter_duration).count());
+
+        prev_iter_start_time = iter_start_time;
+        next_shot += interval;
+
+        if (next_shot < iter_end_time)
+        {
+            LOG(WARNING) << "Thunderloop iteration overran its "
+                         << std::chrono::duration<double, std::milli>(interval).count()
+                         << " ms interval, resetting loop schedule";
+            next_shot = iter_end_time;
+        }
     }
 }
 
 inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
 {
     NetworkPollResult result;
-    struct timespec poll_time;
-    struct timespec current_time;
     TbotsProto::Primitive new_primitive;
 
     // Network Service: receive newest primitives and send out the last robot status
-    {
-        ScopedTimespecTimer timer(&poll_time);
+    const auto poll_start = std::chrono::steady_clock::now();
 
-        ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
+    ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
 
-        new_primitive = network_service_->poll(robot_status_);
-    }
+    new_primitive = network_service_->poll(robot_status_);
 
-    result.poll_time_ms = getMilliseconds(poll_time);
+    const auto poll_end = std::chrono::steady_clock::now();
+    result.poll_time_ms =
+        std::chrono::duration<double, std::milli>(poll_end - poll_start).count();
 
     // Update the time elapsed since the last received primitive
-    struct timespec time_since_last_primitive_received;
-    clock_gettime(CLOCK_MONOTONIC, &current_time);
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time_,
-                                      &time_since_last_primitive_received);
+    const auto time_since_last_primitive_received =
+        std::chrono::steady_clock::now() - last_primitive_received_time_;
     result.network_status.set_ms_since_last_primitive_received(
-        getMilliseconds(time_since_last_primitive_received));
+        std::chrono::duration<double, std::milli>(time_since_last_primitive_received)
+            .count());
 
     // If the primitive msg is new, update the internal buffer and start the new
     // primitive.
@@ -300,16 +274,14 @@ inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
                 RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
         }
 
-        clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time_);
+        last_primitive_received_time_ = std::chrono::steady_clock::now();
 
         // Start new primitive
-        struct timespec start_time;
-        {
-            ScopedTimespecTimer timer(&start_time);
-            primitive_executor_.updatePrimitive(primitive_);
-        }
-
-        result.primitive_start_time_ms = getMilliseconds(start_time);
+        const auto start = std::chrono::steady_clock::now();
+        primitive_executor_.updatePrimitive(primitive_);
+        result.primitive_start_time_ms = std::chrono::duration<double, std::milli>(
+                                             std::chrono::steady_clock::now() - start)
+                                             .count();
     }
 
     return result;
@@ -361,33 +333,26 @@ inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
     const Duration& delta_time)
 {
     PrimitiveStepResult result;
-    struct timespec poll_time;
-    struct timespec current_time;
-    struct timespec time_since_last_primitive_received;
 
-    clock_gettime(CLOCK_MONOTONIC, &current_time);
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time_,
-                                      &time_since_last_primitive_received);
+    const auto poll_start = std::chrono::steady_clock::now();
 
+    ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
+
+    // If primitive not received in a while, stop the robot
+    const auto time_since_last_primitive_received =
+        std::chrono::steady_clock::now() - last_primitive_received_time_;
+    if (time_since_last_primitive_received >
+        std::chrono::nanoseconds(static_cast<long>(PACKET_TIMEOUT_NS)))
     {
-        ScopedTimespecTimer timer(&poll_time);
-
-        ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
-
-        // If primitive not received in a while, stop the robot
-        auto nanoseconds_elapsed_since_last_primitive =
-            getNanoseconds(time_since_last_primitive_received);
-
-        if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
-        {
-            primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
-        }
-
-        result.direct_control =
-            *primitive_executor_.stepPrimitive(result.executor_status, delta_time);
+        primitive_executor_.updatePrimitive(*createStopPrimitiveProto());
     }
 
-    result.step_time_ms = getMilliseconds(poll_time);
+    result.direct_control =
+        *primitive_executor_.stepPrimitive(result.executor_status, delta_time);
+
+    const auto poll_end = std::chrono::steady_clock::now();
+    result.step_time_ms =
+        std::chrono::duration<double, std::milli>(poll_end - poll_start).count();
 
     return result;
 }
@@ -405,10 +370,10 @@ inline void Thunderloop::assembleRobotStatus(const NetworkPollResult& network,
     }
     thunderloop_status_.set_primitive_executor_step_time_ms(primitive.step_time_ms);
 
-    struct timespec current_time;
-    clock_gettime(CLOCK_MONOTONIC, &current_time);
     TbotsProto::Timestamp time_sent;
-    time_sent.set_epoch_timestamp_seconds(static_cast<double>(current_time.tv_sec));
+    time_sent.set_epoch_timestamp_seconds(
+        std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch())
+            .count());
 
     // Compose the outgoing status. Note: motor_status and power_status are written into
     // robot_status_ directly by the motor/power services during their poll.
@@ -418,27 +383,6 @@ inline void Thunderloop::assembleRobotStatus(const NetworkPollResult& network,
     *(robot_status_.mutable_thunderloop_status())        = thunderloop_status_;
     *(robot_status_.mutable_network_status())            = network.network_status;
     *(robot_status_.mutable_primitive_executor_status()) = primitive.executor_status;
-}
-
-double Thunderloop::getMilliseconds(timespec time)
-{
-    return (static_cast<double>(time.tv_sec) * MILLISECONDS_PER_SECOND) +
-           (static_cast<double>(time.tv_nsec) / NANOSECONDS_PER_MILLISECOND);
-}
-
-double Thunderloop::getNanoseconds(timespec time)
-{
-    return (static_cast<double>(time.tv_sec) * NANOSECONDS_PER_SECOND) +
-           static_cast<double>(time.tv_nsec);
-}
-
-void Thunderloop::timespecNorm(struct timespec& ts)
-{
-    while (ts.tv_nsec >= static_cast<int>(NANOSECONDS_PER_SECOND))
-    {
-        ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
-        ts.tv_sec++;
-    }
 }
 
 void Thunderloop::waitForNetworkUp()
