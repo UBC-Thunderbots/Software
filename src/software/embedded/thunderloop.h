@@ -105,18 +105,15 @@ class Thunderloop
     double getNanoseconds(timespec time);
 
     /**
-     * Wait for networking communication to be established. This function is blocking.
-     */
-    void waitForNetworkUp();
-
-    /**
      * Polls the network service: sends the last robot_status_ and receives the newest
      * primitive. When a new primitive arrives, updates the current primitive, seeds the
      * localizer with its starting pose, and (re)starts the primitive executor.
      *
+     * @param time_since_prev_iter_s The time since the previous iteration, in seconds
+     *
      * @return The network status and timing telemetry for this poll
      */
-    inline NetworkPollResult pollNetwork();
+    inline NetworkPollResult pollNetwork(double time_since_prev_iter_s);
 
     /**
      * Fuses sensor measurements (IMU, motors) into a robot state estimate and returns

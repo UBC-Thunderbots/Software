@@ -87,8 +87,6 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
           robot_constants.kalman_vision_noise_variance_rad_2,
           robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2})
 {
-    waitForNetworkUp();
-
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(robot_id_, enable_log_merging,
                                              network_interface_);
@@ -110,10 +108,19 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
-    network_service_ = std::make_unique<NetworkService>(
-        robot_id, std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
-        ROBOT_STATUS_PORT, FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
-        ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT, ROBOT_LOGS_PORT, network_interface);
+    const NetworkService::NetworkConfig network_config{
+        .robot_id                 = static_cast<RobotId>(robot_id_),
+        .multicast_ip             = std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
+        .primitive_listener_port  = PRIMITIVE_PORT,
+        .robot_status_sender_port = ROBOT_STATUS_PORT,
+        .full_system_to_robot_ip_notification_port =
+            FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+        .robot_to_full_system_ip_notification_port =
+            ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
+        .interface = network_interface_,
+    };
+
+    network_service_ = std::make_unique<NetworkService>(network_config);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -217,7 +224,7 @@ void Thunderloop::runLoop()
 
             // Network Service: receive newest primitives and send out the last
             // robot status
-            const NetworkPollResult network_result = pollNetwork();
+            const NetworkPollResult network_result = pollNetwork(delta_time_s);
 
             // Robot Localizer: fuse sensor measurements into a robot state estimate
             // and hand it to the primitive executor
@@ -254,12 +261,11 @@ void Thunderloop::runLoop()
     }
 }
 
-inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
+inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork(
+    const double time_since_prev_iter_s)
 {
     NetworkPollResult result;
     struct timespec poll_time;
-    struct timespec current_time;
-    TbotsProto::Primitive new_primitive;
 
     // Network Service: receive newest primitives and send out the last robot status
     {
@@ -267,50 +273,40 @@ inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
 
         ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
 
-        new_primitive = network_service_->poll(robot_status_);
+        const std::optional<TbotsProto::Primitive> new_primitive =
+            network_service_->poll(robot_status_, time_since_prev_iter_s);
+
+        if (new_primitive.has_value())
+        {
+            // Save new primitive
+            primitive_ = new_primitive.value();
+
+            // Feed the trajectory's starting pose to the localizer as a vision update.
+            if (primitive_.has_move())
+            {
+                const Point position =
+                    createPoint(primitive_.move().xy_traj_params().start_position());
+                const Angle orientation =
+                    createAngle(primitive_.move().w_traj_params().start_angle());
+
+                robot_localizer_.update(
+                    RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
+            }
+
+            clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time_);
+
+            // Start new primitive
+            struct timespec start_time;
+            {
+                ScopedTimespecTimer timer(&start_time);
+                primitive_executor_.updatePrimitive(primitive_);
+            }
+
+            result.primitive_start_time_ms = getMilliseconds(start_time);
+        }
     }
 
     result.poll_time_ms = getMilliseconds(poll_time);
-
-    // Update the time elapsed since the last received primitive
-    struct timespec time_since_last_primitive_received;
-    clock_gettime(CLOCK_MONOTONIC, &current_time);
-    ScopedTimespecTimer::timespecDiff(&current_time, &last_primitive_received_time_,
-                                      &time_since_last_primitive_received);
-    result.network_status.set_ms_since_last_primitive_received(
-        getMilliseconds(time_since_last_primitive_received));
-
-    // If the primitive msg is new, update the internal buffer and start the new
-    // primitive.
-    if (new_primitive.time_sent().epoch_timestamp_seconds() >
-        primitive_.time_sent().epoch_timestamp_seconds())
-    {
-        // Save new primitive
-        primitive_ = new_primitive;
-
-        // Feed the trajectory's starting pose to the localizer as a vision update.
-        if (primitive_.has_move())
-        {
-            const Point position =
-                createPoint(primitive_.move().xy_traj_params().start_position());
-            const Angle orientation =
-                createAngle(primitive_.move().w_traj_params().start_angle());
-
-            robot_localizer_.update(
-                RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
-        }
-
-        clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time_);
-
-        // Start new primitive
-        struct timespec start_time;
-        {
-            ScopedTimespecTimer timer(&start_time);
-            primitive_executor_.updatePrimitive(primitive_);
-        }
-
-        result.primitive_start_time_ms = getMilliseconds(start_time);
-    }
 
     return result;
 }
@@ -413,7 +409,7 @@ inline void Thunderloop::assembleRobotStatus(
     // Compose the outgoing status. Note: motor_status and power_status are written into
     // robot_status_ directly by the motor/power services during their poll.
     robot_status_.set_robot_id(robot_id_);
-    robot_status_.set_last_handled_primitive_set(primitive_.sequence_number());
+    robot_status_.set_last_handled_primitive_seq_num(primitive_.sequence_number());
     *(robot_status_.mutable_time_sent())                 = time_sent;
     *(robot_status_.mutable_thunderloop_status())        = thunderloop_status_;
     *(robot_status_.mutable_network_status())            = network.network_status;
@@ -439,39 +435,4 @@ void Thunderloop::timespecNorm(struct timespec& ts)
         ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
         ts.tv_sec++;
     }
-}
-
-void Thunderloop::waitForNetworkUp()
-{
-    std::unique_ptr<ThreadedUdpSender> network_tester;
-    try
-    {
-        network_tester = std::make_unique<ThreadedUdpSender>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), NETWORK_COMM_TEST_PORT,
-            network_interface_, true);
-    }
-    catch (TbotsNetworkException& e)
-    {
-        LOG(FATAL) << "Thunderloop cannot connect to the network. Error: " << e.what();
-    }
-
-    // Send an empty packet on the specific network interface to
-    // ensure wifi is connected. Keeps trying until successful
-    while (true)
-    {
-        try
-        {
-            network_tester->sendString("");
-            break;
-        }
-        catch (std::exception& e)
-        {
-            // Resend the message after a delay
-            LOG(WARNING) << "Thunderloop cannot connect to network!"
-                         << "Waiting for connection...";
-            sleep(PING_RETRY_DELAY_S);
-        }
-    }
-
-    LOG(INFO) << "Thunderloop connected to network!";
 }
