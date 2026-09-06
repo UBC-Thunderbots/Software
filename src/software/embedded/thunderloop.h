@@ -117,18 +117,6 @@ class Thunderloop
     void updateErrorCodes();
 
     /**
-     * Poll the motor service, sending it the given control command and writing the
-     * resulting motor status into robot_status_.
-     *
-     * @param direct_control The control command to send to the motors
-     * @param time_since_prev_iteration The time difference since the last iteration
-     *
-     * @return The time taken to poll the service, in milliseconds
-     */
-    double pollMotorService(const TbotsProto::DirectControlPrimitive& direct_control,
-                            const struct timespec& time_since_prev_iteration);
-
-    /**
      * Poll the power service, sending it the given control command and writing the
      * resulting power status into robot_status_.
      *
@@ -186,13 +174,11 @@ class Thunderloop
      * @param network The result of the network poll stage
      * @param primitive The result of the primitive execution stage
      * @param chicker_status The status from the chicker tracking stage
-     * @param motor_poll_time_ms Motor service poll time, or nullopt if disabled
      * @param power_poll_time_ms Power service poll time, or nullopt if disabled
      */
     inline void assembleRobotStatus(const NetworkPollResult& network,
                                     const PrimitiveStepResult& primitive,
                                     const TbotsProto::ChipperKickerStatus& chicker_status,
-                                    std::optional<double> motor_poll_time_ms,
                                     std::optional<double> power_poll_time_ms);
 
 
