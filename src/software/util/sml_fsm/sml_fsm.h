@@ -18,20 +18,6 @@ template <class T>
 using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
 
 /**
- * Defines an SML state wrapper around a class/struct
- *
- * @param STATE The state class/struct
- */
-#define DEFINE_SML_STATE(STATE) const auto STATE##_S = boost::sml::state<STATE>;
-
-/**
- * Defines an SML event wrapper around a class/struct
- *
- * @param EVENT The event class/struct
- */
-#define DEFINE_SML_EVENT(EVENT) const auto EVENT##_E = boost::sml::event<EVENT>;
-
-/**
  * Unimplemented stub. Doesn't expose type so that use will throw an error.
  *
  * @tparam T Any type
@@ -40,24 +26,26 @@ template <typename T>
 struct SMLCallbackTraits;
 
 /**
- * Specializes against callback functions meant for Boost::SML and exposes their trait typenames
- * The three template values make up the declaration of a function.
- * const variant below
+ * Specializes against callback functions meant for Boost::SML and exposes their trait
+ * typenames The three template values make up the declaration of a function. const
+ * variant below
  *
  * @tparam FSMClass The FSM class the function belongs to
  * @tparam Ret The return value
  * @tparam Event The type of event being processed.
  */
-template<typename FSMClass, typename Ret, typename Event>
-struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&)> {
-    using FSMType = FSMClass;
-    using EventType = Event;
+template <typename FSMClass, typename Ret, typename Event>
+struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&)>
+{
+    using FSMType    = FSMClass;
+    using EventType  = Event;
     using ReturnType = Ret;
 };
-template<typename FSMClass, typename Ret, typename Event>
-struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&) const> {
-    using FSMType = FSMClass;
-    using EventType = Event;
+template <typename FSMClass, typename Ret, typename Event>
+struct SMLCallbackTraits<Ret (FSMClass::*)(const Event&) const>
+{
+    using FSMType    = FSMClass;
+    using EventType  = Event;
     using ReturnType = Ret;
 };
 
@@ -73,12 +61,14 @@ class SMLGuard
     static_assert(std::is_same_v<typename Traits::ReturnType, bool>,
                   "an SML guard must return bool");
 
-  public:
+   public:
     explicit SMLGuard(Traits::FSMType* fsm) : fsm_(fsm) {}
-    bool operator()(const Traits::EventType& event) const {
+    bool operator()(const Traits::EventType& event) const
+    {
         return (fsm_->*GuardFn)(event);
     }
-  private:
+
+   private:
     Traits::FSMType* fsm_;
 };
 
@@ -94,18 +84,21 @@ class SMLAction
     static_assert(std::is_void_v<typename Traits::ReturnType>,
                   "an SML action must return void");
 
-public:
+   public:
     explicit SMLAction(Traits::FSMType* fsm) : fsm_(fsm) {}
-    void operator()(const Traits::EventType& event) const { (fsm_->*ActionFn)(event); }
+    void operator()(const Traits::EventType& event) const
+    {
+        (fsm_->*ActionFn)(event);
+    }
 
-private:
+   private:
     Traits::FSMType* fsm_;
 };
 
 /**
- * Specializes against callback functions meant for Boost::SML and exposes their trait typenames
- * The three template values make up the declaration of a function.
- * In particular, this class is for actions that utilize subFSMs.
+ * Specializes against callback functions meant for Boost::SML and exposes their trait
+ * typenames The three template values make up the declaration of a function. In
+ * particular, this class is for actions that utilize subFSMs.
  *
  * @tparam FSMClass The FSM class the function belongs to.
  * @tparam Event The type of event from the FSM that must be processed.
@@ -122,8 +115,8 @@ struct SMLCallbackTraits<void (FSMClass::*)(const Event&,
 };
 
 /**
- * Callable wrapper around FSM member function that can be used as an SML action for updating
- * a sub fsm
+ * Callable wrapper around FSM member function that can be used as an SML action for
+ * updating a sub fsm
  * @tparam ActionFn The function to turn into an subFSM update action.
  */
 template <auto ActionFn>
@@ -131,7 +124,7 @@ class SMLSubFSMUpdateAction
 {
     using Traits = SMLCallbackTraits<decltype(ActionFn)>;
 
-public:
+   public:
     explicit SMLSubFSMUpdateAction(Traits::FSMType* fsm) : fsm_(fsm) {}
 
     void operator()(
@@ -141,7 +134,7 @@ public:
         (fsm_->*ActionFn)(event, processEvent);
     }
 
-private:
+   private:
     Traits::FSMType* fsm_;
 };
 

@@ -39,9 +39,9 @@ struct ExamplePlayFSM : PlayFSM<ExamplePlayFSM>
     {
         using namespace boost::sml;
 
-        const auto MoveState_S = boost::sml::state<MoveState>;
+        constexpr auto MoveState_S = boost::sml::state<MoveState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto moveToPosition_A = SMLAction<&ExamplePlayFSM::moveToPosition>{this};
 

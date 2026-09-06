@@ -105,10 +105,10 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
     {
         using namespace boost::sml;
 
-        const auto BlockPassState_S = boost::sml::state<BlockPassState>;
-        const auto InterceptBallState_S = boost::sml::state<InterceptBallState>;
+        constexpr auto BlockPassState_S     = boost::sml::state<BlockPassState>;
+        constexpr auto InterceptBallState_S = boost::sml::state<InterceptBallState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto passStarted_G   = SMLGuard<&PassDefenderFSM::passStarted>{this};
         const auto ballDeflected_G = SMLGuard<&PassDefenderFSM::ballDeflected>{this};
@@ -116,7 +116,7 @@ struct PassDefenderFSM : public DefenderFSMBase, TacticFSM<PassDefenderFSM>
         const auto blockPass_A     = SMLAction<&PassDefenderFSM::blockPass>{this};
         const auto interceptBall_A = SMLAction<&PassDefenderFSM::interceptBall>{this};
 
-        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
+        constexpr auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
         const auto ballNearbyWithoutThreat_G =
             SMLGuard<&PassDefenderFSM::ballNearbyWithoutThreat>{this};
         const auto prepareGetPossession_A =

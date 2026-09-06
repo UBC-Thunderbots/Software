@@ -28,8 +28,8 @@ struct ShootOrChipPlayFSM : PlayFSM<ShootOrChipPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto ShootOrChipState_S = boost::sml::state<ShootOrChipState>;
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto ShootOrChipState_S = boost::sml::state<ShootOrChipState>;
+        constexpr auto Update_E           = boost::sml::event<Update>;
         const auto updateShootOrChip_A =
             SMLAction<&ShootOrChipPlayFSM::updateShootOrChip>{this};
         const auto attackerDone_G = SMLGuard<&ShootOrChipPlayFSM::attackerDone>{this};

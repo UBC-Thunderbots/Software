@@ -188,13 +188,13 @@ struct GoalieFSM : TacticFSM<GoalieFSM>
     {
         using namespace boost::sml;
 
-        const auto Panic_S = boost::sml::state<Panic>;
-        const auto PivotKickFSM_S = boost::sml::state<PivotKickFSM>;
-        const auto PositionToBlock_S = boost::sml::state<PositionToBlock>;
-        const auto MoveToGoalLine_S = boost::sml::state<MoveToGoalLine>;
-        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
+        constexpr auto Panic_S           = boost::sml::state<Panic>;
+        constexpr auto PivotKickFSM_S    = boost::sml::state<PivotKickFSM>;
+        constexpr auto PositionToBlock_S = boost::sml::state<PositionToBlock>;
+        constexpr auto MoveToGoalLine_S  = boost::sml::state<MoveToGoalLine>;
+        constexpr auto DribbleFSM_S      = boost::sml::state<DribbleFSM>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto ballInInflatedDefenseArea_G =
             SMLGuard<&GoalieFSM::ballInInflatedDefenseArea>{this};

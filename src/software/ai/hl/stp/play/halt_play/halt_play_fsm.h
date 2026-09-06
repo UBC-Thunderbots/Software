@@ -36,9 +36,9 @@ struct HaltPlayFSM : PlayFSM<HaltPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto HaltState_S = boost::sml::state<HaltState>;
+        constexpr auto HaltState_S = boost::sml::state<HaltState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto updateStop_A = SMLAction<&HaltPlayFSM::updateStop>{this};
 

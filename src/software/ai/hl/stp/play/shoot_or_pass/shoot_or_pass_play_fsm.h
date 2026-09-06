@@ -113,10 +113,10 @@ struct ShootOrPassPlayFSM : PlayFSM<ShootOrPassPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto AttemptShotState_S = boost::sml::state<AttemptShotState>;
-        const auto TakePassState_S = boost::sml::state<TakePassState>;
-        const auto StartState_S = boost::sml::state<StartState>;
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto AttemptShotState_S = boost::sml::state<AttemptShotState>;
+        constexpr auto TakePassState_S    = boost::sml::state<TakePassState>;
+        constexpr auto StartState_S       = boost::sml::state<StartState>;
+        constexpr auto Update_E           = boost::sml::event<Update>;
 
         const auto lookForPass_A = SMLAction<&ShootOrPassPlayFSM::lookForPass>{this};
         const auto startLookingForPass_A =

@@ -145,10 +145,11 @@ struct ReceiverFSM : TacticFSM<ReceiverFSM>
     {
         using namespace boost::sml;
 
-        const auto ReceiveAndDribbleState_S = boost::sml::state<ReceiveAndDribbleState>;
-        const auto OneTouchShotState_S = boost::sml::state<OneTouchShotState>;
-        const auto WaitingForPassState_S = boost::sml::state<WaitingForPassState>;
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto ReceiveAndDribbleState_S =
+            boost::sml::state<ReceiveAndDribbleState>;
+        constexpr auto OneTouchShotState_S   = boost::sml::state<OneTouchShotState>;
+        constexpr auto WaitingForPassState_S = boost::sml::state<WaitingForPassState>;
+        constexpr auto Update_E              = boost::sml::event<Update>;
 
         const auto onetouchPossible_G = SMLGuard<&ReceiverFSM::onetouchPossible>{this};
         const auto passStarted_G      = SMLGuard<&ReceiverFSM::passStarted>{this};

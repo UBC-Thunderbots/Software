@@ -88,11 +88,11 @@ struct CreaseDefenderFSM : public DefenderFSMBase, TacticFSM<CreaseDefenderFSM>
     {
         using namespace boost::sml;
 
-        const auto MoveFSM_S = boost::sml::state<MoveFSM>;
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto MoveFSM_S = boost::sml::state<MoveFSM>;
+        constexpr auto Update_E  = boost::sml::event<Update>;
         const auto blockThreat_A =
             SMLSubFSMUpdateAction<&CreaseDefenderFSM::blockThreat>{this};
-        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
+        constexpr auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
         const auto ballNearbyWithoutThreat_G =
             SMLGuard<&CreaseDefenderFSM::ballNearbyWithoutThreat>{this};
         const auto prepareGetPossession_A =

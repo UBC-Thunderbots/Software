@@ -70,9 +70,9 @@ struct KickFSM : TacticFSM<KickFSM>
     {
         using namespace boost::sml;
 
-        const auto GetBehindBallFSM_S = boost::sml::state<GetBehindBallFSM>;
-        const auto KickState_S = boost::sml::state<KickState>;
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto GetBehindBallFSM_S = boost::sml::state<GetBehindBallFSM>;
+        constexpr auto KickState_S        = boost::sml::state<KickState>;
+        constexpr auto Update_E           = boost::sml::event<Update>;
 
         const auto ballChicked_G = SMLGuard<&KickFSM::ballChicked>{this};
         const auto shouldRealignWithBall_G =

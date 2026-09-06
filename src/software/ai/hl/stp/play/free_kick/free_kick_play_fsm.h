@@ -209,13 +209,13 @@ struct FreeKickPlayFSM : PlayFSM<FreeKickPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
-        const auto ShootState_S = boost::sml::state<ShootState>;
-        const auto AttemptPassState_S = boost::sml::state<AttemptPassState>;
-        const auto PassState_S = boost::sml::state<PassState>;
-        const auto ChipState_S = boost::sml::state<ChipState>;
+        constexpr auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
+        constexpr auto ShootState_S         = boost::sml::state<ShootState>;
+        constexpr auto AttemptPassState_S   = boost::sml::state<AttemptPassState>;
+        constexpr auto PassState_S          = boost::sml::state<PassState>;
+        constexpr auto ChipState_S          = boost::sml::state<ChipState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto setupPosition_A = SMLAction<&FreeKickPlayFSM::setupPosition>{this};
         const auto shootBall_A     = SMLAction<&FreeKickPlayFSM::shootBall>{this};

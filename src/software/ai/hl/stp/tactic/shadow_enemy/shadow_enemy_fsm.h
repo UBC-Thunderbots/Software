@@ -132,12 +132,12 @@ struct ShadowEnemyFSM : TacticFSM<ShadowEnemyFSM>
     {
         using namespace boost::sml;
 
-        const auto MoveFSM_S = boost::sml::state<MoveFSM>;
-        const auto BlockPassState_S = boost::sml::state<BlockPassState>;
-        const auto GoAndStealState_S = boost::sml::state<GoAndStealState>;
-        const auto StealAndPullState_S = boost::sml::state<StealAndPullState>;
+        constexpr auto MoveFSM_S           = boost::sml::state<MoveFSM>;
+        constexpr auto BlockPassState_S    = boost::sml::state<BlockPassState>;
+        constexpr auto GoAndStealState_S   = boost::sml::state<GoAndStealState>;
+        constexpr auto StealAndPullState_S = boost::sml::state<StealAndPullState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto enemyThreatHasBall_G =
             SMLGuard<&ShadowEnemyFSM::enemyThreatHasBall>{this};

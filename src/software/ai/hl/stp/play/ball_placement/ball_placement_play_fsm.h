@@ -147,13 +147,13 @@ struct BallPlacementPlayFSM : public PlayFSM<BallPlacementPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto StartState_S = boost::sml::state<StartState>;
-        const auto KickOffWallState_S = boost::sml::state<KickOffWallState>;
-        const auto AlignPlacementState_S = boost::sml::state<AlignPlacementState>;
-        const auto PlaceBallState_S = boost::sml::state<PlaceBallState>;
-        const auto WaitState_S = boost::sml::state<WaitState>;
-        const auto RetreatState_S = boost::sml::state<RetreatState>;
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto StartState_S          = boost::sml::state<StartState>;
+        constexpr auto KickOffWallState_S    = boost::sml::state<KickOffWallState>;
+        constexpr auto AlignPlacementState_S = boost::sml::state<AlignPlacementState>;
+        constexpr auto PlaceBallState_S      = boost::sml::state<PlaceBallState>;
+        constexpr auto WaitState_S           = boost::sml::state<WaitState>;
+        constexpr auto RetreatState_S        = boost::sml::state<RetreatState>;
+        constexpr auto Update_E              = boost::sml::event<Update>;
 
         const auto alignPlacement_A =
             SMLAction<&BallPlacementPlayFSM::alignPlacement>{this};

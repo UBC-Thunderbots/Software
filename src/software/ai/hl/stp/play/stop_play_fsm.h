@@ -44,9 +44,9 @@ struct StopPlayFSM
     {
         using namespace boost::sml;
 
-        const auto StopState_S = boost::sml::state<StopState>;
+        constexpr auto StopState_S = boost::sml::state<StopState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto updateStopPosition_A =
             SMLAction<&StopPlayFSM::updateStopPosition>{this};

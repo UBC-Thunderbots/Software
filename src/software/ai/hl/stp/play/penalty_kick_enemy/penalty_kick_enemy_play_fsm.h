@@ -57,10 +57,10 @@ struct PenaltyKickEnemyPlayFSM : PlayFSM<PenaltyKickEnemyPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
-        const auto DefendKickState_S = boost::sml::state<DefendKickState>;
+        constexpr auto SetupPositionState_S = boost::sml::state<SetupPositionState>;
+        constexpr auto DefendKickState_S    = boost::sml::state<DefendKickState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto setupPosition_A =
             SMLAction<&PenaltyKickEnemyPlayFSM::setupPosition>{this};

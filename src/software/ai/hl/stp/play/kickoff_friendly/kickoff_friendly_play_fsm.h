@@ -88,10 +88,10 @@ struct KickoffFriendlyPlayFSM : PlayFSM<KickoffFriendlyPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto SetupState_S = boost::sml::state<SetupState>;
-        const auto ChipState_S = boost::sml::state<ChipState>;
+        constexpr auto SetupState_S = boost::sml::state<SetupState>;
+        constexpr auto ChipState_S  = boost::sml::state<ChipState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto setupKickoff_A =
             SMLAction<&KickoffFriendlyPlayFSM::setupKickoff>{this};

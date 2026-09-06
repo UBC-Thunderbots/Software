@@ -104,11 +104,11 @@ struct EnemyBallPlacementPlayFSM : PlayFSM<EnemyBallPlacementPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto WaitState_S = boost::sml::state<WaitState>;
-        const auto AvoidState_S = boost::sml::state<AvoidState>;
-        const auto DefenseState_S = boost::sml::state<DefenseState>;
+        constexpr auto WaitState_S    = boost::sml::state<WaitState>;
+        constexpr auto AvoidState_S   = boost::sml::state<AvoidState>;
+        constexpr auto DefenseState_S = boost::sml::state<DefenseState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto setPlacementPoint_A =
             SMLAction<&EnemyBallPlacementPlayFSM::setPlacementPoint>{this};

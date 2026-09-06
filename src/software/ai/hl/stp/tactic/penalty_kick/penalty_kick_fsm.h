@@ -104,10 +104,10 @@ struct PenaltyKickFSM : TacticFSM<PenaltyKickFSM>
     {
         using namespace boost::sml;
 
-        const auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
-        const auto KickFSM_S = boost::sml::state<KickFSM>;
+        constexpr auto DribbleFSM_S = boost::sml::state<DribbleFSM>;
+        constexpr auto KickFSM_S    = boost::sml::state<KickFSM>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto takePenaltyShot_G = SMLGuard<&PenaltyKickFSM::takePenaltyShot>{this};
         const auto timeOutApproach_G = SMLGuard<&PenaltyKickFSM::timeOutApproach>{this};

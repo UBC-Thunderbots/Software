@@ -90,9 +90,9 @@ struct KickoffEnemyPlayFSM : PlayFSM<KickoffEnemyPlayFSM>
     {
         using namespace boost::sml;
 
-        const auto SetupState_S = boost::sml::state<SetupState>;
+        constexpr auto SetupState_S = boost::sml::state<SetupState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto kickoff_A = SMLAction<&KickoffEnemyPlayFSM::kickoff>{this};
 

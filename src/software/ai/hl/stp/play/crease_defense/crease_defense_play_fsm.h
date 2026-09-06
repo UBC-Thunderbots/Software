@@ -49,9 +49,9 @@ struct CreaseDefensePlayFSM : PlayFSM<CreaseDefensePlayFSM>
     {
         using namespace boost::sml;
 
-        const auto DefenseState_S = boost::sml::state<DefenseState>;
+        constexpr auto DefenseState_S = boost::sml::state<DefenseState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto defendDefenseArea_A =
             SMLAction<&CreaseDefensePlayFSM::defendDefenseArea>{this};

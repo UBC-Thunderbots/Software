@@ -67,10 +67,10 @@ struct PlaySelectionFSM
     {
         using namespace boost::sml;
 
-        const auto SetPlay_S = boost::sml::state<SetPlay>;
-        const auto Halt_S = boost::sml::state<Halt>;
-        const auto Playing_S = boost::sml::state<Playing>;
-        const auto Stop_S = boost::sml::state<Stop>;
+        constexpr auto SetPlay_S = boost::sml::state<SetPlay>;
+        constexpr auto Halt_S    = boost::sml::state<Halt>;
+        constexpr auto Playing_S = boost::sml::state<Playing>;
+        constexpr auto Stop_S    = boost::sml::state<Stop>;
 
         const auto gameStateStopped_G =
             SMLGuard<&PlaySelectionFSM::gameStateStopped>{this};
@@ -80,7 +80,7 @@ struct PlaySelectionFSM
         const auto gameStateSetupRestart_G =
             SMLGuard<&PlaySelectionFSM::gameStateSetupRestart>{this};
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto setupSetPlay_A  = SMLAction<&PlaySelectionFSM::setupSetPlay>{this};
         const auto setupStopPlay_A = SMLAction<&PlaySelectionFSM::setupStopPlay>{this};

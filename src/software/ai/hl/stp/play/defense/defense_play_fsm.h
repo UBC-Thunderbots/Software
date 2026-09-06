@@ -86,10 +86,11 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     {
         using namespace boost::sml;
 
-        const auto DefenseState_S = boost::sml::state<DefenseState>;
-        const auto AggressiveDefenseState_S = boost::sml::state<AggressiveDefenseState>;
+        constexpr auto DefenseState_S = boost::sml::state<DefenseState>;
+        constexpr auto AggressiveDefenseState_S =
+            boost::sml::state<AggressiveDefenseState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto shouldDefendAggressively_G =
             SMLGuard<&DefensePlayFSM::shouldDefendAggressively>{this};

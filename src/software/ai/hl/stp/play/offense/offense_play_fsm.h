@@ -64,10 +64,10 @@ struct OffensePlayFSM : PlayFSM<OffensePlayFSM>
     {
         using namespace boost::sml;
 
-        const auto OffensiveState_S = boost::sml::state<OffensiveState>;
-        const auto DefensiveState_S = boost::sml::state<DefensiveState>;
+        constexpr auto OffensiveState_S = boost::sml::state<OffensiveState>;
+        constexpr auto DefensiveState_S = boost::sml::state<DefensiveState>;
 
-        const auto Update_E = boost::sml::event<Update>;
+        constexpr auto Update_E = boost::sml::event<Update>;
 
         const auto enemyHasPossession_G =
             SMLGuard<&OffensePlayFSM::enemyHasPossession>{this};
