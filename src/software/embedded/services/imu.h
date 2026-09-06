@@ -2,22 +2,16 @@
 
 #include <Eigen/Dense>
 #include <chrono>
-#include <climits>
-#include <utility>
 
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/angular_acceleration.h"
 #include "software/geom/angular_velocity.h"
 
 /**
- * Handles low level IMU I2C communication, and some minor offset filtering.
+ * A service that reads from the IMU, reporting the robot's angular velocity, angular
+ * acceleration, and linear acceleration.
  */
-struct ImuData
-{
-    std::optional<AngularVelocity> angular_velocity;
-    std::optional<AngularAcceleration> angular_acceleration;
-    std::optional<Eigen::Vector2d> linear_acceleration;
-};
 class ImuService
 {
    public:
@@ -28,7 +22,13 @@ class ImuService
      */
     ImuService();
 
-    std::optional<ImuData> poll();
+    /**
+     * Polls the IMU and updates the robot status with the latest angular velocity,
+     * angular acceleration, and linear acceleration.
+     *
+     * @param robot_status the robot status to update
+     */
+    void poll(TbotsProto::RobotStatus& robot_status);
 
     // Variance from datasheet (in rad^2/s^2)
     static constexpr double IMU_VARIANCE =

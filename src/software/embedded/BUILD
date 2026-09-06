@@ -35,6 +35,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
+        "//software/embedded:robot_localizer",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
         "//software/math:math_functions",
@@ -42,6 +43,7 @@ cc_library(
         "//software/time:duration",
         "//software/world:robot_state",
         "//software/world:team_colour",
+        "@tracy",
     ],
 )
 
@@ -67,7 +69,6 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
-        "//software/embedded:robot_localizer",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
@@ -76,7 +77,6 @@ cc_library(
         "//software/logger:network_logger",
         "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
-        "//software/util/scoped_timespec_timer",
         "@tracy",
     ],
 )
@@ -109,21 +109,13 @@ filegroup(
     srcs = ["hash_thunderloop_binary.sh"],
 )
 
-cc_test(
-    name = "test_battery",
-    srcs = ["battery_test.cpp"],
-    deps = [
-        ":thunderloop",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
 cc_library(
     name = "robot_localizer",
     srcs = ["robot_localizer.cpp"],
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto/primitive:primitive_msg_factory",
         "//software:constants",
         "//software/embedded/services:imu",
         "//software/geom:angle",
@@ -131,7 +123,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/sensor_fusion/filter:kalman_filter",
-        "//software/util/scoped_timespec_timer",
+        "//software/world:robot_state",
         "@eigen",
     ],
 )

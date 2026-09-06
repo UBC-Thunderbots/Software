@@ -1,14 +1,7 @@
 #pragma once
 
-#include <chrono>
-#include <csignal>
 #include <fstream>
-#include <iostream>
-#include <optional>
-#include <thread>
 
-#include "proto/tbots_software_msgs.pb.h"
-#include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/robot_localizer.h"
@@ -23,8 +16,8 @@ class Thunderloop
    public:
     /**
      * Thunderloop is a giant loop that runs at THUNDERLOOP_HZ.
-     * It receives Primitives from AI, executes the Primitives with
-     * the most recent vison data, and polls the services to interact
+     * It receives Primitives from Fullsystem, executes the Primitives
+     * based on robot localization data, and polls the services to interact
      * with the hardware peripherals.
      *
      * High Level Diagram: Service order in loop not shown
@@ -52,134 +45,22 @@ class Thunderloop
      * @param loop_hz The rate to run the loop
      */
     Thunderloop(const robot_constants::RobotConstants& robot_constants,
-                bool enable_log_merging, const int loop_hz);
-
-    ~Thunderloop();
+                bool enable_log_merging, int loop_hz);
 
     [[noreturn]] void runLoop();
 
-    // Services
+   private:
+    std::unique_ptr<TomlConfigClient> toml_config_client_;
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
     std::unique_ptr<ImuService> imu_service_;
+    std::unique_ptr<RobotLocalizer> robot_localizer_;
+    std::unique_ptr<PrimitiveExecutor> primitive_executor_;
 
-    // TOML config client
-    std::unique_ptr<TomlConfigClient> toml_config_client_;
-
-   private:
-    struct NetworkPollResult
-    {
-        TbotsProto::NetworkStatus network_status;
-        double poll_time_ms = 0.0;
-        // Set only when a new primitive arrived and the executor was (re)started.
-        std::optional<double> primitive_start_time_ms;
-    };
-
-    struct PrimitiveStepResult
-    {
-        TbotsProto::DirectControlPrimitive direct_control;
-        TbotsProto::PrimitiveExecutorStatus executor_status;
-        double step_time_ms = 0.0;
-    };
-
-    /*
-     * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
-     * are getting bigger than 1000000000 (= 1 second) the variable containing
-     * seconds has to be incremented and the nanoseconds decremented by 1000000000.
-     *
-     * @param ts timespec to modify
-     */
-    void timespecNorm(struct timespec& ts);
-
-    /**
-     * Converts the given timespec value to milliseconds
-     * @return The time in milliseconds
-     */
-    double getMilliseconds(timespec time);
-
-    /**
-     * Converts the given timespec value to nanoseconds
-     * @return The time in nanoseconds
-     */
-    double getNanoseconds(timespec time);
-
-    /**
-     * Polls the network service: sends the last robot_status_ and receives the newest
-     * primitive. When a new primitive arrives, updates the current primitive, seeds the
-     * localizer with its starting pose, and (re)starts the primitive executor.
-     *
-     * @param time_since_prev_iter_s The time since the previous iteration, in seconds
-     *
-     * @return The network status and timing telemetry for this poll
-     */
-    inline NetworkPollResult pollNetwork(double time_since_prev_iter_s);
-
-    /**
-     * Fuses sensor measurements (IMU, motors) into a robot state estimate and returns
-     * current Robot State.
-     * @return The kinematic state of the robot in the world
-     */
-    inline RobotState updateLocalization();
-
-    /**
-     * Steps the primitive executor, substituting a stop primitive if no primitive has
-     * been received within the timeout.
-     *
-     * @param delta_time The time passed since the last step
-     *
-     * @return The control command, executor status, and timing telemetry for this step
-     */
-    inline PrimitiveStepResult stepActivePrimitive(double delta_time_s);
-
-    /**
-     * Composes the outgoing robot_status_ from the per-stage results. This is the single
-     * place where the aggregate status is assembled.
-     *
-     * @param network The result of the network poll stage
-     * @param primitive The result of the primitive execution stage
-     */
-    inline void assembleRobotStatus(const NetworkPollResult& network,
-                                    const PrimitiveStepResult& primitive);
-
-
-    // The current primitive being executed.
-    TbotsProto::Primitive primitive_;
-
-    // The outgoing robot status.
-    TbotsProto::RobotStatus robot_status_;
-
-    TbotsProto::ThunderloopStatus thunderloop_status_;
-
-    // Current State
-    robot_constants::RobotConstants robot_constants_;
-    int robot_id_;
-    int channel_id_;
-    std::string network_interface_;
     int loop_hz_;
 
-    // Primitive Executor
-    PrimitiveExecutor primitive_executor_;
-
-    // Robot localization model
-    RobotLocalizer robot_localizer_;
-
-    // Loop timing state tracked across iterations. Initialized at the start of runLoop()
-    // and updated by the stage helpers as the corresponding events occur.
-    struct timespec last_primitive_received_time_;
-    struct timespec last_chipper_fired_;
-    struct timespec last_kicker_fired_;
-
-    // 500 millisecond timeout on receiving primitives before we stop the robots
-    const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
-
-    // Timeout after a failed ping request
-    const int PING_RETRY_DELAY_S = 1;
-
-    const std::string PATH_TO_RINGBUFFER_LOG = "/usr/bin/dmesg";
-
-    std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
-
-    // Path to the CPU thermal zone temperature file
-    const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone0/temp";
+    // This robot status message is updated by each service and then sent
+    // to fullsystem over the network.
+    TbotsProto::RobotStatus robot_status_;
 };
