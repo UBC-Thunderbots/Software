@@ -152,11 +152,13 @@ class ErForceSimulator
      * @param primitive_set_msg The primitive set containing the primitive to run
      * @param robot_primitive_executor_map The robot primitive executors to send the
      * primitive set to
+     * @param robot_state The current robot state reported by the simulator
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
         std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-            robot_primitive_executor_map);
+            robot_primitive_executor_map,
+        const RobotState& robot_state);
 
     /**
      * Gets a map from robot id to local and angular velocity from repeated sim robots

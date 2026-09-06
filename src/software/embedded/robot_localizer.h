@@ -4,13 +4,15 @@
 #include <deque>
 #include <optional>
 
-#include "proto/world.pb.h"
+#include "proto/primitive.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "software/util/make_enum/make_enum.hpp"
+#include "software/world/robot_state.h"
 
 MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
           ANGULAR_VELOCITY);
@@ -98,6 +100,22 @@ class RobotLocalizer
     void update(const ImuData& data);
 
     /**
+     * Updates the localizer with the vision-derived position and orientation from a
+     * primitive's trajectory parameters.
+     *
+     * @param primitive The primitive to extract the vision measurement from
+     */
+    void update(const TbotsProto::Primitive& primitive);
+
+    /**
+     * Updates the localizer with the motor and IMU measurements contained in a robot
+     * status.
+     *
+     * @param robot_status The robot status containing motor and IMU measurements
+     */
+    void update(const TbotsProto::RobotStatus& robot_status);
+
+    /**
      * Gets the estimated position of the robot in world space.
      *
      * @return the estimated position of the robot in world space
@@ -124,6 +142,13 @@ class RobotLocalizer
      * @return estimated angular velocity of the robot
      */
     AngularVelocity getAngularVelocity() const;
+
+    /**
+     * Gets the current robot state estimate.
+     *
+     * @return The estimated robot state
+     */
+    RobotState getRobotState() const;
 
    private:
     /**

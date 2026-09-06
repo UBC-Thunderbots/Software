@@ -1,5 +1,9 @@
 #include "robot_localizer.h"
 
+#include "proto/message_translation/tbots_geometry.h"
+#include "shared/constants.h"
+#include "software/physics/velocity_conversion_util.h"
+
 RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
     : process_linear_acceleration_noise_variance_(config.process_noise_variance),
       process_angular_acceleration_noise_variance_(config.process_noise_variance)
@@ -291,6 +295,36 @@ void RobotLocalizer::update(const ImuData& data)
     filter_.update(step.update->measurement);
 }
 
+void RobotLocalizer::update(const TbotsProto::Primitive& primitive)
+{
+    if (primitive.has_move())
+    {
+        const Point position =
+            createPoint(primitive.move().xy_traj_params().start_position());
+        const Angle orientation =
+            createAngle(primitive.move().w_traj_params().start_angle());
+        update(VisionData{position, orientation, RTT_S / 2});
+    }
+}
+
+void RobotLocalizer::update(const TbotsProto::RobotStatus& robot_status)
+{
+    if (robot_status.has_motor_status())
+    {
+        update(MotorData{
+            localToGlobalVelocity(
+                createVector(robot_status.motor_status().local_velocity()),
+                getOrientation()),
+            createAngularVelocity(robot_status.motor_status().angular_velocity())});
+    }
+
+    if (robot_status.has_imu_status() && robot_status.imu_status().has_angular_velocity())
+    {
+        update(
+            ImuData{createAngularVelocity(robot_status.imu_status().angular_velocity())});
+    }
+}
+
 Point RobotLocalizer::getPosition() const
 {
     return Point(
@@ -316,4 +350,10 @@ AngularVelocity RobotLocalizer::getAngularVelocity() const
 {
     return AngularVelocity::fromRadians(
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)));
+}
+
+RobotState RobotLocalizer::getRobotState() const
+{
+    return RobotState(getPosition(), getVelocity(), getOrientation(),
+                      getAngularVelocity());
 }

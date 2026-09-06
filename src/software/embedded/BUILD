@@ -138,6 +138,7 @@ cc_library(
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto/primitive:primitive_msg_factory",
         "//software:constants",
         "//software/embedded/services:imu",
         "//software/geom:angle",
@@ -145,6 +146,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/sensor_fusion/filter:kalman_filter",
+        "//software/world:robot_state",
         "@eigen",
     ],
 )

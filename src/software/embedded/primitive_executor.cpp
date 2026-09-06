@@ -13,12 +13,8 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(
-    const robot_constants::RobotConstants& robot_constants)
-    : robot_localizer_(RobotLocalizer::RobotLocalizerConfig{
-          robot_constants.kalman_process_noise_variance_rad_per_s_4,
-          robot_constants.kalman_vision_noise_variance_rad_2,
-          robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2}),
-      robot_constants_(robot_constants)
+    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id)
+    : robot_state_(), robot_constants_(robot_constants), robot_id_(robot_id)
 {
 }
 
@@ -33,21 +29,13 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
     if (current_primitive_.has_move())
     {
-        const Point position =
-            createPoint(current_primitive_.move().xy_traj_params().start_position());
-        const Angle orientation =
-            createAngle(current_primitive_.move().w_traj_params().start_angle());
-
-        robot_localizer_.update(
-            RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
-
-        const auto new_trajectory_path = createTrajectoryPathFromParams(
-            current_primitive_.move().xy_traj_params(), robot_localizer_.getVelocity(),
-            robot_constants_);
+        const auto new_trajectory_path =
+            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
+                                           robot_state_.velocity(), robot_constants_);
 
         const auto new_angular_trajectory = createAngularTrajectoryFromParams(
-            current_primitive_.move().w_traj_params(),
-            robot_localizer_.getAngularVelocity(), robot_constants_);
+            current_primitive_.move().w_traj_params(), robot_state_.angularVelocity(),
+            robot_constants_);
 
         trajectory_path_ = new_trajectory_path;
         position_controller_.reset();
@@ -67,10 +55,15 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
         update_time.count());
 }
 
+void PrimitiveExecutor::updateRobotState(const RobotState& robot_state)
+{
+    robot_state_ = robot_state;
+}
+
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const double delta_time_s)
 {
     Vector target_v_global =
-        position_controller_.step(robot_localizer_.getPosition(), *trajectory_path_,
+        position_controller_.step(robot_state_.position(), *trajectory_path_,
                                   time_since_linear_trajectory_creation_s_, delta_time_s);
 
     // make sure robot doesn't go faster than max speed (speed is frame-invariant)
@@ -88,13 +81,13 @@ Vector PrimitiveExecutor::stepTargetLinearVelocity(const double delta_time_s)
     }
     prev_target_global_velocity_ = target_v_global;
 
-    return globalToLocalVelocity(target_v_global, robot_localizer_.getOrientation());
+    return globalToLocalVelocity(target_v_global, robot_state_.orientation());
 }
 
 AngularVelocity PrimitiveExecutor::stepTargetAngularVelocity(const double delta_time_s)
 {
     auto target_w = orientation_controller_.step(
-        robot_localizer_.getOrientation(), *angular_trajectory_,
+        robot_state_.orientation(), *angular_trajectory_,
         time_since_angular_trajectory_creation_s_, delta_time_s);
 
     // make sure robot doesn't rotate faster than max angular speed
@@ -120,23 +113,6 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
     ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
 
     const auto step_start = std::chrono::steady_clock::now();
-
-    robot_localizer_.step(Vector(), delta_time_s);
-
-    if (robot_status.has_motor_status())
-    {
-        robot_localizer_.update(RobotLocalizer::MotorData{
-            localToGlobalVelocity(
-                createVector(robot_status.motor_status().local_velocity()),
-                robot_localizer_.getOrientation()),
-            createAngularVelocity(robot_status.motor_status().angular_velocity())});
-    }
-
-    if (robot_status.has_imu_status() && robot_status.imu_status().has_angular_velocity())
-    {
-        robot_localizer_.update(RobotLocalizer::ImuData{
-            createAngularVelocity(robot_status.imu_status().angular_velocity())});
-    }
 
     TbotsProto::PrimitiveExecutorStatus& prim_exec_status =
         *(robot_status.mutable_primitive_executor_status());
@@ -194,7 +170,7 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
                 stepTargetAngularVelocity(delta_time_s);
 
             // For debugging:
-            // sendLinearMotionToPlotJuggler(local_velocity, delta_time_s);
+            sendLinearMotionToPlotJuggler(local_velocity, delta_time_s);
 
             auto prim = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
@@ -239,7 +215,7 @@ void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
                                                  const AngularVelocity& angular_velocity)
 {
     prev_target_global_velocity_ =
-        localToGlobalVelocity(local_velocity, robot_localizer_.getOrientation());
+        localToGlobalVelocity(local_velocity, robot_state_.orientation());
     prev_target_angular_velocity_ = angular_velocity;
 }
 
@@ -248,17 +224,18 @@ void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local
 {
     const Vector& local_acceleration =
         (target_local_velocity -
-         globalToLocalVelocity(robot_localizer_.getVelocity(),
-                               robot_localizer_.getOrientation())) /
+         globalToLocalVelocity(robot_state_.velocity(), robot_state_.orientation())) /
         delta_time_s;
 
+    const std::string robot_prefix = "robot_" + std::to_string(robot_id_);
+
     LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-        {{"x", robot_localizer_.getPosition().x()},
-         {"y", robot_localizer_.getPosition().y()},
-         {"v_x", robot_localizer_.getVelocity().x()},
-         {"v_y", robot_localizer_.getVelocity().y()},
-         {"target_v_x", target_local_velocity.x()},
-         {"target_v_y", target_local_velocity.y()},
-         {"target_a_x", local_acceleration.x()},
-         {"target_a_y", local_acceleration.y()}});
+        {{robot_prefix + "/x", robot_state_.position().x()},
+         {robot_prefix + "/y", robot_state_.position().y()},
+         {robot_prefix + "/v_x", robot_state_.velocity().x()},
+         {robot_prefix + "/v_y", robot_state_.velocity().y()},
+         {robot_prefix + "/target_v_x", target_local_velocity.x()},
+         {robot_prefix + "/target_v_y", target_local_velocity.y()},
+         {robot_prefix + "/target_a_x", local_acceleration.x()},
+         {robot_prefix + "/target_a_y", local_acceleration.y()}});
 }

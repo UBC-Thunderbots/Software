@@ -79,7 +79,6 @@ extern "C" void tbotsExit(const int signal_num)
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          const bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
-      primitive_executor_(robot_constants),
       loop_hz_(loop_hz)
 {
     const RobotId robot_id = std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY));
@@ -144,6 +143,16 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     imu_service_ = std::make_unique<ImuService>();
     LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
+    robot_localizer_ =
+        std::make_unique<RobotLocalizer>(RobotLocalizer::RobotLocalizerConfig{
+            robot_constants.kalman_process_noise_variance_rad_per_s_4,
+            robot_constants.kalman_vision_noise_variance_rad_2,
+            robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2});
+    LOG(INFO) << "THUNDERLOOP: Robot Localizer initialized!";
+
+    primitive_executor_ = std::make_unique<PrimitiveExecutor>(robot_constants, robot_id);
+    LOG(INFO) << "THUNDERLOOP: Primitive Executor initialized!";
+
     // Initial version setup
     std::string thunderloop_hash, thunderloop_date_flashed;
     std::ifstream hashFile("~/thunderbots_hashes/thunderloop.hash");
@@ -198,11 +207,17 @@ void Thunderloop::runLoop()
 
         if (primitive.has_value())
         {
-            primitive_executor_.updatePrimitive(primitive.value(), robot_status_);
+            robot_localizer_->update(primitive.value());
+            primitive_executor_->updatePrimitive(primitive.value(), robot_status_);
         }
 
+        robot_localizer_->step(Vector(), time_since_prev_iter_s);
+        robot_localizer_->update(robot_status_);
+
+        primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
+
         const TbotsProto::DirectControlPrimitive direct_control_primitive =
-            primitive_executor_.stepPrimitive(robot_status_, time_since_prev_iter_s);
+            primitive_executor_->stepPrimitive(robot_status_, time_since_prev_iter_s);
 
         imu_service_->poll(robot_status_);
 

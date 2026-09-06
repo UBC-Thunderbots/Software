@@ -4,6 +4,7 @@
 
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"
@@ -49,17 +50,13 @@ class Thunderloop
     [[noreturn]] void runLoop();
 
    private:
-    // Services
+    std::unique_ptr<TomlConfigClient> toml_config_client_;
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;
     std::unique_ptr<ImuService> imu_service_;
-
-    // TOML config client
-    std::unique_ptr<TomlConfigClient> toml_config_client_;
-
-    // Primitive Executor
-    PrimitiveExecutor primitive_executor_;
+    std::unique_ptr<RobotLocalizer> robot_localizer_;
+    std::unique_ptr<PrimitiveExecutor> primitive_executor_;
 
     int loop_hz_;
 
