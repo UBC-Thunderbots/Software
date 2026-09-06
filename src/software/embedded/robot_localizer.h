@@ -4,13 +4,16 @@
 #include <deque>
 #include <optional>
 
-#include "proto/world.pb.h"
+#include "proto/primitive.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
+#include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
+#include "software/world/robot_state.h"
 
 MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
           ANGULAR_VELOCITY);
@@ -68,11 +71,12 @@ class RobotLocalizer
     explicit RobotLocalizer(const RobotLocalizerConfig& config);
 
     /**
-     * Runs one prediction step using elapsed time since the previous call.
+     * Runs one prediction step over the given elapsed time.
      *
      * @param linear_acceleration The current linear acceleration of the robot
+     * @param delta_time The elapsed time since the previous step
      */
-    void step(const Vector& linear_acceleration);
+    void step(const Vector& linear_acceleration, const Duration& delta_time);
 
     /**
      * Update the robot's position and orientation from data reported by vision.
@@ -95,6 +99,22 @@ class RobotLocalizer
      * @param data IMU reading of the robot's angular velocity
      */
     void update(const ImuData& data);
+
+    /**
+     * Updates the localizer with the vision-derived position and orientation from a
+     * primitive's trajectory parameters.
+     *
+     * @param primitive The primitive to extract the vision measurement from
+     */
+    void update(const TbotsProto::Primitive& primitive);
+
+    /**
+     * Updates the localizer with the motor and IMU measurements contained in a robot
+     * status.
+     *
+     * @param robot_status The robot status containing motor and IMU measurements
+     */
+    void update(const TbotsProto::RobotStatus& robot_status);
 
     /**
      * Gets the estimated position of the robot in world space.
@@ -123,6 +143,13 @@ class RobotLocalizer
      * @return estimated angular velocity of the robot
      */
     AngularVelocity getAngularVelocity() const;
+
+    /**
+     * Gets the current robot state estimate.
+     *
+     * @return The estimated robot state
+     */
+    RobotState getRobotState() const;
 
    private:
     /**
@@ -162,7 +189,7 @@ class RobotLocalizer
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
-        std::chrono::time_point<std::chrono::steady_clock> time;
+        double time_seconds;
     };
 
     KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
@@ -171,8 +198,8 @@ class RobotLocalizer
     double process_linear_acceleration_noise_variance_;
     double process_angular_acceleration_noise_variance_;
 
-    std::chrono::time_point<std::chrono::steady_clock> last_step_time_;
-
     // History is ordered newest-first (front is the most recent step)
     std::deque<FilterStep> history;
+
+    double current_time_seconds_ = 0.0;
 };
