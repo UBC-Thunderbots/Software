@@ -15,7 +15,15 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 @pytest.mark.parametrize(
-    "ball_offset_from_robot, angle_to_chip_at",
+    "auto_chip_or_kick",
+    [
+        protos.AutoChipOrKick(autokick_speed_m_per_s=5.0),
+        protos.AutoChipOrKick(autochip_distance_meters=2.0),
+    ],
+    ids=["autokick", "autochip"],
+)
+@pytest.mark.parametrize(
+    "ball_offset_from_robot, angle_to_kick_or_chip_at",
     [
         # place the ball directly to the left of the robot
         (tbots_cpp.Vector(0, 0.5), tbots_cpp.Angle.zero()),
@@ -30,7 +38,7 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
             tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0),
             tbots_cpp.Angle.zero(),
         ),
-        # Repeat the same tests but kick in the opposite direction
+        # Repeat the same tests but kick or chip in the opposite direction
         # place the ball directly to the left of the robot
         (tbots_cpp.Vector(0, 0.5), tbots_cpp.Angle.half()),
         # place the ball directly to the right of the robot
@@ -46,7 +54,12 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
         ),
     ],
 )
-def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
+def test_kick_or_chip(
+    ball_offset_from_robot,
+    angle_to_kick_or_chip_at,
+    auto_chip_or_kick,
+    simulated_test_runner,
+):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
@@ -65,22 +78,29 @@ def test_chip(ball_offset_from_robot, angle_to_chip_at, simulated_test_runner):
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                1: protos.ChipTactic(
-                    chip_origin=tbots_cpp.createPointProto(ball_position),
-                    chip_direction=tbots_cpp.createAngleProto(angle_to_chip_at),
-                    chip_distance_meters=2.0,
+                1: protos.KickOrChipTactic(
+                    kick_or_chip_origin=tbots_cpp.createPointProto(ball_position),
+                    kick_or_chip_direction=tbots_cpp.createAngleProto(
+                        angle_to_kick_or_chip_at
+                    ),
+                    auto_chip_or_kick=auto_chip_or_kick,
                 )
             }
         )
 
     eventually_validations = [
         [
-            BallEventuallyKickedInDirection(angle_to_chip_at),
-        ],
-        [
-            BallIsEventuallyOffGround(),
+            BallEventuallyKickedInDirection(angle_to_kick_or_chip_at),
         ],
     ]
+
+    # only a chip should send the ball off the ground
+    if auto_chip_or_kick.HasField("autochip_distance_meters"):
+        eventually_validations.append(
+            [
+                BallIsEventuallyOffGround(),
+            ]
+        )
 
     simulated_test_runner.run_test(
         setup=setup,
