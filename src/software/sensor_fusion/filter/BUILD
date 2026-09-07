@@ -121,6 +121,7 @@ cc_library(
         "@eigen",
     ],
 )
+
 cc_test(
     name = "kalman_filter_test",
     srcs = ["kalman_filter_test.cpp"],
