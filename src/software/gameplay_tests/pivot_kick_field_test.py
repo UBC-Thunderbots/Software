@@ -1,12 +1,13 @@
 import math
+
 import proto.import_all_protos as protos
 from software.gameplay_tests.field_test_fixture import (
     WORLD_BUFFER_TIMEOUT,
 )
-from software.logger.logger import create_logger
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
+from software.logger.logger import create_logger
 
 logger = create_logger(__name__)
 

@@ -1,13 +1,13 @@
-import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.field_test_fixture import (
     WORLD_BUFFER_TIMEOUT,
 )
-from software.gameplay_tests.validation.friendly_receives_ball_slow import (
-    FriendlyAlwaysReceivesBallSlow,
-)
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
+    FriendlyAlwaysReceivesBallSlow,
 )
 
 
