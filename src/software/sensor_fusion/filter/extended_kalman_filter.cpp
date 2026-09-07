@@ -46,7 +46,8 @@ class ExtendedKalmanFilter
      */
     ExtendedKalmanFilter(Eigen::Vector<double, DimX> initial_state,
                  Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
-                 Eigen::Matrix<double, DimX, DimX> initial_process_model,
+				 std::function<Eigen::Vector<double, DimX>(Eigen::Matrix<double, DimX, DimX>)> process_model_function,
+				 std::function<Eigen::Matrix<double, DimX, DimX>(Eigen::Matrix<double, DimX, DimX>)> process_model_jacobian_function,
                  Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
                  Eigen::Matrix<double, DimX, DimU> initial_control_model,
                  Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
@@ -68,7 +69,8 @@ class ExtendedKalmanFilter
 
     Eigen::Vector<double, DimX> state_estimate;
     Eigen::Matrix<double, DimX, DimX> state_covariance;
-    Eigen::Matrix<double, DimX, DimX> process_model;
+	std::function<Eigen::Vector<double, DimX>(Eigen::Matrix<double, DimX, DimX>)> process_model_function;
+	std::function<Eigen::Matrix<double, DimX, DimX>(Eigen::Matrix<double, DimX, DimX>)> process_model_jacobian_function;
     Eigen::Matrix<double, DimX, DimX> process_covariance;
     Eigen::Matrix<double, DimX, DimU> control_model;
     Eigen::Matrix<double, DimY, DimX> measurement_model;
@@ -79,7 +81,8 @@ template <int DimX, int DimY, int DimU>
 ExtendedKalmanFilter<DimX, DimY, DimU>::ExendedKalmanFilter()
     : state_estimate(Eigen::Vector<double, DimX>::Zero()),
       state_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
-      process_model(Eigen::Matrix<double, DimX, DimX>::Zero()),
+      std::function<Eigen::Vector<double, DimX>(Eigen::Matrix<double, DimX, DimX>)> initial_process_model_function,
+	  std::function<Eigen::Matrix<double, DimX, DimX>(Eigen::Matrix<double, DimX, DimX>)> initial_process_model_jacobian_function,
       process_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
       control_model(Eigen::Matrix<double, DimX, DimU>::Zero()),
       measurement_model(Eigen::Matrix<double, DimY, DimX>::Zero()),
@@ -91,14 +94,16 @@ template <int DimX, int DimY, int DimU>
 ExtendedKalmanFilter<DimX, DimY, DimU>::ExtendedKalmanFilter(
     Eigen::Vector<double, DimX> initial_state,
     Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
-    Eigen::Matrix<double, DimX, DimX> initial_process_model,
+    std::function<Eigen::Vector<double, DimX>(Eigen::Matrix<double, DimX, DimX>)> initial_process_model_function,
+	std::function<Eigen::Matrix<double, DimX, DimX>(Eigen::Matrix<double, DimX, DimX>)> initial_process_model_jacobian_function,
     Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
     Eigen::Matrix<double, DimX, DimU> initial_control_model,
     Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
     Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance)
     : state_estimate(initial_state),
       state_covariance(initial_state_covariance),
-      process_model(initial_process_model),
+      process_model_function(std::move(initial_process_model_function)),
+	  process_model_jacobian_function(std::move(initial_process_model_jacobian_function)),
       process_covariance(initial_process_covariance),
       control_model(initial_control_model),
       measurement_model(initial_measurement_model),
@@ -110,9 +115,10 @@ template <int DimX, int DimY, int DimU>
 void ExtendedKalmanFilter<DimX, DimY, DimU>::predict(Eigen::Vector<double, DimU> control_input)
 {
     // Project the current estimate through the process model
-    state_estimate = process_model * state_estimate + control_model * control_input;
+    state_estimate = process_model_function(state_estimate) + control_model * control_input;
+	Eigen::Matrix<double, DimX, DimX> evaluated_jacobian=  process_model_jacobian_function(state_estimate);
     state_covariance =
-        process_model * state_covariance * process_model.transpose() + process_covariance;
+         evaluated_jacobian * state_covariance * evaluated_jacobian.transpose() + process_covariance;
 }
 
 template <int DimX, int DimY, int DimU>
