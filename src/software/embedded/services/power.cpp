@@ -106,7 +106,7 @@ void PowerService::poll(const TbotsProto::DirectControlPrimitive& primitive,
     const auto poll_start = std::chrono::steady_clock::now();
 
     updatePowerControlAndStatus(primitive, robot_status);
-    updateErrorCodes(primitive, robot_status);
+    updateErrorCodes(robot_status);
     updateChickerStatus(primitive, robot_status);
     updateDribblerStatus(primitive, robot_status);
 
@@ -130,9 +130,7 @@ void PowerService::updatePowerControlAndStatus(
     *(robot_status.mutable_power_status())     = power_status;
 }
 
-void PowerService::updateErrorCodes(
-    const TbotsProto::DirectControlPrimitive& direct_control,
-    TbotsProto::RobotStatus& robot_status)
+void PowerService::updateErrorCodes(TbotsProto::RobotStatus& robot_status)
 {
     const TbotsProto::PowerStatus& power_status = robot_status.power_status();
 
@@ -234,7 +232,6 @@ double PowerService::getCpuTemperature()
 
     std::string cpu_temp_str;
     std::getline(cpu_temp_file_, cpu_temp_str);
-    cpu_temp_file_.close();
 
     // The temperature returned is in milli-Celsius, convert to Celsius
     return std::stod(cpu_temp_str) / 1000.0;

@@ -77,11 +77,9 @@ class PowerService
     /**
      * Populates the given robot status with any power-related error codes.
      *
-     * @param direct_control DirectControlPrimitive to execute
      * @param robot_status RobotStatus message to modify with error codes
      */
-    void updateErrorCodes(const TbotsProto::DirectControlPrimitive& direct_control,
-                          TbotsProto::RobotStatus& robot_status);
+    void updateErrorCodes(TbotsProto::RobotStatus& robot_status);
 
     /**
      * Updates the chicker/kicker status in the given robot status.
