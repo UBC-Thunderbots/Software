@@ -61,6 +61,22 @@ class Thunderloop
      */
     void waitForNetworkUp(int channel_id, const std::string& network_interface);
 
+    /**
+     * Updates the robot localizer with the vision-derived position and orientation
+     * from a primitive's trajectory parameters.
+     *
+     * @param primitive The primitive to extract the vision measurement from
+     */
+    void updateRobotLocalizer(const TbotsProto::Primitive& primitive);
+
+    /**
+     * Updates the robot localizer with the motor and IMU measurements contained in
+     * a robot status.
+     *
+     * @param robot_status The robot status containing motor and IMU measurements
+     */
+    void updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status);
+
     std::unique_ptr<TomlConfigClient> toml_config_client_;
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;

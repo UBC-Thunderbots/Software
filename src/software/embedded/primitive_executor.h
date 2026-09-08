@@ -87,14 +87,12 @@ class PrimitiveExecutor
     AngularVelocity stepTargetAngularVelocity(const Duration& delta_time);
 
     /**
-     * Sends the position, local velocity, and local acceleration to PlotJuggler.
+     * Sends the position, local velocity, and target local velocity to PlotJuggler.
      *
      * @param target_local_velocity The local velocity being sent to the next direct
      * control primitive
-     * @param delta_time The elapsed time since the last step
      */
-    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                       const Duration& delta_time) const;
+    void sendLinearMotionToPlotJuggler(const Vector& target_local_velocity) const;
 
     /**
      * Records the velocities commanded this step so the next step can measure the

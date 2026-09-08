@@ -101,22 +101,6 @@ class RobotLocalizer
     void update(const ImuData& data);
 
     /**
-     * Updates the localizer with the vision-derived position and orientation from a
-     * primitive's trajectory parameters.
-     *
-     * @param primitive The primitive to extract the vision measurement from
-     */
-    void update(const TbotsProto::Primitive& primitive);
-
-    /**
-     * Updates the localizer with the motor and IMU measurements contained in a robot
-     * status.
-     *
-     * @param robot_status The robot status containing motor and IMU measurements
-     */
-    void update(const TbotsProto::RobotStatus& robot_status);
-
-    /**
      * Gets the estimated position of the robot in world space.
      *
      * @return the estimated position of the robot in world space

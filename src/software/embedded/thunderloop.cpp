@@ -19,6 +19,7 @@
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
+#include "software/physics/velocity_conversion_util.h"
 #include "software/time/duration.h"
 #include "software/tracy/tracy_constants.h"
 
@@ -201,7 +202,7 @@ void Thunderloop::runLoop()
         pollNetwork();
 
         robot_localizer_->step(Vector(), delta_time);
-        robot_localizer_->update(robot_status_);
+        updateRobotLocalizer(robot_status_);
 
         primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
 
@@ -246,7 +247,7 @@ void Thunderloop::pollNetwork()
         primitive_.time_sent().epoch_timestamp_seconds())
     {
         primitive_ = new_primitive;
-        robot_localizer_->update(primitive_);
+        updateRobotLocalizer(primitive_);
         primitive_executor_->updatePrimitive(primitive_, robot_status_);
     }
 }
@@ -285,4 +286,29 @@ void Thunderloop::waitForNetworkUp(const int channel_id,
     }
 
     LOG(INFO) << "Thunderloop connected to network!";
+}
+
+void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
+{
+    if (primitive.has_move())
+    {
+        const Point position =
+            createPoint(primitive.move().xy_traj_params().start_position());
+        const Angle orientation =
+            createAngle(primitive.move().w_traj_params().start_angle());
+        robot_localizer_->update(
+            RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
+    }
+}
+
+void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status)
+{
+    if (robot_status.has_motor_status())
+    {
+        robot_localizer_->update(RobotLocalizer::MotorData{
+            localToGlobalVelocity(
+                createVector(robot_status.motor_status().local_velocity()),
+                robot_localizer_->getOrientation()),
+            createAngularVelocity(robot_status.motor_status().angular_velocity())});
+    }
 }

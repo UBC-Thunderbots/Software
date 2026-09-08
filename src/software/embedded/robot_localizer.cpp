@@ -295,30 +295,6 @@ void RobotLocalizer::update(const ImuData& data)
     filter_.update(step.update->measurement);
 }
 
-void RobotLocalizer::update(const TbotsProto::Primitive& primitive)
-{
-    if (primitive.has_move())
-    {
-        const Point position =
-            createPoint(primitive.move().xy_traj_params().start_position());
-        const Angle orientation =
-            createAngle(primitive.move().w_traj_params().start_angle());
-        update(VisionData{position, orientation, RTT_S / 2});
-    }
-}
-
-void RobotLocalizer::update(const TbotsProto::RobotStatus& robot_status)
-{
-    if (robot_status.has_motor_status())
-    {
-        update(MotorData{
-            localToGlobalVelocity(
-                createVector(robot_status.motor_status().local_velocity()),
-                getOrientation()),
-            createAngularVelocity(robot_status.motor_status().angular_velocity())});
-    }
-}
-
 Point RobotLocalizer::getPosition() const
 {
     return Point(

@@ -172,7 +172,7 @@ TbotsProto::DirectControlPrimitive PrimitiveExecutor::stepPrimitive(
                 stepTargetAngularVelocity(delta_time);
 
             // For debugging:
-            // sendLinearMotionToPlotJuggler(local_velocity, delta_time);
+            // sendLinearMotionToPlotJuggler(local_velocity);
 
             auto prim = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
@@ -221,14 +221,9 @@ void PrimitiveExecutor::setPrevCommandedVelocity(const Vector& local_velocity,
     prev_target_angular_velocity_ = angular_velocity;
 }
 
-void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local_velocity,
-                                                      const Duration& delta_time) const
+void PrimitiveExecutor::sendLinearMotionToPlotJuggler(
+    const Vector& target_local_velocity) const
 {
-    const Vector& local_acceleration =
-        (target_local_velocity -
-         globalToLocalVelocity(robot_state_.velocity(), robot_state_.orientation())) /
-        delta_time.toSeconds();
-
     const std::string robot_prefix = "robot_" + std::to_string(robot_id_);
 
     LOG(PLOTJUGGLER) << *createPlotJugglerValue(
@@ -237,7 +232,5 @@ void PrimitiveExecutor::sendLinearMotionToPlotJuggler(const Vector& target_local
          {robot_prefix + "/v_x", robot_state_.velocity().x()},
          {robot_prefix + "/v_y", robot_state_.velocity().y()},
          {robot_prefix + "/target_v_x", target_local_velocity.x()},
-         {robot_prefix + "/target_v_y", target_local_velocity.y()},
-         {robot_prefix + "/target_a_x", local_acceleration.x()},
-         {robot_prefix + "/target_a_y", local_acceleration.y()}});
+         {robot_prefix + "/target_v_y", target_local_velocity.y()}});
 }
