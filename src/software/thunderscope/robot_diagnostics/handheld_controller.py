@@ -5,7 +5,6 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
 from pygame._sdl2 import controller
-
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.controller_base import IControllerBase
 

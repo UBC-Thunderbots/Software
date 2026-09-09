@@ -1,8 +1,7 @@
+import proto.import_all_protos as protos
+import pyqtgraph.console as pg_console
 from pyqtgraph.Qt import QtWidgets
 from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
-import pyqtgraph.console as pg_console
-import proto.import_all_protos as protos
-
 from software.thunderscope import constants
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

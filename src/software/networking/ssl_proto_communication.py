@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import socket
-from google.protobuf.internal import encoder, decoder
+
 import google.protobuf.message as protobuf_message
+from google.protobuf.internal import decoder, encoder
 
 
 class SslSocketProtoParseException(Exception):
