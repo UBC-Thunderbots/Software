@@ -1,8 +1,26 @@
+# Kickoff (ball still at midfield)
+# +------------------+------------------+
+# | FRIENDLY HALF    | ENEMY HALF       |
+# |                  |                  |
+# | all 6 robots  ---|--> illegal       |
+# |                  |                  |
+# |               +--+--+               |
+# |               | CC  |               |
+# |               +--+--+               |
+# | friendly kickoff: <=1 in CC         |
+# | enemy kickoff:    0 in CC           |
+# +------------------+------------------+
+# After ball leaves center: half/CC rules no longer enforced here.
+
+import threading
+
 import pytest
 
 import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsAlwaysStaysInRegion,
+    NumberOfRobotsNeverEntersRegion,
+    RobotNeverEntersRegion,
 )
 from software.gameplay_tests.validation.ball_enters_region import (
     BallEventuallyExitsRegion,
@@ -70,28 +88,27 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             blue_play = protos.PlayName.KickoffEnemyPlay
             yellow_play = protos.PlayName.KickoffFriendlyPlay
 
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
-        )
+        # Let robots get ready before starting kickoff
+        threading.Timer(
+            4.0,
+            lambda: simulated_test_runner.send_gamecontroller_command(
+                gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
+            ),
+        ).start()
 
         simulated_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
-
-    # TODO (#3650): fix validation logic
-
-    # TODO (#3650): fix validation logic
 
     # Always Validation
     always_validation_sequence_set = [[]]
 
-    ball_moves_at_rest_validation = BallNeverEntersRegion(
+    ball_has_left_center = BallNeverEntersRegion(
         regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
     )
 
     expected_center_circle_or_validation_set = [
-        ball_moves_at_rest_validation,
-        NumberOfRobotsAlwaysStaysInRegion(
+        ball_has_left_center,
+        RobotNeverEntersRegion(
             regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-            req_robot_cnt=0,
         ),
     ]
 
@@ -105,9 +122,9 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         # this expected_center_circle_or_validation_set version checks
         # that either 0 or 1 robots are in centerCircle OR ball moves from center point
         expected_center_circle_or_validation_set.append(
-            NumberOfRobotsAlwaysStaysInRegion(
+            NumberOfRobotsNeverEntersRegion(
                 regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
-                req_robot_cnt=1,
+                req_robot_cnt=2,
             )
         )
     else:
@@ -117,7 +134,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # Checks that there are 6 friendly robots in friendly_regions
     # friendly_regions definition depends on if/else case above
     expected_robot_regions_or_validations_set = [
-        ball_moves_at_rest_validation,
+        ball_has_left_center,
         NumberOfRobotsAlwaysStaysInRegion(
             regions=friendly_regions,
             req_robot_cnt=6,
