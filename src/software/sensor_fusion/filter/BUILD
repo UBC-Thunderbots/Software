@@ -126,6 +126,7 @@ cc_test(
     srcs = ["kalman_filter_test.cpp"],
     deps = [
         ":kalman_filter",
+        ":extended_kalman_filter",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

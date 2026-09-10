@@ -4,6 +4,8 @@
 
 #include <limits>
 
+#include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
+
 struct KalmanParamsMath
 {
     double state_estimate;
@@ -294,3 +296,58 @@ INSTANTIATE_TEST_SUITE_P(
             Eigen::Vector<double, 3>{20.0, 30.0, 50.0},
             Eigen::Matrix<double, 3, 3>{
                 {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}}}));
+
+// Given a linear process model, the extended Kalman filter's linearization is exact,
+// so it should reproduce the linear Kalman filter step for step. This uses a 1D
+// constant velocity model, where state is (position, velocity) and only position is
+// measured.
+TEST(ExtendedKalmanFilterTest, LinearProcessModelMatchesKalmanFilter)
+{
+    constexpr double dt = 0.1;
+    const Eigen::Matrix<double, 2, 2> process_model{{1.0, dt}, {0.0, 1.0}};
+
+    const Eigen::Vector<double, 2> initial_state{0.0, 1.0};
+    const Eigen::Matrix<double, 2, 2> initial_state_covariance =
+        Eigen::Matrix<double, 2, 2>::Identity();
+    const Eigen::Matrix<double, 2, 2> process_covariance =
+        Eigen::Matrix<double, 2, 2>::Identity() * 0.01;
+    const Eigen::Matrix<double, 2, 1> control_model{0.5 * dt * dt, dt};
+    const Eigen::Matrix<double, 1, 2> measurement_model{{1.0, 0.0}};
+    const Eigen::Matrix<double, 1, 1> measurement_covariance{0.5};
+
+    KalmanFilter<2, 1, 1> kalman_filter(
+        initial_state, initial_state_covariance, process_model, process_covariance,
+        control_model, measurement_model, measurement_covariance);
+
+    ExtendedKalmanFilter<2, 1, 1> extended_kalman_filter(
+        initial_state, initial_state_covariance,
+        [process_model](Eigen::Vector<double, 2> state) -> Eigen::Vector<double, 2> {
+            return process_model * state;
+        },
+        [process_model](Eigen::Vector<double, 2>) -> Eigen::Matrix<double, 2, 2> {
+            return process_model;
+        },
+        process_covariance, control_model, measurement_model, measurement_covariance);
+
+    const Eigen::Vector<double, 1> control_input{0.2};
+
+    // Run several cycles so any divergence between the two filters accumulates
+    for (unsigned int step = 1; step <= 5; step++)
+    {
+        kalman_filter.predict(control_input);
+        extended_kalman_filter.predict(control_input);
+
+        // Position measurement of a body starting at 0.0 m moving at 1.0 m/s
+        const Eigen::Vector<double, 1> measurement{step * dt};
+        kalman_filter.update(measurement);
+        extended_kalman_filter.update(measurement);
+
+        constexpr double tolerance = 1e-12;
+        EXPECT_TRUE(extended_kalman_filter.state_estimate.isApprox(
+            kalman_filter.state_estimate, tolerance))
+            << "State estimates diverged at step " << step;
+        EXPECT_TRUE(extended_kalman_filter.state_covariance.isApprox(
+            kalman_filter.state_covariance, tolerance))
+            << "State covariances diverged at step " << step;
+    }
+}
