@@ -315,18 +315,16 @@ TEST(ExtendedKalmanFilterTest, LinearProcessModelMatchesKalmanFilter)
     const Eigen::Matrix<double, 1, 2> measurement_model{{1.0, 0.0}};
     const Eigen::Matrix<double, 1, 1> measurement_covariance{0.5};
 
-    KalmanFilter<2, 1, 1> kalman_filter(
-        initial_state, initial_state_covariance, process_model, process_covariance,
-        control_model, measurement_model, measurement_covariance);
+    KalmanFilter<2, 1, 1> kalman_filter(initial_state, initial_state_covariance,
+                                        process_model, process_covariance, control_model,
+                                        measurement_model, measurement_covariance);
 
     ExtendedKalmanFilter<2, 1, 1> extended_kalman_filter(
         initial_state, initial_state_covariance,
-        [process_model](Eigen::Vector<double, 2> state) -> Eigen::Vector<double, 2> {
-            return process_model * state;
-        },
-        [process_model](Eigen::Vector<double, 2>) -> Eigen::Matrix<double, 2, 2> {
-            return process_model;
-        },
+        [process_model](Eigen::Vector<double, 2> state) -> Eigen::Vector<double, 2>
+        { return process_model * state; },
+        [process_model](Eigen::Vector<double, 2>) -> Eigen::Matrix<double, 2, 2>
+        { return process_model; },
         process_covariance, control_model, measurement_model, measurement_covariance);
 
     const Eigen::Vector<double, 1> control_input{0.2};
