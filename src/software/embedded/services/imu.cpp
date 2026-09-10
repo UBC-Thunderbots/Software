@@ -5,6 +5,7 @@
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
 
+#include <Tracy.hpp>
 #include <climits>  // For SHRT_MAX
 
 #include "shared/constants.h"
@@ -134,7 +135,7 @@ ImuService::ImuService() : initialized_(false)
     // LOG(INFO) << "error: " << deviation.x() << deviation.y()  << ".";
 }
 
-std::optional<ImuData> ImuService::poll()
+void ImuService::poll(TbotsProto::RobotStatus& robot_status)
 {
     std::optional<AngularVelocity> angular_velocity = pollAngularVelocity();
     std::optional<AngularAcceleration> angular_acceleration =
@@ -148,9 +149,31 @@ std::optional<ImuData> ImuService::poll()
             *angular_velocity, *angular_acceleration, *imu_linear_acceleration);
     }
 
+    if (angular_velocity.has_value())
+    {
+        robot_status.mutable_imu_status()
+            ->mutable_angular_velocity()
+            ->set_radians_per_second(angular_velocity->toRadians());
+    }
 
-    return ImuData{angular_velocity, angular_acceleration, linear_acceleration};
+    if (angular_acceleration.has_value())
+    {
+        robot_status.mutable_imu_status()
+            ->mutable_angular_acceleration()
+            ->set_radians_per_second_squared(angular_acceleration->toRadians());
+    }
+
+    if (linear_acceleration.has_value())
+    {
+        robot_status.mutable_imu_status()
+            ->mutable_linear_acceleration()
+            ->set_x_component_meters(linear_acceleration->x());
+        robot_status.mutable_imu_status()
+            ->mutable_linear_acceleration()
+            ->set_y_component_meters(linear_acceleration->y());
+    }
 }
+
 std::optional<int16_t> ImuService::readAndCombineByteData(uint8_t ls_reg, uint8_t ms_reg)
 {
     int least_significant = i2c_smbus_read_byte_data(file_descriptor_, ls_reg);
