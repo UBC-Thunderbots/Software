@@ -187,7 +187,7 @@ void NetworkService::logNewPrimitive(const TbotsProto::Primitive& new_primitive)
 
 void NetworkService::updatePrimitiveLog(TbotsProto::RobotStatus& robot_status)
 {
-    uint64_t seq_num = robot_status.last_handled_primitive_set();
+    uint64_t seq_num = robot_status.last_handled_primitive_seq_num();
     while (!primitive_rtt.empty())
     {
         if (primitive_rtt.front().primitive_sequence_num == seq_num)

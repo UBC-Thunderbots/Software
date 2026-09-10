@@ -2,14 +2,15 @@
 
 #include <Tracy.hpp>
 #include <chrono>
-#include <fstream>
+#include <csignal>
+#include <iostream>
+#include <optional>
 #include <thread>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/constants.h"
 #include "software/embedded/primitive_executor.h"
@@ -19,8 +20,8 @@
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 #include "software/physics/velocity_conversion_util.h"
+#include "software/time/duration.h"
 #include "software/tracy/tracy_constants.h"
-#include "software/world/robot_state.h"
 
 namespace
 {
@@ -137,14 +138,17 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
 #endif
 
     imu_service_ = std::make_unique<ImuService>();
+    LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     robot_localizer_ =
         std::make_unique<RobotLocalizer>(RobotLocalizer::RobotLocalizerConfig{
             robot_constants.kalman_process_noise_variance_rad_per_s_4,
             robot_constants.kalman_vision_noise_variance_rad_2,
             robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2});
+    LOG(INFO) << "THUNDERLOOP: Robot Localizer initialized!";
 
-    primitive_executor_ = std::make_unique<PrimitiveExecutor>(robot_constants);
+    primitive_executor_ = std::make_unique<PrimitiveExecutor>(robot_constants, robot_id);
+    LOG(INFO) << "THUNDERLOOP: Primitive Executor initialized!";
 
     // Initial version setup
     std::string thunderloop_hash, thunderloop_date_flashed;
@@ -166,8 +170,6 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
         << "THUNDERLOOP: to update Thunderloop configuration, edit TOML config file and restart Thunderloop";
 }
 
-Thunderloop::~Thunderloop() {}
-
 /*
  * Run the main robot loop!
  *
@@ -184,8 +186,6 @@ void Thunderloop::runLoop()
     auto prev_iter_start_time = std::chrono::steady_clock::now();
     auto next_shot            = prev_iter_start_time;
 
-    last_primitive_received_time_ = std::chrono::steady_clock::now();
-
     for (;;)
     {
         std::this_thread::sleep_until(next_shot);
@@ -197,30 +197,25 @@ void Thunderloop::runLoop()
 
         FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
-        // Network Service: receive newest primitives and send out the last
-        // robot status
-        const NetworkPollResult network_result = pollNetwork();
+        robot_status_.clear_error_code();
 
-        // Robot Localizer: fuse sensor measurements into a robot state estimate
-        // and hand it to the primitive executor
-        primitive_executor_->updateState(updateLocalization());
+        pollNetwork();
 
-        // Primitive Executor: run the last primitive if we have not timed out,
-        // producing the control command for this iteration
-        const PrimitiveStepResult primitive_result = stepActivePrimitive(delta_time);
+        robot_localizer_->step(Vector(), delta_time);
+        updateRobotLocalizer(robot_status_);
+
+        primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
+
+        const TbotsProto::DirectControlPrimitive direct_control_primitive =
+            primitive_executor_->stepPrimitive(robot_status_, delta_time);
 
 #ifndef DISABLE_MOTOR_SERVICE
-        // Motor Service: execute the motor control command
-        motor_service_->poll(primitive_result.direct_control, robot_status_, delta_time);
+        motor_service_->poll(direct_control_primitive, robot_status_, delta_time);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
-        // Power Service: execute the power control command
-        power_service_->poll(primitive_result.direct_control, robot_status_);
+        power_service_->poll(direct_control_primitive, robot_status_);
 #endif
-
-        // Robot Status: compose the per-stage results into the outgoing status
-        assembleRobotStatus(network_result, primitive_result);
 
         FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
@@ -242,157 +237,19 @@ void Thunderloop::runLoop()
     }
 }
 
-inline Thunderloop::NetworkPollResult Thunderloop::pollNetwork()
+void Thunderloop::pollNetwork()
 {
-    NetworkPollResult result;
-    TbotsProto::Primitive new_primitive;
-
-    // Network Service: receive newest primitives and send out the last robot status
-    const auto poll_start = std::chrono::steady_clock::now();
-
     ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
 
-    new_primitive = network_service_->poll(robot_status_);
+    const TbotsProto::Primitive new_primitive = network_service_->poll(robot_status_);
 
-    const auto poll_end = std::chrono::steady_clock::now();
-    result.poll_time_ms =
-        std::chrono::duration<double, std::milli>(poll_end - poll_start).count();
-
-    // Update the time elapsed since the last received primitive
-    const auto time_since_last_primitive_received =
-        std::chrono::steady_clock::now() - last_primitive_received_time_;
-    result.network_status.set_ms_since_last_primitive_received(
-        std::chrono::duration<double, std::milli>(time_since_last_primitive_received)
-            .count());
-
-    // If the primitive msg is new, update the internal buffer and start the new
-    // primitive.
     if (new_primitive.time_sent().epoch_timestamp_seconds() >
         primitive_.time_sent().epoch_timestamp_seconds())
     {
-        // Save new primitive
         primitive_ = new_primitive;
-
-        // Feed the trajectory's starting pose to the localizer as a vision update.
-        if (primitive_.has_move())
-        {
-            const Point position =
-                createPoint(primitive_.move().xy_traj_params().start_position());
-            const Angle orientation =
-                createAngle(primitive_.move().w_traj_params().start_angle());
-
-            robot_localizer_->update(
-                RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
-        }
-
-        last_primitive_received_time_ = std::chrono::steady_clock::now();
-
-        // Start new primitive
-        const auto start = std::chrono::steady_clock::now();
-        primitive_executor_->updatePrimitive(primitive_);
-        result.primitive_start_time_ms = std::chrono::duration<double, std::milli>(
-                                             std::chrono::steady_clock::now() - start)
-                                             .count();
+        updateRobotLocalizer(primitive_);
+        primitive_executor_->updatePrimitive(primitive_, robot_status_);
     }
-
-    return result;
-}
-
-inline RobotState Thunderloop::updateLocalization()
-{
-    const std::optional<ImuData> imu_poll = imu_service_->poll();
-
-    // IMU: feed the measured angular velocity to the localizer
-    if (imu_poll.has_value() && imu_poll->angular_velocity.has_value())
-    {
-        robot_localizer_->update(
-            RobotLocalizer::ImuData{imu_poll->angular_velocity.value()});
-    }
-
-    // Motors: feed the measured wheel velocities (rotated into the global frame) to
-    // the localizer
-    if (robot_status_.has_motor_status())
-    {
-        const auto status = robot_status_.motor_status();
-
-        robot_localizer_->update(RobotLocalizer::MotorData{
-            localToGlobalVelocity(createVector(status.local_velocity()),
-                                  robot_localizer_->getOrientation()),
-            createAngularVelocity(status.angular_velocity())});
-    }
-
-    // Step the localizer forward using the measured linear acceleration
-    Vector linear_acceleration;
-
-#ifdef ENABLE_IMU_ACCEL
-    if (imu_poll.has_value() && imu_poll->linear_acceleration.has_value())
-    {
-        const auto accel    = imu_poll->linear_acceleration.value();
-        linear_acceleration = Vector(accel[0], accel[1]);
-    }
-#endif
-
-    robot_localizer_->step(linear_acceleration);
-
-    // Hand the fused state estimate to the primitive executor
-    return RobotState(robot_localizer_->getPosition(), robot_localizer_->getVelocity(),
-                      robot_localizer_->getOrientation(),
-                      robot_localizer_->getAngularVelocity());
-}
-
-inline Thunderloop::PrimitiveStepResult Thunderloop::stepActivePrimitive(
-    const Duration& delta_time)
-{
-    PrimitiveStepResult result;
-
-    const auto poll_start = std::chrono::steady_clock::now();
-
-    ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
-
-    // If primitive not received in a while, stop the robot
-    const auto time_since_last_primitive_received =
-        std::chrono::steady_clock::now() - last_primitive_received_time_;
-    if (time_since_last_primitive_received >
-        std::chrono::nanoseconds(static_cast<long>(PACKET_TIMEOUT_NS)))
-    {
-        primitive_executor_->updatePrimitive(*createStopPrimitiveProto());
-    }
-
-    result.direct_control =
-        *primitive_executor_->stepPrimitive(result.executor_status, delta_time);
-
-    const auto poll_end = std::chrono::steady_clock::now();
-    result.step_time_ms =
-        std::chrono::duration<double, std::milli>(poll_end - poll_start).count();
-
-    return result;
-}
-
-inline void Thunderloop::assembleRobotStatus(const NetworkPollResult& network,
-                                             const PrimitiveStepResult& primitive)
-{
-    // Fold the per-stage timing into the sticky telemetry. Fields whose stage did not run
-    // this iteration (a new primitive start, a disabled service) keep their last value.
-    thunderloop_status_.set_network_service_poll_time_ms(network.poll_time_ms);
-    if (network.primitive_start_time_ms.has_value())
-    {
-        thunderloop_status_.set_primitive_executor_start_time_ms(
-            network.primitive_start_time_ms.value());
-    }
-    thunderloop_status_.set_primitive_executor_step_time_ms(primitive.step_time_ms);
-
-    TbotsProto::Timestamp time_sent;
-    time_sent.set_epoch_timestamp_seconds(
-        std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch())
-            .count());
-
-    // Compose the outgoing status. Note: motor_status and power_status are written into
-    // robot_status_ directly by the motor/power services during their poll.
-    robot_status_.set_last_handled_primitive_set(primitive_.sequence_number());
-    *(robot_status_.mutable_time_sent())                 = time_sent;
-    *(robot_status_.mutable_thunderloop_status())        = thunderloop_status_;
-    *(robot_status_.mutable_network_status())            = network.network_status;
-    *(robot_status_.mutable_primitive_executor_status()) = primitive.executor_status;
 }
 
 void Thunderloop::waitForNetworkUp(const int channel_id,
@@ -424,9 +281,34 @@ void Thunderloop::waitForNetworkUp(const int channel_id,
             // Resend the message after a delay
             LOG(WARNING) << "Thunderloop cannot connect to network!"
                          << "Waiting for connection...";
-            sleep(PING_RETRY_DELAY_S);
+            sleep(1);
         }
     }
 
     LOG(INFO) << "Thunderloop connected to network!";
+}
+
+void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
+{
+    if (primitive.has_move())
+    {
+        const Point position =
+            createPoint(primitive.move().xy_traj_params().start_position());
+        const Angle orientation =
+            createAngle(primitive.move().w_traj_params().start_angle());
+        robot_localizer_->update(
+            RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
+    }
+}
+
+void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status)
+{
+    if (robot_status.has_motor_status())
+    {
+        robot_localizer_->update(RobotLocalizer::MotorData{
+            localToGlobalVelocity(
+                createVector(robot_status.motor_status().local_velocity()),
+                robot_localizer_->getOrientation()),
+            createAngularVelocity(robot_status.motor_status().angular_velocity())});
+    }
 }
