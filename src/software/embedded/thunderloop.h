@@ -86,7 +86,7 @@ class Thunderloop
     /**
      * Wait for networking communication to be established. This function is blocking.
      */
-    void waitForNetworkUp();
+    void waitForNetworkUp(int channel_id, const std::string& network_interface);
 
     /**
      * Polls the network service: sends the last robot_status_ and receives the newest
@@ -133,18 +133,13 @@ class Thunderloop
 
     TbotsProto::ThunderloopStatus thunderloop_status_;
 
-    // Current State
-    robot_constants::RobotConstants robot_constants_;
-    int robot_id_;
-    int channel_id_;
-    std::string network_interface_;
     int loop_hz_;
 
     // Primitive Executor
-    PrimitiveExecutor primitive_executor_;
+    std::unique_ptr<PrimitiveExecutor> primitive_executor_;
 
     // Robot localization model
-    RobotLocalizer robot_localizer_;
+    std::unique_ptr<RobotLocalizer> robot_localizer_;
 
     // Loop timing state tracked across iterations. Initialized at the start of runLoop()
     // and updated by the stage helpers as the corresponding events occur.
