@@ -2,17 +2,17 @@
 # below deliberately come after preload_bundled_qt_libs().
 # ruff: noqa: E402
 
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
+preload_bundled_qt_libs()
+
 import argparse
 import contextlib
 import logging
 import os
 import sys
 import threading
-
-from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
-
-# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
-preload_bundled_qt_libs()
 
 import google.protobuf
 import software.thunderscope.thunderscope_config as config
