@@ -16,7 +16,7 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             config.vision_noise_variance, config.vision_noise_variance,
             config.vision_noise_variance, config.motor_sensor_noise_variance,
             config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
-            IMU_VARIANCE)
+            ImuService::IMU_VARIANCE)
             .asDiagonal();
 }
 

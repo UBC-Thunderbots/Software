@@ -30,6 +30,10 @@ class ImuService
      */
     void poll(TbotsProto::RobotStatus& robot_status);
 
+    // Variance from datasheet (in rad^2/s^2)
+    static constexpr double IMU_VARIANCE =
+        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) * (4.0 * 14.4222 / 1000.0 * M_PI / 180.0);
+
    private:
     /**
      * Polls the latest IMU reading of the angular velocity of the robot on the z axis
