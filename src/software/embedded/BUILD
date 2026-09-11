@@ -35,7 +35,6 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
-        "//software/embedded:robot_localizer",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
         "//software/math:math_functions",
