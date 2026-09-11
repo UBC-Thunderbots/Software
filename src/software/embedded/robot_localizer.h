@@ -6,7 +6,6 @@
 
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
@@ -147,6 +146,10 @@ class RobotLocalizer
     static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
     static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
     static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
+
+    // Variance from datasheet (in rad^2/s^2)
+    static constexpr double IMU_VARIANCE =
+        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) * (4.0 * 14.4222 / 1000.0 * M_PI / 180.0);
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.

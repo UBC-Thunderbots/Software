@@ -117,7 +117,6 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software:constants",
-        "//software/embedded/services:imu",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",
