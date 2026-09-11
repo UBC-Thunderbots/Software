@@ -67,6 +67,7 @@ cc_library(
     }),
     deps = [
         ":primitive_executor",
+        ":robot_localizer",
         "//proto:tbots_cc_proto",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
