@@ -14,8 +14,8 @@ cc_library(
         "//software/embedded/motor_controller:motor_fault_indicator",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
-        "//software/util/scoped_timespec_timer",
         "@eigen",
+        "@tracy",
     ],
 )
 
@@ -30,6 +30,7 @@ cc_library(
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
         "@boost//:filesystem",
+        "@tracy",
     ],
 )
 
@@ -46,5 +47,6 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/logger",
         "@eigen",
+        "@tracy",
     ],
 )
