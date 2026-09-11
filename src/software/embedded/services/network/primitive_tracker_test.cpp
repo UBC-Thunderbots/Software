@@ -15,10 +15,9 @@ TbotsProto::Primitive makePrimitive(uint64_t seq_num)
 
 double currentEpochTimeInSeconds()
 {
-    return std::chrono::duration_cast<std::chrono::microseconds>(
+    return std::chrono::duration<double>(
                std::chrono::system_clock::now().time_since_epoch())
-               .count() /
-           1000000.0;
+        .count();
 }
 }  // namespace
 

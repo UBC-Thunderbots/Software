@@ -1,0 +1,9 @@
+--- MODULE.bazel
++++ MODULE.bazel
+@@ -1,3 +1,6 @@
+ module(name = "hedron_compile_commands")
+
++bazel_dep(name = "rules_cc", version = "0.2.19")
++bazel_dep(name = "rules_python", version = "2.2.0")
++
+ p = use_extension("//:workspace_setup.bzl", "hedron_compile_commands_extension")
