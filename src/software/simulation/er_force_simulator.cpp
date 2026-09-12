@@ -19,7 +19,8 @@
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping)
+                                   const bool ramping,
+                                   const bool wheel_acceleration_limits)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -28,7 +29,8 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
-      ramping(ramping)
+      ramping(ramping),
+      wheel_acceleration_limits(wheel_acceleration_limits)
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -208,6 +210,7 @@ void ErForceSimulator::setRobots(
 
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
+    addSimulationLimits(ERForce);
 
     // Initialize Team Robots at the bottom of the field
     ::robot::Team* team;
@@ -304,6 +307,35 @@ void ErForceSimulator::setRobots(
                 std::make_shared<PrimitiveExecutor>(robot_constants, id);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
+    }
+}
+
+void ErForceSimulator::addSimulationLimits(robot::Specs& specs) const
+{
+    if (!wheel_acceleration_limits)
+    {
+        return;
+    }
+
+    auto* limits = specs.mutable_simulation_limits();
+    limits->set_a_speedup_wheel_max(robot_constants.motor_max_acceleration_m_per_s_2);
+    limits->set_a_brake_wheel_max(robot_constants.motor_max_acceleration_m_per_s_2);
+
+    // The simulator expects the coupling matrix in its own local frame, whose first
+    // axis points to the right of the robot and whose second axis points forwards,
+    // while ours has the first axis pointing forwards and the second one to the left.
+    const WheelSpace_t forward_column =
+        euclidean_to_four_wheel.getWheelVelocity(EuclideanSpace_t{1, 0, 0});
+    const WheelSpace_t left_column =
+        euclidean_to_four_wheel.getWheelVelocity(EuclideanSpace_t{0, 1, 0});
+    const WheelSpace_t angular_column =
+        euclidean_to_four_wheel.getWheelVelocity(EuclideanSpace_t{0, 0, 1});
+
+    for (Eigen::Index wheel = 0; wheel < forward_column.size(); wheel++)
+    {
+        limits->add_wheel_velocity_coupling(static_cast<float>(-left_column[wheel]));
+        limits->add_wheel_velocity_coupling(static_cast<float>(forward_column[wheel]));
+        limits->add_wheel_velocity_coupling(static_cast<float>(angular_column[wheel]));
     }
 }
 

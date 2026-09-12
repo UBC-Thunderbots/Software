@@ -12,6 +12,7 @@ cc_library(
         "//proto:ssl_simulation_cc_proto",
         "//shared:constants",
         "@bullet",
+        "@eigen",
     ],
     alwayslink = True,
 )

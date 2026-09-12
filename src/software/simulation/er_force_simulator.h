@@ -27,11 +27,22 @@ class ErForceSimulator
      * @param field_type The field type
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
+     * @param ramping whether to ramp the commanded wheel velocities the way the motor
+     * service does on the real robot
+     * @param wheel_acceleration_limits whether the simulated robots limit how fast each
+     * of their wheels may accelerate. Note that this limits the robots inside the
+     * physics simulation, whereas ramping limits the commands sent to them.
+     * Off by default: the limit is applied to whatever the simulator's internal velocity
+     * controller asks for, and since that asks for far more acceleration than any robot
+     * can deliver, the limit ends up starving whichever of translation and rotation
+     * demands less of the wheels. A robot that is told to drive and spin at the same
+     * time therefore barely spins.
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const robot_constants::RobotConstants& robot_constants,
                               std::unique_ptr<RealismConfigErForce>& realism_config,
-                              const bool ramping = true);
+                              const bool ramping                   = true,
+                              const bool wheel_acceleration_limits = false);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -227,10 +238,19 @@ class ErForceSimulator
     robot_constants::RobotConstants robot_constants;
     Field field;
 
+    /**
+     * Sets the per wheel acceleration limits of the given robot specs from our robot
+     * constants, so that the simulated robots accelerate like ours do
+     *
+     * @param specs the robot specs to add the limits to
+     */
+    void addSimulationLimits(robot::Specs& specs) const;
+
     std::optional<RobotId> blue_robot_with_ball;
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool ramping;
+    bool wheel_acceleration_limits;
 
     struct LocalVelocity
     {
