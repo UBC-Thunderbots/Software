@@ -1,4 +1,7 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
@@ -113,10 +116,23 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "extended_kalman_filter",
+    srcs = [],
+    hdrs = ["extended_kalman_filter.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
 cc_test(
     name = "kalman_filter_test",
     srcs = ["kalman_filter_test.cpp"],
     deps = [
+        ":extended_kalman_filter",
         ":kalman_filter",
         "//shared/test_util:tbots_gtest_main",
     ],

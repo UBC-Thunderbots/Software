@@ -1,4 +1,8 @@
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,7 +39,6 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
-        "//software/embedded:robot_localizer",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
         "//software/math:math_functions",
@@ -68,6 +71,7 @@ cc_library(
     }),
     deps = [
         ":primitive_executor",
+        ":robot_localizer",
         "//proto:tbots_cc_proto",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",

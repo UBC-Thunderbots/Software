@@ -1,4 +1,6 @@
 load("@bazel_embedded//tools/openocd:defs.bzl", "openocd_flash")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_binary(
     name = "mdv6_firmware_main",
