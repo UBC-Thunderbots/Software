@@ -1,7 +1,7 @@
-import software.python_bindings as tbots_cpp
-import proto.import_all_protos as protos
-
 from abc import abstractmethod
+
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 
 
 class Validation:

@@ -3,21 +3,19 @@
 import itertools
 import os
 import sys
-
 from subprocess import PIPE, run
 
 import iterfzf
-
-from thefuzz import process
-from typer import Argument, Context, Typer
-
 from cli.cli_params import (
     ActionArgument,
     AnsiblePlaybook,
+    BazelFlag,
+    BuildConfig,
     DebugBinary,
     DebugBuildOption,
     EnableThunderscopeOption,
     FlashRobotsOption,
+    InteractiveCli,
     InteractiveModeOption,
     JobsOption,
     NoOptimizedBuildOption,
@@ -29,10 +27,9 @@ from cli.cli_params import (
     StopAIOnStartOption,
     TestSuiteOption,
     TracyOption,
-    BuildConfig,
-    BazelFlag,
-    InteractiveCli,
 )
+from thefuzz import process
+from typer import Argument, Context, Typer
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10

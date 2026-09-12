@@ -1,17 +1,17 @@
 import math
-from pyqtgraph.Qt.QtCore import Qt
-from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-import proto.import_all_protos as protos
-from software.thunderscope.gl.layers.gl_world_layer import tbots_cpp
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.logger.logger import create_logger
-from software.thunderscope.constants import Colors
-from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
-from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import override
 
+import proto.import_all_protos as protos
+from pyqtgraph.Qt.QtCore import Qt
+from software.logger.logger import create_logger
+from software.thunderscope.constants import Colors
+from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
+from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
+from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.gl.layers.gl_world_layer import tbots_cpp
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 logger = create_logger(__name__)
 

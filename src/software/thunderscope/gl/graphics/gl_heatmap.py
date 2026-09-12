@@ -1,11 +1,10 @@
-import pyqtgraph.opengl as gl
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-import pyqtgraph as pg
-
 from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
+import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 
 class GLHeatmap(gl.GLMeshItem):

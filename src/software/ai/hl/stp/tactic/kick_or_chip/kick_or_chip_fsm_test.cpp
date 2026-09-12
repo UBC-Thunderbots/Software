@@ -1,19 +1,24 @@
-#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
 
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
 
-TEST(ChipFSMTest, test_transitions)
+class KickOrChipFSMTest : public ::testing::TestWithParam<AutoChipOrKick>
+{
+};
+
+TEST_P(KickOrChipFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    ChipFSM::ControlParams control_params{.chip_origin          = Point(-2, 1.5),
-                                          .chip_direction       = Angle::threeQuarter(),
-                                          .chip_distance_meters = 1.2};
+    KickOrChipFSM::ControlParams control_params{
+        .kick_or_chip_origin    = Point(-2, 1.5),
+        .kick_or_chip_direction = Angle::threeQuarter(),
+        .auto_chip_or_kick      = GetParam()};
 
-    FSM<ChipFSM> fsm{ChipFSM(std::make_shared<TbotsProto::AiConfig>()),
-                     GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
+    FSM<KickOrChipFSM> fsm{KickOrChipFSM(std::make_shared<TbotsProto::AiConfig>()),
+                           GetBehindBallFSM(std::make_shared<TbotsProto::AiConfig>())};
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
@@ -21,7 +26,7 @@ TEST(ChipFSMTest, test_transitions)
         boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // Transition to GetBehindBallFSM state's GetBehindBallState
-    fsm.process_event(ChipFSM::Update(
+    fsm.process_event(KickOrChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
@@ -32,14 +37,14 @@ TEST(ChipFSMTest, test_transitions)
                   RobotState(Point(-2, 1.7), Vector(), Angle::threeQuarter(),
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(123));
-    fsm.process_event(ChipFSM::Update(
+    fsm.process_event(KickOrChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    // Transition to ChipState
-    EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
+    // Transition to KickOrChipState
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickOrChipFSM::KickOrChipState>));
 
-    // Change the chip direction and expect the FSM to realign
-    control_params.chip_direction = Angle::quarter();
-    fsm.process_event(ChipFSM::Update(
+    // Change the kick or chip direction and expect the FSM to realign
+    control_params.kick_or_chip_direction = Angle::quarter();
+    fsm.process_event(KickOrChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
@@ -50,18 +55,23 @@ TEST(ChipFSMTest, test_transitions)
         0,
         RobotState(Point(-2, 1.3), Vector(), Angle::quarter(), AngularVelocity::zero()),
         Timestamp::fromSeconds(124));
-    fsm.process_event(ChipFSM::Update(
+    fsm.process_event(KickOrChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    // Transition to ChipState again
-    EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
+    // Transition to KickOrChipState again
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickOrChipFSM::KickOrChipState>));
 
-    // Ball is now chipped
+    // Ball is now kicked or chipped
     ::TestUtil::setBallVelocity(world, Vector(0, 2.1), Timestamp::fromSeconds(123));
 
     EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::quarter()));
 
     // Tactic is done
-    fsm.process_event(ChipFSM::Update(
+    fsm.process_event(KickOrChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }
+
+INSTANTIATE_TEST_CASE_P(
+    AutoChipOrKickModes, KickOrChipFSMTest,
+    ::testing::Values(AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 1.2},
+                      AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 1.2}));
