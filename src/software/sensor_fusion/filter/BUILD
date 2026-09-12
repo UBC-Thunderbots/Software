@@ -113,10 +113,23 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "extended_kalman_filter",
+    srcs = [],
+    hdrs = ["extended_kalman_filter.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
 cc_test(
     name = "kalman_filter_test",
     srcs = ["kalman_filter_test.cpp"],
     deps = [
+        ":extended_kalman_filter",
         ":kalman_filter",
         "//shared/test_util:tbots_gtest_main",
     ],
