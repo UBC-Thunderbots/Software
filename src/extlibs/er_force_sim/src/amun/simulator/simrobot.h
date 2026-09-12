@@ -82,6 +82,17 @@ class camun::simulator::SimRobot
 
     void stopDribbling();
 
+    /**
+     * Sets how much the robot deviates from driving straight, as a fraction of its
+     * forward acceleration that is applied as rotational acceleration
+     *
+     * @param error the rotation error
+     */
+    void setRotationError(float error)
+    {
+        m_rotationError = error;
+    }
+
     const robot::Specs& specs() const
     {
         return m_specs;
@@ -130,6 +141,7 @@ class camun::simulator::SimRobot
     float m_error_sum_omega;
 
     bool m_perfectDribbler = false;
+    float m_rotationError  = 0.0f;
 
     int64_t m_lastSendTime = 0;
 };

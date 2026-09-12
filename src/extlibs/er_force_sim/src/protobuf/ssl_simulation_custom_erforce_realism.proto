@@ -53,4 +53,17 @@ message RealismConfigErForce
     // Simulates an offset of all reported object positions (robots, ball) at this
     // magnitude [m]
     optional float object_position_offset = 16;
+    // The percentage of times a robot is erroneously not "seen" by a camera [0-1]
+    optional float missing_robot_detections = 17;
+    // Robot control commands are only applied this long after they were received [ns]
+    optional int64 command_delay = 18;
+    // Simulates a robot that does not drive perfectly straight, by adding this
+    // fraction of the forward acceleration as rotational acceleration
+    optional float robot_rotation_error = 19;
+    // The probability per frame and camera that a robot starts being detected a
+    // second time, with its pattern misread as the one rotated by 90 degrees [0-1]
+    optional float rotated_robot_detections_start = 20;
+    // The probability per frame and camera that such a rotated detection stops
+    // again [0-1]
+    optional float rotated_robot_detections_stop = 21;
 }
