@@ -185,7 +185,6 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         else
         {
             consecutive_outliers++;
-            // so like if timestamp gap then it timestamp gaps.
             if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD)
             {
                 reset(pos_measurement, ang_measurement, current_time);
