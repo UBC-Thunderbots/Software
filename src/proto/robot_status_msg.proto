@@ -8,17 +8,16 @@ import "proto/geometry.proto";
 
 message RobotStatus
 {
-    reserved 8;
-
     uint32 robot_id                                   = 1;
     repeated ErrorCode error_code                     = 2;
     ChipperKickerStatus chipper_kicker_status         = 4;
     MotorStatus motor_status                          = 5;
     NetworkStatus network_status                      = 6;
     PowerStatus power_status                          = 7;
+    ImuStatus imu_status                              = 16;
     ThunderloopStatus thunderloop_status              = 9;
     Timestamp time_sent                               = 10;
-    uint64 last_handled_primitive_set                 = 11;
+    uint64 last_handled_primitive_seq_num             = 11;
     PrimitiveExecutorStatus primitive_executor_status = 12;
     Timestamp adjusted_time_sent                      = 13;
     string thunderloop_version                        = 14;
@@ -32,12 +31,12 @@ message PrimitiveExecutorStatus
 
 message ThunderloopStatus
 {
-    double network_service_poll_time_ms     = 1;
-    double primitive_executor_start_time_ms = 2;
-    double primitive_executor_step_time_ms  = 3;
-    double motor_service_poll_time_ms       = 4;
-    double power_service_poll_time_ms       = 5;
-    double iteration_time_ms                = 6;
+    double network_service_poll_time_ms      = 1;
+    double primitive_executor_update_time_ms = 2;
+    double primitive_executor_step_time_ms   = 3;
+    double motor_service_poll_time_ms        = 4;
+    double power_service_poll_time_ms        = 5;
+    double iteration_time_ms                 = 6;
 }
 
 /* Data about the status of the chipper and kicker */
@@ -81,40 +80,19 @@ enum ErrorCode
 
 enum MotorFault
 {
-    /*********** TMC Faults ************/
-    // Refer to Trinamic 6100 datasheet for precise definitions of motor faults.
-    // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf
-    // (Section 5.1, p22-23)
-    RESET                             = 0;
-    DRIVER_OVERTEMPERATURE_PREWARNING = 1;
-    DRIVER_OVERTEMPERATURE            = 2;
-    UNDERVOLTAGE_CHARGEPUMP           = 3;
-    PHASE_U_SHORT_COUNTER_DETECTED    = 4;
-    PHASE_U_SHORT_TO_GND_DETECTED     = 5;
-    PHASE_U_SHORT_TO_VS_DETECTED      = 6;
-    // for the sake of consistency with the TMC 6100, "7" is unused
-    PHASE_V_SHORT_COUNTER_DETECTED = 8;
-    PHASE_V_SHORT_TO_GND_DETECTED  = 9;
-    PHASE_V_SHORT_TO_VS_DETECTED   = 10;
-    // for the sake of consistency with the TMC 6100, "11" is unused
-    PHASE_W_SHORT_COUNTER_DETECTED = 12;
-    PHASE_W_SHORT_TO_GND_DETECTED  = 13;
-    PHASE_W_SHORT_TO_VS_DETECTED   = 14;
-
-    // TODO: #3749 Move this to its own proto.
-    /*********** STSPIN Faults ************/
-    NO_FAULT     = 15;
-    DURATION     = 16;
-    OVER_VOLT    = 17;
-    UNDER_VOLT   = 18;
-    OVER_TEMP    = 19;
-    START_UP     = 20;
-    SPEED_FDBK   = 21;
-    OVER_CURR    = 22;
-    SW_ERROR     = 23;
-    SAMPLE_FAULT = 24;
-    OVERCURR_SW  = 25;
-    DP_FAULT     = 26;
+    reserved 13 to 26;
+    NO_FAULT     = 0;
+    DURATION     = 1;
+    OVER_VOLT    = 2;
+    UNDER_VOLT   = 3;
+    OVER_TEMP    = 4;
+    START_UP     = 5;
+    SPEED_FDBK   = 6;
+    OVER_CURR    = 7;
+    SW_ERROR     = 8;
+    SAMPLE_FAULT = 9;
+    OVERCURR_SW  = 10;
+    DP_FAULT     = 11;
 }
 
 message DriveUnit
@@ -166,4 +144,11 @@ message PowerStatus
     Geneva.Slot geneva_slot = 4;
     uint32 sequence_num     = 5;
     bool breakbeam_tripped  = 6;
+}
+
+message ImuStatus
+{
+    AngularVelocity angular_velocity         = 1;
+    AngularAcceleration angular_acceleration = 2;
+    Vector linear_acceleration               = 3;
 }

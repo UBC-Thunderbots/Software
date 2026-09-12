@@ -1,20 +1,19 @@
-import pytest
-
-import software.python_bindings as tbots_cpp
-from software.gameplay_tests.validation.robot_enters_region import (
-    NumberOfRobotsAlwaysStaysInRegion,
-)
-from software.gameplay_tests.validation.ball_enters_region import (
-    BallEventuallyExitsRegion,
-    BallNeverEntersRegion,
-)
 import proto.import_all_protos as protos
+import pytest
+import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallEventuallyExitsRegion,
+    BallNeverEntersRegion,
+)
 from software.gameplay_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsAlwaysStaysInRegion,
+)
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])

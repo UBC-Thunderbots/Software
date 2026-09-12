@@ -1,13 +1,13 @@
-import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.field_test_fixture import (
     WORLD_BUFFER_TIMEOUT,
 )
-from software.gameplay_tests.validation.friendly_receives_ball_slow import (
-    FriendlyAlwaysReceivesBallSlow,
-)
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
+    FriendlyAlwaysReceivesBallSlow,
 )
 
 
@@ -41,16 +41,18 @@ def test_passing(field_test_runner):
     )
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
+    # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
+    # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[passer_robot_id] = protos.KickTactic(
-        kick_origin=protos.Point(
+    blue_tactics[passer_robot_id] = protos.KickOrChipTactic(
+        kick_or_chip_origin=protos.Point(
             x_meters=pass_to_test.passerPoint().x(),
             y_meters=pass_to_test.passerPoint().y(),
         ),
-        kick_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
-        kick_speed_meters_per_second=pass_to_test.speed(),
+        kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=protos.AutoChipOrKick(
+            autokick_speed_m_per_s=pass_to_test.speed(),
+        ),
     )
 
     # if we want a friendly robot to receive the pass

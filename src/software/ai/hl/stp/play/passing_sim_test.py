@@ -1,22 +1,22 @@
+import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-import proto.import_all_protos as protos
+from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.validation.friendly_receives_ball_slow import (
-    FriendlyAlwaysReceivesBallSlow,
-)
-from software.gameplay_tests.validation.friendly_has_ball_possession import (
-    FriendlyEventuallyHasBallPossession,
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallEventuallyEntersRegion,
+    BallEventuallyExitsRegion,
 )
 from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallMovesForwardInRegions,
 )
-from software.gameplay_tests.validation.ball_enters_region import (
-    BallEventuallyExitsRegion,
-    BallEventuallyEntersRegion,
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
+    FriendlyEventuallyHasBallPossession,
+)
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
+    FriendlyAlwaysReceivesBallSlow,
 )
 
 
@@ -107,16 +107,18 @@ def setup_pass_and_robots(
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
+    # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
+    # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[0] = protos.KickTactic(
-        kick_origin=protos.Point(
+    blue_tactics[0] = protos.KickOrChipTactic(
+        kick_or_chip_origin=protos.Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
         ),
-        kick_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
-        kick_speed_meters_per_second=best_pass.speed(),
+        kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=protos.AutoChipOrKick(
+            autokick_speed_m_per_s=best_pass.speed(),
+        ),
     )
 
     # if we want a friendly robot to receive the pass

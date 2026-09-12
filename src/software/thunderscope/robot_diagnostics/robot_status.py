@@ -1,9 +1,10 @@
-from pyqtgraph.Qt import QtWidgets
-from pyqtgraph import parametertree
-import proto.import_all_protos as protos
-from software.thunderscope.common import proto_parameter_tree_util
-from google.protobuf.message import Message
 from typing import override
+
+import proto.import_all_protos as protos
+from google.protobuf.message import Message
+from pyqtgraph import parametertree
+from pyqtgraph.Qt import QtWidgets
+from software.thunderscope.common import proto_parameter_tree_util
 
 
 class RobotStatusView(QtWidgets.QWidget):

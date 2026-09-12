@@ -1,19 +1,20 @@
+import math
+
+import proto.import_all_protos as protos
 import pytest
+import software.python_bindings as tbots
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.simulated_test_fixture import (
+    SimulatedTestRunner,
     pytest_main,
 )
 from software.gameplay_tests.validation.avoid_collisions import (
     RobotsDoNotCollide,
 )
-import software.python_bindings as tbots
-from proto.message_translation.tbots_protobuf import create_world_state
-import math
-import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import SimulatedTestRunner
 from software.gameplay_tests.validation.validation import (
-    create_validation_types,
     create_validation_geometry,
+    create_validation_types,
 )
 
 

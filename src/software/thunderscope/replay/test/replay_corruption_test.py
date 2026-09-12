@@ -12,21 +12,21 @@ Steps to test:
     3. we check to see if there are uncaught exception. If there are, we know for sure proto player wouldn't work!
 """
 
-import time
-from typing import Callable
-import random
-import shutil
+import base64
 import gzip
 import os
+import random
+import shutil
+import time
+from typing import Callable
+
 import proto.import_all_protos as protos
 from google.protobuf.message import Message
-import base64
-from software.py_constants import REPLAY_METADATA_DELIMITER
-
-from software.thunderscope.constants import ProtoPlayerFlags
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.gameplay_tests.simulated_test_fixture import pytest_main
+from software.py_constants import REPLAY_METADATA_DELIMITER
+from software.thunderscope.constants import ProtoPlayerFlags
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 random.seed(0)
 

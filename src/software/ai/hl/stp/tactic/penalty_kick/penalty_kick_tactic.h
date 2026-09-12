@@ -12,7 +12,7 @@
  */
 
 class PenaltyKickTactic
-    : public TacticBase<PenaltyKickFSM, DribbleFSM, KickFSM, GetBehindBallFSM>
+    : public TacticBase<PenaltyKickFSM, DribbleFSM, KickOrChipFSM, GetBehindBallFSM>
 {
    public:
     /**

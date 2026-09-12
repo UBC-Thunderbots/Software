@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_test(
@@ -16,13 +19,12 @@ cc_library(
     deps = [
         ":tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/halt:halt_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
+        "//software/ai/hl/stp/tactic/kick_or_chip:kick_or_chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",

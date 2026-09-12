@@ -1,12 +1,12 @@
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt import QtWidgets
-from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
+from typing import Type
+
 import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtWidgets
+from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from typing import Type
 
 
 class RobotViewComponent(QtWidgets.QWidget):

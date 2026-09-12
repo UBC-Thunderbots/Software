@@ -1,4 +1,7 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,7 +19,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/keep_away:keep_away_tactic",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/passing:pass",
