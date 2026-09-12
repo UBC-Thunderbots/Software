@@ -388,10 +388,17 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
                                            positionErrorVisionScale.z());
     }
 
-    // add ball model to geometry data
-    geometry->mutable_models()->mutable_straight_two_phase()->set_acc_roll(-0.35);
-    geometry->mutable_models()->mutable_straight_two_phase()->set_acc_slide(-4.5);
-    geometry->mutable_models()->mutable_straight_two_phase()->set_k_switch(0.69);
+    // Add the ball model to the geometry data. These values describe the ball model
+    // that this simulator actually implements (see SimBall::begin), so that consumers
+    // of the geometry packet can predict the ball the same way we simulate it. The
+    // sliding deceleration is the effective coefficient of friction between ball and
+    // floor (the product of both bodies' friction values) times gravity.
+    auto* ball_model = geometry->mutable_models()->mutable_straight_two_phase();
+    ball_model->set_acc_roll(
+        BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED);
+    ball_model->set_acc_slide(-BALL_SLIDING_FRICTION_NEWTONS * FLOOR_FRICTION *
+                              ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+    ball_model->set_k_switch(FRICTION_TRANSITION_FACTOR);
     geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_z(0.566);
     geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_xy_first_hop(
         0.715);
