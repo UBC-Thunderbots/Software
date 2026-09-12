@@ -33,6 +33,7 @@ from software.gameplay_tests.validation.robot_enters_region import (
 
 NORMAL_START_DELAY_S = 4.0
 
+
 @pytest.mark.parametrize("is_friendly_test", [True, False])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
     ball_initial_pos = tbots_cpp.Point(0, 0)
