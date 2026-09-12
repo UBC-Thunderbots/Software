@@ -11,7 +11,6 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
-
 int main(int argc, char** argv)
 {
     struct CommandLineArgs
@@ -104,6 +103,10 @@ int main(int argc, char** argv)
         // World Buffer
         TbotsProto::World blue_vision;
         TbotsProto::World yellow_vision;
+
+        // Timestamp of the first vision message received, so that logged timestamps
+        // start at 0
+        double start_timestamp_s = 0.0;
 
         // Outputs
         // SSL Wrapper Output
