@@ -1,5 +1,7 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 
+#include "software/time/duration.h"
+
 namespace
 {
 // The robot starts out unknown, so the initial estimate is given a covariance wide
@@ -79,7 +81,7 @@ constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 constexpr int EXPIRED_FRAME_THRESHOLD = 10;
 }  // namespace
 // control model = 0.
-RobotFilter::RobotFilter(Robot current_robot_state)
+RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state),
       pos_kalman_filter(POS_INITIAL_STATE, POS_INITIAL_COVARIANCE,
                         Eigen::Matrix<double, POS_STATE_SIZE, POS_STATE_SIZE>::Zero(),
@@ -92,11 +94,12 @@ RobotFilter::RobotFilter(Robot current_robot_state)
                         Eigen::Matrix<double, ANG_STATE_SIZE, CONTROL_SIZE>::Zero(),
                         ANG_MEASUREMENT_MODEL, ANG_MEASUREMENT_COVARIANCE),
       consecutive_outliers(0),
-      expired_frame_count(0)
+      expiry_buffer_duration(expiry_buffer_duration)
 {
 }
 // change the constructor initializations
-RobotFilter::RobotFilter(RobotDetection current_robot_state)
+RobotFilter::RobotFilter(RobotDetection current_robot_state,
+                         Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state.id, current_robot_state.position,
                           Vector(0, 0), current_robot_state.orientation,
                           AngularVelocity::zero(), current_robot_state.timestamp),
@@ -111,7 +114,7 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state)
                         Eigen::Matrix<double, ANG_STATE_SIZE, CONTROL_SIZE>::Zero(),
                         ANG_MEASUREMENT_MODEL, ANG_MEASUREMENT_COVARIANCE),
       consecutive_outliers(0),
-      expired_frame_count(0)
+      expiry_buffer_duration(expiry_buffer_duration)
 {
 }
 
@@ -173,7 +176,6 @@ std::optional<Robot> RobotFilter::estimateRobotState(
             pos_kalman_filter.update(pos_measurement);
             ang_kalman_filter.update(ang_measurement);
             consecutive_outliers     = 0;
-            expired_frame_count      = 0;
             prev_pos_measurement     = pos_measurement;
             prev_ang_measurement     = ang_measurement;
             prev_detection_timestamp = current_time;
@@ -183,7 +185,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         else
         {
             consecutive_outliers++;
-
+            // so like if timestamp gap then it timestamp gaps.
             if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD)
             {
                 reset(pos_measurement, ang_measurement, current_time);
@@ -192,8 +194,8 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     }
     else
     {
-        expired_frame_count++;
-        if (expired_frame_count > EXPIRED_FRAME_THRESHOLD)
+        if (prev_detection_timestamp &&
+            current_time > *prev_detection_timestamp + expiry_buffer_duration)
         {
             return std::nullopt;
         }
@@ -332,7 +334,6 @@ void RobotFilter::reset(const PosMeasurement& pos_measurement,
 
     revolutions          = 0;
     consecutive_outliers = 0;
-    expired_frame_count  = 0;
     // The reset measurement is now what the estimate is built on, so it becomes the
     // reference for the next timestep. Leaving the old timestamp here would make the
     // next predict() jump forward by the whole rejection streak.
