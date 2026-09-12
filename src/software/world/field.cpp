@@ -56,7 +56,9 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
           Point(enemyGoalCenter().x() + goalXLength(), enemyGoalpostNeg().y()))),
       friendly_goal_(Rectangle(
           Point(friendlyGoalCenter().x() - goalXLength(), friendlyGoalpostPos().y()),
-          Point(friendlyGoalCenter().x(), friendlyGoalpostNeg().y())))
+          Point(friendlyGoalCenter().x(), friendlyGoalpostNeg().y()))),
+      field_boundary_(Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
+                                Point(totalXLength() / 2, totalYLength() / 2)))
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
         defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||
@@ -160,11 +162,9 @@ const Rectangle& Field::fieldLines() const
     return field_lines_;
 }
 
-Rectangle Field::fieldBoundary() const
+const Rectangle& Field::fieldBoundary() const
 {
-    Point neg_x_neg_y_corner(-totalXLength() / 2, -totalYLength() / 2);
-    Point pos_x_pos_y_corner(totalXLength() / 2, totalYLength() / 2);
-    return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
+    return field_boundary_;
 }
 
 double Field::centerCircleRadius() const
