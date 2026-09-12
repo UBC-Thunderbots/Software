@@ -10,20 +10,26 @@ struct PlaySelectionFSM
     class Playing;
     class Stop;
     class SetPlay;
-    class OverridePlay;
 
     struct Update
     {
-        Update(const std::function<void(std::unique_ptr<Play>)>& set_current_play,
-               const GameState& game_state, const TbotsProto::AiConfig& ai_config)
-            : set_current_play(set_current_play),
-              game_state(game_state),
-              ai_config(ai_config)
+        Update(const GameState& game_state, const TbotsProto::AiConfig& ai_config)
+            : game_state(game_state), ai_config(ai_config)
         {
         }
-        std::function<void(std::unique_ptr<Play>)> set_current_play;
         GameState game_state;
         TbotsProto::AiConfig ai_config;
+    };
+
+    struct Override
+    {
+        explicit Override(std::unique_ptr<Play> play) : play(std::move(play)) {}
+        std::shared_ptr<Play> play;
+    };
+
+    struct Reset : Override
+    {
+        using Override::Override;
     };
 
     /**
@@ -32,6 +38,13 @@ struct PlaySelectionFSM
      * @param ai_config_ptr pointer to the default play config for this play fsm
      */
     explicit PlaySelectionFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
+    /**
+     * Gets the currently selected play
+     *
+     * @return the override play if one exists, otherwise the current play
+     */
+    Play& getSelectedPlay() const;
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -46,7 +59,21 @@ struct PlaySelectionFSM
     bool gameStateSetupRestart(const Update& event);
 
     /**
-     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, or OffensePlay
+     * Action to set up the override play
+     *
+     * @param event The PlaySelection::Override event
+     */
+    void setupOverridePlay(const Override& event);
+
+    /**
+     * Action to reset play selection and set up the override play
+     *
+     * @param event The PlaySelection::Reset event
+     */
+    void resetPlaySelection(const Reset& event);
+
+    /**
+     * Action to set up the SetPlay, StopPlay, HaltPlay, or OffensePlay
      *
      * @param event The PlaySelection::Update event
      *
@@ -63,6 +90,13 @@ struct PlaySelectionFSM
      */
     void resetSetPlay(const Update& event);
 
+    /**
+     * Sets the current play
+     *
+     * @param play the new current play
+     */
+    void setCurrentPlay(std::unique_ptr<Play> play);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -78,7 +112,11 @@ struct PlaySelectionFSM
         DEFINE_SML_GUARD(gameStateSetupRestart)
 
         DEFINE_SML_EVENT(Update)
+        DEFINE_SML_EVENT(Override)
+        DEFINE_SML_EVENT(Reset)
 
+        DEFINE_SML_ACTION(setupOverridePlay)
+        DEFINE_SML_ACTION(resetPlaySelection)
         DEFINE_SML_ACTION(setupSetPlay)
         DEFINE_SML_ACTION(setupStopPlay)
         DEFINE_SML_ACTION(setupHaltPlay)
@@ -93,18 +131,24 @@ struct PlaySelectionFSM
             *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
             Halt_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
             Halt_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            Halt_S + Override_E / setupOverridePlay_A,
+            Halt_S + Reset_E / resetPlaySelection_A = Halt_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
             Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
             Stop_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
             Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            Stop_S + Override_E / setupOverridePlay_A,
+            Stop_S + Reset_E / resetPlaySelection_A = Halt_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
             Playing_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
             Playing_S + Update_E[gameStateStopped_G] / setupStopPlay_A     = Stop_S,
             Playing_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            Playing_S + Override_E / setupOverridePlay_A,
+            Playing_S + Reset_E / resetPlaySelection_A = Halt_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
@@ -115,6 +159,8 @@ struct PlaySelectionFSM
             SetPlay_S + Update_E[gameStatePlaying_G] /
                             (resetSetPlay_A, setupOffensePlay_A) = Playing_S,
             SetPlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
+            SetPlay_S + Override_E / setupOverridePlay_A,
+            SetPlay_S + Reset_E / resetPlaySelection_A = Halt_S,
 
             X + Update_E = X);
     }
@@ -122,4 +168,6 @@ struct PlaySelectionFSM
    private:
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::optional<TbotsProto::PlayName> current_set_play;
+    std::shared_ptr<Play> current_play;
+    std::shared_ptr<Play> override_play;
 };

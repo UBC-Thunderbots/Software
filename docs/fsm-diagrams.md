@@ -11,16 +11,24 @@ direction LR
 Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Halt --> Halt : <i>setupOverridePlay</i>
+Halt --> Halt : <i>resetPlaySelection</i>
 Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Stop --> Stop : <i>setupOverridePlay</i>
+Stop --> Halt : <i>resetPlaySelection</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Playing --> Playing : <i>setupOverridePlay</i>
+Playing --> Halt : <i>resetPlaySelection</i>
 SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
 SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
 SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
 SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+SetPlay --> SetPlay : <i>setupOverridePlay</i>
+SetPlay --> Halt : <i>resetPlaySelection</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
