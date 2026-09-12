@@ -4,9 +4,15 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "generic_angle",
+    hdrs = ["generic_angle.h"],
+    deps = [":geom_constants"],
+)
+
+cc_library(
     name = "angle",
     hdrs = ["angle.h"],
-    deps = [":geom_constants"],
+    deps = [":generic_angle"],
 )
 
 cc_library(
@@ -39,13 +45,13 @@ cc_library(
 cc_library(
     name = "angular_velocity",
     hdrs = ["angular_velocity.h"],
-    deps = [":angle"],
+    deps = [":generic_angle"],
 )
 
 cc_library(
     name = "angular_acceleration",
     hdrs = ["angular_acceleration.h"],
-    deps = [":angle"],
+    deps = [":generic_angle"],
 )
 
 cc_library(
