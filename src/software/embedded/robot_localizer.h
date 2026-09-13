@@ -180,6 +180,8 @@ class RobotLocalizer
         std::optional<Predict> prediction;
         std::optional<Update> update;
 
+        // Filter state captured immediately after this step's own operation ran
+        // (i.e. post-operation, not pre-operation).
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 

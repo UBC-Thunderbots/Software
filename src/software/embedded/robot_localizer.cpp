@@ -114,21 +114,22 @@ void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& del
 
     generatedPredictionMatrices(delta_time_seconds);
 
-    FilterStep step{
-        .prediction       = std::make_optional<FilterStep::Predict>(),
+    FilterStep::Predict prediction{
+        .process_model      = filter_.process_model,
+        .process_covariance = filter_.process_covariance,
+        .control_model      = filter_.control_model,
+    };
+    prediction.control_input << linear_acceleration.x(), linear_acceleration.y();
+
+    filter_.predict(prediction.control_input);
+
+    history.push_front(FilterStep{
+        .prediction       = prediction,
         .update           = std::nullopt,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
-    };
-
-    step.prediction->process_model      = filter_.process_model;
-    step.prediction->process_covariance = filter_.process_covariance;
-    step.prediction->control_model      = filter_.control_model;
-    step.prediction->control_input << linear_acceleration.x(), linear_acceleration.y();
-
-    history.push_front(step);
-    filter_.predict(step.prediction->control_input);
+    });
 }
 
 void RobotLocalizer::update(const VisionData& data)
@@ -264,16 +265,15 @@ void RobotLocalizer::update(const MotorData& data)
     update.measurement(static_cast<Eigen::Index>(
         MeasurementIndex::MOTOR_ANGULAR_VELOCITY)) = data.angular_velocity.toRadians();
 
-    const FilterStep step{
+    filter_.update(update.measurement);
+
+    history.push_front(FilterStep{
         .prediction       = std::nullopt,
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
-    };
-
-    history.push_front(step);
-    filter_.update(step.update->measurement);
+    });
 }
 
 void RobotLocalizer::update(const ImuData& data)
@@ -291,16 +291,15 @@ void RobotLocalizer::update(const ImuData& data)
     update.measurement(static_cast<Eigen::Index>(
         MeasurementIndex::IMU_ANGULAR_VELOCITY)) = data.angular_velocity.toRadians();
 
-    const FilterStep step{
+    filter_.update(update.measurement);
+
+    history.push_front(FilterStep{
         .prediction       = std::nullopt,
         .update           = update,
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
-    };
-
-    history.push_front(step);
-    filter_.update(step.update->measurement);
+    });
 }
 
 Point RobotLocalizer::getPosition() const
