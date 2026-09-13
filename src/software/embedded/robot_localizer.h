@@ -172,25 +172,12 @@ class RobotLocalizer
      */
     struct FilterStep
     {
-        struct Predict
-        {
-            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_model;
-            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_covariance;
-            Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE> control_model;
-            Eigen::Vector<double, CONTROL_SIZE> control_input;
-        };
+        std::optional<Eigen::Vector<double, CONTROL_SIZE>> control_input;
 
-        struct Update
-        {
-            MeasurementSource source;
-            Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
-        };
+        std::optional<MeasurementSource> measurement_source;
+        std::optional<Eigen::Vector<double, MEASUREMENT_SIZE>> measurement;
 
-        std::optional<Predict> prediction;
-        std::optional<Update> update;
-
-        // Filter state captured immediately after this step's own operation ran
-        // (i.e. post-operation, not pre-operation).
+		// Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
