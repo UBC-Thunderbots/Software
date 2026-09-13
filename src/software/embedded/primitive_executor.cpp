@@ -62,6 +62,11 @@ void PrimitiveExecutor::updateRobotState(const RobotState& robot_state)
     robot_state_ = robot_state;
 }
 
+Vector PrimitiveExecutor::getPrevCommandedVelocity() const
+{
+    return prev_target_global_velocity_;
+}
+
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
 {
     Vector target_v_global =
