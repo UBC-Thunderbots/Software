@@ -107,6 +107,42 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
         delta_time_seconds;
 }
 
+void RobotLocalizer::generateMeasurementModel(MeasurementSource source)
+{
+    filter_.measurement_model.setZero();
+
+    switch (source)
+    {
+        case MeasurementSource::VISION_DATA:
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
+                static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
+                static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
+                static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
+            break;
+        case MeasurementSource::MOTOR_DATA:
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            break;
+        case MeasurementSource::IMU_DATA:
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            break;
+    }
+}
+
 void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& delta_time)
 {
     const double delta_time_seconds = delta_time.toSeconds();
@@ -221,32 +257,14 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
 
-    filter_.measurement_model.setZero();
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
-        static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
-        static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
-        static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
+    generateMeasurementModel(MeasurementSource::VISION_DATA);
 
     filter_.update(measurement);
 }
 
 void RobotLocalizer::update(const MotorData& data)
 {
-    filter_.measurement_model.setZero();
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
-        static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY),
-        static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
-        static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+    generateMeasurementModel(MeasurementSource::MOTOR_DATA);
 
     FilterStep::Update update{
         .measurement_model = filter_.measurement_model,
@@ -273,10 +291,7 @@ void RobotLocalizer::update(const MotorData& data)
 
 void RobotLocalizer::update(const ImuData& data)
 {
-    filter_.measurement_model.setZero();
-    filter_.measurement_model(
-        static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
-        static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+    generateMeasurementModel(MeasurementSource::IMU_DATA);
 
     FilterStep::Update update{
         .measurement_model = filter_.measurement_model,

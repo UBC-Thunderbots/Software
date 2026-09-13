@@ -24,6 +24,8 @@ MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTA
 
 MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION);
 
+MAKE_ENUM(MeasurementSource, MOTOR_DATA, IMU_DATA, VISION_DATA);
+
 /**
  * Estimates robot orientation, angular velocity, and angular acceleration
  * using a Kalman filter.
@@ -153,6 +155,13 @@ class RobotLocalizer
      * matrices for
      */
     void generatedPredictionMatrices(double delta_time_seconds);
+
+    /**
+     * Writes the measurement model for the given data source into the filter.
+     *
+     * @param source Which sensor's measurement model to generate
+     */
+    void generateMeasurementModel(MeasurementSource source);
 
     static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
     static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
