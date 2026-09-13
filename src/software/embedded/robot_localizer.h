@@ -182,7 +182,7 @@ class RobotLocalizer
 
         struct Update
         {
-            Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> measurement_model;
+            MeasurementSource source;
             Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
         };
 
