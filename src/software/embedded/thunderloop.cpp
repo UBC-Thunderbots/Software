@@ -271,17 +271,13 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_stat
 {
 	// Seperate update is okay because measurement model is linear
 	if (robot_status.has_imu_status()){
-		robot_localizer_.update(RobotLocalizer::ImuData{
-			createAngularVelocity(robot_status.imu_status().angular_velocity())
-				})	
-
+		robot_localizer_->update(RobotLocalizer::ImuData{
+			createAngularVelocity(robot_status.imu_status().angular_velocity())});
 	}
     if (robot_status.has_motor_status())
     {
         robot_localizer_->update(RobotLocalizer::MotorData{
-            localToGlobalVelocity(
-                createVector(robot_status.motor_status().local_velocity()),
-                robot_localizer_->getOrientation()),
+            createVector(robot_status.motor_status().local_velocity()),
             createAngularVelocity(robot_status.motor_status().angular_velocity())});
     }
 }
