@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "software/constants.h"
 #include "software/test_util/equal_within_tolerance.h"
 
 class RobotFilterTest : public ::testing::Test
@@ -16,7 +17,7 @@ class RobotFilterTest : public ::testing::Test
     Timestamp default_timestamp;
 };
 
-// Robot expires when it gets more than 10 frames of only data not matching its own
+// Robot expires when it hasn't received its own data for at least 200 milliseconds.
 TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expired_test)
 {
     Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
@@ -26,27 +27,20 @@ TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expired_test)
 
     // Give it 1 data point so that it doesn't break due to "prev_" variables
     new_robot_data = {
-        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromSeconds(0.1)}};
-    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(0.2));
+        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(10)}};
+    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(15));
 
-    // Give it 10 failing frames in total, and it should return nullopt
-    constexpr double EXPIRED_FRAME_THRESHOLD_TEST = 10.0;
+    new_robot_data = {
+        {2, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(110)}};
 
-    for (int i = 1; i < EXPIRED_FRAME_THRESHOLD_TEST + 1; i++)
-    {
-        new_robot_data = {
-            {2, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromSeconds(i)}};
-        robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(i + 0.1));
-    }
-    new_robot_data = {{2, Point(2, 0), Angle::fromRadians(1), 0.5,
-                       Timestamp::fromSeconds(EXPIRED_FRAME_THRESHOLD_TEST + 2)}};
-    EXPECT_EQ(
-        std::nullopt,
-        robot_filter.estimateRobotState(
-            new_robot_data, Timestamp::fromSeconds(EXPIRED_FRAME_THRESHOLD_TEST + 2.1)));
+    EXPECT_EQ(std::nullopt,
+              robot_filter.estimateRobotState(
+                  new_robot_data, Timestamp::fromMilliseconds(
+                                      ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 115)));
 }
 
-// Robot does not expire when it gets less than 9 frames of only data not matching its own
+// Robot does not expire when it hasn't received its own data for less than 200
+// milliseconds.
 TEST_F(RobotFilterTest, no_match_robot_data_robot_state_not_expired_test)
 {
     Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
@@ -56,29 +50,22 @@ TEST_F(RobotFilterTest, no_match_robot_data_robot_state_not_expired_test)
 
     // Give it 1 data point so that it doesn't break due to "prev_" variables
     new_robot_data = {
-        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromSeconds(0.1)}};
-    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(0.2));
+        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(100)}};
+    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(105));
 
-    // Give it 10 failing frames in total, and it should return nullopt
-    constexpr double EXPIRED_FRAME_THRESHOLD_TEST = 9.0;
+    new_robot_data = {
+        {2, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(110)}};
 
-    for (int i = 1; i < EXPIRED_FRAME_THRESHOLD_TEST + 1; i++)
-    {
-        new_robot_data = {
-            {2, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromSeconds(i)}};
-        robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(i + 0.1));
-    }
-    new_robot_data              = {{2, Point(2, 0), Angle::fromRadians(1), 0.5,
-                                    Timestamp::fromSeconds(EXPIRED_FRAME_THRESHOLD_TEST + 2)}};
     std::optional<Robot> result = robot_filter.estimateRobotState(
-        new_robot_data, Timestamp::fromSeconds(EXPIRED_FRAME_THRESHOLD_TEST + 2.1));
+        new_robot_data,
+        Timestamp::fromMilliseconds(ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 100));
 
     // Result isn't Optional
     ASSERT_TRUE(result.has_value());
     // test
     EXPECT_EQ(result->id(), 1);
     EXPECT_EQ(result->timestamp(),
-              Timestamp::fromSeconds(EXPIRED_FRAME_THRESHOLD_TEST + 2.1));
+              Timestamp::fromMilliseconds(ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 100));
 }
 
 // tests multiple detections
@@ -130,9 +117,9 @@ TEST_F(RobotFilterTest, large_orientation_angle_wrapping_test)
 
     // feed it data for another robot, make it predict what it will be
     new_robot_data = {{2, Point(2, 0), Angle::fromRadians(M_PI * 2 - 0.2), 0.5,
-                       Timestamp::fromSeconds(3)}};
+                       Timestamp::fromSeconds(3.1)}};
     std::optional<Robot> result =
-        robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(3.6));
+        robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(3.11));
 
     // Result isn't Optional
     ASSERT_TRUE(result.has_value());

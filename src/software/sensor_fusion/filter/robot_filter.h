@@ -3,9 +3,11 @@
 #include <optional>
 #include <vector>
 
+#include "software/constants.h"
 #include "software/geom/point.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
+#include "software/time/duration.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
@@ -19,9 +21,12 @@ class RobotFilter
      * @param expiry_buffer_duration the time when the robot is determined to be removed
      * from the field if data about the robot is not received before that time
      */
-    explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
+    explicit RobotFilter(Robot current_robot_state,
+                         Duration expiry_buffer_duration = Duration::fromMilliseconds(
+                             ROBOT_DEBOUNCE_DURATION_MILLISECONDS));
     explicit RobotFilter(RobotDetection current_robot_state,
-                         Duration expiry_buffer_duration);
+                         Duration expiry_buffer_duration = Duration::fromMilliseconds(
+                             ROBOT_DEBOUNCE_DURATION_MILLISECONDS));
 
     /**
      * Update the filter with the new SSLRobot detections, and returns the new

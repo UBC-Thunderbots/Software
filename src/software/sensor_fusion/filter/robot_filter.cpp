@@ -1,7 +1,5 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 
-#include "software/time/duration.h"
-
 namespace
 {
 // The robot starts out unknown, so the initial estimate is given a covariance wide
