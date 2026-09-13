@@ -20,7 +20,7 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             .asDiagonal();
 }
 
-void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& delta_time)
+void RobotLocalizer::predict(const Vector& linear_acceleration, const Duration& delta_time)
 {
     const double delta_time_seconds = delta_time.toSeconds();
     current_time_seconds_ += delta_time_seconds;
