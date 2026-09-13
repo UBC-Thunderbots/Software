@@ -65,7 +65,7 @@ double sampleCorrelatedNoise(std::mt19937& rng, double& bias, double dt_seconds,
 }
 }  // namespace
 
-const std::string ErForceSimulator::CSV_OUTPUT_PATH = "/tmp/offense_play_test_master.csv";
+const std::string ErForceSimulator::CSV_OUTPUT_PATH = "/tmp/master_test_new.csv";
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
