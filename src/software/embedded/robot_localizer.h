@@ -22,7 +22,7 @@ MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTA
           MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
           IMU_ANGULAR_VELOCITY);
 
-MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION);
+MAKE_ENUM(ControlIndex, X_VELOCITY_TARGET, Y_VELOCITY_TARGET);
 
 MAKE_ENUM(FilterStepType, PREDICT, MOTOR_DATA, IMU_DATA, VISION_DATA);
 
@@ -75,10 +75,11 @@ class RobotLocalizer
     /**
      * Runs one prediction step over the given elapsed time.
      *
-     * @param linear_acceleration The current linear acceleration of the robot
+     * @param target_velocity The global-frame linear velocity the robot is currently
+     * being commanded to achieve
      * @param delta_time The elapsed time since the previous step
      */
-    void predict(const Vector& linear_acceleration, const Duration& delta_time);
+    void predict(const Vector& target_velocity, const Duration& delta_time);
 
     /**
      * Update the robot's position and orientation from data reported by vision.
@@ -193,8 +194,10 @@ class RobotLocalizer
 
     KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
-    // Process noise variance used in prediction
-    double process_linear_acceleration_noise_variance_;
+    // Process noise variance used in prediction. The linear term models how much
+    // actual velocity deviates from the commanded target velocity (a rate, per unit
+    // time); the angular term models unmeasured angular acceleration disturbance.
+    double process_linear_velocity_noise_variance_;
     double process_angular_acceleration_noise_variance_;
 
     // History is ordered newest-first (front is the most recent step)
