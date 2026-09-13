@@ -48,13 +48,13 @@ class ExtendedKalmanFilter
      * The process model f(x): propagates a state forward by one time step.
      */
     using ProcessModelFunction =
-        std::function<Eigen::Vector<double, DimX>(Eigen::Vector<double, DimX>, double dt)>;
+        std::function<Eigen::Vector<double, DimX>(Eigen::Vector<double, DimX>)>;
 
     /**
      * The Jacobian of the process model (F = df/dx), evaluated at a given state.
      */
     using ProcessModelJacobianFunction =
-        std::function<Eigen::Matrix<double, DimX, DimX>(Eigen::Vector<double, DimX>, double dt)>;
+        std::function<Eigen::Matrix<double, DimX, DimX>(Eigen::Vector<double, DimX>)>;
 
     /**
      * Creates an extended Kalman filter with all internal matrices and vectors set

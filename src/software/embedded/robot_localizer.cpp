@@ -224,16 +224,21 @@ RobotState RobotLocalizer::getRobotState() const
                       getAngularVelocity());
 }
 
-void RobotLocalizer::logToPlotJuggler(RobotId robot_id, const RobotState& robot_state,
-                                      const std::string& tag)
+void RobotLocalizer::logToPlotJuggler(RobotId robot_id, const std::string& tag) const
 {
     const std::string robot_suffix = "_robot_" + std::to_string(robot_id) + tag;
 
+    const Point position         = getPosition();
+    const Vector global_velocity = getGlobalVelocity();
+    const Vector local_velocity  = getLocalVelocity();
+
     LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-        {{"pos_x" + robot_suffix, robot_state.position().x()},
-         {"pos_y" + robot_suffix, robot_state.position().y()},
-         {"vel_x" + robot_suffix, robot_state.velocity().x()},
-         {"vel_y" + robot_suffix, robot_state.velocity().y()}});
+        {{"pos_x" + robot_suffix, position.x()},
+         {"pos_y" + robot_suffix, position.y()},
+         {"vel_x" + robot_suffix, global_velocity.x()},
+         {"vel_y" + robot_suffix, global_velocity.y()},
+         {"local_vel_x" + robot_suffix, local_velocity.x()},
+         {"local_vel_y" + robot_suffix, local_velocity.y()}});
 }
 
 // TODO: Investigate proces models/variances/etc

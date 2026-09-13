@@ -593,17 +593,16 @@ void ErForceSimulator::updateRobotLocalizers(
         // which feeds this localizer the actual vision-derived position the AI used
         // to plan this robot's trajectory, whenever a new primitive arrives.
 
-        RobotLocalizer::logToPlotJuggler(robot_id, localizer.getRobotState(),
-                                         plotjuggler_tag);
+        localizer.logToPlotJuggler(robot_id, plotjuggler_tag);
 
         robot_localizer_csv_ << (team_colour == TeamColour::BLUE ? "blue" : "yellow")
                              << ',' << robot_id << ',' << localizer.getPosition().x()
                              << ',' << ground_truth.position().x() << ','
                              << localizer.getPosition().y() << ','
                              << ground_truth.position().y() << ','
-                             << localizer.getVelocity().x() << ','
+                             << localizer.getGlobalVelocity().x() << ','
                              << ground_truth.velocity().x() << ','
-                             << localizer.getVelocity().y() << ','
+                             << localizer.getGlobalVelocity().y() << ','
                              << ground_truth.velocity().y() << '\n';
     }
 }

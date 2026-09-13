@@ -162,16 +162,15 @@ class RobotLocalizer
     RobotState getRobotState() const;
 
     /**
-     * Logs a robot's position and velocity to PlotJuggler, with the robot ID embedded
-     * in each key (e.g. "vel_x_robot_4").
+     * Logs this localizer's estimated state to PlotJuggler, with the robot ID embedded
+     * in each key (e.g. "vel_x_robot_4"). Logs both the raw local-frame velocity state
+     * and the converted global-frame velocity, so the two can be compared.
      *
-     * @param robot_id The ID of the robot the state belongs to
-     * @param robot_state The robot state to log
+     * @param robot_id The ID of the robot this localizer belongs to
      * @param tag Optional suffix appended after the robot ID (e.g. "_estimated"), to
-     * distinguish multiple state sources logged for the same robot
+     * distinguish multiple localizers logged for the same robot
      */
-    static void logToPlotJuggler(RobotId robot_id, const RobotState& robot_state,
-                                 const std::string& tag = "");
+    void logToPlotJuggler(RobotId robot_id, const std::string& tag = "") const;
 
    private:
     /**
