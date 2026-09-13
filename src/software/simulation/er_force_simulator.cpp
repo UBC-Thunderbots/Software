@@ -524,6 +524,8 @@ void ErForceSimulator::updateRobotLocalizers(
 {
     const std::string plotjuggler_tag =
         (team_colour == TeamColour::BLUE) ? "_blue_estimated" : "_yellow_estimated";
+    const std::string ground_truth_plotjuggler_tag =
+        (team_colour == TeamColour::BLUE) ? "_blue_ground_truth" : "_yellow_ground_truth";
 
     for (const auto& [robot_id, ground_truth] : robot_map)
     {
@@ -594,6 +596,8 @@ void ErForceSimulator::updateRobotLocalizers(
         // to plan this robot's trajectory, whenever a new primitive arrives.
 
         localizer.logToPlotJuggler(robot_id, plotjuggler_tag);
+        RobotLocalizer::logRobotStateToPlotJuggler(robot_id, ground_truth,
+                                                   ground_truth_plotjuggler_tag);
 
         robot_localizer_csv_ << (team_colour == TeamColour::BLUE ? "blue" : "yellow")
                              << ',' << robot_id << ',' << localizer.getPosition().x()
