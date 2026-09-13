@@ -165,22 +165,21 @@ void RobotLocalizer::update(const ImuData& data)
 {
     generateMeasurementModel(MeasurementSource::IMU_DATA);
 
-    FilterStep::Update update{
-        .source      = MeasurementSource::IMU_DATA,
-        .measurement = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
-    };
+    Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
+        Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
 
-    update.measurement(static_cast<Eigen::Index>(
-        MeasurementIndex::IMU_ANGULAR_VELOCITY)) = data.angular_velocity.toRadians();
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY)) =
+        data.angular_velocity.toRadians();
 
-    filter_.update(update.measurement);
+    filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .prediction       = std::nullopt,
-        .update           = update,
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time_seconds     = current_time_seconds_,
+        .control_input      = std::nullopt,
+        .measurement_source = MeasurementSource::IMU_DATA,
+        .measurement        = measurement,
+        .state_estimate     = filter_.state_estimate,
+        .state_covariance   = filter_.state_covariance,
+        .time_seconds       = current_time_seconds_,
     });
 }
 
