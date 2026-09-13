@@ -5,7 +5,7 @@
 #include "software/physics/velocity_conversion_util.h"
 
 RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
-    : process_linear_acceleration_noise_variance_(config.process_noise_variance),
+    : process_linear_velocity_noise_variance_(config.process_noise_variance),
       process_angular_acceleration_noise_variance_(config.process_noise_variance)
 {
     filter_.state_covariance =
@@ -20,7 +20,7 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             .asDiagonal();
 }
 
-void RobotLocalizer::predict(const Vector& linear_acceleration, const Duration& delta_time)
+void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delta_time)
 {
     const double delta_time_seconds = delta_time.toSeconds();
     current_time_seconds_ += delta_time_seconds;
@@ -28,7 +28,7 @@ void RobotLocalizer::predict(const Vector& linear_acceleration, const Duration& 
     generatedPredictionMatrices(delta_time_seconds);
 
     Eigen::Vector<double, CONTROL_SIZE> control_input;
-    control_input << linear_acceleration.x(), linear_acceleration.y();
+    control_input << target_velocity.x(), target_velocity.y();
 
     filter_.predict(control_input);
 
@@ -215,15 +215,17 @@ RobotState RobotLocalizer::getRobotState() const
                       getAngularVelocity());
 }
 
+// TODO: Investigate proces models/variances/etc
 void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
 {
-    // clang-format off
+	// In the current model, we use target velocity as our new velocity of the preiction state, and position is derived from it.
+	// Therefore, process model keeps the positions and we don't predict it using estimated velocities
     filter_.process_model <<
-        1, 0, 0, delta_time_seconds, 0, 0,
-        0, 1, 0, 0, delta_time_seconds, 0,
+        1, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0,
         0, 0, 1, 0, 0, delta_time_seconds,
-        0, 0, 0, 1, 0, 0,
-        0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 1;
     // clang-format on
 
@@ -231,13 +233,18 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
     const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
 
+    // Linear terms model velocity itself as the noisy quantity (how much actual
+    // velocity deviates from the commanded target velocity), integrated once into
+    // position, rather than a noisy acceleration integrated twice.
     const double linear_position_variance =
-        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
+        delta_time_cubed * process_linear_velocity_noise_variance_;
     const double linear_position_velocity_covariance =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+        delta_time_squared * process_linear_velocity_noise_variance_;
     const double linear_velocity_variance =
-        delta_time_squared * process_linear_acceleration_noise_variance_;
+        delta_time_seconds * process_linear_velocity_noise_variance_;
 
+    // Angular terms are unchanged: angular velocity has no control input, so it's
+    // still modeled as a noisy acceleration integrated twice.
     const double angular_position_variance =
         delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
     const double angular_position_velocity_covariance =
@@ -257,24 +264,25 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
         0, 0, angular_position_velocity_covariance, 0, 0, angular_velocity_variance;
     // clang-format on
 
+    // Control input is the commanded (target) linear velocity: it replaces the old
+    // velocity state outright (see process_model above) and drives position over this
+    // step's elapsed time.
     auto& control_model = filter_.control_model;
     control_model.setZero();
 
     control_model(static_cast<Eigen::Index>(StateIndex::X_POSITION),
-                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
-        delta_time_squared / 2;
+                  static_cast<Eigen::Index>(ControlIndex::X_VELOCITY_TARGET)) =
+        delta_time_seconds;
 
     control_model(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
-                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
-        delta_time_squared / 2;
+                  static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) =
+        delta_time_seconds;
 
     control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
-        delta_time_seconds;
+                  static_cast<Eigen::Index>(ControlIndex::X_VELOCITY_TARGET)) = 1;
 
     control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
-        delta_time_seconds;
+                  static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) = 1;
 }
 
 void RobotLocalizer::generateMeasurementModel(FilterStepType source)
