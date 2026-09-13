@@ -28,6 +28,7 @@ void geometrySetDefault(world::Geometry* geometry, bool useQuadField)
     geometry->set_field_width((useQuadField) ? 9.00f : 6.00f);
     geometry->set_field_height((useQuadField) ? 12.00f : 9.00f);
     geometry->set_boundary_width((useQuadField) ? 0.30f : 0.25f);
+    geometry->set_boundary_width_goal_line(geometry->boundary_width());
     geometry->set_goal_width((useQuadField) ? 1.20f : 1.00f);
     geometry->set_goal_depth(0.18f);
     geometry->set_goal_wall_width(0.02f);
@@ -56,6 +57,15 @@ void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize& g,
     outGeometry.set_goal_width(g.goal_width() / 1000.0f);
     outGeometry.set_goal_depth(g.goal_depth() / 1000.0f);
     outGeometry.set_boundary_width(g.boundary_width() / 1000.0f);
+    const float boundaryWidthGoalLine = g.has_boundary_width_goal_line()
+                                            ? g.boundary_width_goal_line()
+                                            : g.boundary_width();
+    outGeometry.set_boundary_width_goal_line(boundaryWidthGoalLine / 1000.0f);
+    if (g.has_goal_substitution_area_width())
+    {
+        outGeometry.set_goal_substitution_area_width(g.goal_substitution_area_width() /
+                                                     1000.0f);
+    }
     outGeometry.set_goal_height(0.155f);
     outGeometry.set_goal_wall_width(0.02f);
     outGeometry.set_free_kick_from_defense_dist(0.20f);
@@ -157,6 +167,15 @@ void convertToSSlGeometry(const world::Geometry& geometry,
     field->set_field_width(geometry.field_width() * 1000.0f);
     field->set_field_length(geometry.field_height() * 1000.0f);
     field->set_boundary_width(geometry.boundary_width() * 1000.0f);
+    const float boundaryWidthGoalLine = geometry.has_boundary_width_goal_line()
+                                            ? geometry.boundary_width_goal_line()
+                                            : geometry.boundary_width();
+    field->set_boundary_width_goal_line(boundaryWidthGoalLine * 1000.0f);
+    if (geometry.has_goal_substitution_area_width())
+    {
+        field->set_goal_substitution_area_width(geometry.goal_substitution_area_width() *
+                                                1000.0f);
+    }
     field->set_goal_width(geometry.goal_width() * 1000.0f);
     field->set_goal_depth(geometry.goal_depth() * 1000.0f);
 

@@ -663,3 +663,41 @@ TEST_F(ErForceSimulatorRealismTest, commands_are_only_applied_after_the_command_
     // Once the delay has passed, the robot drives just like it does without a delay
     EXPECT_GT(driveFor(Duration::fromSeconds(1.0)), 0.1);
 }
+
+TEST_F(ErForceSimulatorTest, corner_blocks_keep_the_ball_out_of_the_field_corners)
+{
+    // The corners of the field are blocked off by triangular blocks, so a ball rolling
+    // into a corner is deflected by them instead of coming to rest in the corner itself
+    constexpr double CORNER_BLOCK_CATHETUS_METERS = 0.09;
+
+    const double corner_x =
+        simulator->getField().xLength() / 2 + simulator->getField().boundaryMargin();
+    const double corner_y =
+        simulator->getField().yLength() / 2 + simulator->getField().boundaryMargin();
+
+    simulator->setBallState(BallState(Point(3.9, 2.4), Vector(2.5, 2.5)));
+
+    // How far the ball gets into the corner, measured as the distance from the corner
+    // along both axes summed up. The block face runs diagonally across the corner, so
+    // this value cannot get below the length of its cathetus while the block is there.
+    double closest_approach_to_corner = std::numeric_limits<double>::max();
+    for (unsigned int step = 0; step < 400; step++)
+    {
+        simulator->stepSimulation(Duration::fromMilliseconds(5));
+
+        for (const auto& packet : simulator->getSSLWrapperPackets())
+        {
+            for (const auto& ball : packet.detection().balls())
+            {
+                const double x = std::abs(ball.x() * METERS_PER_MILLIMETER);
+                const double y = std::abs(ball.y() * METERS_PER_MILLIMETER);
+                closest_approach_to_corner =
+                    std::min(closest_approach_to_corner, (corner_x - x) + (corner_y - y));
+            }
+        }
+    }
+
+    // Without the corner block the ball rolls right up into the corner, where it only
+    // keeps its own radius of distance from each of the two walls
+    EXPECT_GT(closest_approach_to_corner, CORNER_BLOCK_CATHETUS_METERS * 0.75);
+}

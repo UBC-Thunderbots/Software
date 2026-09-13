@@ -37,6 +37,16 @@ message Geometry
     optional float defense_height                    = 17 [default = 1.0];
     optional GeometryType type                       = 18 [default = TYPE_2014];
     optional Division division                       = 19 [default = A];
+    // deprecated = 20
+    // Length of the cathetus of the triangular blocks that smooth out the corners of
+    // the field [m]. Fields without such blocks leave this unset.
+    optional float corner_block_cathetus_length = 21;
+    // Width of the boundary area behind the goal lines [m]. Defaults to
+    // boundary_width when unset.
+    optional float boundary_width_goal_line = 22;
+    // Width of the goal substitution area (distance from goal line center plus
+    // boundary width to boundary walls) [m]
+    optional float goal_substitution_area_width = 23;
 }
 
 message BallPosition
