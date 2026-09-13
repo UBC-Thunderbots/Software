@@ -126,7 +126,7 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/geom:point",
         "//software/geom:vector",
-        "//software/sensor_fusion/filter:kalman_filter",
+        "//software/sensor_fusion/filter:extended_kalman_filter",
         "//software/world:robot_state",
         "@eigen",
     ],
