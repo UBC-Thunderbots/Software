@@ -33,12 +33,12 @@ void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& del
     filter_.predict(control_input);
 
     history.push_front(FilterStep{
-        .control_input      = control_input,
-        .measurement_source = std::nullopt,
-        .measurement        = std::nullopt,
-        .state_estimate     = filter_.state_estimate,
-        .state_covariance   = filter_.state_covariance,
-        .time_seconds       = current_time_seconds_,
+        .type             = FilterStepType::PREDICT,
+        .control_input    = control_input,
+        .measurement      = std::nullopt,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time_seconds     = current_time_seconds_,
     });
 }
 
@@ -91,16 +91,15 @@ void RobotLocalizer::update(const VisionData& data)
     double prev_time = current_time_seconds_ - data.age_seconds;
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
-        if (it->control_input.has_value())
+        if (it->type == FilterStepType::PREDICT)
         {
             generatedPredictionMatrices(it->time_seconds - prev_time);
             filter_.predict(it->control_input.value());
             prev_time = it->time_seconds;
         }
-
-        if (it->measurement.has_value())
+        else
         {
-            generateMeasurementModel(it->measurement_source.value());
+            generateMeasurementModel(it->type);
             filter_.update(it->measurement.value());
         }
 
@@ -113,7 +112,7 @@ void RobotLocalizer::update(const VisionData& data)
 void RobotLocalizer::updateFilterWithVision(const Point& position,
                                             const Angle& orientation)
 {
-    generateMeasurementModel(MeasurementSource::VISION_DATA);
+    generateMeasurementModel(FilterStepType::VISION_DATA);
 
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
@@ -137,7 +136,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
 
 void RobotLocalizer::update(const MotorData& data)
 {
-    generateMeasurementModel(MeasurementSource::MOTOR_DATA);
+    generateMeasurementModel(FilterStepType::MOTOR_DATA);
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
         Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
@@ -152,18 +151,18 @@ void RobotLocalizer::update(const MotorData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .control_input      = std::nullopt,
-        .measurement_source = MeasurementSource::MOTOR_DATA,
-        .measurement        = measurement,
-        .state_estimate     = filter_.state_estimate,
-        .state_covariance   = filter_.state_covariance,
-        .time_seconds       = current_time_seconds_,
+        .type             = FilterStepType::MOTOR_DATA,
+        .control_input    = std::nullopt,
+        .measurement      = measurement,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time_seconds     = current_time_seconds_,
     });
 }
 
 void RobotLocalizer::update(const ImuData& data)
 {
-    generateMeasurementModel(MeasurementSource::IMU_DATA);
+    generateMeasurementModel(FilterStepType::IMU_DATA);
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
         Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
@@ -174,12 +173,12 @@ void RobotLocalizer::update(const ImuData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .control_input      = std::nullopt,
-        .measurement_source = MeasurementSource::IMU_DATA,
-        .measurement        = measurement,
-        .state_estimate     = filter_.state_estimate,
-        .state_covariance   = filter_.state_covariance,
-        .time_seconds       = current_time_seconds_,
+        .type             = FilterStepType::IMU_DATA,
+        .control_input    = std::nullopt,
+        .measurement      = measurement,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time_seconds     = current_time_seconds_,
     });
 }
 
@@ -278,13 +277,13 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
         delta_time_seconds;
 }
 
-void RobotLocalizer::generateMeasurementModel(MeasurementSource source)
+void RobotLocalizer::generateMeasurementModel(FilterStepType source)
 {
     filter_.measurement_model.setZero();
 
     switch (source)
     {
-        case MeasurementSource::VISION_DATA:
+        case FilterStepType::VISION_DATA:
             filter_.measurement_model(
                 static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
                 static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
@@ -295,7 +294,7 @@ void RobotLocalizer::generateMeasurementModel(MeasurementSource source)
                 static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
                 static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
             break;
-        case MeasurementSource::MOTOR_DATA:
+        case FilterStepType::MOTOR_DATA:
             filter_.measurement_model(
                 static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
                 static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
@@ -306,10 +305,13 @@ void RobotLocalizer::generateMeasurementModel(MeasurementSource source)
                 static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
                 static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
             break;
-        case MeasurementSource::IMU_DATA:
+        case FilterStepType::IMU_DATA:
             filter_.measurement_model(
                 static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
                 static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            break;
+        case FilterStepType::PREDICT:
+            // Never called with PREDICT; predict steps use generatedPredictionMatrices.
             break;
     }
 }

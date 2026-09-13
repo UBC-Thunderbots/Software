@@ -24,7 +24,7 @@ MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTA
 
 MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION);
 
-MAKE_ENUM(MeasurementSource, MOTOR_DATA, IMU_DATA, VISION_DATA);
+MAKE_ENUM(FilterStepType, PREDICT, MOTOR_DATA, IMU_DATA, VISION_DATA);
 
 /**
  * Estimates robot orientation, angular velocity, and angular acceleration
@@ -159,9 +159,10 @@ class RobotLocalizer
     /**
      * Writes the measurement model for the given data source into the filter.
      *
-     * @param source Which sensor's measurement model to generate
+     * @param source Which sensor's measurement model to generate. Must not be
+     * FilterStepType::PREDICT.
      */
-    void generateMeasurementModel(MeasurementSource source);
+    void generateMeasurementModel(FilterStepType source);
 
     static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
     static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
@@ -172,9 +173,15 @@ class RobotLocalizer
      */
     struct FilterStep
     {
+        FilterStepType type;
+
+        // Set iff type == PREDICT. process_model/process_covariance/control_model are
+        // recomputed from the elapsed time during replay instead of being stored (see
+        // generatedPredictionMatrices).
         std::optional<Eigen::Vector<double, CONTROL_SIZE>> control_input;
 
-        std::optional<MeasurementSource> measurement_source;
+        // Set iff type != PREDICT. The measurement model is regenerated from type
+        // during replay (see generateMeasurementModel).
         std::optional<Eigen::Vector<double, MEASUREMENT_SIZE>> measurement;
 
 		// Post operation state
