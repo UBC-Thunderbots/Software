@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <random>
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
@@ -318,6 +319,12 @@ class ErForceSimulator
 
     // RNG for synthesizing Gaussian sensor noise for the RobotLocalizer side-channel.
     std::mt19937 noise_rng_;
+
+    // Per-tick estimated-vs-ground-truth log for the RobotLocalizer side-channel. Opened
+    // once at construction (truncating any previous run's data) and appended to on every
+    // updateRobotLocalizers() call; see CSV_OUTPUT_PATH.
+    std::ofstream robot_localizer_csv_;
+    static const std::string CSV_OUTPUT_PATH;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
