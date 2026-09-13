@@ -227,8 +227,8 @@ void RobotLocalizer::update(const VisionData& data)
 
         if (it->update.has_value())
         {
-            const auto& update        = it->update.value();
-            filter_.measurement_model = update.measurement_model;
+            const auto& update = it->update.value();
+            generateMeasurementModel(update.source);
             filter_.update(update.measurement);
         }
 
@@ -267,8 +267,8 @@ void RobotLocalizer::update(const MotorData& data)
     generateMeasurementModel(MeasurementSource::MOTOR_DATA);
 
     FilterStep::Update update{
-        .measurement_model = filter_.measurement_model,
-        .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
+        .source      = MeasurementSource::MOTOR_DATA,
+        .measurement = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
     };
 
     update.measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY)) =
@@ -294,8 +294,8 @@ void RobotLocalizer::update(const ImuData& data)
     generateMeasurementModel(MeasurementSource::IMU_DATA);
 
     FilterStep::Update update{
-        .measurement_model = filter_.measurement_model,
-        .measurement       = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
+        .source      = MeasurementSource::IMU_DATA,
+        .measurement = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
     };
 
     update.measurement(static_cast<Eigen::Index>(
