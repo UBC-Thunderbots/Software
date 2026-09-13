@@ -65,13 +65,6 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 void PrimitiveExecutor::updateRobotState(const RobotState& robot_state)
 {
     robot_state_ = robot_state;
-
-    // Team colour is embedded in the key since the simulator runs both teams (which
-    // number robots independently) in one process/log stream; without it, e.g. yellow
-    // robot 0 and blue robot 0 would collide onto the same PlotJuggler key.
-    const std::string team_tag =
-        (team_colour_ == TeamColour::YELLOW) ? "_yellow" : "_blue";
-    RobotLocalizer::logToPlotJuggler(robot_id_, robot_state_, team_tag);
 }
 
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)

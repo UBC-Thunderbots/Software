@@ -219,9 +219,7 @@ void Thunderloop::runLoop()
         updateRobotLocalizer(robot_status_);
 
         primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
-
-		Point position = robot_localizer_->getPosition();
-		Vector velocity = robot_localizer_->getVelocity();
+        robot_localizer_->logToPlotJuggler(robot_status_.robot_id());
 
         const TbotsProto::DirectControlPrimitive direct_control_primitive =
             primitive_executor_->stepPrimitive(robot_status_, delta_time);

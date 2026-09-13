@@ -137,16 +137,28 @@ class RobotLocalizer
     RobotState getRobotState() const;
 
     /**
-     * Logs a robot's position and velocity to PlotJuggler, with the robot ID embedded
-     * in each key (e.g. "vel_x_robot_4").
+     * Logs this localizer's estimated position and velocity to PlotJuggler, with the
+     * robot ID embedded in each key (e.g. "vel_x_robot_4").
+     *
+     * @param robot_id The ID of the robot this localizer belongs to
+     * @param tag Optional suffix appended after the robot ID (e.g. "_estimated"), to
+     * distinguish multiple localizers logged for the same robot
+     */
+    void logToPlotJuggler(RobotId robot_id, const std::string& tag = "") const;
+
+    /**
+     * Logs an arbitrary robot state to PlotJuggler, with the robot ID embedded in each
+     * key (e.g. "vel_x_robot_4"). Useful for logging e.g. ground truth alongside a
+     * RobotLocalizer's own estimate (see logToPlotJuggler), since ground truth isn't
+     * backed by a RobotLocalizer instance.
      *
      * @param robot_id The ID of the robot the state belongs to
      * @param robot_state The robot state to log
-     * @param tag Optional suffix appended after the robot ID (e.g. "_estimated"), to
+     * @param tag Optional suffix appended after the robot ID (e.g. "_ground_truth"), to
      * distinguish multiple state sources logged for the same robot
      */
-    static void logToPlotJuggler(RobotId robot_id, const RobotState& robot_state,
-                                 const std::string& tag = "");
+    static void logRobotStateToPlotJuggler(RobotId robot_id, const RobotState& robot_state,
+                                           const std::string& tag = "");
 
    private:
     /**

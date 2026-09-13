@@ -330,8 +330,23 @@ RobotState RobotLocalizer::getRobotState() const
                       getAngularVelocity());
 }
 
-void RobotLocalizer::logToPlotJuggler(RobotId robot_id, const RobotState& robot_state,
-                                      const std::string& tag)
+void RobotLocalizer::logToPlotJuggler(RobotId robot_id, const std::string& tag) const
+{
+    const std::string robot_suffix = "_robot_" + std::to_string(robot_id) + tag;
+
+    const Point position  = getPosition();
+    const Vector velocity = getVelocity();
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue(
+        {{"pos_x" + robot_suffix, position.x()},
+         {"pos_y" + robot_suffix, position.y()},
+         {"vel_x" + robot_suffix, velocity.x()},
+         {"vel_y" + robot_suffix, velocity.y()}});
+}
+
+void RobotLocalizer::logRobotStateToPlotJuggler(RobotId robot_id,
+                                                const RobotState& robot_state,
+                                                const std::string& tag)
 {
     const std::string robot_suffix = "_robot_" + std::to_string(robot_id) + tag;
 
