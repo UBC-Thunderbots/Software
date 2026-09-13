@@ -11,6 +11,7 @@
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 #include "software/sensor_fusion/filter/kalman_filter.hpp"
+#include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
@@ -192,7 +193,7 @@ class RobotLocalizer
         double time_seconds;
     };
 
-    KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
+    ExtendedKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
     // Process noise variance used in prediction. The linear term models how much
     // actual velocity deviates from the commanded target velocity (a rate, per unit

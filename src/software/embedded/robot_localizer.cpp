@@ -18,6 +18,8 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
+
+    filter_.process_model_function = robot_localizer_process_model;
 }
 
 void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delta_time)
@@ -214,6 +216,21 @@ RobotState RobotLocalizer::getRobotState() const
     return RobotState(getPosition(), getVelocity(), getOrientation(),
                       getAngularVelocity());
 }
+
+std::function<Eigen::Vector<double, DimX>(Eigen::Vector<double, DimX>)>  robot_localizer_process_model = [](Eigen::Vector<double,DimX> state, double dt){
+    Eigen::Vector<double, Dimx> prior;
+    Vector velocity = Vector(state(static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) , state(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)));
+    double rot = state(static_cast<Eigen::Index>(StateIndex::ORIENTATION)); 
+    prior << state(static_cast<Eigen::Index>(StateIndex::X_POSITION)) + (velocity.x() * rot.cos() - velocity.y() * rot.sin())*dt,
+             state(static_cast<Eigen::Index>(StateIndex::Y_POSITION)) + (velocity.x() * rot.sin() + velocity.y() * rot.cos())*dt,
+             state(static_cast<Eigen::Index>(StateIndex::ORIENTATION))+ state(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) * dt;
+             0,
+             0,
+             1;
+    return prior;
+                  
+}
+    return Vector(, );
 
 // TODO: Investigate proces models/variances/etc
 void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
