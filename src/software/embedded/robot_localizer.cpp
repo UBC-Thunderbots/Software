@@ -223,7 +223,6 @@ RobotState RobotLocalizer::getRobotState() const
     return RobotState(getPosition(), getGlobalVelocity(), getOrientation(),
                       getAngularVelocity());
 }
-
 // TODO: Investigate proces models/variances/etc
 void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
 {
