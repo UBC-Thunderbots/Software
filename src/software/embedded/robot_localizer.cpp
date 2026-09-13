@@ -20,129 +20,6 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             .asDiagonal();
 }
 
-void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
-{
-    // clang-format off
-    filter_.process_model <<
-        1, 0, 0, delta_time_seconds, 0, 0,
-        0, 1, 0, 0, delta_time_seconds, 0,
-        0, 0, 1, 0, 0, delta_time_seconds,
-        0, 0, 0, 1, 0, 0,
-        0, 0, 0, 0, 1, 0,
-        0, 0, 0, 0, 0, 1;
-    // clang-format on
-
-    const double delta_time_squared = delta_time_seconds * delta_time_seconds;
-    const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
-    const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
-
-    auto& process_covariance = filter_.process_covariance;
-    process_covariance.setZero();
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
-        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
-        delta_time_squared * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
-        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
-        delta_time_squared * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
-                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
-        delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
-                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
-        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
-        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
-        delta_time_squared * process_angular_acceleration_noise_variance_;
-
-    auto& control_model = filter_.control_model;
-    control_model.setZero();
-
-    control_model(static_cast<Eigen::Index>(StateIndex::X_POSITION),
-                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
-        delta_time_squared / 2;
-
-    control_model(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
-                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
-        delta_time_squared / 2;
-
-    control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
-        delta_time_seconds;
-
-    control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
-        delta_time_seconds;
-}
-
-void RobotLocalizer::generateMeasurementModel(MeasurementSource source)
-{
-    filter_.measurement_model.setZero();
-
-    switch (source)
-    {
-        case MeasurementSource::VISION_DATA:
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
-                static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
-                static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
-                static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
-            break;
-        case MeasurementSource::MOTOR_DATA:
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
-            break;
-        case MeasurementSource::IMU_DATA:
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
-            break;
-    }
-}
-
 void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& delta_time)
 {
     const double delta_time_seconds = delta_time.toSeconds();
@@ -343,4 +220,127 @@ RobotState RobotLocalizer::getRobotState() const
 {
     return RobotState(getPosition(), getVelocity(), getOrientation(),
                       getAngularVelocity());
+}
+
+void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
+{
+    // clang-format off
+    filter_.process_model <<
+        1, 0, 0, delta_time_seconds, 0, 0,
+        0, 1, 0, 0, delta_time_seconds, 0,
+        0, 0, 1, 0, 0, delta_time_seconds,
+        0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 1;
+    // clang-format on
+
+    const double delta_time_squared = delta_time_seconds * delta_time_seconds;
+    const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
+    const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
+
+    auto& process_covariance = filter_.process_covariance;
+    process_covariance.setZero();
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
+        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
+        delta_time_squared * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
+        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
+                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
+        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
+        delta_time_squared * process_linear_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
+                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
+        delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
+                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
+        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
+        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
+
+    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
+                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
+        delta_time_squared * process_angular_acceleration_noise_variance_;
+
+    auto& control_model = filter_.control_model;
+    control_model.setZero();
+
+    control_model(static_cast<Eigen::Index>(StateIndex::X_POSITION),
+                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
+        delta_time_squared / 2;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
+                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
+        delta_time_squared / 2;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
+                  static_cast<Eigen::Index>(ControlIndex::X_ACCELERATION)) =
+        delta_time_seconds;
+
+    control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
+                  static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
+        delta_time_seconds;
+}
+
+void RobotLocalizer::generateMeasurementModel(MeasurementSource source)
+{
+    filter_.measurement_model.setZero();
+
+    switch (source)
+    {
+        case MeasurementSource::VISION_DATA:
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
+                static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
+                static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
+                static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
+            break;
+        case MeasurementSource::MOTOR_DATA:
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            break;
+        case MeasurementSource::IMU_DATA:
+            filter_.measurement_model(
+                static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
+                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            break;
+    }
 }
