@@ -27,21 +27,18 @@ void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& del
 
     generatedPredictionMatrices(delta_time_seconds);
 
-    FilterStep::Predict prediction{
-        .process_model      = filter_.process_model,
-        .process_covariance = filter_.process_covariance,
-        .control_model      = filter_.control_model,
-    };
-    prediction.control_input << linear_acceleration.x(), linear_acceleration.y();
+    Eigen::Vector<double, CONTROL_SIZE> control_input;
+    control_input << linear_acceleration.x(), linear_acceleration.y();
 
-    filter_.predict(prediction.control_input);
+    filter_.predict(control_input);
 
     history.push_front(FilterStep{
-        .prediction       = prediction,
-        .update           = std::nullopt,
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time_seconds     = current_time_seconds_,
+        .control_input      = control_input,
+        .measurement_source = std::nullopt,
+        .measurement        = std::nullopt,
+        .state_estimate     = filter_.state_estimate,
+        .state_covariance   = filter_.state_covariance,
+        .time_seconds       = current_time_seconds_,
     });
 }
 
@@ -58,19 +55,19 @@ void RobotLocalizer::update(const VisionData& data)
         [&](const FilterStep& step)
         { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
+	// If rollback point is at the start, vision is newer than all history steps
+	// So we empty history and apply vision
     if (rollback_point == history.begin())
     {
-        // All history predates the sample, or is exactly at the same time.
-        // No need to rollback, just apply to the current state.
         updateFilterWithVision(data.position, data.orientation);
         history.clear();  // Safe to clear, since all history is older than current state
         return;
     }
 
+	// If rollback point is at the end, vision is older than all history steps
+	// So rollback ever step 
     if (rollback_point == history.end())
     {
-        // The vision sample is older than our entire history.
-        // Roll back as far as we can (to the oldest step).
         rollback_point = std::prev(history.end());
     }
 
@@ -94,19 +91,17 @@ void RobotLocalizer::update(const VisionData& data)
     double prev_time = current_time_seconds_ - data.age_seconds;
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
-        if (it->prediction.has_value())
+        if (it->control_input.has_value())
         {
-            const auto& prediction = it->prediction.value();
             generatedPredictionMatrices(it->time_seconds - prev_time);
-            filter_.predict(prediction.control_input);
+            filter_.predict(it->control_input.value());
             prev_time = it->time_seconds;
         }
 
-        if (it->update.has_value())
+        if (it->measurement.has_value())
         {
-            const auto& update = it->update.value();
-            generateMeasurementModel(update.source);
-            filter_.update(update.measurement);
+            generateMeasurementModel(it->measurement_source.value());
+            filter_.update(it->measurement.value());
         }
 
         // Update the history with the recomputed state so future rollbacks are correct
@@ -118,6 +113,8 @@ void RobotLocalizer::update(const VisionData& data)
 void RobotLocalizer::updateFilterWithVision(const Point& position,
                                             const Angle& orientation)
 {
+    generateMeasurementModel(MeasurementSource::VISION_DATA);
+
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
 
@@ -129,12 +126,11 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION)) =
         position.y();
 
-    // Coterminal angle that is closest to current estimate
+	// Integrating omega for position makes angule goes out of bounds so we wrap it around
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION)) =
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
 
-    generateMeasurementModel(MeasurementSource::VISION_DATA);
 
     filter_.update(measurement);
 }
@@ -143,26 +139,25 @@ void RobotLocalizer::update(const MotorData& data)
 {
     generateMeasurementModel(MeasurementSource::MOTOR_DATA);
 
-    FilterStep::Update update{
-        .source      = MeasurementSource::MOTOR_DATA,
-        .measurement = Eigen::Vector<double, MEASUREMENT_SIZE>::Zero(),
-    };
+    Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
+        Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
 
-    update.measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY)) =
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY)) =
         data.velocity.x();
-    update.measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY)) =
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY)) =
         data.velocity.y();
-    update.measurement(static_cast<Eigen::Index>(
-        MeasurementIndex::MOTOR_ANGULAR_VELOCITY)) = data.angular_velocity.toRadians();
+    measurement(static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY)) =
+        data.angular_velocity.toRadians();
 
-    filter_.update(update.measurement);
+    filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .prediction       = std::nullopt,
-        .update           = update,
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time_seconds     = current_time_seconds_,
+        .control_input      = std::nullopt,
+        .measurement_source = MeasurementSource::MOTOR_DATA,
+        .measurement        = measurement,
+        .state_estimate     = filter_.state_estimate,
+        .state_covariance   = filter_.state_covariance,
+        .time_seconds       = current_time_seconds_,
     });
 }
 
@@ -238,56 +233,31 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
     const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
 
-    auto& process_covariance = filter_.process_covariance;
-    process_covariance.setZero();
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
+    const double linear_position_variance =
         delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
+    const double linear_position_velocity_covariance =
         delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::X_POSITION)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) =
+    const double linear_velocity_variance =
         delta_time_squared * process_linear_acceleration_noise_variance_;
 
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
-        delta_time_fourth / 4 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_POSITION),
-                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::Y_POSITION)) =
-        delta_time_cubed / 2 * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) =
-        delta_time_squared * process_linear_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
-                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
+    const double angular_position_variance =
         delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ORIENTATION),
-                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
+    const double angular_position_velocity_covariance =
         delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::ORIENTATION)) =
-        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
-
-    process_covariance(static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY),
-                       static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
+    const double angular_velocity_variance =
         delta_time_squared * process_angular_acceleration_noise_variance_;
+
+    // State order: X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
+    // ANGULAR_VELOCITY
+    // clang-format off
+    filter_.process_covariance <<
+        linear_position_variance, 0, 0, linear_position_velocity_covariance, 0, 0,
+        0, linear_position_variance, 0, 0, linear_position_velocity_covariance, 0,
+        0, 0, angular_position_variance, 0, 0, angular_position_velocity_covariance,
+        linear_position_velocity_covariance, 0, 0, linear_velocity_variance, 0, 0,
+        0, linear_position_velocity_covariance, 0, 0, linear_velocity_variance, 0,
+        0, 0, angular_position_velocity_covariance, 0, 0, angular_velocity_variance;
+    // clang-format on
 
     auto& control_model = filter_.control_model;
     control_model.setZero();
