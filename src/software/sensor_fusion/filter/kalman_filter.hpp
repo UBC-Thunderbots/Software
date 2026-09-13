@@ -66,6 +66,22 @@ class KalmanFilter
      */
     void update(Eigen::Vector<double, DimY> measurement);
 
+    /**
+     * Returns the squared Mahalanobis distance between the given measurement and the
+     * measurement the current state estimate predicts.
+     *
+     * Unlike a plain Euclidean distance, this scales the discrepancy by how uncertain
+     * the filter currently is, so a measurement that is far away but within a poorly
+     * constrained direction is not penalized as heavily as one that contradicts a
+     * confident estimate. This makes it a useful gate for rejecting outlier
+     * measurements before they are fed to update().
+     *
+     * @param measurement Measurement vector
+     *
+     * @return The squared Mahalanobis distance of the measurement
+     */
+    double mahalanobisDistance(Eigen::Vector<double, DimY> measurement) const;
+
     Eigen::Vector<double, DimX> state_estimate;
     Eigen::Matrix<double, DimX, DimX> state_covariance;
     Eigen::Matrix<double, DimX, DimX> process_model;
@@ -73,6 +89,20 @@ class KalmanFilter
     Eigen::Matrix<double, DimX, DimU> control_model;
     Eigen::Matrix<double, DimY, DimX> measurement_model;
     Eigen::Matrix<double, DimY, DimY> measurement_covariance;
+
+   private:
+    /**
+     * Returns the inverse of the innovation covariance S = H*P*H' + R, which describes
+     * the expected spread of the difference between an actual and a predicted
+     * measurement.
+     *
+     * Near-zero entries are zeroed out and a pseudo-inverse is used, so a singular S
+     * (e.g. an uninitialized filter with zero covariance) yields a zero matrix rather
+     * than infinities.
+     *
+     * @return The inverse of the innovation covariance
+     */
+    Eigen::Matrix<double, DimY, DimY> innovationCovarianceInverse() const;
 };
 
 template <int DimX, int DimY, int DimU>
@@ -122,21 +152,11 @@ void KalmanFilter<DimX, DimY, DimU>::update(Eigen::Vector<double, DimY> measurem
     const Eigen::Vector<double, DimY> innovation =
         measurement - measurement_model * state_estimate;
 
-    // Innovation covariance (measurement uncertainty in innovation space)
-    const Eigen::Matrix<double, DimY, DimY> innovation_covariance =
-        measurement_model * state_covariance * measurement_model.transpose() +
-        measurement_covariance;
-    const Eigen::Matrix<double, DimY, DimY> regularized_innovation_covariance =
-        innovation_covariance.unaryExpr(
-            [](double value) { return (std::abs(value) < 1.0e-20) ? 0.0 : value; });
-
     // Kalman gain defines how much the input measurement will influence the
     // state estimate, i.e., how strongly we trust measurement vs. prediction
     const Eigen::Matrix<double, DimX, DimY> kalman_gain =
         state_covariance *
-        (measurement_model.transpose() *
-         regularized_innovation_covariance.completeOrthogonalDecomposition()
-             .pseudoInverse());
+        (measurement_model.transpose() * innovationCovarianceInverse());
 
     // Correct state estimate with innovation weighted by Kalman gain
     state_estimate = state_estimate + kalman_gain * innovation;
@@ -148,4 +168,31 @@ void KalmanFilter<DimX, DimY, DimU>::update(Eigen::Vector<double, DimY> measurem
     state_covariance = posterior_covariance_factor * state_covariance *
                            posterior_covariance_factor.transpose() +
                        kalman_gain * measurement_covariance * kalman_gain.transpose();
+}
+
+template <int DimX, int DimY, int DimU>
+double KalmanFilter<DimX, DimY, DimU>::mahalanobisDistance(
+    Eigen::Vector<double, DimY> measurement) const
+{
+    // Innovation between actual and predicted measurement
+    const Eigen::Vector<double, DimY> innovation =
+        measurement - measurement_model * state_estimate;
+
+    return innovation.transpose() * innovationCovarianceInverse() * innovation;
+}
+
+template <int DimX, int DimY, int DimU>
+Eigen::Matrix<double, DimY, DimY>
+KalmanFilter<DimX, DimY, DimU>::innovationCovarianceInverse() const
+{
+    // Innovation covariance (measurement uncertainty in innovation space)
+    const Eigen::Matrix<double, DimY, DimY> innovation_covariance =
+        measurement_model * state_covariance * measurement_model.transpose() +
+        measurement_covariance;
+    const Eigen::Matrix<double, DimY, DimY> regularized_innovation_covariance =
+        innovation_covariance.unaryExpr(
+            [](double value) { return (std::abs(value) < 1.0e-20) ? 0.0 : value; });
+
+    return regularized_innovation_covariance.completeOrthogonalDecomposition()
+        .pseudoInverse();
 }
