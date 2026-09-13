@@ -527,9 +527,14 @@ void SimRobot::begin(SimBall& ball, double time)
     const float K_I_phi = /*0*0.2/1000; //*/ 0.f;
 
     const float a_phi = V_phi * omega + K_phi * error_omega + K_I_phi * m_error_sum_omega;
-    const float a_phi_bound =
-        bound(a_phi, omega, accelScale * m_specs.strategy().a_speedup_phi_max(),
-              accelScale * m_specs.strategy().a_brake_phi_max());
+
+    // A real robot does not drive perfectly straight; simulate that by turning part of
+    // the forward acceleration into rotational acceleration
+    const float a_phi_with_error = a_phi + m_rotationError * a_f;
+
+    const float a_phi_bound = bound(a_phi_with_error, omega,
+                                    accelScale * m_specs.strategy().a_speedup_phi_max(),
+                                    accelScale * m_specs.strategy().a_brake_phi_max());
     const btVector3 torque(0, 0, a_phi_bound * 0.007884f);
 
     if (force.length2() > 0 || torque.length2() > 0)

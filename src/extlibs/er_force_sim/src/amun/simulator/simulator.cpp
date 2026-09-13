@@ -21,6 +21,7 @@
 #include "simulator.h"
 
 #include <algorithm>
+#include <array>
 #include <functional>
 
 #include "extlibs/er_force_sim/src/core/coordinates.h"
@@ -67,20 +68,25 @@ Simulator::Simulator(const amun::SimulatorSetup& setup)
     m_data->field = std::make_unique<SimField>(m_data->dynamicsWorld, m_data->geometry);
     m_data->ball  = std::make_shared<SimBall>(m_data->dynamicsWorld);
     m_data->flip  = false;
-    m_data->stddevBall               = 0.0f;
-    m_data->stddevBallArea           = 0.0f;
-    m_data->stddevRobot              = 0.0f;
-    m_data->stddevRobotPhi           = 0.0f;
-    m_data->ballDetectionsAtDribbler = 0.0f;
-    m_data->enableInvisibleBall      = true;
-    m_data->ballVisibilityThreshold  = 0.4;
-    m_data->cameraOverlap            = 0.3;
-    m_data->cameraPositionError      = 0;
-    m_data->objectPositionOffset     = 0;
-    m_data->robotCommandPacketLoss   = 0;
-    m_data->robotReplyPacketLoss     = 0;
-    m_data->missingBallDetections    = 0;
-    m_data->dribblePerfect           = false;
+    m_data->stddevBall                  = 0.0f;
+    m_data->stddevBallArea              = 0.0f;
+    m_data->stddevRobot                 = 0.0f;
+    m_data->stddevRobotPhi              = 0.0f;
+    m_data->ballDetectionsAtDribbler    = 0.0f;
+    m_data->enableInvisibleBall         = true;
+    m_data->ballVisibilityThreshold     = 0.4;
+    m_data->cameraOverlap               = 0.3;
+    m_data->cameraPositionError         = 0;
+    m_data->objectPositionOffset        = 0;
+    m_data->robotCommandPacketLoss      = 0;
+    m_data->robotReplyPacketLoss        = 0;
+    m_data->missingBallDetections       = 0;
+    m_data->dribblePerfect              = false;
+    m_data->missingRobotDetections      = 0;
+    m_data->commandDelay                = 0;
+    m_data->robotRotationError          = 0;
+    m_data->rotatedRobotDetectionsStart = 0;
+    m_data->rotatedRobotDetectionsStop  = 0;
 
     // no robots after initialisation
 }
@@ -98,6 +104,38 @@ std::vector<robot::RadioResponse> Simulator::acceptYellowRobotControlCommand(
 }
 
 std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
+    const SSLSimulationProto::RobotControl& control, bool isBlue)
+{
+    auto& pendingCommands = isBlue ? m_blueRadioCommands : m_yellowRadioCommands;
+
+    if (m_data->commandDelay <= 0 && pendingCommands.empty())
+    {
+        return applyRobotControlCommand(control, isBlue);
+    }
+
+    // The robots only receive the command after the command delay has passed. Note
+    // that the radio responses of a command are reported when it is applied, so they
+    // are delayed by the same amount.
+    pendingCommands.emplace_back(control, m_time);
+
+    std::vector<robot::RadioResponse> responses;
+    while (!pendingCommands.empty() &&
+           pendingCommands.front().second + m_data->commandDelay <= m_time)
+    {
+        const SSLSimulationProto::RobotControl pendingControl =
+            pendingCommands.front().first;
+        pendingCommands.pop_front();
+
+        const std::vector<robot::RadioResponse> pendingResponses =
+            applyRobotControlCommand(pendingControl, isBlue);
+        responses.insert(responses.end(), pendingResponses.begin(),
+                         pendingResponses.end());
+    }
+
+    return responses;
+}
+
+std::vector<robot::RadioResponse> Simulator::applyRobotControlCommand(
     const SSLSimulationProto::RobotControl& control, bool isBlue)
 {
     // collect responses from robots
@@ -146,7 +184,7 @@ void Simulator::resetFlipped(Simulator::RobotMap& robots, float side)
         {
             robot = std::make_unique<SimRobot>(robot->specs(), m_data->dynamicsWorld,
                                                btVector3(x, side * y, 0), 0.0f);
-            robot->setDribbleMode(m_data->dribblePerfect);
+            applyRobotRealism(*robot);
         }
         y -= 0.3;
     }
@@ -243,6 +281,126 @@ static btVector3 positionOffsetForCamera(float offsetStrength, btVector3 cameraP
     return btVector3(cameraPos.x(), cameraPos.y(), 0).normalized() * offsetStrength;
 }
 
+uint32_t Simulator::getRotatedRobotId(uint32_t id)
+{
+    // pink is 0, green is 1, starting from the top left side (dribbler is up) as the
+    // most significant bit, going clockwise to the least significant bit
+    static constexpr std::array<uint32_t, 16> PATTERNS = {
+        0b0001,  // 0
+        0b1001,  // 1
+        0b1101,  // 2
+        0b0101,  // 3
+        0b0010,  // 4
+        0b1010,  // 5
+        0b1110,  // 6
+        0b0110,  // 7
+        0b1111,  // 8
+        0b0000,  // 9
+        0b0011,  // 10
+        0b1100,  // 11
+        0b1011,  // 12
+        0b1000,  // 13
+        0b0111,  // 14
+        0b0100,  // 15
+    };
+
+    if (id >= PATTERNS.size())
+    {
+        return id;
+    }
+
+    const uint32_t pattern        = PATTERNS[id];
+    const uint32_t rotatedPattern = (pattern >> 1) | ((pattern << 3) & 0b1000);
+    const auto it = std::find(PATTERNS.begin(), PATTERNS.end(), rotatedPattern);
+    return static_cast<uint32_t>(std::distance(PATTERNS.begin(), it));
+}
+
+void Simulator::createRobotDetection(
+    SimRobot& robot, bool teamIsBlue,
+    std::vector<SSLProto::SSL_DetectionFrame>& detections)
+{
+    if (m_time - robot.getLastSendTime() < m_minRobotDetectionTime)
+    {
+        return;
+    }
+
+    const float timeDiff     = (m_time - robot.getLastSendTime()) * 1E-9;
+    const btVector3 robotPos = robot.position() / SIMULATOR_SCALE;
+
+    const std::size_t numCameras = m_data->reportedCameraSetup.size();
+    for (std::size_t cameraId = 0; cameraId < numCameras; ++cameraId)
+    {
+        if (!checkCameraID(cameraId, robotPos, m_data->cameraPositions,
+                           m_data->cameraOverlap))
+        {
+            continue;
+        }
+
+        const btVector3& cameraPos = m_data->cameraPositions[cameraId];
+        const btVector3 positionOffset =
+            positionOffsetForCamera(m_data->objectPositionOffset, cameraPos);
+        auto& cameraDetections = detections[cameraId];
+
+        const bool missingRobot =
+            m_data->missingRobotDetections > 0 &&
+            m_data->rng.uniformFloat(0, 1) <= m_data->missingRobotDetections;
+        if (!missingRobot)
+        {
+            auto& robotDetection = teamIsBlue ? *cameraDetections.add_robots_blue()
+                                              : *cameraDetections.add_robots_yellow();
+            robot.update(robotDetection, m_data->stddevRobot, m_data->stddevRobotPhi,
+                         m_time, positionOffset);
+        }
+
+        // Once in a while the vision misreads a robot's pattern as the one that it
+        // turns into when rotated by 90 degrees, and reports that second robot on top
+        // of the real one. Such a misdetection tends to persist for a few frames, so
+        // whether it starts and whether it stops are rolled separately.
+        const auto rotatedDetectionKey =
+            std::make_tuple(cameraId, robot.specs().id(), teamIsBlue);
+        const bool hadRotated        = m_hasRotatedDetection[rotatedDetectionKey];
+        const float rotatedThreshold = hadRotated
+                                           ? (1 - m_data->rotatedRobotDetectionsStop)
+                                           : m_data->rotatedRobotDetectionsStart;
+        const bool hasRotated        = m_data->rng.uniformFloat(0, 1) < rotatedThreshold;
+        m_hasRotatedDetection[rotatedDetectionKey] = hasRotated;
+
+        if (hasRotated)
+        {
+            auto& rotatedDetection = teamIsBlue ? *cameraDetections.add_robots_blue()
+                                                : *cameraDetections.add_robots_yellow();
+            robot.update(rotatedDetection, m_data->stddevRobot, m_data->stddevRobotPhi,
+                         m_time, positionOffset);
+            rotatedDetection.set_robot_id(getRotatedRobotId(rotatedDetection.robot_id()));
+            rotatedDetection.set_orientation(rotatedDetection.orientation() + M_PI_2);
+        }
+
+        // once in a while, add a ball mis-detection at a corner of the dribbler
+        // in real games, this happens because the ball detection light beam used by
+        // many teams is red
+        const float detectionProb = timeDiff * m_data->ballDetectionsAtDribbler;
+        if (m_data->ballDetectionsAtDribbler > 0 &&
+            m_data->rng.uniformFloat(0, 1) < detectionProb)
+        {
+            // always on the right side of the dribbler for now
+            if (!m_data->ball->addDetection(*cameraDetections.add_balls(),
+                                            robot.dribblerCorner(false) / SIMULATOR_SCALE,
+                                            m_data->stddevRobot, 0, cameraPos, false, 0,
+                                            positionOffset))
+            {
+                cameraDetections.mutable_balls()->DeleteSubrange(
+                    cameraDetections.balls_size() - 1, 1);
+            }
+        }
+    }
+}
+
+void Simulator::applyRobotRealism(SimRobot& robot) const
+{
+    robot.setDribbleMode(m_data->dribblePerfect);
+    robot.setRotationError(m_data->robotRotationError);
+}
+
 std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
 {
     const std::size_t numCameras = m_data->reportedCameraSetup.size();
@@ -253,10 +411,8 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
         initializeDetection(detections[i], i);
     }
 
-    bool missingBall = m_data->missingBallDetections > 0 &&
-                       m_data->rng.uniformFloat(0, 1) <= m_data->missingBallDetections;
     const btVector3 ballPosition = m_data->ball->position() / SIMULATOR_SCALE;
-    if (m_time - m_lastBallSendTime >= m_minBallDetectionTime && !missingBall)
+    if (m_time - m_lastBallSendTime >= m_minBallDetectionTime)
     {
         m_lastBallSendTime = m_time;
 
@@ -265,6 +421,16 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
             // at least one id is always valid
             if (!checkCameraID(cameraId, ballPosition, m_data->cameraPositions,
                                m_data->cameraOverlap))
+            {
+                continue;
+            }
+
+            // the ball is missed by each camera individually, rather than by all of
+            // them at once, which is what the real vision does
+            const bool missingBall =
+                m_data->missingBallDetections > 0 &&
+                m_data->rng.uniformFloat(0, 1) <= m_data->missingBallDetections;
+            if (missingBall)
             {
                 continue;
             }
@@ -291,54 +457,7 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
     {
         for (auto& [robotId, robot] : team)
         {
-            if (m_time - robot->getLastSendTime() >= m_minRobotDetectionTime)
-            {
-                const float timeDiff     = (m_time - robot->getLastSendTime()) * 1E-9;
-                const btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
-
-                for (std::size_t cameraId = 0; cameraId < numCameras; ++cameraId)
-                {
-                    if (!checkCameraID(cameraId, robotPos, m_data->cameraPositions,
-                                       m_data->cameraOverlap))
-                    {
-                        continue;
-                    }
-
-                    const btVector3 positionOffset = positionOffsetForCamera(
-                        m_data->objectPositionOffset, m_data->cameraPositions[cameraId]);
-                    if (teamIsBlue)
-                    {
-                        robot->update(*detections[cameraId].add_robots_blue(),
-                                      m_data->stddevRobot, m_data->stddevRobotPhi, m_time,
-                                      positionOffset);
-                    }
-                    else
-                    {
-                        robot->update(*detections[cameraId].add_robots_yellow(),
-                                      m_data->stddevRobot, m_data->stddevRobotPhi, m_time,
-                                      positionOffset);
-                    }
-
-                    // once in a while, add a ball mis-detection at a corner of the
-                    // dribbler in real games, this happens because the ball detection
-                    // light beam used by many teams is red
-                    float detectionProb = timeDiff * m_data->ballDetectionsAtDribbler;
-                    if (m_data->ballDetectionsAtDribbler > 0 &&
-                        m_data->rng.uniformFloat(0, 1) < detectionProb)
-                    {
-                        // always on the right side of the dribbler for now
-                        if (!m_data->ball->addDetection(
-                                *detections[cameraId].add_balls(),
-                                robot->dribblerCorner(false) / SIMULATOR_SCALE,
-                                m_data->stddevRobot, 0, m_data->cameraPositions[cameraId],
-                                false, 0, positionOffset))
-                        {
-                            detections[cameraId].mutable_balls()->DeleteSubrange(
-                                detections[cameraId].balls_size() - 1, 1);
-                        }
-                    }
-                }
-            }
+            createRobotDetection(*robot, teamIsBlue, detections);
         }
     }
 
@@ -472,7 +591,7 @@ void Simulator::setTeam(Simulator::RobotMap& robotMap, float side,
 
         robotMap[id] = std::make_unique<SimRobot>(teamSpecs[id], m_data->dynamicsWorld,
                                                   btVector3(x, side * y, 0), 0.f);
-        robotMap[id]->setDribbleMode(m_data->dribblePerfect);
+        applyRobotRealism(*robotMap[id]);
 
         y -= 0.3;
     }
@@ -557,7 +676,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot& robot)
                 robotMap[robot.id().id()] = std::make_unique<SimRobot>(
                     teamSpecs[robot.id().id()], m_data->dynamicsWorld,
                     btVector3(targetPos.x, targetPos.y, 0), 0.f);
-                robotMap[robot.id().id()]->setDribbleMode(m_data->dribblePerfect);
+                applyRobotRealism(*robotMap[robot.id().id()]);
             }
         }
         else if (!robot.present() && isPresent)
@@ -602,7 +721,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot& robot)
 
 void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>& command)
 {
-    bool teamOrPerfectDribbleChanged = false;
+    bool robotRealismChanged = false;
 
     if (command->has_simulator())
     {
@@ -695,8 +814,36 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
             if (realism.has_simulate_dribbling())
             {
-                m_data->dribblePerfect      = !realism.simulate_dribbling();
-                teamOrPerfectDribbleChanged = true;
+                m_data->dribblePerfect = !realism.simulate_dribbling();
+                robotRealismChanged    = true;
+            }
+
+            if (realism.has_missing_robot_detections())
+            {
+                m_data->missingRobotDetections = realism.missing_robot_detections();
+            }
+
+            if (realism.has_command_delay())
+            {
+                m_data->commandDelay = std::max<int64_t>(0l, realism.command_delay());
+            }
+
+            if (realism.has_robot_rotation_error())
+            {
+                m_data->robotRotationError = realism.robot_rotation_error();
+                robotRealismChanged        = true;
+            }
+
+            if (realism.has_rotated_robot_detections_start())
+            {
+                m_data->rotatedRobotDetectionsStart =
+                    realism.rotated_robot_detections_start();
+            }
+
+            if (realism.has_rotated_robot_detections_stop())
+            {
+                m_data->rotatedRobotDetectionsStop =
+                    realism.rotated_robot_detections_stop();
             }
         }
 
@@ -759,26 +906,26 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
 
     if (command->has_set_team_blue())
     {
-        teamOrPerfectDribbleChanged = true;
+        robotRealismChanged = true;
         setTeam(m_data->robotsBlue, 1.0f, command->set_team_blue(), m_data->specsBlue);
     }
 
     if (command->has_set_team_yellow())
     {
-        teamOrPerfectDribbleChanged = true;
+        robotRealismChanged = true;
         setTeam(m_data->robotsYellow, -1.0f, command->set_team_yellow(),
                 m_data->specsYellow);
     }
 
-    if (teamOrPerfectDribbleChanged)
+    if (robotRealismChanged)
     {
         for (auto& [robotId, robot] : m_data->robotsBlue)
         {
-            robot->setDribbleMode(m_data->dribblePerfect);
+            applyRobotRealism(*robot);
         }
         for (auto& [robotId, robot] : m_data->robotsYellow)
         {
-            robot->setDribbleMode(m_data->dribblePerfect);
+            applyRobotRealism(*robot);
         }
     }
 }
