@@ -701,3 +701,80 @@ TEST_F(ErForceSimulatorTest, corner_blocks_keep_the_ball_out_of_the_field_corner
     // keeps its own radius of distance from each of the two walls
     EXPECT_GT(closest_approach_to_corner, CORNER_BLOCK_CATHETUS_METERS * 0.75);
 }
+
+class ErForceSimulatorWheelLimitTest : public ::testing::Test
+{
+   protected:
+    // Creates a simulator with a single yellow robot at the center of the field, either
+    // with or without per wheel acceleration limits
+    void createSimulator(bool wheel_acceleration_limits)
+    {
+        auto realism_config = ErForceSimulator::createDefaultRealismConfig();
+        simulator           = std::make_shared<ErForceSimulator>(
+            TbotsProto::FieldType::DIV_B, robot_constants, realism_config,
+            /*ramping=*/false, wheel_acceleration_limits);
+        simulator->resetCurrentTime();
+        simulator->setYellowRobots({RobotStateWithId{
+            .id          = 0,
+            .robot_state = RobotState(Point(0, 0), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())}});
+    }
+
+    // Drives the robot with the given local velocity command and returns the speed it
+    // reaches after a short time
+    double reachedSpeed(const Vector& velocity, const AngularVelocity& angular_velocity)
+    {
+        TbotsProto::PrimitiveSet primitive_set;
+        (*primitive_set.mutable_robot_primitives())[0] = *createDirectControlPrimitive(
+            velocity, angular_velocity, /*dribbler_rpm=*/0, TbotsProto::AutoChipOrKick());
+        for (unsigned int step = 0; step < 10; step++)
+        {
+            simulator->setYellowRobotPrimitiveSet(primitive_set,
+                                                  std::make_unique<TbotsProto::World>());
+            simulator->stepSimulation(Duration::fromMilliseconds(5));
+        }
+
+        const auto& robot = simulator->getSimulatorState().yellow_robots(0);
+        return Vector(robot.v_x(), robot.v_y()).length();
+    }
+
+    std::shared_ptr<ErForceSimulator> simulator;
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+};
+
+TEST_F(ErForceSimulatorWheelLimitTest, robots_accelerate_as_before_when_limits_are_off)
+{
+    const Vector target_velocity(2.0, 0);
+
+    createSimulator(/*wheel_acceleration_limits=*/false);
+    const double speed_without_limits =
+        reachedSpeed(target_velocity, AngularVelocity::zero());
+
+    createSimulator(/*wheel_acceleration_limits=*/true);
+    const double speed_with_limits =
+        reachedSpeed(target_velocity, AngularVelocity::zero());
+
+    // Driving straight ahead the wheels of our robots are the limiting factor well
+    // before the robot as a whole is, so the limits slow the robot down
+    EXPECT_GT(speed_without_limits, 0.1);
+    EXPECT_LT(speed_with_limits, speed_without_limits);
+}
+
+TEST_F(ErForceSimulatorWheelLimitTest, acceleration_depends_on_the_driving_direction)
+{
+    // Driving diagonally puts more of the load on a single wheel than driving straight
+    // ahead does, so a robot whose wheels limit its acceleration reaches a lower speed
+    // in the same time, even though both commands ask for the same speed
+    constexpr double TARGET_SPEED_METERS_PER_SECOND = 2.0;
+    const Vector straight(TARGET_SPEED_METERS_PER_SECOND, 0);
+    const Vector diagonal = straight.rotate(Angle::fromDegrees(45));
+
+    createSimulator(/*wheel_acceleration_limits=*/true);
+    const double straight_speed = reachedSpeed(straight, AngularVelocity::zero());
+
+    createSimulator(/*wheel_acceleration_limits=*/true);
+    const double diagonal_speed = reachedSpeed(diagonal, AngularVelocity::zero());
+
+    EXPECT_LT(diagonal_speed, straight_speed);
+}

@@ -15,10 +15,11 @@ int main(int argc, char** argv)
 {
     struct CommandLineArgs
     {
-        bool help               = false;
-        std::string runtime_dir = "/tmp/tbots";
-        std::string division    = "div_b";
-        bool enable_realism     = false;  // realism flag
+        bool help                             = false;
+        std::string runtime_dir               = "/tmp/tbots";
+        std::string division                  = "div_b";
+        bool enable_realism                   = false;  // realism flag
+        bool enable_wheel_acceleration_limits = false;
     };
 
     CommandLineArgs args;
@@ -35,6 +36,10 @@ int main(int argc, char** argv)
     desc.add_options()("enable_realism",
                        boost::program_options::bool_switch(&args.enable_realism),
                        "realism simulator");  // install terminal flag
+    desc.add_options()(
+        "enable_wheel_acceleration_limits",
+        boost::program_options::bool_switch(&args.enable_wheel_acceleration_limits),
+        "limit how fast each wheel of a simulated robot may accelerate");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -85,18 +90,12 @@ int main(int argc, char** argv)
             realism_config = ErForceSimulator::createDefaultRealismConfig();
         }
 
-        if (args.division == "div_a")
-        {
-            er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, robot_constants::createRobotConstants(),
-                realism_config);
-        }
-        else
-        {
-            er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, robot_constants::createRobotConstants(),
-                realism_config);
-        }
+        const TbotsProto::FieldType field_type = args.division == "div_a"
+                                                     ? TbotsProto::FieldType::DIV_A
+                                                     : TbotsProto::FieldType::DIV_B;
+        er_force_sim                           = std::make_shared<ErForceSimulator>(
+            field_type, robot_constants::createRobotConstants(), realism_config,
+            /*ramping=*/true, args.enable_wheel_acceleration_limits);
 
         std::mutex simulator_mutex;
 
