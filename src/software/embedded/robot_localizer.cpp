@@ -20,21 +20,10 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
             .asDiagonal();
 }
 
-void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& delta_time)
+void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
 {
-    const double delta_time_seconds = delta_time.toSeconds();
-    current_time_seconds_ += delta_time_seconds;
-
-    FilterStep step{
-        .prediction       = std::make_optional<FilterStep::Predict>(),
-        .update           = std::nullopt,
-        .state_estimate   = filter_.state_estimate,
-        .state_covariance = filter_.state_covariance,
-        .time_seconds     = current_time_seconds_,
-    };
-
     // clang-format off
-    step.prediction->process_model <<
+    filter_.process_model <<
         1, 0, 0, delta_time_seconds, 0, 0,
         0, 1, 0, 0, delta_time_seconds, 0,
         0, 0, 1, 0, 0, delta_time_seconds,
@@ -47,7 +36,7 @@ void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& del
     const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
     const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
 
-    auto& process_covariance = step.prediction->process_covariance;
+    auto& process_covariance = filter_.process_covariance;
     process_covariance.setZero();
 
     process_covariance(static_cast<Eigen::Index>(StateIndex::X_POSITION),
@@ -98,7 +87,7 @@ void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& del
                        static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) =
         delta_time_squared * process_angular_acceleration_noise_variance_;
 
-    auto& control_model = step.prediction->control_model;
+    auto& control_model = filter_.control_model;
     control_model.setZero();
 
     control_model(static_cast<Eigen::Index>(StateIndex::X_POSITION),
@@ -116,12 +105,27 @@ void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& del
     control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
                   static_cast<Eigen::Index>(ControlIndex::Y_ACCELERATION)) =
         delta_time_seconds;
+}
 
+void RobotLocalizer::step(const Vector& linear_acceleration, const Duration& delta_time)
+{
+    const double delta_time_seconds = delta_time.toSeconds();
+    current_time_seconds_ += delta_time_seconds;
+
+    generatedPredictionMatrices(delta_time_seconds);
+
+    FilterStep step{
+        .prediction       = std::make_optional<FilterStep::Predict>(),
+        .update           = std::nullopt,
+        .state_estimate   = filter_.state_estimate,
+        .state_covariance = filter_.state_covariance,
+        .time_seconds     = current_time_seconds_,
+    };
+
+    step.prediction->process_model      = filter_.process_model;
+    step.prediction->process_covariance = filter_.process_covariance;
+    step.prediction->control_model      = filter_.control_model;
     step.prediction->control_input << linear_acceleration.x(), linear_acceleration.y();
-
-    filter_.process_model      = step.prediction->process_model;
-    filter_.process_covariance = step.prediction->process_covariance;
-    filter_.control_model      = step.prediction->control_model;
 
     history.push_front(step);
     filter_.predict(step.prediction->control_input);
@@ -169,21 +173,25 @@ void RobotLocalizer::update(const VisionData& data)
     history.erase(std::next(rollback_point), history.end());
 
     // 3. Apply the delayed vision measurement at the rolled-back time.
-    updateFilterWithVision(data.position, data.orientation);
+    updateFilterWithVision(data.position, data.orientation);	
 
     // 4. Replay the remaining history (from oldest to newest), including the rollback
     //    point's own operation.
+	double prev_time = rollback_point.time_seconds;
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
+		double elapsed_time = it.time_seconds - prev_time;
         if (it->prediction.has_value())
         {
-            const auto& prediction     = it->prediction.value();
-            filter_.process_model      = prediction.process_model;
-            filter_.process_covariance = prediction.process_covariance;
-            filter_.control_model      = prediction.control_model;
+			const auto& prediction     = it->prediction.value();
+			if (it==history.rbegin()){
+				generatedPredictionMatrices(it.time_seconds - (current_time_seconds_ - data.age_seconds));
+			}
+			else{
+				generatedPredictionMatrices(elapsed_time);
+			}
             filter_.predict(prediction.control_input);
         }
-
         if (it->update.has_value())
         {
             const auto& update        = it->update.value();

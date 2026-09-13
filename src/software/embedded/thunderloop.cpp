@@ -7,6 +7,7 @@
 #include <optional>
 #include <thread>
 
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/robot_crash_msg.pb.h"
@@ -213,6 +214,7 @@ void Thunderloop::runLoop()
             updateRobotLocalizer(primitive.value());
             primitive_executor_->updatePrimitive(primitive.value(), robot_status_);
         }
+        imu_service_->poll(robot_status_);
 
         robot_localizer_->step(Vector(), delta_time);
         updateRobotLocalizer(robot_status_);
@@ -222,7 +224,6 @@ void Thunderloop::runLoop()
         const TbotsProto::DirectControlPrimitive direct_control_primitive =
             primitive_executor_->stepPrimitive(robot_status_, delta_time);
 
-        imu_service_->poll(robot_status_);
 
 #ifndef DISABLE_MOTOR_SERVICE
         motor_service_->poll(direct_control_primitive, robot_status_, delta_time);
@@ -267,6 +268,13 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
 
 void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status)
 {
+	// Seperate update is okay because measurement model is linear
+	if (robot_status.has_imu_status()){
+		robot_localizer_.update(RobotLocalizer::ImuData{
+			createAngularVelocity(robot_status.imu_status().angular_velocity())
+				})	
+
+	}
     if (robot_status.has_motor_status())
     {
         robot_localizer_->update(RobotLocalizer::MotorData{

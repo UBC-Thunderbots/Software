@@ -144,6 +144,16 @@ class RobotLocalizer
      */
     void updateFilterWithVision(const Point& position, const Angle& orientation);
 
+    /**
+     * Computes the process model, process covariance, and control model for the
+     * given elapsed time, and writes them into the filter. Does not run the
+     * predict step itself.
+     *
+     * @param delta_time_seconds The elapsed time to generate the prediction
+     * matrices for
+     */
+    void generatedPredictionMatrices(double delta_time_seconds);
+
     static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
     static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
     static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
