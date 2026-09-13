@@ -161,38 +161,34 @@ void RobotLocalizer::update(const VisionData& data)
         rollback_point = std::prev(history.end());
     }
 
-    // 1. Roll the filter back to the state from just before the rollback point's
-    //    operation (its stored state is captured pre-operation).
+    // 1. Roll the filter back to the state right after the rollback point's own
+    //    operation ran (state is captured post-operation), since the rollback point
+    //    happened at or before the vision sample's timestamp.
     filter_.state_estimate   = rollback_point->state_estimate;
     filter_.state_covariance = rollback_point->state_covariance;
 
-    // 2. Drop everything strictly older than the rollback point, but KEEP the rollback
-    //    point itself so its operation is replayed after the vision measurement is
-    //    inserted. (Erasing the rollback point too would silently drop one
-    //    predict/update step on every vision frame, making the position estimate lag
-    //    and inflating the velocity estimate through the position/velocity covariance.)
-    history.erase(std::next(rollback_point), history.end());
+    // 2. Drop the rollback point and everything older than it. Its operation is
+    //    already reflected in the state we just restored, so it doesn't need to be
+    //    replayed again.
+    history.erase(rollback_point, history.end());
 
     // 3. Apply the delayed vision measurement at the rolled-back time.
-    updateFilterWithVision(data.position, data.orientation);	
+    updateFilterWithVision(data.position, data.orientation);
 
-    // 4. Replay the remaining history (from oldest to newest), including the rollback
-    //    point's own operation.
-	double prev_time = rollback_point.time_seconds;
+    // 4. Replay the remaining (newer) history, from oldest to newest, recomputing each
+    //    predict step's elapsed time from the vision sample's true timestamp so the
+    //    inserted correction doesn't skew the replayed intervals.
+    double prev_time = current_time_seconds_ - data.age_seconds;
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
-		double elapsed_time = it.time_seconds - prev_time;
         if (it->prediction.has_value())
         {
-			const auto& prediction     = it->prediction.value();
-			if (it==history.rbegin()){
-				generatedPredictionMatrices(it.time_seconds - (current_time_seconds_ - data.age_seconds));
-			}
-			else{
-				generatedPredictionMatrices(elapsed_time);
-			}
+            const auto& prediction = it->prediction.value();
+            generatedPredictionMatrices(it->time_seconds - prev_time);
             filter_.predict(prediction.control_input);
+            prev_time = it->time_seconds;
         }
+
         if (it->update.has_value())
         {
             const auto& update        = it->update.value();
@@ -200,8 +196,7 @@ void RobotLocalizer::update(const VisionData& data)
             filter_.update(update.measurement);
         }
 
-        // IMPORTANT: Update the history with the recomputed state so future rollbacks are
-        // correct
+        // Update the history with the recomputed state so future rollbacks are correct
         it->state_estimate   = filter_.state_estimate;
         it->state_covariance = filter_.state_covariance;
     }
