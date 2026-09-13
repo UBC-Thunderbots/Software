@@ -65,6 +65,8 @@ double sampleCorrelatedNoise(std::mt19937& rng, double& bias, double dt_seconds,
 }
 }  // namespace
 
+const std::string ErForceSimulator::CSV_OUTPUT_PATH = "/tmp/offense_play_test_master.csv";
+
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
@@ -80,6 +82,12 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       ramping(ramping),
       noise_rng_(std::random_device{}())
 {
+    robot_localizer_csv_.open(CSV_OUTPUT_PATH);
+    robot_localizer_csv_ << "team,robot_id,estimated_x,actual_x,estimated_y,actual_y,"
+                            "estimated_vel_x,actual_vel_x,estimated_vel_y,actual_vel_y\n";
+    LOG(INFO) << "Logging RobotLocalizer estimate-vs-ground-truth data to "
+              << CSV_OUTPUT_PATH;
+
     std::string full_filename = CONFIG_DIRECTORY;
 
     if (field_type == TbotsProto::FieldType::DIV_A)
@@ -587,6 +595,16 @@ void ErForceSimulator::updateRobotLocalizers(
 
         RobotLocalizer::logToPlotJuggler(robot_id, localizer.getRobotState(),
                                          plotjuggler_tag);
+
+        robot_localizer_csv_ << (team_colour == TeamColour::BLUE ? "blue" : "yellow")
+                             << ',' << robot_id << ',' << localizer.getPosition().x()
+                             << ',' << ground_truth.position().x() << ','
+                             << localizer.getPosition().y() << ','
+                             << ground_truth.position().y() << ','
+                             << localizer.getVelocity().x() << ','
+                             << ground_truth.velocity().x() << ','
+                             << localizer.getVelocity().y() << ','
+                             << ground_truth.velocity().y() << '\n';
     }
 }
 
