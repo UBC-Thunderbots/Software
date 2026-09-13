@@ -8,13 +8,18 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(
-    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id)
-    : robot_state_(), robot_constants_(robot_constants), robot_id_(robot_id)
+    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id,
+    const TeamColour team_colour)
+    : robot_state_(),
+      robot_constants_(robot_constants),
+      robot_id_(robot_id),
+      team_colour_(team_colour)
 {
 }
 
@@ -60,6 +65,13 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 void PrimitiveExecutor::updateRobotState(const RobotState& robot_state)
 {
     robot_state_ = robot_state;
+
+    // Team colour is embedded in the key since the simulator runs both teams (which
+    // number robots independently) in one process/log stream; without it, e.g. yellow
+    // robot 0 and blue robot 0 would collide onto the same PlotJuggler key.
+    const std::string team_tag =
+        (team_colour_ == TeamColour::YELLOW) ? "_yellow" : "_blue";
+    RobotLocalizer::logToPlotJuggler(robot_id_, robot_state_, team_tag);
 }
 
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)

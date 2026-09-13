@@ -16,6 +16,7 @@
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
+#include "software/logger/custom_logging_levels.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 #include "software/physics/velocity_conversion_util.h"
@@ -218,6 +219,9 @@ void Thunderloop::runLoop()
         updateRobotLocalizer(robot_status_);
 
         primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
+
+		Point position = robot_localizer_->getPosition();
+		Vector velocity = robot_localizer_->getVelocity();
 
         const TbotsProto::DirectControlPrimitive direct_control_primitive =
             primitive_executor_->stepPrimitive(robot_status_, delta_time);
