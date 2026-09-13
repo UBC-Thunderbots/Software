@@ -78,7 +78,7 @@ class RobotLocalizer
      * @param linear_acceleration The current linear acceleration of the robot
      * @param delta_time The elapsed time since the previous step
      */
-    void step(const Vector& linear_acceleration, const Duration& delta_time);
+    void predict(const Vector& linear_acceleration, const Duration& delta_time);
 
     /**
      * Update the robot's position and orientation from data reported by vision.

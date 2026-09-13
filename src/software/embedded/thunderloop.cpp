@@ -216,7 +216,7 @@ void Thunderloop::runLoop()
         }
         imu_service_->poll(robot_status_);
 
-        robot_localizer_->step(Vector(), delta_time);
+        robot_localizer_->predict(Vector(), delta_time);
         updateRobotLocalizer(robot_status_);
 
         primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
