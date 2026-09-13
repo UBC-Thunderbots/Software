@@ -5,6 +5,7 @@
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
+#include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/geom/vector.h"
 #include "software/physics/euclidean_to_wheel.h"
@@ -453,4 +454,83 @@ TEST_F(ErForceSimulatorRampingTest, ramps_in_motor_service_frame_when_clipping)
             time_to_ramp.toSeconds()));
 
     EXPECT_GT(std::abs(rotated_ramped[1] - expected[0]), 1e-3);
+}
+
+TEST_F(ErForceSimulatorTest, robots_duelling_over_the_ball_stay_upright)
+{
+    // Two robots drive into the ball from opposite sides with their dribblers running.
+    // The perfect dribbler holds the ball with a constraint between the robot and the
+    // ball, which used to tip the robots over when two of them pulled on the same ball.
+    // A tipped over robot is considered flipped and gets teleported to the side of the
+    // field by Simulator::resetFlipped.
+    constexpr double DISTANCE_FROM_BALL_METERS     = 0.11;
+    constexpr double DRIVE_SPEED_METERS_PER_SECOND = 1.0;
+
+    simulator->setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    simulator->setYellowRobots({RobotStateWithId{
+        .id          = 0,
+        .robot_state = RobotState(Point(DISTANCE_FROM_BALL_METERS, 0), Vector(0, 0),
+                                  Angle::half(), AngularVelocity::zero())}});
+    simulator->setBlueRobots({RobotStateWithId{
+        .id          = 0,
+        .robot_state = RobotState(Point(-DISTANCE_FROM_BALL_METERS, 0), Vector(0, 0),
+                                  Angle::zero(), AngularVelocity::zero())}});
+
+    // Both robots drive forwards, towards each other and the ball, while dribbling
+    TbotsProto::PrimitiveSet primitive_set;
+    (*primitive_set.mutable_robot_primitives())[0] = *createDirectControlPrimitive(
+        Vector(DRIVE_SPEED_METERS_PER_SECOND, 0), AngularVelocity::zero(),
+        robot_constants.indefinite_dribbler_speed_rpm, TbotsProto::AutoChipOrKick());
+
+    for (unsigned int step = 0; step < 400; step++)
+    {
+        simulator->setYellowRobotPrimitiveSet(primitive_set,
+                                              std::make_unique<TbotsProto::World>());
+        simulator->setBlueRobotPrimitiveSet(primitive_set,
+                                            std::make_unique<TbotsProto::World>());
+        simulator->stepSimulation(Duration::fromMilliseconds(5));
+    }
+
+    auto sim_state = simulator->getSimulatorState();
+    ASSERT_EQ(1, sim_state.yellow_robots_size());
+    ASSERT_EQ(1, sim_state.blue_robots_size());
+
+    for (const auto& robot : {sim_state.yellow_robots(0), sim_state.blue_robots(0)})
+    {
+        // The z component of the robot's local z axis in world coordinates. It is 1 when
+        // the robot stands flat on the field and decreases as the robot tips over.
+        const double i                 = robot.rotation().i();
+        const double j                 = robot.rotation().j();
+        const double upright_component = 1.0 - 2.0 * (i * i + j * j);
+
+        EXPECT_GT(upright_component, std::cos(Angle::fromDegrees(10).toRadians()))
+            << "Robot tipped over while duelling for the ball";
+
+        // A robot that stays upright also stays within the width of the field, rather
+        // than being teleported to the side by resetFlipped
+        EXPECT_LT(std::abs(robot.p_y()), simulator->getField().yLength() / 2);
+    }
+}
+
+TEST_F(ErForceSimulatorTest, simulator_state_rotation_matches_robot_orientation)
+{
+    const Angle orientation = Angle::fromRadians(0.7);
+
+    simulator->setYellowRobots({RobotStateWithId{
+        .id          = 0,
+        .robot_state = RobotState(Point(0, 0), Vector(0, 0), orientation,
+                                  AngularVelocity::zero())}});
+    simulator->stepSimulation(Duration::fromMilliseconds(5));
+
+    auto sim_state = simulator->getSimulatorState();
+    ASSERT_EQ(1, sim_state.yellow_robots_size());
+    const auto& rotation = sim_state.yellow_robots(0).rotation();
+
+    // A robot standing on the field is only rotated about the z axis, so the rotation
+    // quaternion is (i, j, k, real) = (0, 0, sin(angle / 2), cos(angle / 2))
+    EXPECT_NEAR(rotation.i(), 0.0, 1e-3);
+    EXPECT_NEAR(rotation.j(), 0.0, 1e-3);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        Angle::fromRadians(2 * std::atan2(rotation.k(), rotation.real())), orientation,
+        Angle::fromDegrees(1)));
 }

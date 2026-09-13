@@ -21,6 +21,7 @@
 #ifndef SIMROBOT_H
 #define SIMROBOT_H
 
+#include <BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h>
 #include <btBulletDynamicsCommon.h>
 
 #include "extlibs/er_force_sim/src/core/rng.h"
@@ -111,7 +112,9 @@ class camun::simulator::SimRobot
     std::unique_ptr<btHingeConstraint> m_dribblerConstraint;
     std::vector<std::unique_ptr<btCollisionShape>> m_shapes;
     std::unique_ptr<btMotionState> m_motionState;
-    std::unique_ptr<btHingeConstraint> m_holdBallConstraint;
+    std::unique_ptr<btPoint2PointConstraint> m_holdBallConstraint;
+    // Keeps a robot that is holding the ball from tipping over, see dribble()
+    std::unique_ptr<btGeneric6DofSpring2Constraint> m_notTipOverConstraint;
     btVector3 m_dribblerCenter;
 
     sslsim::TeleportRobot m_move;
