@@ -19,7 +19,6 @@
 #include "software/embedded/services/motor.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
-#include "software/physics/velocity_conversion_util.h"
 #include "software/time/duration.h"
 #include "software/tracy/tracy_constants.h"
 
