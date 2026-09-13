@@ -30,7 +30,7 @@ static const std::string LOOPBACK_INTERFACE = "lo";
 #endif
 
 // PlotJuggler's default host and port
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // ProtoLogger constants for replay files

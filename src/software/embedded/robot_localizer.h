@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <deque>
 #include <optional>
+#include <string>
 
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -137,6 +138,18 @@ class RobotLocalizer
      * @return The estimated robot state
      */
     RobotState getRobotState() const;
+
+    /**
+     * Logs a robot's position and velocity to PlotJuggler, with the robot ID embedded
+     * in each key (e.g. "vel_x_robot_4").
+     *
+     * @param robot_id The ID of the robot the state belongs to
+     * @param robot_state The robot state to log
+     * @param tag Optional suffix appended after the robot ID (e.g. "_estimated"), to
+     * distinguish multiple state sources logged for the same robot
+     */
+    static void logToPlotJuggler(RobotId robot_id, const RobotState& robot_state,
+                                 const std::string& tag = "");
 
    private:
     /**
