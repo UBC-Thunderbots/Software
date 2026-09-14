@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import subprocess
 import threading
 import time
 from subprocess import Popen, TimeoutExpired
-import re
 
+import proto.import_all_protos as protos
 from software.py_constants import (
     DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
     MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC,
@@ -25,12 +26,11 @@ from software.py_constants import (
     VIRTUAL_OBSTACLES_UNIX_PATH,
     WORLD_PATH,
 )
-import proto.import_all_protos as protos
-from software.thunderscope.constants import LogLevels
 from software.thunderscope.binary_context_managers.util import (
     is_cmd_running,
     kill_cmd_if_running,
 )
+from software.thunderscope.constants import LogLevels
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -105,7 +105,7 @@ class FullSystem:
         # Setup unix socket directory
         try:
             os.makedirs(self.full_system_runtime_dir)
-        except:
+        except OSError:
             pass
 
         supported_flags = self.discover_supported_flags(self.path_to_binary)

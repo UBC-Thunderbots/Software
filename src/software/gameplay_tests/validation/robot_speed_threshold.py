@@ -1,13 +1,12 @@
-import software.python_bindings as tbots_cpp
+from typing import override
+
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.speed_threshold_helpers import (
     get_current_robot_position,
     get_validation_centre_position,
     get_validation_line_endpoints,
 )
-from typing import override
-
-
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,

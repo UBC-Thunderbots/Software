@@ -1,14 +1,15 @@
+from typing import Any, override
+
+import proto.import_all_protos as protos
 from pyqtgraph.Qt import QtWidgets
-from pyqtgraph.Qt.QtCore import Qt, QByteArray, QBuffer, QIODeviceBase, QEvent
+from pyqtgraph.Qt.QtCore import QBuffer, QByteArray, QEvent, QIODeviceBase, Qt
+from software.thunderscope.common.common_widgets import display_tooltip
+from software.thunderscope.common.proto_parameter_tree_util import get_string_val
 from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_loader import (
     get_no_fault_icon,
     get_stopped_icon,
     get_warning_icon,
 )
-from software.thunderscope.common.proto_parameter_tree_util import get_string_val
-from software.thunderscope.common.common_widgets import display_tooltip
-from typing import Any, override
-import proto.import_all_protos as protos
 
 
 class MotorFaultView(QtWidgets.QWidget):

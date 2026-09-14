@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import StrEnum, auto
-import proto.import_all_protos as protos
 from typing import Any, override
+
+import proto.import_all_protos as protos
 from software.stats.logs.log_interface import TimestampedEvalLog
 from software.stats.logs.world_state_log import WorldStateLog
 

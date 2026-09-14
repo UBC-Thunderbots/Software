@@ -137,25 +137,25 @@ constexpr double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
     -BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
 
 /* Unit Conversion */
-static const double MILLIMETERS_PER_METER = 1000.0;
-static const double METERS_PER_MILLIMETER = 1.0 / 1000.0;
-static const double CENTIMETERS_PER_METER = 100.0;
-static const double METERS_PER_CENTIMETER = 1.0 / 100.0;
+static constexpr double MILLIMETERS_PER_METER = 1000.0;
+static constexpr double METERS_PER_MILLIMETER = 1.0 / 1000.0;
+static constexpr double CENTIMETERS_PER_METER = 100.0;
+static constexpr double METERS_PER_CENTIMETER = 1.0 / 100.0;
 
-static const double CENTIRADIANS_PER_RADIAN = 100.0;
-static const double RADIANS_PER_CENTIRADIAN = 1.0 / 100.0;
+static constexpr double CENTIRADIANS_PER_RADIAN = 100.0;
+static constexpr double RADIANS_PER_CENTIRADIAN = 1.0 / 100.0;
 
-static const double NANOSECONDS_PER_MILLISECOND  = 1000000.0;
-static const double NANOSECONDS_PER_SECOND       = 1000000000.0;
-static const double MICROSECONDS_PER_MILLISECOND = 1000.0;
-static const double MICROSECONDS_PER_SECOND      = 1000000.0;
-static const double MILLISECONDS_PER_SECOND      = 1000.0;
-static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
-static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
-static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
-static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
-static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
-static const double SECONDS_PER_MINUTE           = 60.0;
+static constexpr double NANOSECONDS_PER_MILLISECOND  = 1000000.0;
+static constexpr double NANOSECONDS_PER_SECOND       = 1000000000.0;
+static constexpr double MICROSECONDS_PER_MILLISECOND = 1000.0;
+static constexpr double MICROSECONDS_PER_SECOND      = 1000000.0;
+static constexpr double MILLISECONDS_PER_SECOND      = 1000.0;
+static constexpr double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
+static constexpr double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
+static constexpr double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
+static constexpr double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
+static constexpr double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
+static constexpr double SECONDS_PER_MINUTE           = 60.0;
 
 static const double DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK =
     1.0 / 60.0;  // corresponds to 60 Hz

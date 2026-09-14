@@ -1,8 +1,9 @@
+from abc import abstractmethod
+from typing import Any
+
 import proto.import_all_protos as protos
 from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from abc import abstractmethod
-from typing import Any
 
 logger = create_logger(__name__)
 

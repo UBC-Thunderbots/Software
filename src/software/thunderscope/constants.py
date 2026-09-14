@@ -1,9 +1,9 @@
-from pyqtgraph.Qt import QtGui
-from OpenGL import GL
-import proto.import_all_protos as protos
+import textwrap
 from enum import Enum, IntEnum, StrEnum
 
-import textwrap
+import proto.import_all_protos as protos
+from OpenGL import GL
+from pyqtgraph.Qt import QtGui
 
 
 class ProtoUnixIOTypes(Enum):

@@ -1,13 +1,14 @@
-import os
-import proto.import_all_protos as protos
-from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.constants import ProtoConfigurationConstant
 import logging
-from pyqtgraph.Qt.QtCore import QTimer
-from pyqtgraph.Qt import QtWidgets
-from pyqtgraph import parametertree
-from software.thunderscope.common import proto_parameter_tree_util
+import os
 from typing import Any, Callable
+
+import proto.import_all_protos as protos
+from pyqtgraph import parametertree
+from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt.QtCore import QTimer
+from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.common import proto_parameter_tree_util
+from software.thunderscope.constants import ProtoConfigurationConstant
 
 
 class ProtoConfigurationWidget(QtWidgets.QWidget):

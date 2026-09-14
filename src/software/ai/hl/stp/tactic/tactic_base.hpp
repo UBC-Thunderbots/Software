@@ -182,7 +182,6 @@ template <class TacticFsm, class... TacticSubFsms>
 std::map<RobotId, std::shared_ptr<Primitive>>
 TacticBase<TacticFsm, TacticSubFsms...>::get(const WorldPtr& world_ptr)
 {
-    TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
 
     {

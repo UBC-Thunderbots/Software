@@ -1,10 +1,10 @@
 from typing import override
 
 import proto.import_all_protos as protos
-from software.py_constants import DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 from software.gameplay_tests.validation.validation import (
     Validation,
 )
+from software.py_constants import DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 
 
 class DurationValidation(Validation):

@@ -3,6 +3,9 @@ load("@platformio_rules//platformio:platformio.bzl", "PlatformIOLibraryInfo")
 # This file is heavily referencing platformio.bzl from rules_platformio project
 # https://github.com/mum4k/platformio_rules
 
+load("@protobuf//bazel/private:toolchain_helpers.bzl", "toolchains")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 # The relative filename of the header file.
@@ -97,20 +100,24 @@ def _compile_protos_for_nanopb(
     all_proto_hdr_files = []
     all_proto_src_files = []
 
+    protoc = ctx.toolchains[toolchains.PROTO_TOOLCHAIN].proto.proto_compiler
+    protoc_path = protoc.executable.path
+    protoc_dir = "/".join(protoc_path.split("/")[:-1])
+
     for proto_file in all_proto_files.to_list():
         if proto_file.basename in ("descriptor.proto", "nanopb.proto"):
             continue
         proto_compile_args = []
         for path in all_proto_include_dirs.to_list():
-            proto_compile_args += ["-I%s" % path]
+            proto_compile_args.append("-I%s" % path)
         target_path = proto_file.path[:-len(".proto")]
         h_out_name = generation_folder_name + target_path + ".nanopb.h"
         c_out_name = generation_folder_name + target_path + ".nanopb.c"
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
 
-        proto_compile_args += ["--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path)]
-        proto_compile_args += ["--nanopb_out=%s %s" % (generated_folder_abs_path, proto_file.path)]
+        proto_compile_args.append("--plugin=protoc-gen-nanopb=%s" % (ctx.executable.nanopb_generator.path))
+        proto_compile_args.append("--nanopb_out=%s %s" % (generated_folder_abs_path, proto_file.path))
 
         nanopb_opts = ["--extension=.nanopb"]
         proto_basename = proto_file.basename[:-len(".proto")]
@@ -118,13 +125,13 @@ def _compile_protos_for_nanopb(
             nanopb_opts.append("--options-file=%s" % all_options_map[proto_basename].path)
 
         for opt in nanopb_opts:
-            proto_compile_args += ["--nanopb_opt=%s" % opt]
+            proto_compile_args.append("--nanopb_opt=%s" % opt)
 
-        cmd = [ctx.executable.protoc.path] + proto_compile_args
-        cmd_str = " ".join(cmd)
+        cmd = [protoc_path] + proto_compile_args
+        cmd_str = "PATH={}:$PATH ".format(protoc_dir) + " ".join(cmd)
         ctx.actions.run_shell(
             tools = [
-                ctx.executable.protoc,
+                protoc,
                 ctx.executable.nanopb_generator,
             ],
             inputs = all_proto_files.to_list() + list(all_options_map.values()),
@@ -436,13 +443,8 @@ nanopb_proto_library = rule(
         ),
         "nanopb_generator": attr.label(
             executable = True,
-            cfg = "host",
+            cfg = "exec",
             default = Label("@nanopb//:protoc-gen-nanopb"),
-        ),
-        "protoc": attr.label(
-            executable = True,
-            cfg = "host",
-            default = Label("@protobuf//:protoc"),
         ),
         "options": attr.label_list(
             allow_files = [".options"],
@@ -457,7 +459,7 @@ nanopb_proto_library = rule(
         PlatformIOLibraryInfo,
         CcInfo,
     ],
-    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
+    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"] + toolchains.use_toolchain(toolchains.PROTO_TOOLCHAIN),
     fragments = ["cpp"],
     host_fragments = ["cpp"],
 )

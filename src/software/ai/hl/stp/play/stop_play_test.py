@@ -1,17 +1,16 @@
-import pytest
-
-import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from proto.ssl_gc_common_pb2 import Team as SslTeam
+import pytest
+import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.validation.robot_speed_threshold import (
-    RobotSpeedAlwaysBelowThreshold,
-)
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.validation.delay_validation import DelayValidation
 from software.gameplay_tests.validation.robot_enters_region import (
     RobotNeverEntersRegion,
 )
-from software.gameplay_tests.validation.delay_validation import DelayValidation
-from software.gameplay_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.validation.robot_speed_threshold import (
+    RobotSpeedAlwaysBelowThreshold,
+)
 
 
 @pytest.mark.parametrize(

@@ -1,4 +1,6 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,7 +19,7 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/kick_or_chip:kick_or_chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",

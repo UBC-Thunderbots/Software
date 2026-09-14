@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -8,20 +9,22 @@
 #include "software/embedded/gpio/gpio.h"
 #include "software/embedded/motor_controller/motor_controller.h"
 #include "software/physics/euclidean_to_wheel.h"
+#include "software/time/duration.h"
 
 /**
- * A service that interacts with the motors.
+ * A service that drives the robot's four wheel motors (and dribbler depending
+ * on the robot model).
  *
  * It is responsible for:
  * - Converting Euclidean velocities to wheel velocities
- * - Communicating with the motor
+ * - Communicating with the motor driver boards
  * - Detecting and handling faults
  */
 class MotorService
 {
    public:
     /**
-     * Service that interacts with the motors.
+     * Constructs a new MotorService.
      *
      * @param robot_constants The robot constants
      */
@@ -33,11 +36,11 @@ class MotorService
      *
      * @param primitive DirectControlPrimitive to execute
      * @param robot_status RobotStatus message to modify with the current motor status
-     * @param time_elapsed_since_last_poll_s The time since the last poll in seconds
+     * @param time_elapsed_since_last_poll The time since the last poll
      */
     void poll(const TbotsProto::DirectControlPrimitive& primitive,
               TbotsProto::RobotStatus& robot_status,
-              double time_elapsed_since_last_poll_s);
+              const Duration& time_elapsed_since_last_poll);
 
     /**
      * Clears previous faults, configures the motor and checks encoder connections.
@@ -51,24 +54,47 @@ class MotorService
 
    private:
     /**
-     * Creates a motor controller based on the motor board type specified at compile time.
-     *
-     * @return the instantiated motor controller implementation corresponding to the
-     * motor board type specified at compile time
+     * Resets the motors if any of them reports a fault that requires a reset.
      */
-    std::unique_ptr<MotorController> setupMotorController();
+    void resetMotorsIfNeeded();
 
     /**
-     * Return a MotorStatus proto filled with motor velocities and faults.
+     * Writes the target velocities to the motors and reads back the current velocities.
      *
-     * @param current_wheel_velocities  the current wheel velocities in m/s
-     * @param dribbler_rpm             the dribbler motor's rotations per minute
-     *
-     * @return a MotorStatus proto with the velocity of each motor as well as their fault
-     * statuses (some faults may be cached)
+     * @return the current wheel velocities in m/s and the dribbler RPM read from the
+     * dribbler motor
      */
-    TbotsProto::MotorStatus createMotorStatus(
-        const WheelSpace_t& current_wheel_velocities, double dribbler_rpm) const;
+    std::pair<WheelSpace_t, double> driveMotors();
+
+    /**
+     * Disables the motors and halts Thunderloop if any wheel velocity has changed by
+     * more than the runaway protection threshold since the previous step.
+     *
+     * @param current_wheel_velocities the current wheel velocities in m/s
+     */
+    void checkForMotorRunaway(const WheelSpace_t& current_wheel_velocities);
+
+    /**
+     * Updates the target wheel velocities and dribbler RPM from the primitive, ramping
+     * them toward the commanded values to respect acceleration limits.
+     *
+     * @param primitive DirectControlPrimitive to execute
+     * @param time_elapsed_since_last_poll_s The time since the last poll in seconds
+     */
+    void updateTargetVelocities(const TbotsProto::DirectControlPrimitive& primitive,
+                                double time_elapsed_since_last_poll_s);
+
+    /**
+     * Builds the motor status (motor faults, current and target velocities, and dribbler
+     * RPM) and assigns it to robot_status.
+     *
+     * @param robot_status RobotStatus message to modify with the current motor status
+     * @param current_wheel_velocities the current wheel velocities in m/s
+     * @param dribbler_rpm the current dribbler RPM read from the dribbler motor
+     */
+    void updateMotorStatus(TbotsProto::RobotStatus& robot_status,
+                           const WheelSpace_t& current_wheel_velocities,
+                           double dribbler_rpm);
 
     /**
      * Tracks that a motor reset occurred just now.

@@ -1,10 +1,11 @@
-from typing import override, Callable
-from software.stats.trackers.tracker import Tracker
-import proto.import_all_protos as protos
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.logs.event_log import EventType
 import queue
+from typing import Callable, override
+
+import proto.import_all_protos as protos
+from software.stats.logs.event_log import EventType
+from software.stats.trackers.tracker import Tracker
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class RefereeTracker(Tracker):

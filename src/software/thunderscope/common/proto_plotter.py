@@ -1,15 +1,12 @@
-from random import randint
 import time
 from collections import deque
-from typing import Type, Callable
-from google.protobuf.message import Message
+from random import randint
+from typing import Callable, Type, override
 
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtWidgets
-from pyqtgraph.Qt import QtGui
-
+from google.protobuf.message import Message
+from pyqtgraph.Qt import QtGui, QtWidgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from typing import override
 
 
 class ProtoPlotter(QtWidgets.QWidget):

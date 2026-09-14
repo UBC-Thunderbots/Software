@@ -1,10 +1,9 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
-
 #added platformio rules to make constants library compatible with arduino board build tool
 load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
 )
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 

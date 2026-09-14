@@ -1,6 +1,7 @@
+import math
+
 from software.py_constants import MILLIMETERS_PER_METER
 from software.thunderscope.constants import SPEED_SEGMENT_SCALE
-import math
 
 """Helper functions for robot_speed_threshold and ball_speed_threshold"""
 

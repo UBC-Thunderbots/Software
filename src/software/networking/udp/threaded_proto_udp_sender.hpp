@@ -82,6 +82,6 @@ std::string ThreadedProtoUdpSender<SendProto>::getIpAddress() const
 template <class SendProto>
 void ThreadedProtoUdpSender<SendProto>::sendProto(const SendProto& message, bool async)
 {
-    message.SerializeToString(&data_buffer);
+    std::ignore = message.SerializeToString(&data_buffer);
     sendString(data_buffer, async);
 }

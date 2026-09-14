@@ -1,4 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,29 +30,6 @@ config_setting(
     },
 )
 
-config_setting(
-    name = "build_trinamic",
-    flag_values = {
-        ":motor_board": "TRINAMIC",
-    },
-)
-
-config_setting(
-    name = "build_stspin",
-    flag_values = {
-        ":motor_board": "STSPIN",
-    },
-)
-
-string_flag(
-    name = "motor_board",
-    build_setting_default = "STSPIN",
-    values = [
-        "TRINAMIC",
-        "STSPIN",
-    ],
-)
-
 cc_library(
     name = "primitive_executor",
     srcs = ["primitive_executor.cpp"],
@@ -65,15 +46,13 @@ cc_library(
         "//software/time:duration",
         "//software/world:robot_state",
         "//software/world:team_colour",
+        "@tracy",
     ],
 )
 
 cc_library(
     name = "spi_utils",
-    srcs = ["spi_utils.cpp"],
-    hdrs = ["spi_utils.h"],
-    # Uses Linux kernel headers (linux/spi/spidev.h); robot-only.
-    target_compatible_with = ["@platforms//os:linux"],
+    hdrs = ["spi_utils.hpp"],
     deps = [
         "//software/logger",
     ],
@@ -92,8 +71,8 @@ cc_library(
     }),
     deps = [
         ":primitive_executor",
+        ":robot_localizer",
         "//proto:tbots_cc_proto",
-        "//software/embedded:robot_localizer",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
@@ -102,7 +81,6 @@ cc_library(
         "//software/logger:network_logger",
         "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
-        "//software/util/scoped_timespec_timer",
         "@tracy",
     ],
 )
@@ -135,21 +113,13 @@ filegroup(
     srcs = ["hash_thunderloop_binary.sh"],
 )
 
-cc_test(
-    name = "test_battery",
-    srcs = ["battery_test.cpp"],
-    deps = [
-        ":thunderloop",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
 cc_library(
     name = "robot_localizer",
     srcs = ["robot_localizer.cpp"],
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto/primitive:primitive_msg_factory",
         "//software:constants",
         "//software/embedded/services:imu",
         "//software/geom:angle",
@@ -157,7 +127,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/sensor_fusion/filter:kalman_filter",
-        "//software/util/scoped_timespec_timer",
+        "//software/world:robot_state",
         "@eigen",
     ],
 )

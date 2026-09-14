@@ -1,6 +1,6 @@
 import textwrap
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt import QtWidgets
+
+from pyqtgraph.Qt import QtCore, QtWidgets
 
 
 class GLToolbar(QtWidgets.QWidget):

@@ -1,11 +1,12 @@
-from software.stats.trackers.tracker import Tracker
+import queue
 from typing import override
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 from software.stats.logs.event_log import EventType
-import proto.import_all_protos as protos
-import queue
+from software.stats.trackers.tracker import Tracker
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class GoalieTracker(Tracker):

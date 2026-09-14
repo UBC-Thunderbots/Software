@@ -6,7 +6,7 @@
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/play_fsm.hpp"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/logger/logger.h"
 

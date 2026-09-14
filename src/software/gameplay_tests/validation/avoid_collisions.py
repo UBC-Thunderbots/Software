@@ -1,12 +1,13 @@
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
-import software.python_bindings as tbots
+from typing import override
+
 import proto.import_all_protos as protos
+import software.python_bindings as tbots
 from software.gameplay_tests.validation.validation import (
     Validation,
-    create_validation_types,
     create_validation_geometry,
+    create_validation_types,
 )
-from typing import override
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 
 class RobotsDoNotCollide(Validation):

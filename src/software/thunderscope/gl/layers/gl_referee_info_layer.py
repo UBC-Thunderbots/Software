@@ -1,23 +1,23 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl.items.GLTextItem import GLTextItem
+from typing import override
 
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from pyqtgraph.opengl.items.GLTextItem import GLTextItem
+from pyqtgraph.Qt import QtGui
 from software.py_constants import (
     BALL_PLACEMENT_ROBOT_AVOID_RADIUS_METERS,
     BALL_PLACEMENT_TIME_LIMIT_S,
     BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
 )
-import software.python_bindings as tbots_cpp
 from software.thunderscope.constants import (
-    DepthValues,
-    Colors,
     THUNDERSCOPE_UI_FONT_NAME,
+    Colors,
+    DepthValues,
 )
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from typing import override
 
 
 class GLRefereeInfoLayer(GLLayer):

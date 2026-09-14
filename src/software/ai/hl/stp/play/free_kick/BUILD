@@ -1,4 +1,6 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,9 +21,9 @@ cc_library(
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/play/defense:defense_play",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/hl/stp/tactic/kick_or_chip:kick_or_chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",

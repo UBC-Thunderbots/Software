@@ -1,4 +1,7 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,7 +21,7 @@ cc_library(
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
+        "//software/ai/hl/stp/tactic/kick_or_chip:kick_or_chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom/algorithms",
         "//software/logger",

@@ -1,8 +1,9 @@
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.trackers.tracker import Tracker
-from typing import Type, Self
-import proto.import_all_protos as protos
 import queue
+from typing import Self, Type
+
+import proto.import_all_protos as protos
+from software.stats.trackers.tracker import Tracker
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class TrackerBuilder:

@@ -1,0 +1,9 @@
+--- pybind11_protobuf/BUILD
++++ pybind11_protobuf/BUILD
+@@ -1,5 +1,6 @@
+ # Pybind11 bindings for Google's Protocol Buffers
+
++load("@rules_cc//cc:defs.bzl", "cc_library")
+ load("@pybind11_bazel//:build_defs.bzl", "pybind_library")
+
+ licenses(["notice"])

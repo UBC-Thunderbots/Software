@@ -1,4 +1,5 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(default_visibility = ["//visibility:public"])
@@ -49,6 +50,7 @@ py_library(
         "//software/networking/unix:threaded_unix_listener_py",
         "//software/networking/unix:threaded_unix_sender_py",
         "//software/thunderscope",
+        "//software/thunderscope:qt_dependency_bootstrap",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
@@ -73,6 +75,7 @@ py_library(
         "//software/thunderscope",
         "//software/thunderscope:constants",
         "//software/thunderscope:estop_helpers",
+        "//software/thunderscope:qt_dependency_bootstrap",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",

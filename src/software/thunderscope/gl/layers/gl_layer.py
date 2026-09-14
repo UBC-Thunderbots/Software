@@ -2,7 +2,6 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from pyqtgraph.opengl.GLViewWidget import GLViewMixin
 from pyqtgraph.opengl.shaders import ShaderProgram
 from pyqtgraph.Qt import QtGui
-
 from software.thunderscope.gl.helpers import gl_patches
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction

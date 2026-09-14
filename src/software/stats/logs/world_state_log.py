@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import Any, Iterator, override
+
 import proto.import_all_protos as protos
+from software.py_constants import DIV_B_NUM_ROBOTS
 from software.stats.logs.log_interface import IEvalLog
 from software.stats.logs.type_utils import count_primitive_fields
-from software.py_constants import DIV_B_NUM_ROBOTS
-from typing import Any, Iterator, override
 
 
 @dataclass
