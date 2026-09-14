@@ -89,6 +89,18 @@ TEST(StepAlongPerimeterTest, positive_distance_starts_from_middle)
     EXPECT_EQ(result_point, expected_point);
 }
 
+TEST(StepAlongPerimeterTest, small_positive_distance_from_middle_of_segment)
+{
+    // travel must start from the closest point on the segment, not the
+    // segment's start vertex.
+    Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
+    Point start_point(1, 0);
+    double travel_distance = 0.5;
+    Point expected_point(0.5, 0);
+    Point result_point = stepAlongPerimeter(polygon, start_point, travel_distance);
+    EXPECT_EQ(result_point, expected_point);
+}
+
 TEST(StepAlongPerimeterTest, distance_equals_perimeter_returns_start)
 {
     Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
