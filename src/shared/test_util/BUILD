@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -18,7 +20,6 @@ cc_library(
     name = "tbots_gtest_main",
     testonly = True,
     srcs = ["tbots_gtest_main.cpp"],
-    hdrs = ["tbots_gtest_main.h"],
     deps = [
         "//software/logger",
         "@boost//:program_options",

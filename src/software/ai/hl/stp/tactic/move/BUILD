@@ -1,3 +1,8 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -28,17 +33,12 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "move_tactic_test",
-    srcs = ["move_tactic_test.cpp"],
+    srcs = ["move_tactic_test.py"],
     deps = [
-        ":move_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

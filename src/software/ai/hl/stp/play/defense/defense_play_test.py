@@ -1,15 +1,16 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.friendly_has_ball_possession import (
-    FriendlyEventuallyHasBallPossession,
-)
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallNeverEntersRegion,
+)
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
+    FriendlyEventuallyHasBallPossession,
 )
 
 
@@ -49,14 +50,14 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.DefensePlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.DefensePlay, yellow_play=protos.PlayName.HaltPlay
         )
 
     simulated_test_runner.run_test(
@@ -114,14 +115,15 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.DefensePlay, yellow_play=PlayName.ShootOrPassPlay
+            blue_play=protos.PlayName.DefensePlay,
+            yellow_play=protos.PlayName.ShootOrPassPlay,
         )
 
     simulated_test_runner.run_test(

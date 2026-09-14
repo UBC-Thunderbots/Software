@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget
+from pyqtgraph.Qt.QtWidgets import QWidget
 from pyqttoast import Toast, ToastPreset
 
 

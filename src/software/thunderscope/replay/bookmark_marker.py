@@ -1,17 +1,15 @@
 from collections.abc import Callable
-
-from PyQt6.QtCore import QRect
-from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QPushButton, QSlider, QLabel
-from software.py_constants import *
 from typing import override
 
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
+from software.py_constants import MILLISECONDS_PER_SECOND
 
-class BookmarkMarker(QPushButton):
+
+class BookmarkMarker(QtWidgets.QPushButton):
     """Bookmark Visual"""
 
     # Color of the visual
-    MARKER_COLOR = QColor(130, 130, 130)
+    MARKER_COLOR = QtGui.QColor(130, 130, 130)
 
     # Radius of the visual
     MARKER_RADIUS = 5
@@ -20,8 +18,8 @@ class BookmarkMarker(QPushButton):
         self,
         value: float,
         click_func: Callable[[float], None],
-        slider: QSlider,
-        label: QLabel,
+        slider: QtWidgets.QSlider,
+        label: QtWidgets.QLabel,
         parent=None,
     ):
         """Create a bookmark visual
@@ -51,8 +49,8 @@ class BookmarkMarker(QPushButton):
         """Update bookmark visuals display"""
         super().update()
         # Re-calculate the position of the visuals
-        slider_rect: QRect = self.slider.geometry()
-        label_rect: QRect = self.label.geometry()
+        slider_rect: QtCore.QRect = self.slider.geometry()
+        label_rect: QtCore.QRect = self.label.geometry()
         max_val = self.slider.maximum() / MILLISECONDS_PER_SECOND
         self.move(
             int(slider_rect.width() * self.value // max_val),

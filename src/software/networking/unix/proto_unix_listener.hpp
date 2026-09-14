@@ -106,8 +106,8 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
-        packet_data.ParseFromArray(raw_received_data_.data(),
-                                   static_cast<int>(num_bytes_received));
+        std::ignore      = packet_data.ParseFromArray(raw_received_data_.data(),
+                                                      static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
 
         if (proto_logger)

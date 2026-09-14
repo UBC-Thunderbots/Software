@@ -1,23 +1,22 @@
+import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-import math
-from proto.import_all_protos import *
-from software.simulated_tests.simulated_test_fixture import (
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
-from software.simulated_tests.validation.friendly_receives_ball_slow import (
-    FriendlyAlwaysReceivesBallSlow,
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallEventuallyEntersRegion,
+    BallEventuallyExitsRegion,
 )
-from software.simulated_tests.validation.friendly_has_ball_possession import (
-    FriendlyEventuallyHasBallPossession,
-)
-from software.simulated_tests.validation.ball_moves_in_direction import (
+from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallMovesForwardInRegions,
 )
-from software.simulated_tests.validation.ball_enters_region import (
-    BallEventuallyExitsRegion,
-    BallEventuallyEntersRegion,
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
+    FriendlyEventuallyHasBallPossession,
+)
+from software.gameplay_tests.validation.friendly_receives_ball_slow import (
+    FriendlyAlwaysReceivesBallSlow,
 )
 
 
@@ -92,7 +91,7 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    config = PassingConfig()
+    config = protos.PassingConfig()
     config.enemy_proximity_importance = 0.01
     config.enemy_interception_time_multiplier = 5
     config.max_receive_speed_m_per_s = 2.0
@@ -108,28 +107,30 @@ def setup_pass_and_robots(
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
+    # We use KickOrChipTactic since AttackerTactic shoots towards the goal instead if
+    # open. KickOrChipTactic just does the kick we want
     blue_tactics = {}
-    blue_tactics[0] = KickTactic(
-        kick_origin=Point(
+    blue_tactics[0] = protos.KickOrChipTactic(
+        kick_or_chip_origin=protos.Point(
             x_meters=best_pass.passerPoint().x(),
             y_meters=best_pass.passerPoint().y(),
         ),
-        kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
-        kick_speed_meters_per_second=best_pass.speed(),
+        kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+        auto_chip_or_kick=protos.AutoChipOrKick(
+            autokick_speed_m_per_s=best_pass.speed(),
+        ),
     )
 
     # if we want a friendly robot to receive the pass
     if receive_pass:
         # arguments for a ReceiverTactic
         receiver_args = {
-            "pass": Pass(
-                passer_point=Point(
+            "pass": protos.Pass(
+                passer_point=protos.Point(
                     x_meters=best_pass.passerPoint().x(),
                     y_meters=best_pass.passerPoint().y(),
                 ),
-                receiver_point=Point(
+                receiver_point=protos.Point(
                     x_meters=best_pass.receiverPoint().x(),
                     y_meters=best_pass.receiverPoint().y(),
                 ),
@@ -138,7 +139,7 @@ def setup_pass_and_robots(
             "disable_one_touch_shot": True,
         }
 
-        blue_tactics[1] = ReceiverTactic(**receiver_args)
+        blue_tactics[1] = protos.ReceiverTactic(**receiver_args)
 
     simulated_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
 
@@ -155,7 +156,7 @@ def setup_pass_and_robots(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(-1.0, 0.0),
             [tbots_cpp.Point(1.0, 0.0)],
-            [0, math.pi],
+            [tbots_cpp.Angle.zero(), tbots_cpp.Angle.half()],
             [],
         ),
         # pass between 2 robots on opposite ends of the field
@@ -164,7 +165,7 @@ def setup_pass_and_robots(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(-3.5, 0.0),
             [tbots_cpp.Point(3.5, 0.0)],
-            [0, math.pi],
+            [tbots_cpp.Angle.zero(), tbots_cpp.Angle.half()],
             [],
         ),
         # TODO: Make Interception Better
@@ -175,7 +176,7 @@ def setup_pass_and_robots(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(0.0, -1.0),
             [tbots_cpp.Point(0.0, 3.0)],
-            [0, math.pi],
+            [tbots_cpp.Angle.zero(), tbots_cpp.Angle.half()],
             [],
         ),
         # pass between 2 robots on opposite ends of the field's diagonal
@@ -184,7 +185,7 @@ def setup_pass_and_robots(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(-3.5, 2.5),
             [tbots_cpp.Point(3.5, -2.5)],
-            [0, math.pi],
+            [tbots_cpp.Angle.zero(), tbots_cpp.Angle.half()],
             [],
         ),
         # straight pass with an enemy in between the 2 robots
@@ -193,7 +194,7 @@ def setup_pass_and_robots(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(-1.0, 0.0),
             [tbots_cpp.Point(1.5, 0.0)],
-            [0, math.pi],
+            [tbots_cpp.Angle.zero(), tbots_cpp.Angle.half()],
             [tbots_cpp.Point(0.5, 0.0)],
         ),
         # pass with a sparse wall of enemy robots in between the 2 robots
@@ -202,7 +203,7 @@ def setup_pass_and_robots(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(-2.0, 0.0),
             [tbots_cpp.Point(1.0, 0.0)],
-            [0, math.pi],
+            [tbots_cpp.Angle.zero(), tbots_cpp.Angle.half()],
             [
                 tbots_cpp.Point(0.5, 2.0),
                 tbots_cpp.Point(0.5, 1.0),
@@ -274,7 +275,7 @@ def test_passing_receive_speed(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(2.0, -2.0),
             [tbots_cpp.Point(-2.5, 2.0)],
-            [math.pi, 0],
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [],
         ),
         (
@@ -282,7 +283,7 @@ def test_passing_receive_speed(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(0.5, 0),
             [tbots_cpp.Point(-0.5, 0)],
-            [math.pi, 0],
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [],
         ),
         (
@@ -290,7 +291,7 @@ def test_passing_receive_speed(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(0.6, 0),
             [tbots_cpp.Point(-0.6, 0)],
-            [math.pi, 0],
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [],
         ),
         (
@@ -303,7 +304,7 @@ def test_passing_receive_speed(
                 tbots_cpp.Point(1, -1),
                 tbots_cpp.Point(2, 0),
             ],
-            [math.pi, 0],
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [],
         ),
         (
@@ -311,7 +312,7 @@ def test_passing_receive_speed(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(1, 0),
             [tbots_cpp.Point(2.5, 2.5), tbots_cpp.Point(-1, 0)],
-            [math.pi, 0],
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [],
         ),
         (
@@ -319,7 +320,7 @@ def test_passing_receive_speed(
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(0.5, 0),
             [tbots_cpp.Point(-1, 0)],
-            [math.pi, 0],
+            [tbots_cpp.Angle.half(), tbots_cpp.Angle.zero()],
             [
                 tbots_cpp.Point(0.5, 0.5),
                 tbots_cpp.Point(0.5, -0.5),

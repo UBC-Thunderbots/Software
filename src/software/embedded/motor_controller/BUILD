@@ -1,0 +1,65 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "motor_index",
+    hdrs = ["motor_index.h"],
+    deps = [
+        "//software/util/make_enum",
+    ],
+)
+
+cc_library(
+    name = "motor_controller",
+    srcs = [
+        "stspin_motor_controller.cpp",
+    ],
+    hdrs = [
+        "motor_controller.h",
+        "stspin_motor_controller.h",
+    ],
+    # Uses Linux kernel headers (linux/spi/spidev.h); robot-only.
+    target_compatible_with = ["@platforms//os:linux"],
+    deps = [
+        ":motor_fault_indicator",
+        ":motor_index",
+        ":stspin_types",
+        "//proto/message_translation:tbots_protobuf",
+        "//software/embedded:spi_utils",
+        "//software/embedded/gpio",
+        "//software/logger",
+        "//software/physics:euclidean_to_wheel",
+        "@cppcrc",
+    ],
+)
+
+cc_library(
+    name = "motor_fault_indicator",
+    srcs = ["motor_fault_indicator.cpp"],
+    hdrs = ["motor_fault_indicator.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "stspin_types",
+    hdrs = ["stspin_types.h"],
+)
+
+cc_binary(
+    name = "stspin_motor_controller_test",
+    srcs = ["stspin_motor_controller_test.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
+    deps = [
+        ":motor_controller",
+        "//software/logger",
+        "//software/logger:network_logger",
+        "@boost//:program_options",
+    ],
+)

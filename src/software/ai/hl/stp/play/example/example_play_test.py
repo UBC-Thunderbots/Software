@@ -1,14 +1,13 @@
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_enters_region import (
-    NumberOfRobotsEventuallyExitsRegion,
-    NumberOfRobotsEventuallyEntersRegion,
-)
-from software.simulated_tests.validation.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from proto.play_pb2 import PlayName
-from software.simulated_tests.simulated_test_fixture import (
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsEventuallyEntersRegion,
+    NumberOfRobotsEventuallyExitsRegion,
 )
 
 
@@ -47,37 +46,35 @@ def test_example_play(simulated_test_runner):
             ),
         )
 
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
+        )
+        simulated_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.DIRECT, team=SslTeam.BLUE
+        )
+
         simulated_test_runner.set_plays(
-            blue_play=PlayName.ExamplePlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.ExamplePlay, yellow_play=protos.PlayName.HaltPlay
         )
 
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-        )
-        simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.DIRECT, team=Team.BLUE
-        )
+    eventually_validations = [
+        [
+            NumberOfRobotsEventuallyEntersRegion(
+                regions=[tbots_cpp.Circle(ball_initial_pos, 1.15)], req_robot_cnt=6
+            ),
+            NumberOfRobotsEventuallyExitsRegion(
+                regions=[tbots_cpp.Circle(ball_initial_pos, 0.9)], req_robot_cnt=6
+            ),
+        ]
+    ]
 
-    # params just have to be a list of length 1 to ensure the test runs at least once
     simulated_test_runner.run_test(
         setup=setup,
-        params=[0],
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
-            [
-                NumberOfRobotsEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_initial_pos, 1.15)], req_robot_cnt=6
-                ),
-                NumberOfRobotsEventuallyExitsRegion(
-                    regions=[tbots_cpp.Circle(ball_initial_pos, 0.9)], req_robot_cnt=6
-                ),
-            ]
-        ],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=eventually_validations,
+        ag_eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,
     )
 

@@ -1,7 +1,8 @@
-load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("@thunderscope_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -125,7 +126,7 @@ py_library(
     name = "conftest",
     srcs = ["conftest.py"],
     deps = [
-        "//software/field_tests:field_test_fixture",
-        "//software/simulated_tests:simulated_test_fixture",
+        "//software/gameplay_tests:field_test_fixture",
+        "//software/gameplay_tests:simulated_test_fixture",
     ],
 )

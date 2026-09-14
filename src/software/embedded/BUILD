@@ -1,6 +1,34 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 package(default_visibility = ["//visibility:public"])
+
+bool_flag(
+    name = "disable_power_service",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "disable_power_service_enabled",
+    flag_values = {
+        ":disable_power_service": "True",
+    },
+)
+
+bool_flag(
+    name = "disable_motor_service",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "disable_motor_service_enabled",
+    flag_values = {
+        ":disable_motor_service": "True",
+    },
+)
 
 cc_library(
     name = "primitive_executor",
@@ -11,11 +39,22 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
+        "//software/embedded/motion_control:orientation_controller",
+        "//software/embedded/motion_control:position_controller",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/time:duration",
         "//software/world:robot_state",
         "//software/world:team_colour",
+        "@tracy",
+    ],
+)
+
+cc_library(
+    name = "spi_utils",
+    hdrs = ["spi_utils.hpp"],
+    deps = [
+        "//software/logger",
     ],
 )
 
@@ -23,35 +62,26 @@ cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     hdrs = ["thunderloop.h"],
+    local_defines = select({
+        ":disable_power_service_enabled": ["DISABLE_POWER_SERVICE"],
+        "//conditions:default": [],
+    }) + select({
+        ":disable_motor_service_enabled": ["DISABLE_MOTOR_SERVICE"],
+        "//conditions:default": [],
+    }),
     deps = [
         ":primitive_executor",
+        ":robot_localizer",
         "//proto:tbots_cc_proto",
+        "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
         "//software/embedded/services/network",
         "//software/embedded/toml_config",
         "//software/logger:network_logger",
+        "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
-        "//software/util/scoped_timespec_timer",
         "@tracy",
-    ],
-)
-
-cc_library(
-    name = "gpio",
-    srcs = [
-        "gpio_char_dev.cpp",
-        "gpio_sysfs.cpp",
-    ],
-    hdrs = [
-        "gpio.h",
-        "gpio_char_dev.h",
-        "gpio_sysfs.h",
-    ],
-    deps = [
-        "//software/logger",
-        "//software/logger:network_logger",
-        "//software/util/make_enum",
     ],
 )
 
@@ -73,16 +103,42 @@ sh_binary(
     srcs = ["setup_robot_software_deps.sh"],
 )
 
+sh_binary(
+    name = "setup_openocd_deps",
+    srcs = ["setup_openocd_deps.sh"],
+)
+
 filegroup(
     name = "hash_thunderloop_binary",
     srcs = ["hash_thunderloop_binary.sh"],
 )
 
-cc_test(
-    name = "test_battery",
-    srcs = ["battery_test.cpp"],
+cc_library(
+    name = "robot_localizer",
+    srcs = ["robot_localizer.cpp"],
+    hdrs = ["robot_localizer.h"],
     deps = [
-        ":thunderloop",
+        "//proto:tbots_cc_proto",
+        "//proto/primitive:primitive_msg_factory",
+        "//software:constants",
+        "//software/embedded/services:imu",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/sensor_fusion/filter:kalman_filter",
+        "//software/world:robot_state",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "robot_localizer_test",
+    srcs = ["robot_localizer_test.cpp"],
+    deps = [
+        ":robot_localizer",
+        "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
+        "//software/physics:velocity_conversion_util",
     ],
 )

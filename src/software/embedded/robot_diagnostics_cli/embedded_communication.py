@@ -1,12 +1,18 @@
-from proto.import_all_protos import *
-from software.embedded.robot_diagnostics_cli.embedded_data import EmbeddedData
-from google.protobuf.message import Message
-from software.embedded.constants.py_constants import get_estop_config, EstopMode
-from rich.progress import track
-from threading import Thread
-import software.python_bindings as tbots_cpp
-from software.py_constants import *
 import time
+from threading import Thread
+
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from google.protobuf.message import Message
+from rich.progress import track
+from software.embedded.constants.py_constants import EstopMode, get_estop_config
+from software.embedded.robot_diagnostics_cli.embedded_data import EmbeddedData
+from software.py_constants import (
+    FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
+    PRIMITIVE_PORT,
+    ROBOT_STATUS_PORT,
+    getRobotMulticastChannel,
+)
 
 
 class EmbeddedCommunication:
@@ -37,19 +43,29 @@ class EmbeddedCommunication:
             True,
         )
 
-        # initialising the estop
         self.estop_reader = None
         self.should_send_stop = False
-        self.estop_mode, self.estop_path = get_estop_config(
-            keyboard_estop=False, disable_communication=False
-        )
+        self.estop_mode = EstopMode.PHYSICAL_ESTOP
+        self.estop_path = None
 
-        # Always in PHYSICAL_ESTOP mode within CLI
+    def setup_estop(self) -> bool:
+        """Lazily sets up the physical estop reader the first time a command
+        that actuates the robot's electrical/mechanical components is run.
+
+        :return: True if a physical estop is connected and ready, False otherwise
+        """
+        if self.estop_reader is not None:
+            return True
+
         try:
+            self.estop_mode, self.estop_path = get_estop_config(
+                keyboard_estop=False, disable_communication=False
+            )
             self.estop_reader = tbots_cpp.ThreadedEstopReader(self.estop_path, 115200)
             self.__update_estop_state()
-        except Exception as e:
-            raise Exception(f"Invalid Estop found at location {self.estop_path} as {e}")
+            return True
+        except Exception:
+            return False
 
     def __receive_robot_status(self, robot_status: Message) -> None:
         """Updates the dynamic information with the new RobotStatus message.
@@ -74,7 +90,7 @@ class EmbeddedCommunication:
             self.estop_mode != EstopMode.DISABLE_ESTOP
         ) and not self.should_send_stop
 
-    def send_primitive(self, primitive: Primitive) -> None:
+    def send_primitive(self, primitive: protos.Primitive) -> None:
         """Forward Primitive protos from diagnostics to the robots."""
         primitive.sequence_number = self.sequence_number
         primitive.time_sent.epoch_timestamp_seconds = time.time()
@@ -93,7 +109,7 @@ class EmbeddedCommunication:
         else:
             self.should_send_stop = True
 
-    def run_primitive(self, diagnostics_primitive: Primitive) -> None:
+    def run_primitive(self, diagnostics_primitive: protos.Primitive) -> None:
         """Wrapper class that forwards Primitive protos from diagnostics to the robots.
 
         If the emergency stop is tripped, the Primitive will not be sent so
@@ -106,7 +122,7 @@ class EmbeddedCommunication:
             self.send_primitive(diagnostics_primitive)
 
     def run_primitive_over_time(
-        self, duration_seconds: float, primitive: Primitive, description: str
+        self, duration_seconds: float, primitive: protos.Primitive, description: str
     ) -> None:
         """Executes a primitive synchronously for the specified amount of time in the console.
         :param duration_seconds: Duration to execute in seconds
@@ -123,7 +139,8 @@ class EmbeddedCommunication:
     def __broadcast_fullsystem_ip(self) -> None:
         while self.running:
             self.fullsystem_ip_broadcaster.send_proto(
-                IpNotification(ip_address=EmbeddedCommunication.LOCALHOST_IP), True
+                protos.IpNotification(ip_address=EmbeddedCommunication.LOCALHOST_IP),
+                True,
             )
             time.sleep(1.0 / EmbeddedCommunication.BROADCAST_HZ)
 

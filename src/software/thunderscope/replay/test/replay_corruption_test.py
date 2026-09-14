@@ -12,21 +12,21 @@ Steps to test:
     3. we check to see if there are uncaught exception. If there are, we know for sure proto player wouldn't work!
 """
 
-import time
-from typing import Callable
-import random
-import shutil
+import base64
 import gzip
 import os
-from proto.import_all_protos import *
-from google.protobuf.message import Message
-import base64
-from software.py_constants import *
+import random
+import shutil
+import time
+from typing import Callable
 
+import proto.import_all_protos as protos
+from google.protobuf.message import Message
+from software.gameplay_tests.simulated_test_fixture import pytest_main
+from software.py_constants import REPLAY_METADATA_DELIMITER
 from software.thunderscope.constants import ProtoPlayerFlags
-from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.simulated_tests.simulated_test_fixture import pytest_main
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 random.seed(0)
 
@@ -39,7 +39,7 @@ def create_random_proto() -> Message:
 
     :return: the proto that we are referencing
     """
-    some_random_proto = RobotId(id=1, team=2)
+    some_random_proto = protos.RobotId(id=1, team=2)
     return some_random_proto
 
 

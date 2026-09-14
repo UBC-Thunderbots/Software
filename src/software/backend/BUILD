@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -14,7 +16,6 @@ cc_library(
 )
 
 cc_library(
-    # TODO (#2510) Rename to SimulatorBackend
     name = "unix_simulator_backend",
     srcs = ["unix_simulator_backend.cpp"],
     hdrs = ["unix_simulator_backend.h"],

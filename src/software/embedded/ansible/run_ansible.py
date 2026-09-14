@@ -1,15 +1,15 @@
+import argparse
+import os
+import subprocess
+
 from ansible import context
 from ansible.cli import CLI
-from ansible.module_utils.common.collections import ImmutableDict
 from ansible.executor.playbook_executor import PlaybookExecutor
-from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
-from ansible.vars.manager import VariableManager
+from ansible.module_utils.common.collections import ImmutableDict
+from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.loader import init_plugin_loader
-
-import os
-import argparse
-import subprocess
+from ansible.vars.manager import VariableManager
 
 # Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
 # documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
@@ -29,9 +29,14 @@ def ansible_runner(playbook: str, options: dict = {}):
 
     # parse options
     vars = set(options.get("extra_vars", []))
+    if "BUILD_WORKSPACE_DIRECTORY" in os.environ:
+        vars.add(f"workspace_dir={os.environ['BUILD_WORKSPACE_DIRECTORY']}")
+
+    ssh_pass = options.get("ssh_pass", "")
+    vars.add(f"ansible_sudo_pass={ssh_pass}")
+
     tags = set(options.get("tags", {}))
     skip_tags = set(options.get("skip_tags", {}))
-    ssh_pass = options.get("ssh_pass", "")
 
     hosts = set(options.get("hosts", []))
     host_aliases = hosts.copy()
@@ -105,7 +110,13 @@ def ansible_runner(playbook: str, options: dict = {}):
         passwords={"conn_pass": ssh_pass, "become_pass": ssh_pass},
     )
 
-    pbex.run()
+    try:
+        pbex.run()
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        raise e
 
 
 def main():

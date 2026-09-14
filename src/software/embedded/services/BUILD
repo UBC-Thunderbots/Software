@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -7,13 +9,13 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
-        "//software/embedded:gpio",
-        "//software/embedded/constants",
+        "//software/embedded/gpio",
+        "//software/embedded/motor_controller",
+        "//software/embedded/motor_controller:motor_fault_indicator",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
-        "//software/util/scoped_timespec_timer",
         "@eigen",
-        "@trinamic",
+        "@tracy",
     ],
 )
 
@@ -28,24 +30,23 @@ cc_library(
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
         "@boost//:filesystem",
+        "@tracy",
     ],
 )
 
-cc_binary(
-    name = "robot_auto_test",
-    srcs = ["robot_auto_test.cpp"],
-    linkopts = [
-        "-lpthread",
-        "-lrt",
-    ],
+cc_library(
+    name = "imu",
+    srcs = ["imu.cpp"],
+    hdrs = ["imu.h"],
+    # Uses Linux kernel headers (linux/i2c-dev.h); robot-only.
+    target_compatible_with = ["@platforms//os:linux"],
     deps = [
-        ":motor",
-        ":power",
-        "//proto/message_translation:tbots_geometry",
-        "//proto/primitive:primitive_msg_factory",
-        "//shared:robot_constants",
-        "//software/embedded:primitive_executor",
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
         "//software/logger",
-        "@trinamic",
+        "@eigen",
+        "@tracy",
     ],
 )

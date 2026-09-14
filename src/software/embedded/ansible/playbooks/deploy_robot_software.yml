@@ -36,13 +36,7 @@
     - name: Start Flash Process
       block:
         - name: Stop Services
-          become: true
-          become_method: ansible.builtin.sudo
-          ansible.builtin.systemd:
-            name: "{{ service_name }}"
-            masked: false
-            daemon_reload: true
-            state: stopped
+          ansible.builtin.include_tasks: ../tasks/stop_service.yml
           with_items: "{{ services }}"
           loop_control:
             loop_var: service_name
@@ -97,13 +91,7 @@
             force: true
 
         - name: Start Services
-          become: true
-          become_method: ansible.builtin.sudo
-          ansible.builtin.systemd:
-            name: "{{ service_name }}"
-            masked: false
-            daemon_reload: true
-            state: started
+          ansible.builtin.include_tasks: ../tasks/start_service.yml
           with_items: "{{ services }}"
           loop_control:
             loop_var: service_name

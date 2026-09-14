@@ -1,11 +1,6 @@
-package(default_visibility = ["//visibility:public"])
+load("@rules_python//python:defs.bzl", "py_library")
 
-cc_library(
-    name = "constants",
-    hdrs = [
-        "constants.h",
-    ],
-)
+package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "py_constants",

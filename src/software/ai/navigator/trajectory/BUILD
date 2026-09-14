@@ -1,8 +1,11 @@
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = [
     "//software/ai:__subpackages__",
-    "//software/simulated_tests:__subpackages__",
+    "//software/gameplay_tests:__subpackages__",
 ])
 
 cc_library(
@@ -153,11 +156,10 @@ cc_test(
 py_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.py"],
-    tags = ["exclusive"],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software:conftest",
-        "//software/simulated_tests/validation:validations",
+        "//software/gameplay_tests/validation:validations",
         requirement("pytest"),
     ],
 )

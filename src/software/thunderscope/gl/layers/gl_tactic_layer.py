@@ -1,22 +1,21 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-
 import textwrap
+from typing import override
 
-from proto.import_all_protos import *
-from software.py_constants import *
+import proto.import_all_protos as protos
+import pyqtgraph.opengl as gl
+from pyqtgraph.Qt import QtGui
+from software.py_constants import (
+    ROBOT_MAX_HEIGHT_METERS,
+    ROBOT_MAX_RADIUS_METERS,
+)
 from software.thunderscope.constants import (
+    THUNDERSCOPE_UI_FONT_NAME,
     Colors,
     DepthValues,
-    THUNDERSCOPE_UI_FONT_NAME,
 )
-
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLTacticLayer(GLLayer):
@@ -32,9 +31,9 @@ class GLTacticLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
-        self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
-        self.cached_world = World()
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
+        self.play_info_buffer = ThreadSafeBuffer(buffer_size, protos.PlayInfo, False)
+        self.cached_world = protos.World()
 
         self.tactic_fsm_info_graphics = ObservableList(self._graphics_changed)
 
@@ -46,7 +45,7 @@ class GLTacticLayer(GLLayer):
 
         self.__update_tactic_name_graphics(self.cached_world.friendly_team, play_info)
 
-    def __update_tactic_name_graphics(self, team: Team, play_info) -> None:
+    def __update_tactic_name_graphics(self, team: protos.Team, play_info) -> None:
         """Update the GLGraphicsItems that display tactic data
 
         :param team: The team proto
@@ -57,7 +56,7 @@ class GLTacticLayer(GLLayer):
         # Ensure we have the same number of graphics as robots
         self.tactic_fsm_info_graphics.resize(
             len(team.team_robots),
-            lambda: GLTextItem(
+            lambda: gl.GLTextItem(
                 font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                 color=Colors.SECONDARY_TEXT_COLOR,
             ),

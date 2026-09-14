@@ -1,9 +1,12 @@
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-from software.simulated_tests.validation.robot_speed_threshold import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.robot_speed_threshold import (
+    RobotSpeedEventuallyBelowThreshold,
 )
 
 
@@ -45,10 +48,10 @@ def test_halt_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.UNKNOWN
         )
 
     # params just have to be a list of length 1 to ensure the test runs at least once
@@ -64,8 +67,8 @@ def test_halt_play(simulated_test_runner):
             [RobotSpeedEventuallyBelowThreshold(1e-3)]
         ],
         ci_cmd_with_delay=[
-            (3, Command.Type.HALT, Team.BLUE),
-            (3, Command.Type.HALT, Team.YELLOW),
+            (3, protos.Command.Type.HALT, SslTeam.BLUE),
+            (3, protos.Command.Type.HALT, SslTeam.YELLOW),
         ],
         test_timeout_s=10,
     )

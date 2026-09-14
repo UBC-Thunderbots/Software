@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 # We force linking for all plays so that the static variables required for the
@@ -34,21 +37,5 @@ cc_test(
         ":penalty_kick_play",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-    ],
-)
-
-cc_test(
-    name = "penalty_kick_play_test",
-    srcs = ["penalty_kick_play_test.cpp"],
-    deps = [
-        ":penalty_kick_play",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )

@@ -1,13 +1,21 @@
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-from software.simulated_tests.validation.friendly_team_scored import *
-from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.friendly_has_ball_possession import *
-from software.simulated_tests.validation.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
+)
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallAlwaysStaysInRegion,
+)
+from software.gameplay_tests.validation.excessive_dribbling import (
+    NeverExcessivelyDribbles,
+)
+from software.gameplay_tests.validation.friendly_has_ball_possession import (
+    FriendlyAlwaysHasBallPossession,
+)
+from software.gameplay_tests.validation.friendly_team_scored import (
+    FriendlyTeamEventuallyScored,
 )
 
 
@@ -47,14 +55,14 @@ def test_offense_play(simulated_test_runner):
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.OffensePlay, yellow_play=PlayName.HaltPlay
+            blue_play=protos.PlayName.OffensePlay, yellow_play=protos.PlayName.HaltPlay
         )
 
     field = tbots_cpp.Field.createSSLDivisionBField()

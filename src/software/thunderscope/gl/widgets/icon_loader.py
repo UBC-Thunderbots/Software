@@ -1,5 +1,6 @@
-from pyqtgraph.Qt import QtGui
 import os
+
+from pyqtgraph.Qt import QtGui
 
 
 def get_icon(path: os.PathLike, color: str = None) -> QtGui.QPixmap:

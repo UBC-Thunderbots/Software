@@ -17,13 +17,11 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
-                                   const RobotConstants_t& robot_constants,
+                                   const robot_constants::RobotConstants& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping,
-                                   double primitive_executor_time_step)
+                                   const bool ramping)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
-      primitive_executor_time_step_s(primitive_executor_time_step),
       frame_number(0),
       euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
@@ -56,7 +54,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     std::string config_str = config_ss.str();
 
     google::protobuf::TextFormat::Parser parser;
-    parser.ParseFromString(config_str, &er_force_sim_setup);
+    std::ignore  = parser.ParseFromString(config_str, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
@@ -132,13 +130,15 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
     {
         setBallState(createBallState(world_state.ball_state()));
     }
-    if (world_state.blue_robots().size() > 0)
+
+    if (world_state.has_blue_robots())
     {
-        setRobots(world_state.blue_robots(), gameController::Team::BLUE);
+        setRobots(world_state.blue_robots().robot_states(), gameController::Team::BLUE);
     }
-    if (world_state.yellow_robots().size() > 0)
+    if (world_state.has_yellow_robots())
     {
-        setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
+        setRobots(world_state.yellow_robots().robot_states(),
+                  gameController::Team::YELLOW);
     }
 }
 
@@ -280,16 +280,14 @@ void ErForceSimulator::setRobots(
     {
         if (side == gameController::Team::BLUE)
         {
-            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants,
-                TeamColour::BLUE, id);
+            auto robot_primitive_executor =
+                std::make_shared<PrimitiveExecutor>(robot_constants, id);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants,
-                TeamColour::YELLOW, id);
+            auto robot_primitive_executor =
+                std::make_shared<PrimitiveExecutor>(robot_constants, id);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
@@ -299,19 +297,18 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
-    auto sim_state                   = getSimulatorState();
-    const auto& sim_robots           = sim_state.yellow_robots();
-    const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
+    auto sim_state         = getSimulatorState();
+    const auto& sim_robots = sim_state.yellow_robots();
+    const auto robot_map =
+        getRobotIdToRobotStateMap(sim_robots, gameController::Team::YELLOW);
 
-    yellow_team_world_msg               = std::move(world_msg);
-    const TbotsProto::World world_proto = *yellow_team_world_msg;
+    yellow_team_world_msg = std::move(world_msg);
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        if (robot_to_vel_pair_map.contains(robot_id))
+        if (robot_map.contains(robot_id))
         {
-            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, local_vel, angular_vel);
+                              robot_map.at(robot_id));
         }
     }
 }
@@ -320,20 +317,18 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
-    auto sim_state                   = getSimulatorState();
-    const auto& sim_robots           = sim_state.blue_robots();
-    const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
+    auto sim_state         = getSimulatorState();
+    const auto& sim_robots = sim_state.blue_robots();
+    const auto robot_map =
+        getRobotIdToRobotStateMap(sim_robots, gameController::Team::BLUE);
 
-    blue_team_world_msg                 = std::move(world_msg);
-    const TbotsProto::World world_proto = *blue_team_world_msg;
-
+    blue_team_world_msg = std::move(world_msg);
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        if (robot_to_vel_pair_map.contains(robot_id))
+        if (robot_map.contains(robot_id))
         {
-            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
             setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                              world_proto, local_vel, angular_vel);
+                              robot_map.at(robot_id));
         }
     }
 }
@@ -342,18 +337,17 @@ void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg, const Vector& local_velocity,
-    const AngularVelocity angular_velocity)
+    const RobotState& robot_state)
 {
-    // Set to NEG_X because the world msg in this simulator is normalized
-    // correctly
     auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);
 
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
-        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
-        primitive_executor->updateVelocity(local_velocity, angular_velocity);
+        TbotsProto::RobotStatus robot_status;
+        primitive_executor->updateRobotState(robot_state);
+        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id),
+                                            robot_status);
     }
     else
     {
@@ -365,41 +359,62 @@ void ErForceSimulator::setRobotPrimitive(
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
-    const TbotsProto::World& world_msg, gameController::Team side)
+    const TbotsProto::World& world_msg, const Duration& time_step,
+    gameController::Team side)
 {
     SSLSimulationProto::RobotControl robot_control;
 
-    auto sim_state = getSimulatorState();
-    std::map<RobotId, std::pair<Vector, Angle>> current_velocity_map;
-    if (side == gameController::Team::BLUE)
-    {
-        const auto& sim_robots = sim_state.blue_robots();
-        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots);
-    }
-    else
-    {
-        const auto& sim_robots = sim_state.yellow_robots();
-        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots);
-    }
+    auto sim_state         = getSimulatorState();
+    const auto& sim_robots = (side == gameController::Team::BLUE)
+                                 ? sim_state.blue_robots()
+                                 : sim_state.yellow_robots();
+    const auto robot_map   = getRobotIdToRobotStateMap(sim_robots, side);
 
-    for (auto& primitive_executor_with_id : robot_primitive_executor_map)
+    for (auto& [robot_id, primitive_executor] : robot_primitive_executor_map)
     {
-        unsigned int robot_id    = primitive_executor_with_id.first;
-        auto& primitive_executor = primitive_executor_with_id.second;
         std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control;
 
-        TbotsProto::PrimitiveExecutorStatus status;  // Added for compilation
+        TbotsProto::RobotStatus robot_status;
         if (ramping)
         {
-            auto direct_control_no_ramp = primitive_executor->stepPrimitive(status);
-            direct_control              = getRampedVelocityPrimitive(
-                             current_velocity_map.at(robot_id).first,
-                             current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
-                             primitive_executor_time_step_s);
+            auto direct_control_no_ramp =
+                primitive_executor->stepPrimitive(robot_status, time_step);
+
+            auto* prev_ramp_velocities = &yellow_prev_ramp_velocities;
+            if (side == gameController::Team::BLUE)
+            {
+                prev_ramp_velocities = &blue_prev_ramp_velocities;
+            }
+            auto prev_it = prev_ramp_velocities->find(robot_id);
+            if (prev_it == prev_ramp_velocities->end())
+            {
+                LocalVelocity seed{Vector(0, 0), AngularVelocity::zero()};
+                auto robot_state_it = robot_map.find(robot_id);
+                if (robot_state_it != robot_map.end())
+                {
+                    seed = LocalVelocity{robot_state_it->second.localVelocity(),
+                                         robot_state_it->second.angularVelocity()};
+                }
+                prev_it = prev_ramp_velocities->insert({robot_id, seed}).first;
+            }
+
+            direct_control = getRampedVelocityPrimitive(
+                prev_it->second.linear, prev_it->second.angular, direct_control_no_ramp,
+                time_step);
+
+            // Persist the ramped command as the setpoint to ramp from next tick.
+            const auto& ramped =
+                direct_control->motor_control().direct_velocity_control();
+            prev_it->second =
+                LocalVelocity{Vector(ramped.velocity().x_component_meters(),
+                                     ramped.velocity().y_component_meters()),
+                              AngularVelocity::fromRadians(
+                                  ramped.angular_velocity().radians_per_second())};
         }
         else
         {
-            direct_control = primitive_executor->stepPrimitive(status);
+            direct_control = std::make_unique<TbotsProto::DirectControlPrimitive>(
+                primitive_executor->stepPrimitive(robot_status, time_step));
         }
 
         auto command = *getRobotCommandFromDirectControl(
@@ -413,16 +428,15 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive>
 ErForceSimulator::getRampedVelocityPrimitive(
     const Vector current_local_velocity,
     const AngularVelocity current_local_angular_velocity,
-    TbotsProto::DirectControlPrimitive& target_velocity_primitive,
-    const double& time_to_ramp)
+    TbotsProto::DirectControlPrimitive& target_velocity_primitive, Duration time_to_ramp)
 {
     TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
         target_velocity_primitive.motor_control().direct_velocity_control();
 
     // getting the target wheel velocity
     EuclideanSpace_t target_euclidean_velocity = {
-        -direct_velocity.velocity().y_component_meters(),
         direct_velocity.velocity().x_component_meters(),
+        direct_velocity.velocity().y_component_meters(),
         direct_velocity.angular_velocity().radians_per_second()};
 
     WheelSpace_t target_wheel_velocity =
@@ -430,14 +444,14 @@ ErForceSimulator::getRampedVelocityPrimitive(
 
     // getting the current wheel velocity
     EuclideanSpace_t current_euclidean_velocity = {
-        -current_local_velocity.y(), current_local_velocity.x(),
+        current_local_velocity.x(), current_local_velocity.y(),
         current_local_angular_velocity.toRadians()};
 
     WheelSpace_t current_wheel_velocity =
         euclidean_to_four_wheel.getWheelVelocity(current_euclidean_velocity);
 
     WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp.toSeconds());
 
     EuclideanSpace_t ramped_euclidean =
         euclidean_to_four_wheel.getEuclideanVelocity(ramped_four_wheel);
@@ -445,7 +459,7 @@ ErForceSimulator::getRampedVelocityPrimitive(
     auto mutable_direct_velocity = target_velocity_primitive.mutable_motor_control()
                                        ->mutable_direct_velocity_control();
     *(mutable_direct_velocity->mutable_velocity()) =
-        *createVectorProto({ramped_euclidean[1], -ramped_euclidean[0]});
+        *createVectorProto({ramped_euclidean[0], ramped_euclidean[1]});
     *(mutable_direct_velocity->mutable_angular_velocity()) =
         *createAngularVelocityProto(AngularVelocity::fromRadians(ramped_euclidean[2]));
 
@@ -459,10 +473,11 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,
-                              gameController::Team::YELLOW);
+                              time_step, gameController::Team::YELLOW);
 
-    SSLSimulationProto::RobotControl blue_robot_control = updateSimulatorRobots(
-        blue_primitive_executor_map, *blue_team_world_msg, gameController::Team::BLUE);
+    SSLSimulationProto::RobotControl blue_robot_control =
+        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg,
+                              time_step, gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
@@ -564,18 +579,28 @@ void ErForceSimulator::resetCurrentTime()
     current_time = Timestamp::fromSeconds(0);
 }
 
-std::map<RobotId, std::pair<Vector, AngularVelocity>>
-ErForceSimulator::getRobotIdToLocalVelocityMap(
-    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots)
+std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
+    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots,
+    gameController::Team side)
 {
-    std::map<RobotId, std::pair<Vector, AngularVelocity>> robot_to_local_velocity;
+    std::map<RobotId, RobotState> robot_map;
     for (const auto& sim_robot : sim_robots)
     {
-        const Vector local_vel =
-            globalToLocalVelocity(Vector(sim_robot.v_x(), sim_robot.v_y()),
-                                  Angle::fromRadians(sim_robot.angle()));
-        const AngularVelocity angular_vel       = Angle::fromRadians(sim_robot.r_z());
-        robot_to_local_velocity[sim_robot.id()] = {local_vel, angular_vel};
+        auto position         = Point(sim_robot.p_x(), sim_robot.p_y());
+        auto velocity         = Vector(sim_robot.v_x(), sim_robot.v_y());
+        auto orientation      = Angle::fromRadians(sim_robot.angle());
+        auto angular_velocity = AngularVelocity::fromRadians(sim_robot.r_z());
+
+        if (side == gameController::Team::YELLOW)
+        {
+            position = -position;
+            velocity = -velocity;
+            orientation += Angle::half();
+            // angular_velocity is the same no matter which side
+        }
+
+        robot_map[sim_robot.id()] =
+            RobotState(position, velocity, orientation, angular_velocity);
     }
-    return robot_to_local_velocity;
+    return robot_map;
 }

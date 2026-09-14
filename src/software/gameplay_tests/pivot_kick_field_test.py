@@ -1,0 +1,50 @@
+import math
+
+import proto.import_all_protos as protos
+from software.gameplay_tests.field_test_fixture import (
+    WORLD_BUFFER_TIMEOUT,
+)
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
+from software.logger.logger import create_logger
+
+logger = create_logger(__name__)
+
+
+def test_pivot_kick(field_test_runner):
+    id = 5
+
+    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    print("Here are the robots:")
+    print(
+        [
+            robot.current_state.global_position
+            for robot in world.friendly_team.team_robots
+        ]
+    )
+
+    field_test_runner.set_tactics(
+        blue_tactics={
+            id: protos.PivotKickTactic(
+                kick_origin=protos.Point(x_meters=-1.13, y_meters=0.75),
+                kick_direction=protos.Angle(radians=-math.pi / 2),
+                auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=5.0),
+            )
+        },
+        yellow_tactics=None,
+    )
+    field_test_runner.run_test(
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
+        test_timeout_s=15,
+    )
+
+    # Send a halt tactic after the test finishes
+    field_test_runner.set_tactics(
+        blue_tactics={id: protos.HaltTactic()}, yellow_tactics=None
+    )
+
+
+if __name__ == "__main__":
+    pytest_main(__file__)

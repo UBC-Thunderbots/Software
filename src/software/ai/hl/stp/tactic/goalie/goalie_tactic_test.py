@@ -1,18 +1,21 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
-from software.simulated_tests.validation.robot_enters_region import *
-from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.ball_moves_in_direction import *
-from software.simulated_tests.validation.friendly_has_ball_possession import *
-from software.simulated_tests.validation.ball_speed_threshold import *
-from software.simulated_tests.validation.robot_speed_threshold import *
-from software.simulated_tests.validation.excessive_dribbling import *
-from software.simulated_tests.simulated_test_fixture import (
+from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallEventuallyExitsRegion,
+    BallNeverEntersRegion,
+)
+from software.gameplay_tests.validation.excessive_dribbling import (
+    NeverExcessivelyDribbles,
+)
+from software.gameplay_tests.validation.robot_enters_region import (
+    RobotEventuallyEntersRegion,
+    RobotNeverEntersRegion,
+)
 
 
 @pytest.mark.parametrize(
@@ -126,8 +129,8 @@ def test_goalie_blocks_shot(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: GoalieTactic(
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                0: protos.GoalieTactic(
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
                 )
             }
         )
@@ -207,8 +210,8 @@ def test_goalie_clears_from_dead_zone(
 
         simulated_test_runner.set_tactics(
             blue_tactics={
-                0: GoalieTactic(
-                    max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT
+                0: protos.GoalieTactic(
+                    max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT
                 )
             }
         )

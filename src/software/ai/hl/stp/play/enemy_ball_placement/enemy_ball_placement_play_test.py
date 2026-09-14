@@ -1,13 +1,14 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-from software.simulated_tests.validation.robot_enters_placement_region import *
-from software.simulated_tests.simulated_test_fixture import (
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
     pytest_main,
 )
-from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from software.gameplay_tests.validation.robot_enters_placement_region import (
+    RobotNeverEntersPlacementRegion,
+)
 
 
 @pytest.mark.parametrize(
@@ -55,17 +56,17 @@ def test_two_ai_ball_placement(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.BALL_PLACEMENT,
-            team=Team.YELLOW,
+            gc_command=protos.Command.Type.BALL_PLACEMENT,
+            team=SslTeam.YELLOW,
             final_ball_placement_point=ball_placement_point,
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.EnemyBallPlacementPlay,
-            yellow_play=PlayName.BallPlacementPlay,
+            blue_play=protos.PlayName.EnemyBallPlacementPlay,
+            yellow_play=protos.PlayName.BallPlacementPlay,
         )
 
     always_validation_sequence_set = [

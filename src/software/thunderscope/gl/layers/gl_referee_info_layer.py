@@ -1,19 +1,23 @@
-from PyQt6 import QtGui
-from pyqtgraph.opengl.items.GLTextItem import GLTextItem
+from typing import override
 
-from proto.import_all_protos import *
-from software.py_constants import *
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
+from pyqtgraph.opengl.items.GLTextItem import GLTextItem
+from pyqtgraph.Qt import QtGui
+from software.py_constants import (
+    BALL_PLACEMENT_ROBOT_AVOID_RADIUS_METERS,
+    BALL_PLACEMENT_TIME_LIMIT_S,
+    BALL_PLACEMENT_TOLERANCE_RADIUS_METERS,
+)
 from software.thunderscope.constants import (
-    DepthValues,
-    Colors,
     THUNDERSCOPE_UI_FONT_NAME,
+    Colors,
+    DepthValues,
 )
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_label import GLLabel
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from typing import override
 
 
 class GLRefereeInfoLayer(GLLayer):
@@ -42,11 +46,11 @@ class GLRefereeInfoLayer(GLLayer):
         """
         super().__init__(name)
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
-        self.referee_vis_buffer = ThreadSafeBuffer(buffer_size, Referee)
+        self.referee_vis_buffer = ThreadSafeBuffer(buffer_size, protos.Referee)
         self.ball_placement_vis_buffer = ThreadSafeBuffer(
-            buffer_size, BallPlacementVisualization
+            buffer_size, protos.BallPlacementVisualization
         )
-        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.world_buffer = ThreadSafeBuffer(buffer_size, protos.World)
 
         self.cached_world = None
         self.cached_referee_info = None
@@ -119,12 +123,12 @@ class GLRefereeInfoLayer(GLLayer):
 
         self.gamestate_type_text.set_text(
             GLRefereeInfoLayer.GAMESTATE_PREFIX
-            + Referee.Stage.Name(referee_proto.stage)
+            + protos.Referee.Stage.Name(referee_proto.stage)
         )
 
         self.command_type_text.set_text(
             GLRefereeInfoLayer.REFEREE_COMMAND_PREFIX
-            + Referee.Command.Name(referee_proto.command)
+            + protos.Referee.Command.Name(referee_proto.command)
         )
 
     @override
@@ -135,7 +139,7 @@ class GLRefereeInfoLayer(GLLayer):
         self.__update_referee_info()
         self.__update_ball_placement()
 
-    def __update_ball_placement_status(self, ball_state: BallState) -> None:
+    def __update_ball_placement_status(self, ball_state: protos.BallState) -> None:
         """Update ball placement circle color corresponding to ball position.
         If the ball lies inside the tolerance circle, the circle will be green, otherwise red.
         :param ball_state: state of the ball
@@ -175,7 +179,9 @@ class GLRefereeInfoLayer(GLLayer):
             )
             self.ball_placement_countdown_graphic.setData(text=f"{time_left}s")
 
-    def __display_ball_placement_visuals(self, new_placement_point: Point) -> None:
+    def __display_ball_placement_visuals(
+        self, new_placement_point: protos.Point
+    ) -> None:
         """Display ball placement visuals
         :param new_placement_point: ball placement point
         """

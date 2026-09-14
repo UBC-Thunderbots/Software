@@ -1,0 +1,88 @@
+from typing import override
+
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from software.gameplay_tests.validation.speed_threshold_helpers import (
+    get_ball_speed,
+    get_current_ball_angle,
+    get_current_ball_position,
+    get_validation_centre_position,
+    get_validation_line_endpoints,
+)
+from software.gameplay_tests.validation.validation import (
+    Validation,
+    create_validation_geometry,
+    create_validation_types,
+)
+
+
+class BallSpeedThreshold(Validation):
+    """Checks if the ball speed is at or above some threshold."""
+
+    def __init__(self, speed_threshold):
+        """Constructor
+
+        :param speed_threshold: The speed threshold in m/s
+        """
+        self.speed_threshold = speed_threshold
+
+    @override
+    def get_validation_status(self, world) -> protos.ValidationStatus:
+        """Checks if the ball speed is at or above some threshold
+
+        :param world: The world msg to validate
+        :return: FAILING if the ball speed is below some threshold
+                 PASSING if the ball speed is at or above some threshold
+        """
+        if (
+            tbots_cpp.createVector(world.ball.current_state.global_velocity).length()
+            >= self.speed_threshold
+        ):
+            return protos.ValidationStatus.PASSING
+
+        return protos.ValidationStatus.FAILING
+
+    @override
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
+        """(override) shows regions to enter"""
+        if get_ball_speed(world.ball) == 0:
+            return create_validation_geometry([])
+
+        ball_x, ball_y = get_current_ball_position(world.ball)
+        ball_angle = get_current_ball_angle(world.ball)
+
+        validation_centre_x, validation_centre_y = get_validation_centre_position(
+            ball_x, ball_y, self.speed_threshold, ball_angle
+        )
+
+        (
+            validation_start_x,
+            validation_end_x,
+            validation_start_y,
+            validation_end_y,
+        ) = get_validation_line_endpoints(
+            validation_centre_x, validation_centre_y, ball_angle
+        )
+
+        return create_validation_geometry(
+            [
+                tbots_cpp.Segment(
+                    tbots_cpp.Point(validation_start_x, validation_start_y),
+                    tbots_cpp.Point(validation_end_x, validation_end_y),
+                )
+            ]
+        )
+
+    @override
+    def __repr__(self):
+        return "Check that the ball speed is at or above above " + str(
+            self.speed_threshold
+        )
+
+
+(
+    BallSpeedEventuallyAtOrAboveThreshold,
+    BallSpeedEventuallyBelowThreshold,
+    BallSpeedAlwaysAtOrAboveThreshold,
+    BallSpeedAlwaysBelowThreshold,
+) = create_validation_types(BallSpeedThreshold)

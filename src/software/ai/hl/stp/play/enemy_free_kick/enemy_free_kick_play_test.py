@@ -1,20 +1,18 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-from proto.play_pb2 import PlayName
-
-from software.simulated_tests.validation.or_validation import OrValidation
-
-from software.simulated_tests.validation.friendly_team_scored import *
-from software.simulated_tests.validation.ball_enters_region import *
-from software.simulated_tests.validation.robot_enters_region import (
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.simulated_test_fixture import (
+    pytest_main,
+)
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallNeverEntersRegion,
+)
+from software.gameplay_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
-)
-from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
-from software.simulated_tests.simulated_test_fixture import (
-    pytest_main,
 )
 
 
@@ -92,10 +90,6 @@ from software.simulated_tests.simulated_test_fixture import (
         ),
     ],
 )
-# TODO: #3503
-@pytest.mark.skip(
-    "Disabling this test because OrValidation is passed both an always validation and eventually validation"
-)
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
@@ -110,25 +104,26 @@ def test_enemy_free_kick_play(
         )
 
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         simulated_test_runner.send_gamecontroller_command(
-            gc_command=Command.Type.DIRECT, team=Team.YELLOW
+            gc_command=protos.Command.Type.DIRECT, team=SslTeam.YELLOW
         )
 
         simulated_test_runner.set_plays(
-            blue_play=PlayName.EnemyFreeKickPlay, yellow_play=PlayName.FreeKickPlay
+            blue_play=protos.PlayName.EnemyFreeKickPlay,
+            yellow_play=protos.PlayName.FreeKickPlay,
         )
 
-    # Always Validation
+    # Validation RoboCup SSL rules: can't be within 0.5m of ball before its kicked
     always_validation_sequence_set = [
         [
             OrValidation(
                 [
                     RobotNeverEntersRegion(
-                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+                        regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]
                     ),
-                    BallEventuallyExitsRegion(
+                    BallNeverEntersRegion(
                         regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
                     ),
                 ]

@@ -1,13 +1,12 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
 from typing import Optional
 
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
 from software.thunderscope.constants import Colors
 
 
-class GLSphere(GLMeshItem):
+class GLSphere(gl.GLMeshItem):
     """Displays a 3D sphere"""
 
     def __init__(
@@ -45,7 +44,7 @@ class GLSphere(GLMeshItem):
             return
 
         self.radius = radius
-        self.setMeshData(meshdata=MeshData.sphere(rows, cols, self.radius))
+        self.setMeshData(meshdata=gl.MeshData.sphere(rows, cols, self.radius))
 
     def set_position(self, x: float, y: float, z: float) -> None:
         """Set the position of the graphic in the scene

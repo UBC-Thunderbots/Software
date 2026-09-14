@@ -1,16 +1,14 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.py_constants import ROBOT_MAX_HEIGHT_METERS
-from software.thunderscope.constants import Colors, LINE_WIDTH
-
 from typing import Optional
 
 import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.py_constants import ROBOT_MAX_HEIGHT_METERS
+from software.thunderscope.constants import LINE_WIDTH, Colors
 
 
-class GLGoal(GLMeshItem):
+class GLGoal(gl.GLMeshItem):
     """Displays a 3D mesh representing the goal"""
 
     def __init__(
@@ -33,14 +31,14 @@ class GLGoal(GLMeshItem):
 
         # The 3D mesh isn't visible from the orthographic view, so
         # we need to draw an outline of the goal on the ground
-        self.goal_outline = GLLinePlotItem(
+        self.goal_outline = gl.GLLinePlotItem(
             parentItem=self, color=color, width=LINE_WIDTH
         )
 
         # Need to give goal some default meshdata; otherwise, pyqtgraph
         # tries calculating some stuff using invalid vertices/faces and
         # runs into "NoneType object is not subscriptable" errors
-        self.setMeshData(meshdata=MeshData.sphere(1, 1))
+        self.setMeshData(meshdata=gl.MeshData.sphere(1, 1))
 
     def set_dimensions(self, x_length: float, y_length: float) -> None:
         """Set the dimensions of the goal
@@ -91,7 +89,7 @@ class GLGoal(GLMeshItem):
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
 
-    def __get_mesh_data(self, x_length: float, y_length: float) -> MeshData:
+    def __get_mesh_data(self, x_length: float, y_length: float) -> gl.MeshData:
         """Return a MeshData instance with vertices and faces computed
         for a mesh representing the goal
 
@@ -125,7 +123,7 @@ class GLGoal(GLMeshItem):
             [7, 3, 1],
         ]
 
-        return MeshData(
+        return gl.MeshData(
             vertexes=np.array(vertices),
             faces=np.array(faces),
         )

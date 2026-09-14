@@ -7,6 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#define CHECK_VERSION(v) (CURRENT_ROBOT_VERSION == v)
+
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
@@ -20,10 +22,15 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
     {12, "ff02::c3d0:42d2:bb12"}, {13, "ff02::c3d0:42d2:bb13"},
     {14, "ff02::c3d0:42d2:bb14"}, {15, "ff02::c3d0:42d2:bb15"}};
 
+// the name of the loopback network interface, which differs across platforms
+#ifdef __APPLE__
+static const std::string LOOPBACK_INTERFACE = "lo0";
+#else
+static const std::string LOOPBACK_INTERFACE = "lo";
+#endif
+
 // PlotJuggler's default host and port
-// Should be updated to your local machine's IP address if
-// you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "ff02::c3d0:42d2:aaaa";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 // ProtoLogger constants for replay files
@@ -130,25 +137,25 @@ constexpr double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
     -BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
 
 /* Unit Conversion */
-static const double MILLIMETERS_PER_METER = 1000.0;
-static const double METERS_PER_MILLIMETER = 1.0 / 1000.0;
-static const double CENTIMETERS_PER_METER = 100.0;
-static const double METERS_PER_CENTIMETER = 1.0 / 100.0;
+static constexpr double MILLIMETERS_PER_METER = 1000.0;
+static constexpr double METERS_PER_MILLIMETER = 1.0 / 1000.0;
+static constexpr double CENTIMETERS_PER_METER = 100.0;
+static constexpr double METERS_PER_CENTIMETER = 1.0 / 100.0;
 
-static const double CENTIRADIANS_PER_RADIAN = 100.0;
-static const double RADIANS_PER_CENTIRADIAN = 1.0 / 100.0;
+static constexpr double CENTIRADIANS_PER_RADIAN = 100.0;
+static constexpr double RADIANS_PER_CENTIRADIAN = 1.0 / 100.0;
 
-static const double NANOSECONDS_PER_MILLISECOND  = 1000000.0;
-static const double NANOSECONDS_PER_SECOND       = 1000000000.0;
-static const double MICROSECONDS_PER_MILLISECOND = 1000.0;
-static const double MICROSECONDS_PER_SECOND      = 1000000.0;
-static const double MILLISECONDS_PER_SECOND      = 1000.0;
-static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
-static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
-static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
-static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
-static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
-static const double SECONDS_PER_MINUTE           = 60.0;
+static constexpr double NANOSECONDS_PER_MILLISECOND  = 1000000.0;
+static constexpr double NANOSECONDS_PER_SECOND       = 1000000000.0;
+static constexpr double MICROSECONDS_PER_MILLISECOND = 1000.0;
+static constexpr double MICROSECONDS_PER_SECOND      = 1000000.0;
+static constexpr double MILLISECONDS_PER_SECOND      = 1000.0;
+static constexpr double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
+static constexpr double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
+static constexpr double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
+static constexpr double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
+static constexpr double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
+static constexpr double SECONDS_PER_MINUTE           = 60.0;
 
 static const double DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK =
     1.0 / 60.0;  // corresponds to 60 Hz
@@ -213,16 +220,30 @@ static const unsigned int NUM_TIMES_SEND_STOP = 10;
 // disconnected
 static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
 
-// product and vendor id for Arduino Uno Rev3 (retrieved from
-// http://www.linux-usb.org/usb.ids )
-#define ARDUINO_ID_LENGTH 5
-static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
-static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
+// Vendor and product id pairs for the USB-to-serial adapters used by the
+// physical estop. Multiple pairs are supported since estop units may use
+// different adapters. IDs retrieved from http://www.linux-usb.org/usb.ids
+struct EstopUsbId
+{
+    const char* vendor_id;
+    const char* product_id;
+};
+
+constexpr EstopUsbId ESTOP_USB_DEVICE_IDS[] = {
+    {"2341", "0043"},  // Arduino Uno Rev3
+    {"1a86", "7523"},  // CH340-based Arduino clones
+};
+
+constexpr int NUM_ESTOP_USB_DEVICE_IDS =
+    sizeof(ESTOP_USB_DEVICE_IDS) / sizeof(ESTOP_USB_DEVICE_IDS[0]);
 
 // Number of times thunderloop should tick per second
 static const unsigned THUNDERLOOP_HZ = 300u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
+
+
+static constexpr double RTT_S = 0.03;
 
 // Robot diagnostics constants
 constexpr double AUTO_CHIP_DISTANCE_DEFAULT_M     = 1.5;

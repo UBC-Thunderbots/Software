@@ -11,16 +11,24 @@ direction LR
 Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Halt --> Halt : <i>setupOverridePlay</i>
+Halt --> Halt : <i>resetPlaySelection</i>
 Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
 Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Stop --> Stop : <i>setupOverridePlay</i>
+Stop --> Halt : <i>resetPlaySelection</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+Playing --> Playing : <i>setupOverridePlay</i>
+Playing --> Halt : <i>resetPlaySelection</i>
 SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
 SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
 SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
 SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
+SetPlay --> SetPlay : <i>setupOverridePlay</i>
+SetPlay --> Halt : <i>resetPlaySelection</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -304,23 +312,6 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [ChipFSM](/src/software/ai/hl/stp/tactic/chip/chip_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> GetBehindBallFSM
-GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
-GetBehindBallFSM --> ChipState
-ChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
-ChipState --> ChipState : [!ballChicked]\n<i>updateChip</i>
-ChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
-Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
 ## [CreaseDefenderFSM](/src/software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h)
 
 ```mermaid
@@ -435,7 +426,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
+## [KickOrChipFSM](/src/software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h)
 
 ```mermaid
 
@@ -444,10 +435,10 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
-GetBehindBallFSM --> KickState
-KickState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
-KickState --> KickState : [!ballChicked]\n<i>updateKick</i>
-KickState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+GetBehindBallFSM --> KickOrChipState
+KickOrChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
+KickOrChipState --> KickOrChipState : [!ballChicked]\n<i>kickOrChipBall</i>
+KickOrChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -495,11 +486,11 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
-DribbleFSM --> KickFSM : [timeOutApproach]\n<i>shoot</i>
+DribbleFSM --> KickOrChipFSM : [timeOutApproach]\n<i>shoot</i>
 DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
-DribbleFSM --> KickFSM
-KickFSM --> KickFSM : <i>shoot</i>
-KickFSM --> Terminate:::terminate
+DribbleFSM --> KickOrChipFSM
+KickOrChipFSM --> KickOrChipFSM : <i>shoot</i>
+KickOrChipFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```

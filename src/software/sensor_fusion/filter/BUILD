@@ -1,3 +1,8 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
+
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
 cc_library(
@@ -86,17 +91,46 @@ cc_library(
     ],
 )
 
-cc_test(
+py_test(
     name = "ball_occlusion_test",
-    srcs = ["ball_occlusion_test.cpp"],
+    srcs = ["ball_occlusion_test.py"],
     deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
+
+cc_library(
+    name = "kalman_filter",
+    srcs = [],
+    hdrs = ["kalman_filter.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "extended_kalman_filter",
+    srcs = [],
+    hdrs = ["extended_kalman_filter.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "kalman_filter_test",
+    srcs = ["kalman_filter_test.cpp"],
+    deps = [
+        ":extended_kalman_filter",
+        ":kalman_filter",
         "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play/halt_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )

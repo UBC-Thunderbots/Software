@@ -1,16 +1,32 @@
 from __future__ import annotations
 
-import os
 import logging
+import os
 import time
-
 from subprocess import Popen
-from software.python_bindings import *
-from proto.import_all_protos import *
-from software.py_constants import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+
+import proto.import_all_protos as protos
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
-from software.thunderscope.binary_context_managers.util import *
+from software.py_constants import (
+    BLUE_PRIMITIVE_SET,
+    BLUE_ROBOT_STATUS_PATH,
+    BLUE_SSL_WRAPPER_PATH,
+    BLUE_WORLD_PATH,
+    SIMULATION_TICK_PATH,
+    SIMULATOR_STATE_PATH,
+    SSL_WRAPPER_PATH,
+    WORLD_STATE_PATH,
+    WORLD_STATE_RECEIVED_TRIGGER_PATH,
+    YELLOW_PRIMITIVE_SET,
+    YELLOW_ROBOT_STATUS_PATH,
+    YELLOW_SSL_WRAPPER_PATH,
+    YELLOW_WORLD_PATH,
+)
+from software.thunderscope.binary_context_managers.util import (
+    is_cmd_running,
+    kill_cmd_if_running,
+)
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class Simulator:
@@ -54,7 +70,7 @@ class Simulator:
         # Setup unix socket directory
         try:
             os.makedirs(self.simulator_runtime_dir)
-        except:
+        except OSError:
             pass
 
         simulator_command = "software/er_force_simulator_main --runtime_dir={}".format(
@@ -123,29 +139,29 @@ gdb --args bazel-bin/{simulator_command}
         """
         # inputs to er_force_simulator_main
         for arg in [
-            (SIMULATION_TICK_PATH, SimulatorTick),
-            (WORLD_STATE_PATH, WorldState),
+            (SIMULATION_TICK_PATH, protos.SimulatorTick),
+            (WORLD_STATE_PATH, protos.WorldState),
         ]:
             simulator_proto_unix_io.attach_unix_sender(self.simulator_runtime_dir, *arg)
 
         simulator_proto_unix_io.attach_unix_receiver(
             self.simulator_runtime_dir,
             WORLD_STATE_RECEIVED_TRIGGER_PATH,
-            WorldStateReceivedTrigger,
+            protos.WorldStateReceivedTrigger,
         )
 
         # setup blue full system unix io
         for arg in [
-            (BLUE_WORLD_PATH, World),
-            (BLUE_PRIMITIVE_SET, PrimitiveSet),
+            (BLUE_WORLD_PATH, protos.World),
+            (BLUE_PRIMITIVE_SET, protos.PrimitiveSet),
         ]:
             blue_full_system_proto_unix_io.attach_unix_sender(
                 self.simulator_runtime_dir, *arg
             )
 
         for arg in [
-            (BLUE_SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (BLUE_ROBOT_STATUS_PATH, RobotStatus),
+            (BLUE_SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
+            (BLUE_ROBOT_STATUS_PATH, protos.RobotStatus),
             (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(
@@ -154,16 +170,16 @@ gdb --args bazel-bin/{simulator_command}
 
         # setup yellow full system unix io
         for arg in [
-            (YELLOW_WORLD_PATH, World),
-            (YELLOW_PRIMITIVE_SET, PrimitiveSet),
+            (YELLOW_WORLD_PATH, protos.World),
+            (YELLOW_PRIMITIVE_SET, protos.PrimitiveSet),
         ]:
             yellow_full_system_proto_unix_io.attach_unix_sender(
                 self.simulator_runtime_dir, *arg
             )
 
         for arg in [
-            (YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (YELLOW_ROBOT_STATUS_PATH, RobotStatus),
+            (YELLOW_SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
+            (YELLOW_ROBOT_STATUS_PATH, protos.RobotStatus),
             (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(
@@ -171,5 +187,5 @@ gdb --args bazel-bin/{simulator_command}
             )
 
         autoref_proto_unix_io.attach_unix_receiver(
-            self.simulator_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket
+            self.simulator_runtime_dir, SSL_WRAPPER_PATH, protos.SSL_WrapperPacket
         )

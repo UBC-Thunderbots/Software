@@ -1,14 +1,12 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.thunderscope.constants import Colors, LINE_WIDTH
 from typing import Optional, override
 
-import software.thunderscope.gl.helpers.triangulate as triangulate
-from software.thunderscope.gl.graphics.gl_shape import GLShape
-
 import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import LINE_WIDTH, Colors
+from software.thunderscope.gl.graphics.gl_shape import GLShape
+from software.thunderscope.gl.helpers import triangulate
 
 
 class GLPolygon(GLShape):
@@ -67,5 +65,5 @@ class GLPolygon(GLShape):
 
         if self.fill_graphic:
             faces = triangulate.earclip(self.points)
-            meshdata = MeshData(vertexes=vertices, faces=np.array(faces))
+            meshdata = gl.MeshData(vertexes=vertices, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)

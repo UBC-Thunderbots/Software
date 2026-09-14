@@ -1,0 +1,9 @@
+---
+- name: "Stop service {{ service_name | default('thunderloop') }}"
+  become: true
+  become_method: ansible.builtin.sudo
+  ansible.builtin.systemd:
+    name: "{{ service_name | default('thunderloop') }}"
+    masked: false
+    daemon_reload: true
+    state: stopped

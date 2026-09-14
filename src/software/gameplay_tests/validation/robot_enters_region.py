@@ -1,0 +1,88 @@
+from typing import override
+
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from software.gameplay_tests.validation.validation import (
+    Validation,
+    create_validation_geometry,
+    create_validation_types,
+)
+
+
+class MinNumberOfRobotsEntersRegion(Validation):
+    """Checks if a certain number of Robots enters a specific set of regions."""
+
+    def __init__(self, regions, req_robot_cnt):
+        """Initializes the validation class with a set of regions and required count of robots
+
+        :param regions: the regions that will be checked for robot count
+        :param req_robot_cnt: the minimum number of unique robots that must be in the given regions
+        """
+        self.regions = regions
+        self.req_robot_cnt = req_robot_cnt
+        # map to keep track of robot positions
+        self.robot_in_zone = {}
+
+    @override
+    def get_validation_status(self, world) -> protos.ValidationStatus:
+        """Checks if a specific number of robots enter the provided set of regions
+
+        :param world: The world msg to validate
+        :returns: FAILING until req_robot_cnt robots enter the set of regions
+                  PASSING when req_robot_cnt robots enter the set of regions
+        #
+        """
+        robots_in_regions = set()
+        for region in self.regions:
+            for robot in world.friendly_team.team_robots:
+                if tbots_cpp.contains(
+                    region, tbots_cpp.createPoint(robot.current_state.global_position)
+                ):
+                    robots_in_regions.add(robot.id)
+
+        # Validate on length of set robots_in_regions
+        if len(robots_in_regions) >= self.req_robot_cnt:
+            return protos.ValidationStatus.PASSING
+
+        return protos.ValidationStatus.FAILING
+
+    @override
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
+        """(override) shows region to enter"""
+        return create_validation_geometry(self.regions)
+
+    @override
+    def __repr__(self):
+        return (
+            "Check for "
+            + str(self.req_robot_cnt)
+            + " robots in region "
+            + ",".join(repr(region) for region in self.regions)
+        )
+
+
+(
+    NumberOfRobotsEventuallyEntersRegion,
+    NumberOfRobotsEventuallyExitsRegion,
+    NumberOfRobotsAlwaysStaysInRegion,
+    NumberOfRobotsNeverEntersRegion,
+) = create_validation_types(MinNumberOfRobotsEntersRegion)
+
+
+class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
+    """Checks if at least one robot is contained within the given regions"""
+
+    def __init__(self, regions):
+        """Initializes the validation class with a set of regions
+
+        :param regions: the regions that will be checked to contain at least one robot
+        """
+        super(RobotEntersRegion, self).__init__(regions, 1)
+
+
+(
+    RobotEventuallyEntersRegion,
+    RobotEventuallyExitsRegion,
+    RobotAlwaysStaysInRegion,
+    RobotNeverEntersRegion,
+) = create_validation_types(RobotEntersRegion)

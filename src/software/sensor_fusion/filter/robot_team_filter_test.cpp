@@ -3,7 +3,19 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(RobotTeamFilterTest, one_robot_detection_update_test)
+class RobotTeamFilterTest : public ::testing::Test
+{
+   protected:
+    void SetUp() override
+    {
+        default_timestamp = Timestamp::fromSeconds(0);
+    }
+
+    Timestamp default_timestamp;
+};
+
+
+TEST_F(RobotTeamFilterTest, one_robot_detection_update_test)
 {
     Team old_team = Team(Duration::fromMilliseconds(1000));
     std::vector<RobotDetection> robot_detections;
@@ -23,7 +35,8 @@ TEST(RobotTeamFilterTest, one_robot_detection_update_test)
     robot_detections.push_back(robot_detection);
 
     // robot detection also has id = 0
-    Team new_team = robot_team_filter.getFilteredData(old_team, robot_detections);
+    Team new_team =
+        robot_team_filter.getFilteredData(old_team, robot_detections, default_timestamp);
 
     auto robots = new_team.getAllRobots();
 
@@ -33,7 +46,7 @@ TEST(RobotTeamFilterTest, one_robot_detection_update_test)
     EXPECT_EQ(robot_detection.timestamp, robots[0].timestamp());
 }
 
-TEST(RobotTeamFilterTest, detections_with_same_timestamp_test)
+TEST_F(RobotTeamFilterTest, detections_with_same_timestamp_test)
 {
     Team old_team = Team(Duration::fromMilliseconds(1000));
     std::vector<RobotDetection> robot_detections;
@@ -51,7 +64,8 @@ TEST(RobotTeamFilterTest, detections_with_same_timestamp_test)
         robot_detections.push_back(robot_detection);
     }
 
-    Team new_team = robot_team_filter.getFilteredData(old_team, robot_detections);
+    Team new_team =
+        robot_team_filter.getFilteredData(old_team, robot_detections, default_timestamp);
 
     EXPECT_EQ(num_robots, new_team.numRobots());
 
@@ -65,7 +79,7 @@ TEST(RobotTeamFilterTest, detections_with_same_timestamp_test)
     }
 }
 
-TEST(RobotTeamFilterTest, detections_with_different_times_test)
+TEST_F(RobotTeamFilterTest, detections_with_different_times_test)
 {
     Team old_team = Team(Duration::fromMilliseconds(1000));
     std::vector<RobotDetection> robot_detections;
@@ -84,7 +98,8 @@ TEST(RobotTeamFilterTest, detections_with_different_times_test)
         robot_detections.push_back(robot_detection);
     }
 
-    Team new_team = robot_team_filter.getFilteredData(old_team, robot_detections);
+    Team new_team =
+        robot_team_filter.getFilteredData(old_team, robot_detections, default_timestamp);
 
     EXPECT_EQ(1, new_team.numRobots());
 }

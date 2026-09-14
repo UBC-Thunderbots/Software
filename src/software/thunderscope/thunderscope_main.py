@@ -1,3 +1,12 @@
+# Qt libs must be preloaded before any Qt binding is imported, so the imports
+# below deliberately come after preload_bundled_qt_libs().
+# ruff: noqa: E402
+
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
+preload_bundled_qt_libs()
+
 import argparse
 import contextlib
 import logging
@@ -6,34 +15,44 @@ import sys
 import threading
 
 import google.protobuf
+import software.thunderscope.thunderscope_config as config
 from google.protobuf.internal import api_implementation
-
+from pyqtgraph.Qt.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+from software.py_constants import (
+    DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+    DIV_B_NUM_ROBOTS,
+    SECONDS_PER_MINUTE,
+    SSL_REFEREE_PORT,
+    getRobotMulticastChannel,
+)
+from software.stats.loggers.stats_logger import StatsLogger
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.runtime_manager import (
     runtime_manager_instance,
 )
-from software.thunderscope.log.stats.stats import Stats
-
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers import *
-from proto.import_all_protos import *
-from software.py_constants import *
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 from software.thunderscope.constants import (
+    CI_DURATION_S,
     EstopMode,
+    LogLevels,
     ProtoUnixIOTypes,
 )
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
-from software.thunderscope.util import *
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.util import (
+    async_sim_ticker,
+    exit_poller,
+    realtime_sim_ticker,
+    sync_simulation,
+)
+from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
 
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+print(PYQT_VERSION_STR)
+print(QT_VERSION_STR)
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (
@@ -98,12 +117,6 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Debug the simulator",
-    )
-    parser.add_argument(
-        "--visualize_cpp_test",
-        action="store_true",
-        default=False,
-        help="Visualize C++ Tests",
     )
     parser.add_argument(
         "--log_level",
@@ -260,49 +273,6 @@ if __name__ == "__main__":
         )
 
     ###########################################################################
-    #                      Visualize CPP Tests                                #
-    ###########################################################################
-    # TODO (#2581) remove this
-    if args.visualize_cpp_test:
-        runtime_dir = "/tmp/tbots/gtest_logs"
-
-        try:
-            os.makedirs(runtime_dir)
-        except OSError:
-            pass
-
-        tscope = Thunderscope(
-            config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size
-            ),
-            layout_path=args.layout,
-        )
-        proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-
-        # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
-        # to true to decode from base64.
-        for arg in [
-            {"proto_class": ObstacleList},
-            {"proto_class": PathVisualization},
-            {"proto_class": PassVisualization},
-            {"proto_class": AttackerVisualization},
-            {"proto_class": CostVisualization},
-            {"proto_class": DebugShapes},
-            {"proto_class": NamedValue},
-            {"proto_class": PrimitiveSet},
-            {"proto_class": World},
-            {"proto_class": PlayInfo},
-            {"proto_class": BallPlacementVisualization},
-        ]:
-            proto_unix_io.attach_unix_receiver(
-                runtime_dir, from_log_visualize=True, **arg
-            )
-
-        proto_unix_io.attach_unix_receiver(runtime_dir + "/log", proto_class=RobotLog)
-
-        tscope.show()
-
-    ###########################################################################
     #              AI + Robot Communication + Robot Diagnostics               #
     ###########################################################################
     #
@@ -329,6 +299,9 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
+        # Fetch the AI runtime/backends
+        runtime_config = runtime_manager_instance.fetch_runtime_config()
+
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
             friendly_colour_yellow = False
@@ -348,26 +321,30 @@ if __name__ == "__main__":
         )
 
         with (
-            Gamecontroller(
-                suppress_logs=(not args.verbose),
-                use_conventional_port=False,
-            )
-            if args.launch_gc
-            else contextlib.nullcontext()
-        ) as gamecontroller, WifiCommunicationManager(
-            current_proto_unix_io=current_proto_unix_io,
-            multicast_channel=getRobotMulticastChannel(args.channel),
-            should_setup_full_system=(args.run_blue or args.run_yellow),
-            interface=args.interface,
-            referee_port=gamecontroller.get_referee_port()
-            if gamecontroller
-            else SSL_REFEREE_PORT,
-        ) as wifi_communication_manager, RobotCommunication(
-            current_proto_unix_io=current_proto_unix_io,
-            communication_manager=wifi_communication_manager,
-            estop_mode=estop_mode,
-            estop_path=estop_path,
-        ) as robot_communication:
+            (
+                Gamecontroller(
+                    suppress_logs=(not args.verbose),
+                    use_conventional_port=False,
+                )
+                if args.launch_gc
+                else contextlib.nullcontext()
+            ) as gamecontroller,
+            WifiCommunicationManager(
+                current_proto_unix_io=current_proto_unix_io,
+                multicast_channel=getRobotMulticastChannel(args.channel),
+                should_setup_full_system=(args.run_blue or args.run_yellow),
+                interface=args.interface,
+                referee_port=gamecontroller.get_referee_port()
+                if gamecontroller
+                else SSL_REFEREE_PORT,
+            ) as wifi_communication_manager,
+            RobotCommunication(
+                current_proto_unix_io=current_proto_unix_io,
+                communication_manager=wifi_communication_manager,
+                estop_mode=estop_mode,
+                estop_path=estop_path,
+            ) as robot_communication,
+        ):
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
                 tscope.keyboard_estop_shortcut.activated.connect(
                     robot_communication.toggle_keyboard_estop
@@ -378,12 +355,8 @@ if __name__ == "__main__":
             )
 
             if args.run_blue or args.run_yellow:
-                full_system_runtime_dir = (
-                    args.blue_full_system_runtime_dir
-                    if args.run_blue
-                    else args.yellow_full_system_runtime_dir
-                )
                 with FullSystem(
+                    path_to_binary=runtime_config.get_blue_runtime_path(),
                     full_system_runtime_dir=runtime_dir,
                     debug_full_system=debug,
                     friendly_colour_yellow=friendly_colour_yellow,
@@ -462,54 +435,66 @@ if __name__ == "__main__":
         runtime_config = runtime_manager_instance.fetch_runtime_config()
 
         # Launch all binaries
-        with Simulator(
-            args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
-        ) as simulator, FullSystem(
-            path_to_binary=runtime_config.get_blue_runtime_path(),
-            full_system_runtime_dir=args.blue_full_system_runtime_dir,
-            debug_full_system=args.debug_blue_full_system,
-            friendly_colour_yellow=False,
-            should_restart_on_crash=False,
-            run_sudo=args.sudo,
-            running_in_realtime=(not args.ci_mode),
-            log_level=args.log_level,
-        ) as blue_fs, FullSystem(
-            path_to_binary=runtime_config.get_yellow_runtime_path(),
-            full_system_runtime_dir=args.yellow_full_system_runtime_dir,
-            debug_full_system=args.debug_yellow_full_system,
-            friendly_colour_yellow=True,
-            should_restart_on_crash=False,
-            run_sudo=args.sudo,
-            running_in_realtime=(not args.ci_mode),
-            log_level=args.log_level,
-        ) as yellow_fs, Gamecontroller(
-            suppress_logs=(not args.verbose),
-            automate_referee=args.enable_autogc,
-        ) as gamecontroller, (
-            # Here we only initialize autoref if the --enable_autoref flag is requested.
-            # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
-            # All calls to autoref should be guarded with args.enable_autoref
-            TigersAutoref(
-                ci_mode=True,
-                gc=gamecontroller,
+        with (
+            Simulator(
+                args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+            ) as simulator,
+            FullSystem(
+                path_to_binary=runtime_config.get_blue_runtime_path(),
+                full_system_runtime_dir=args.blue_full_system_runtime_dir,
+                debug_full_system=args.debug_blue_full_system,
+                friendly_colour_yellow=False,
+                should_restart_on_crash=False,
+                run_sudo=args.sudo,
+                running_in_realtime=(not args.ci_mode),
+                log_level=args.log_level,
+            ) as blue_fs,
+            FullSystem(
+                path_to_binary=runtime_config.get_yellow_runtime_path(),
+                full_system_runtime_dir=args.yellow_full_system_runtime_dir,
+                debug_full_system=args.debug_yellow_full_system,
+                friendly_colour_yellow=True,
+                should_restart_on_crash=False,
+                run_sudo=args.sudo,
+                running_in_realtime=(not args.ci_mode),
+                log_level=args.log_level,
+            ) as yellow_fs,
+            Gamecontroller(
                 suppress_logs=(not args.verbose),
-                tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
-                show_gui=args.show_autoref_gui,
-            )
-            if args.enable_autoref
-            else contextlib.nullcontext()
-        ) as autoref, (
-            Stats(
-                proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                record_enemy_stats=True,
-            )
-            if args.record_stats
-            else contextlib.nullcontext()
-        ) as blue_stats, (
-            Stats(proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
-            if args.record_stats
-            else contextlib.nullcontext()
-        ) as yellow_stats:
+                automate_referee=args.enable_autogc,
+            ) as gamecontroller,
+            (
+                # Here we only initialize autoref if the --enable_autoref flag is requested.
+                # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
+                # All calls to autoref should be guarded with args.enable_autoref
+                TigersAutoref(
+                    ci_mode=True,
+                    gc=gamecontroller,
+                    suppress_logs=(not args.verbose),
+                    tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+                    show_gui=args.show_autoref_gui,
+                )
+                if args.enable_autoref
+                else contextlib.nullcontext()
+            ) as autoref,
+            (
+                StatsLogger(
+                    proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    record_enemy_stats=True,
+                    friendly_colour_yellow=False,
+                )
+                if args.record_stats
+                else contextlib.nullcontext()
+            ) as blue_stats_logger,
+            (
+                StatsLogger(
+                    proto_unix_io=tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    friendly_colour_yellow=True,
+                )
+                if args.record_stats
+                else contextlib.nullcontext()
+            ) as yellow_stats_logger,
+        ):
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
@@ -520,9 +505,9 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
             )
 
-            if args.record_stats:
-                tscope.register_refresh_function(blue_stats.refresh)
-                tscope.register_refresh_function(yellow_stats.refresh)
+            if args.record_stats and blue_stats_logger and yellow_stats_logger:
+                tscope.register_refresh_function(blue_stats_logger.refresh)
+                tscope.register_refresh_function(yellow_stats_logger.refresh)
 
             simulator.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],

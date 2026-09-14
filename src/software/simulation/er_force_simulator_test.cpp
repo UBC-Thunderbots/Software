@@ -1,13 +1,13 @@
 #include "software/simulation/er_force_simulator.h"
 
 #include <gtest/gtest.h>
-// TODO (#2419): remove this
-#include <fenv.h>
 
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
-#include "shared/2021_robot_constants.h"
+#include "shared/robot_constants.h"
+#include "software/geom/vector.h"
+#include "software/physics/euclidean_to_wheel.h"
 #include "software/test_util/test_util.h"
 
 class ErForceSimulatorTest : public ::testing::Test
@@ -15,8 +15,6 @@ class ErForceSimulatorTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        // TODO (#2419): remove this to re-enable sigfpe checks
-        fedisableexcept(FE_INVALID | FE_OVERFLOW);
         auto realism_config = ErForceSimulator::createDefaultRealismConfig();
         simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
                                                        robot_constants, realism_config);
@@ -24,7 +22,8 @@ class ErForceSimulatorTest : public ::testing::Test
     }
 
     std::shared_ptr<ErForceSimulator> simulator;
-    RobotConstants_t robot_constants = create2021RobotConstants();
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
 };
 
 TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_does_not_already_exist)
@@ -309,8 +308,9 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
-    RobotConstants_t robot_constants = create2021RobotConstants();
-    auto realism_config              = ErForceSimulator::createDefaultRealismConfig();
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+    auto realism_config = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
         TbotsProto::FieldType::DIV_A, robot_constants, realism_config);
     simulator->resetCurrentTime();
@@ -321,12 +321,136 @@ TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 
 TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
 {
-    RobotConstants_t robot_constants = create2021RobotConstants();
-    auto realism_config              = ErForceSimulator::createDefaultRealismConfig();
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+    auto realism_config = ErForceSimulator::createDefaultRealismConfig();
     std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(
         TbotsProto::FieldType::DIV_B, robot_constants, realism_config);
     simulator->resetCurrentTime();
     simulator->getField();
 
     EXPECT_EQ(simulator->getField(), Field::createSSLDivisionBField());
+}
+
+class ErForceSimulatorRampingTest : public ::testing::Test
+{
+   protected:
+    void SetUp() override
+    {
+        auto realism_config = ErForceSimulator::createDefaultRealismConfig();
+        simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
+                                                       robot_constants, realism_config,
+                                                       /*ramping=*/true);
+    }
+
+    // Forwarding wrapper so TEST_F bodies (which derive from this fixture) can reach the
+    // private method through this friend class.
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> rampVelocityPrimitive(
+        const Vector& current_local_velocity,
+        const AngularVelocity& current_local_angular_velocity,
+        TbotsProto::DirectControlPrimitive& target_velocity_primitive,
+        Duration time_to_ramp)
+    {
+        return simulator->getRampedVelocityPrimitive(
+            current_local_velocity, current_local_angular_velocity,
+            target_velocity_primitive, time_to_ramp);
+    }
+
+    // Builds a direct-velocity-control primitive with the given local target velocity.
+    static TbotsProto::DirectControlPrimitive makeTargetPrimitive(
+        const Vector& velocity, const AngularVelocity& angular_velocity)
+    {
+        return createDirectControlPrimitive(velocity, angular_velocity,
+                                            /*dribbler_rpm=*/0,
+                                            TbotsProto::AutoChipOrKick())
+            ->direct_control();
+    }
+
+    std::shared_ptr<ErForceSimulator> simulator;
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+};
+
+TEST_F(ErForceSimulatorRampingTest, passes_target_through_when_within_acceleration_limit)
+{
+    const Vector target_velocity(0.5, -0.3);
+    const AngularVelocity target_angular = AngularVelocity::fromRadians(0.2);
+
+    auto target_primitive = makeTargetPrimitive(target_velocity, target_angular);
+
+    // Start from rest, but allow a large ramp window so nothing clips.
+    auto ramped = rampVelocityPrimitive(Vector(0, 0), AngularVelocity::zero(),
+                                        target_primitive, Duration::fromSeconds(10.0));
+
+    const auto& velocity = ramped->motor_control().direct_velocity_control().velocity();
+    EXPECT_NEAR(velocity.x_component_meters(), target_velocity.x(), 1e-9);
+    EXPECT_NEAR(velocity.y_component_meters(), target_velocity.y(), 1e-9);
+    EXPECT_NEAR(ramped->motor_control()
+                    .direct_velocity_control()
+                    .angular_velocity()
+                    .radians_per_second(),
+                target_angular.toRadians(), 1e-9);
+}
+
+TEST_F(ErForceSimulatorRampingTest, holds_velocity_when_already_at_target)
+{
+    const Vector velocity(1.0, 0.5);
+    const AngularVelocity angular = AngularVelocity::fromRadians(0.4);
+
+    auto target_primitive = makeTargetPrimitive(velocity, angular);
+
+    auto ramped = rampVelocityPrimitive(velocity, angular, target_primitive,
+                                        Duration::fromSeconds(0.001));
+
+    const auto& out = ramped->motor_control().direct_velocity_control().velocity();
+    EXPECT_NEAR(out.x_component_meters(), velocity.x(), 1e-9);
+    EXPECT_NEAR(out.y_component_meters(), velocity.y(), 1e-9);
+}
+
+TEST_F(ErForceSimulatorRampingTest, ramps_in_motor_service_frame_when_clipping)
+{
+    const Vector current_velocity(0.0, 0.0);
+    const AngularVelocity current_angular = AngularVelocity::zero();
+    const Vector target_velocity(3.0, 0.5);
+    const AngularVelocity target_angular = AngularVelocity::fromRadians(1.0);
+    // Tiny timestep forces the acceleration limit to clip hard.
+    const Duration time_to_ramp = Duration::fromSeconds(0.01);
+
+    EuclideanToWheel euclidean_to_wheel(robot_constants);
+
+    EuclideanSpace_t current_euclidean{current_velocity.x(), current_velocity.y(),
+                                       current_angular.toRadians()};
+    EuclideanSpace_t target_euclidean{target_velocity.x(), target_velocity.y(),
+                                      target_angular.toRadians()};
+    WheelSpace_t ramped_wheel = euclidean_to_wheel.rampWheelVelocity(
+        euclidean_to_wheel.getWheelVelocity(current_euclidean),
+        euclidean_to_wheel.getWheelVelocity(target_euclidean), time_to_ramp.toSeconds());
+    EuclideanSpace_t expected = euclidean_to_wheel.getEuclideanVelocity(ramped_wheel);
+
+    ASSERT_LT(expected[0], target_velocity.x());
+
+    auto target_primitive = makeTargetPrimitive(target_velocity, target_angular);
+    auto ramped           = rampVelocityPrimitive(current_velocity, current_angular,
+                                                  target_primitive, time_to_ramp);
+
+    const auto& velocity = ramped->motor_control().direct_velocity_control().velocity();
+    EXPECT_NEAR(velocity.x_component_meters(), expected[0], 1e-9);
+    EXPECT_NEAR(velocity.y_component_meters(), expected[1], 1e-9);
+    EXPECT_NEAR(ramped->motor_control()
+                    .direct_velocity_control()
+                    .angular_velocity()
+                    .radians_per_second(),
+                expected[2], 1e-9);
+
+    EuclideanSpace_t rotated_current{-current_velocity.y(), current_velocity.x(),
+                                     current_angular.toRadians()};
+    EuclideanSpace_t rotated_target{-target_velocity.y(), target_velocity.x(),
+                                    target_angular.toRadians()};
+    EuclideanSpace_t rotated_ramped =
+        euclidean_to_wheel.getEuclideanVelocity(euclidean_to_wheel.rampWheelVelocity(
+            euclidean_to_wheel.getWheelVelocity(rotated_current),
+            euclidean_to_wheel.getWheelVelocity(rotated_target),
+            time_to_ramp.toSeconds()));
+
+    EXPECT_GT(std::abs(rotated_ramped[1] - expected[0]), 1e-3);
 }

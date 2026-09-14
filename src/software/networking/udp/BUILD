@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -17,6 +20,7 @@ cc_test(
     ],
     deps = [
         ":network_utils",
+        "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -68,6 +72,7 @@ cc_test(
     ],
     deps = [
         ":threaded_proto_udp_listener",
+        "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
         "@protobuf//:empty_cc_proto",
     ],
@@ -90,6 +95,7 @@ cc_test(
     ],
     deps = [
         ":threaded_proto_udp_sender",
+        "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
         "@protobuf//:empty_cc_proto",
     ],

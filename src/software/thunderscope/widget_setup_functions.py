@@ -1,53 +1,54 @@
 import math
 import os
-
 from typing import Any, Optional
 
-from software.py_constants import *
-from proto.import_all_protos import *
+import proto.import_all_protos as protos
+from pyqtgraph.dockarea.Dock import Dock, DockLabel
+from software.py_constants import BALL_MAX_SPEED_METERS_PER_SECOND
+from software.thunderscope import dock_style
 from software.thunderscope.common.fps_widget import FPSWidget
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
-from software.thunderscope.common.proto_plotter import ProtoPlotter
-from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
-    GLDrawPolygonObstacleLayer,
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
 )
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from proto.robot_log_msg_pb2 import RobotLog
-from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.thunderscope.dock_style import *
+from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.constants import IndividualRobotMode
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
 from software.thunderscope.gl.layers import (
-    gl_obstacle_layer,
-    gl_path_layer,
-    gl_validation_layer,
-    gl_passing_layer,
     gl_attacker_layer,
-    gl_sandbox_world_layer,
-    gl_world_layer,
+    gl_cost_vis_layer,
     gl_debug_shapes_layer,
+    gl_max_dribble_layer,
+    gl_movement_field_test_layer,
+    gl_obstacle_layer,
+    gl_passing_layer,
+    gl_path_layer,
+    gl_referee_info_layer,
+    gl_sandbox_world_layer,
     gl_simulator_layer,
     gl_tactic_layer,
-    gl_cost_vis_layer,
     gl_trail_layer,
-    gl_movement_field_test_layer,
-    gl_max_dribble_layer,
-    gl_referee_info_layer,
+    gl_validation_layer,
+    gl_world_layer,
 )
-
-from software.thunderscope.common.proto_configuration_widget import (
-    ProtoConfigurationWidget,
+from software.thunderscope.gl.layers.gl_draw_polygon_obstacle import (
+    GLDrawPolygonObstacleLayer,
 )
 from software.thunderscope.log.g3log_widget import g3logWidget
-from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
-from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
-from software.thunderscope.robot_diagnostics.robot_view import RobotView
-from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
-from software.thunderscope.robot_diagnostics.estop_view import EstopView
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.replay.proto_player import ProtoPlayer
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
+from software.thunderscope.robot_diagnostics.estop_view import EstopView
+from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
+from software.thunderscope.robot_diagnostics.robot_view import RobotView
+
+# monkey patches for custom styles
+Dock.updateStyle = dock_style.updateDockStylePatched
+DockLabel.updateStyle = dock_style.updateDockLabelStylePatched
 
 
 ################################
@@ -65,7 +66,7 @@ def setup_gl_widget(
     replay_log: os.PathLike = None,
     frame_swap_counter: Optional[FrameTimeCounter] = None,
     send_sync_message: bool = False,
-) -> Field:
+) -> protos.Field:
     """Setup the GLWidget with its constituent layers
 
     :param sim_proto_unix_io: The proto unix io object for the simulator
@@ -183,38 +184,38 @@ def setup_gl_widget(
             world_layer.toggle_play_state
         )
         sim_proto_unix_io.register_observer(
-            SimulationState, simulation_control_toolbar.simulation_state_buffer
+            protos.SimulationState, simulation_control_toolbar.simulation_state_buffer
         )
         sim_proto_unix_io.register_observer(
-            SimulationState, world_layer.simulation_state_buffer
+            protos.SimulationState, world_layer.simulation_state_buffer
         )
         sim_proto_unix_io.register_observer(
-            SimulationState, gl_widget.simulation_state_buffer
+            protos.SimulationState, gl_widget.simulation_state_buffer
         )
 
     for arg in [
-        (World, world_layer.world_buffer),
-        (World, cost_vis_layer.world_buffer),
-        (World, field_movement_layer.world_buffer),
-        (World, max_dribble_layer.world_buffer),
-        (RobotStatus, world_layer.robot_status_buffer),
-        (Referee, world_layer.referee_buffer),
-        (ObstacleList, obstacle_layer.obstacles_list_buffer),
-        (PrimitiveSet, world_layer.primitive_set_buffer),
-        (PrimitiveSet, path_layer.primitive_set_buffer),
-        (PathVisualization, path_layer.path_visualization_buffer),
-        (PassVisualization, passing_layer.pass_visualization_buffer),
-        (AttackerVisualization, attacker_layer.attacker_vis_buffer),
-        (World, tactic_layer.world_buffer),
-        (PlayInfo, tactic_layer.play_info_buffer),
-        (ValidationProtoSet, validation_layer.validation_set_buffer),
-        (SimulationState, simulation_control_toolbar.simulation_state_buffer),
-        (CostVisualization, cost_vis_layer.cost_visualization_buffer),
-        (World, trail_layer.world_buffer),
-        (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
-        (Referee, referee_layer.referee_vis_buffer),
-        (BallPlacementVisualization, referee_layer.ball_placement_vis_buffer),
-        (World, referee_layer.world_buffer),
+        (protos.World, world_layer.world_buffer),
+        (protos.World, cost_vis_layer.world_buffer),
+        (protos.World, field_movement_layer.world_buffer),
+        (protos.World, max_dribble_layer.world_buffer),
+        (protos.RobotStatus, world_layer.robot_status_buffer),
+        (protos.Referee, world_layer.referee_buffer),
+        (protos.ObstacleList, obstacle_layer.obstacles_list_buffer),
+        (protos.PrimitiveSet, world_layer.primitive_set_buffer),
+        (protos.PrimitiveSet, path_layer.primitive_set_buffer),
+        (protos.PathVisualization, path_layer.path_visualization_buffer),
+        (protos.PassVisualization, passing_layer.pass_visualization_buffer),
+        (protos.AttackerVisualization, attacker_layer.attacker_vis_buffer),
+        (protos.World, tactic_layer.world_buffer),
+        (protos.PlayInfo, tactic_layer.play_info_buffer),
+        (protos.ValidationProtoSet, validation_layer.validation_set_buffer),
+        (protos.SimulationState, simulation_control_toolbar.simulation_state_buffer),
+        (protos.CostVisualization, cost_vis_layer.cost_visualization_buffer),
+        (protos.World, trail_layer.world_buffer),
+        (protos.DebugShapes, debug_shapes_layer.debug_shapes_buffer),
+        (protos.Referee, referee_layer.referee_vis_buffer),
+        (protos.BallPlacementVisualization, referee_layer.ball_placement_vis_buffer),
+        (protos.World, referee_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
@@ -233,11 +234,12 @@ def setup_parameter_widget(
     """
 
     def on_change_callback(
-        attr: Any, value: Any, updated_proto: ThunderbotsConfig
+        attr: Any, value: Any, updated_proto: protos.ThunderbotsConfig
     ) -> None:
-        proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+        proto_unix_io.send_proto(protos.ThunderbotsConfig, updated_proto)
         proto_unix_io.send_proto(
-            NetworkConfig, updated_proto.ai_config.ai_control_config.network_config
+            protos.NetworkConfig,
+            updated_proto.ai_config.ai_control_config.network_config,
         )
 
     return ProtoConfigurationWidget(
@@ -255,7 +257,7 @@ def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
     logs = g3logWidget()
 
     # Register observer
-    proto_unix_io.register_observer(RobotLog, logs.log_buffer)
+    proto_unix_io.register_observer(protos.RobotLog, logs.log_buffer)
 
     return logs
 
@@ -275,11 +277,13 @@ def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
         min_y=0,
         max_y=100,
         window_secs=15,
-        configuration={NamedValue: extract_namedvalue_data},
+        configuration={protos.NamedValue: extract_namedvalue_data},
     )
 
     # Register observer
-    proto_unix_io.register_observer(NamedValue, proto_plotter.buffers[NamedValue])
+    proto_unix_io.register_observer(
+        protos.NamedValue, proto_plotter.buffers[protos.NamedValue]
+    )
     return proto_plotter
 
 
@@ -305,9 +309,9 @@ def setup_ball_speed_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
         min_y=0,
         max_y=10,
         window_secs=10,
-        configuration={World: extract_ball_speed_data},
+        configuration={protos.World: extract_ball_speed_data},
     )
-    proto_unix_io.register_observer(World, proto_plotter.buffers[World])
+    proto_unix_io.register_observer(protos.World, proto_plotter.buffers[protos.World])
     return proto_plotter
 
 
@@ -318,7 +322,7 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     :return: The play info widget
     """
     play_info = PlayInfoWidget()
-    proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
+    proto_unix_io.register_observer(protos.PlayInfo, play_info.playinfo_buffer)
     return play_info
 
 
@@ -342,7 +346,7 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     :return: The referee info widget
     """
     referee_info = RefereeInfoWidget()
-    proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
+    proto_unix_io.register_observer(protos.Referee, referee_info.referee_buffer)
     return referee_info
 
 
@@ -363,8 +367,10 @@ def setup_robot_view(
     :return: The robot view widget
     """
     robot_view = RobotView(available_control_modes)
-    proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
-    proto_unix_io.register_observer(RobotStatistic, robot_view.robot_statistic_buffer)
+    proto_unix_io.register_observer(protos.RobotStatus, robot_view.robot_status_buffer)
+    proto_unix_io.register_observer(
+        protos.RobotStatistic, robot_view.robot_statistic_buffer
+    )
     return robot_view
 
 
@@ -375,9 +381,13 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     :return: The robot error log widget
     """
     robot_error_log = RobotErrorLog()
-    proto_unix_io.register_observer(RobotStatus, robot_error_log.robot_status_buffer)
-    proto_unix_io.register_observer(RobotCrash, robot_error_log.robot_crash_buffer)
-    proto_unix_io.register_observer(RobotLog, robot_error_log.robot_log_buffer)
+    proto_unix_io.register_observer(
+        protos.RobotStatus, robot_error_log.robot_status_buffer
+    )
+    proto_unix_io.register_observer(
+        protos.RobotCrash, robot_error_log.robot_crash_buffer
+    )
+    proto_unix_io.register_observer(protos.RobotLog, robot_error_log.robot_log_buffer)
     return robot_error_log
 
 
@@ -388,7 +398,7 @@ def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     :return: The estop widget
     """
     estop_view = EstopView()
-    proto_unix_io.register_observer(EstopState, estop_view.estop_state_buffer)
+    proto_unix_io.register_observer(protos.EstopState, estop_view.estop_state_buffer)
     return estop_view
 
 

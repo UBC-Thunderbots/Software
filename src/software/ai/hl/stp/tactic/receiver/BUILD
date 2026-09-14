@@ -1,3 +1,8 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -15,7 +20,6 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/passing:pass",
         "//software/logger",
@@ -33,17 +37,12 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "receiver_tactic_test",
-    srcs = ["receiver_tactic_test.cpp"],
+    srcs = ["receiver_tactic_test.py"],
     deps = [
-        ":receiver_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/cpp_validation:validation_function",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

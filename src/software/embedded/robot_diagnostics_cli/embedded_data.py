@@ -1,16 +1,22 @@
 import math
 import os
 import tomllib
-from software.py_constants import *
-from proto.import_all_protos import *
+
+import proto.import_all_protos as protos
 from software.embedded.constants.py_constants import (
+    MAX_FORCE_DRIBBLER_SPEED_RPM,
     ROBOT_MAX_ANG_SPEED_RAD_PER_S,
     ROBOT_MAX_SPEED_M_PER_S,
-    MAX_FORCE_DRIBBLER_SPEED_RPM,
 )
 from software.py_constants import (
     AUTO_CHIP_DISTANCE_DEFAULT_M,
     AUTO_KICK_SPEED_DEFAULT_M_PER_S,
+    ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY,
+    ROBOT_ID_CONFIG_KEY,
+    ROBOT_KICK_CONSTANT_CONFIG_KEY,
+    ROBOT_KICK_EXP_COEFF_CONFIG_KEY,
+    ROBOT_MULTICAST_CHANNEL_CONFIG_KEY,
+    ROBOT_NETWORK_INTERFACE_CONFIG_KEY,
     WHEEL_ROTATION_MAX_SPEED_M_PER_S,
 )
 
@@ -64,14 +70,9 @@ class EmbeddedData:
     def get_chip_pulse_width(self) -> str:
         return self._get_value(ROBOT_CHIP_PULSE_WIDTH_CONFIG_KEY)
 
-    def get_current_draw(self) -> str:
-        return self._get_value(ROBOT_CURRENT_DRAW_CONFIG_KEY)
-
-    def get_battery_volt(self) -> str:
-        return self._get_value(ROBOT_BATTERY_VOLTAGE_CONFIG_KEY)
-
-    def get_cap_volt(self) -> str:
-        return self._get_value(ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY)
+    # TODO: #3809
+    # def get_cap_volt(self) -> str:
+    #     return self._get_value(ROBOT_CAPACITOR_VOLTAGE_CONFIG_KEY)
 
     def __clamp(self, val: float, min_val: float, max_val: float) -> float:
         """Simple Math Clamp function (Faster than numpy & fewer dependencies)
@@ -82,39 +83,39 @@ class EmbeddedData:
         return min(max(val, min_val), max_val)
 
     # TODO (#3435): Refactor Get Primitives
-    def get_rotate_primitive(self, velocity: float) -> Primitive:
+    def get_rotate_primitive(self, velocity: float) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a velocity
         :param velocity: Angular Velocity to rotate the robot
         """
         velocity = self.__clamp(
             velocity, -ROBOT_MAX_ANG_SPEED_RAD_PER_S, ROBOT_MAX_ANG_SPEED_RAD_PER_S
         )
-        motor_control_primitive = MotorControl()
+        motor_control_primitive = protos.MotorControl()
         motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = velocity
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive, power_control=PowerControl()
+        direct_control_primitive = protos.DirectControlPrimitive(
+            motor_control=motor_control_primitive, power_control=protos.PowerControl()
         )
-        return Primitive(direct_control=direct_control_primitive)
+        return protos.Primitive(direct_control=direct_control_primitive)
 
-    def get_move_primitive(self, angle: float, speed: float) -> Primitive:
+    def get_move_primitive(self, angle: float, speed: float) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a speed.
         :param angle: Angle to move the robot at in degrees
         :param speed: Speed to move the robot at in m/s
         """
         speed = self.__clamp(val=speed, min_val=0, max_val=ROBOT_MAX_SPEED_M_PER_S)
-        motor_control_primitive = MotorControl()
+        motor_control_primitive = protos.MotorControl()
         motor_control_primitive.direct_velocity_control.velocity.x_component_meters = (
             speed * math.cos(angle)
         )
         motor_control_primitive.direct_velocity_control.velocity.y_component_meters = (
             speed * math.sin(angle)
         )
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive, power_control=PowerControl()
+        direct_control_primitive = protos.DirectControlPrimitive(
+            motor_control=motor_control_primitive, power_control=protos.PowerControl()
         )
-        return Primitive(direct_control=direct_control_primitive)
+        return protos.Primitive(direct_control=direct_control_primitive)
 
-    def get_chip_primitive(self, auto: bool, distance: float) -> Primitive:
+    def get_chip_primitive(self, auto: bool, distance: float) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a distance and state.
         :param auto: Determines whether auto-chip is enabled
         :param distance: Distance to chip the "ball"
@@ -122,31 +123,31 @@ class EmbeddedData:
         distance = self.__clamp(
             val=distance, min_val=0, max_val=ROBOT_MAX_SPEED_M_PER_S
         )
-        power_control_primitive = PowerControl()
+        power_control_primitive = protos.PowerControl()
         if not auto:
             power_control_primitive.chicker.chip_distance_meters = distance
         else:
             power_control_primitive.chicker.auto_chip_or_kick.autochip_distance_meters = AUTO_CHIP_DISTANCE_DEFAULT_M
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=MotorControl(), power_control=power_control_primitive
+        direct_control_primitive = protos.DirectControlPrimitive(
+            motor_control=protos.MotorControl(), power_control=power_control_primitive
         )
-        return Primitive(direct_control=direct_control_primitive)
+        return protos.Primitive(direct_control=direct_control_primitive)
 
-    def get_zero_power_control_primitive(self) -> Primitive:
+    def get_zero_power_control_primitive(self) -> protos.Primitive:
         """Creates a PowerControl primitive with zeroed/default base values"""
-        power_control_primitive = PowerControl()
-        power_control_primitive.geneva_slot = Slot.CENTRE_RIGHT
+        power_control_primitive = protos.PowerControl()
+        power_control_primitive.geneva_slot = protos.Slot.CENTRE_RIGHT
         return power_control_primitive
 
-    def get_zero_motor_control_primitive(self) -> Primitive:
+    def get_zero_motor_control_primitive(self) -> protos.Primitive:
         """Creates a MotorControl primitive with zeroed/default base values"""
-        motor_control_primitive = MotorControl()
+        motor_control_primitive = protos.MotorControl()
         motor_control_primitive.direct_velocity_control.velocity.x_component_meters = 0
         motor_control_primitive.direct_velocity_control.velocity.y_component_meters = 0
         motor_control_primitive.direct_velocity_control.angular_velocity.radians_per_second = 0
         return motor_control_primitive
 
-    def get_kick_primitive(self, auto: bool, speed: float) -> Primitive:
+    def get_kick_primitive(self, auto: bool, speed: float) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a speed and state.
         :param auto: Determines whether auto-kick is enabled
         :param speed: Speed to kick the "ball" at
@@ -159,13 +160,13 @@ class EmbeddedData:
             power_control_primitive.chicker.auto_chip_or_kick.autokick_speed_m_per_s = (
                 AUTO_KICK_SPEED_DEFAULT_M_PER_S
             )
-        direct_control_primitive = DirectControlPrimitive(
+        direct_control_primitive = protos.DirectControlPrimitive(
             motor_control=self.get_zero_motor_control_primitive(),
             power_control=power_control_primitive,
         )
-        return Primitive(direct_control=direct_control_primitive)
+        return protos.Primitive(direct_control=direct_control_primitive)
 
-    def get_dribble_primitive(self, velocity: float) -> Primitive:
+    def get_dribble_primitive(self, velocity: float) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a velocity.
         :param velocity: Speed & direction of the dribbler
         """
@@ -176,12 +177,14 @@ class EmbeddedData:
         )
         motor_control_primitive = self.get_zero_motor_control_primitive()
         motor_control_primitive.dribbler_speed_rpm = int(velocity)
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive, power_control=PowerControl()
+        direct_control_primitive = protos.DirectControlPrimitive(
+            motor_control=motor_control_primitive, power_control=protos.PowerControl()
         )
-        return Primitive(direct_control=direct_control_primitive)
+        return protos.Primitive(direct_control=direct_control_primitive)
 
-    def get_move_wheel_primitive(self, wheels: list[int], velocity: float) -> Primitive:
+    def get_move_wheel_primitive(
+        self, wheels: list[int], velocity: float
+    ) -> protos.Primitive:
         """Prepares and returns the processed direct control primitive given a velocity mapped to
         wheel_velocity_map = {1: 0, 2: 0, 3: 0, 4: 0} where {1:"NE", 2:"SE", 3:"SW", 4:"NW"}
         :param wheels: The wheels to rotate
@@ -196,7 +199,7 @@ class EmbeddedData:
 
         for wheel in wheels:
             wheel_velocity_map[wheel] = velocity
-        motor_control_primitive = MotorControl()
+        motor_control_primitive = protos.MotorControl()
         motor_control_primitive.direct_per_wheel_control.front_left_wheel_velocity = (
             wheel_velocity_map[1]
         )
@@ -210,7 +213,7 @@ class EmbeddedData:
             wheel_velocity_map[4]
         )
 
-        direct_control_primitive = DirectControlPrimitive(
-            motor_control=motor_control_primitive, power_control=PowerControl()
+        direct_control_primitive = protos.DirectControlPrimitive(
+            motor_control=motor_control_primitive, power_control=protos.PowerControl()
         )
-        return Primitive(direct_control=direct_control_primitive)
+        return protos.Primitive(direct_control=direct_control_primitive)
