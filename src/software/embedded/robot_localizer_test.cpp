@@ -44,7 +44,8 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
 
         const Vector local_velocity =
             globalToLocalVelocity(true_velocity, true_orientation);
-        localizer.update(RobotLocalizer::MotorData{local_velocity, AngularVelocity::zero()});
+        localizer.update(
+            RobotLocalizer::MotorData{local_velocity, AngularVelocity::zero()});
 
         localizer.predict(Vector(0.0, 0.0), Duration::fromSeconds(DT));
 
@@ -69,8 +70,9 @@ TEST(RobotLocalizer, tracks_constant_forward_velocity)
     const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/true);
 
     std::cerr << "[motor+vision] pos=(" << localizer.getPosition().x() << ", "
-              << localizer.getPosition().y() << ") vel=(" << localizer.getGlobalVelocity().x()
-              << ", " << localizer.getGlobalVelocity().y()
+              << localizer.getPosition().y() << ") vel=("
+              << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y()
               << ") orient=" << localizer.getOrientation().toDegrees() << "deg\n";
 
     // NOTE: we assert on velocity and orientation, not absolute position. RobotLocalizer
