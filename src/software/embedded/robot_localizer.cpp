@@ -57,8 +57,8 @@ void RobotLocalizer::update(const VisionData& data)
         [&](const FilterStep& step)
         { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
-	// If rollback point is at the start, vision is newer than all history steps
-	// So we empty history and apply vision
+    // If rollback point is at the start, vision is newer than all history steps
+    // So we empty history and apply vision
     if (rollback_point == history.begin())
     {
         updateFilterWithVision(data.position, data.orientation);
@@ -66,8 +66,8 @@ void RobotLocalizer::update(const VisionData& data)
         return;
     }
 
-	// If rollback point is at the end, vision is older than all history steps
-	// So rollback ever step 
+    // If rollback point is at the end, vision is older than all history steps
+    // So rollback ever step
     if (rollback_point == history.end())
     {
         rollback_point = std::prev(history.end());
@@ -127,7 +127,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION)) =
         position.y();
 
-	// Integrating omega for position makes angule goes out of bounds so we wrap it around
+    // Integrating omega for position makes angule goes out of bounds so we wrap it around
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION)) =
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
@@ -222,7 +222,7 @@ RobotState RobotLocalizer::getRobotState() const
                       getAngularVelocity());
 }
 
-// TODO: Investigate proces models/variances/etc
+// TODO: Investigate process models/variances/etc
 void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
 {
     // Velocity is estimated in the robot's local frame (see StateIndex), but position
@@ -236,12 +236,9 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     filter_.process_model_function =
         [delta_time_seconds](Eigen::Vector<double, STATE_SIZE> state)
     {
-        const double theta =
-            state(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
-        const double local_vx =
-            state(static_cast<Eigen::Index>(StateIndex::X_VELOCITY));
-        const double local_vy =
-            state(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY));
+        const double theta    = state(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
+        const double local_vx = state(static_cast<Eigen::Index>(StateIndex::X_VELOCITY));
+        const double local_vy = state(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY));
 
         Eigen::Vector<double, STATE_SIZE> next_state =
             Eigen::Vector<double, STATE_SIZE>::Zero();
@@ -266,20 +263,19 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     filter_.process_model_jacobian_function =
         [delta_time_seconds](Eigen::Vector<double, STATE_SIZE> state)
     {
-        const auto x_position_index = static_cast<Eigen::Index>(StateIndex::X_POSITION);
-        const auto y_position_index = static_cast<Eigen::Index>(StateIndex::Y_POSITION);
-        const auto orientation_index =
-            static_cast<Eigen::Index>(StateIndex::ORIENTATION);
-        const auto x_velocity_index = static_cast<Eigen::Index>(StateIndex::X_VELOCITY);
-        const auto y_velocity_index = static_cast<Eigen::Index>(StateIndex::Y_VELOCITY);
+        const auto x_position_index  = static_cast<Eigen::Index>(StateIndex::X_POSITION);
+        const auto y_position_index  = static_cast<Eigen::Index>(StateIndex::Y_POSITION);
+        const auto orientation_index = static_cast<Eigen::Index>(StateIndex::ORIENTATION);
+        const auto x_velocity_index  = static_cast<Eigen::Index>(StateIndex::X_VELOCITY);
+        const auto y_velocity_index  = static_cast<Eigen::Index>(StateIndex::Y_VELOCITY);
         const auto angular_velocity_index =
             static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY);
 
-        const double theta       = state(orientation_index);
-        const double local_vx    = state(x_velocity_index);
-        const double local_vy    = state(y_velocity_index);
-        const double cos_theta   = std::cos(theta);
-        const double sin_theta   = std::sin(theta);
+        const double theta     = state(orientation_index);
+        const double local_vx  = state(x_velocity_index);
+        const double local_vy  = state(y_velocity_index);
+        const double cos_theta = std::cos(theta);
+        const double sin_theta = std::sin(theta);
 
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> jacobian =
             Eigen::Matrix<double, STATE_SIZE, STATE_SIZE>::Identity();
@@ -355,18 +351,15 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     control_model.setZero();
 
     control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::X_VELOCITY_TARGET)) =
-        cos_theta;
+                  static_cast<Eigen::Index>(ControlIndex::X_VELOCITY_TARGET)) = cos_theta;
     control_model(static_cast<Eigen::Index>(StateIndex::X_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) =
-        sin_theta;
+                  static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) = sin_theta;
 
     control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
                   static_cast<Eigen::Index>(ControlIndex::X_VELOCITY_TARGET)) =
         -sin_theta;
     control_model(static_cast<Eigen::Index>(StateIndex::Y_VELOCITY),
-                  static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) =
-        cos_theta;
+                  static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) = cos_theta;
 }
 
 void RobotLocalizer::generateMeasurementModel(FilterStepType source)

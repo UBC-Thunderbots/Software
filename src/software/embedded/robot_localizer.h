@@ -213,7 +213,7 @@ class RobotLocalizer
         // during replay (see generateMeasurementModel).
         std::optional<Eigen::Vector<double, MEASUREMENT_SIZE>> measurement;
 
-		// Post operation state
+        // Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
