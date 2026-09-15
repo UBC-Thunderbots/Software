@@ -9,7 +9,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "robot_localizer",
     srcs = ["robot_localizer.cpp"],
-    hdrs = ["robot_localizer.h"],
+    hdrs = ["robot_localizer.h", "robot_localizer_constants.h"],
     deps = [
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",

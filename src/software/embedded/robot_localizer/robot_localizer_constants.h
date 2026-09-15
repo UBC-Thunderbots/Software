@@ -20,34 +20,45 @@ static constexpr double VISION_X_INITIAL_VARIANCE_M = 0.00001;
 static constexpr double VISION_Y_INITIAL_VARIANCE_M = 0.00001;
 static constexpr double VISION_THETA_INITIAL_VARIANCE_RAD = 0.00001;
 
-static constexpr double MOTOR_THETA_INITIAL_VARIANCE_M_S = 0.5;
-static constexpr double MOTOR_THETA_INITIAL_VARIANCE_M_S = 0.5;
-static constexpr double MOTOR_THETA_INITIAL_VARIANCE_M_RAD = 0.5;
+static constexpr double MOTOR_X_INITIAL_VARIANCE_M_S = 0.5;
+static constexpr double MOTOR_Y_INITIAL_VARIANCE_M_S = 0.5;
+static constexpr double MOTOR_THETA_INITIAL_VARIANCE_RAD_S = 0.5;
 
 static constexpr double PROCESS_MODEL_INITIAL_VARIANCE = 1;
 
 
-// Measurement models
-static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> VISION_MEASUREMENT_MODEL << 
-1,0,0,0,0,0,0,
-0,1,0,0,0,0,0,
-0,0,1,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0;
+static constexpr double PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE = 1; 
+static constexpr double PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE = 1; 
+    
+static const Eigen::Matrix<double, MEASUREMENT_SIZE,STATE_SIZE > VISION_MEASUREMENT_MODEL = []{
+    Eigen::Matrix<double, MEASUREMENT_SIZE,STATE_SIZE > m;
+    m << 1,0,0,0,0,0,0,
+         0,1,0,0,0,0,0,
+         0,0,1,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0;
+    return m;
+}();
 
-static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> MOTOR_MEASUREMENT_MODEL << 
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,1,0,0,0,
-0,0,0,0,1,0,0,
-0,0,0,0,0,1,0;
+static const Eigen::Matrix<double, MEASUREMENT_SIZE,STATE_SIZE > MOTOR_MEASUREMENT_MODEL = []{
+    Eigen::Matrix<double, MEASUREMENT_SIZE,STATE_SIZE > m;
+    m << 0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,1,0,0,0,
+         0,0,0,0,1,0,0,
+         0,0,0,0,0,1,0;
+    return m;
+}();
 
-static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> IMU_MEASUREMENT_MODEL<< 
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,
-0,0,0,0,0,0,1;
+static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> IMU_MEASUREMENT_MODEL = []{
+    Eigen::Matrix<double, MEASUREMENT_SIZE,STATE_SIZE > m;
+    m << 0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,
+         0,0,0,0,0,0,1;
+    return m;
+}();

@@ -1,4 +1,4 @@
-#include "software/embedded/robot_localizer.h"
+#include "robot_localizer.h"
 
 #include <gtest/gtest.h>
 

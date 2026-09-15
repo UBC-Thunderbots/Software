@@ -14,8 +14,8 @@ RobotLocalizer::RobotLocalizer()
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
             VISION_X_INITIAL_VARIANCE_M, VISION_Y_INITIAL_VARIANCE_M,
-            VISION_THETA_INITIAL_VARIANCE_RAD, MOTOR_X_INITIAL_VARIANCE_M,
-            MOTOR_Y_INITIAL_VARIANCE_M, MOTOR_THETA_INITIAL_VARIANCE_RAD,
+            VISION_THETA_INITIAL_VARIANCE_RAD, MOTOR_X_INITIAL_VARIANCE_M_S,
+            MOTOR_Y_INITIAL_VARIANCE_M_S, MOTOR_THETA_INITIAL_VARIANCE_RAD_S,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
 }
@@ -302,25 +302,24 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     const double delta_time_cubed   = delta_time_squared * delta_time_seconds;
     const double delta_time_fourth  = delta_time_cubed * delta_time_seconds;
 
-    // Linear terms model velocity itself as the noisy quantity (how much actual
-    // velocity deviates from the commanded target velocity), integrated once into
-    // position, rather than a noisy acceleration integrated twice.
     const double linear_position_variance =
-        delta_time_cubed * process_linear_velocity_noise_variance_;
+        delta_time_cubed * PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE;
+    
     const double linear_position_velocity_covariance =
-        delta_time_squared * process_linear_velocity_noise_variance_;
+        delta_time_squared * PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE;
+    
     const double linear_velocity_variance =
-        delta_time_seconds * process_linear_velocity_noise_variance_;
-
-    // Angular terms are unchanged: angular velocity has no control input, so it's
-    // still modeled as a noisy acceleration integrated twice.
+        delta_time_seconds * PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE;
+    
     const double angular_position_variance =
-        delta_time_fourth / 4 * process_angular_acceleration_noise_variance_;
+        (delta_time_fourth / 4.0) * PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE;
+    
     const double angular_position_velocity_covariance =
-        delta_time_cubed / 2 * process_angular_acceleration_noise_variance_;
+        (delta_time_cubed / 2.0) * PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE;
+    
     const double angular_velocity_variance =
-        delta_time_squared * process_angular_acceleration_noise_variance_;
-
+        delta_time_squared * PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE;
+ 
     // State order: X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
     // ANGULAR_VELOCITY
     // clang-format off
