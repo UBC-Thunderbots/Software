@@ -281,7 +281,7 @@ class Gamecontroller:
 
     def send_gc_command(
         self,
-        gc_command: protos.Command,
+        gc_command: protos.Command.Type,
         team: SslTeam,
         final_ball_placement_point: tbots_cpp.Point = None,
     ) -> Any:

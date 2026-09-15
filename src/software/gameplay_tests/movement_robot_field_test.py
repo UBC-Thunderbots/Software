@@ -1,6 +1,5 @@
 import math
 import threading
-import time
 
 import proto.import_all_protos as protos
 from proto.ssl_gc_common_pb2 import Team as SslTeam
@@ -17,7 +16,7 @@ logger = create_logger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0, 45, 90, 180, 270, 0]
+    test_angles = [0, math.pi, 0, math.pi, 0, math.pi]
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
@@ -49,13 +48,11 @@ def test_basic_rotation(field_test_runner):
         )
 
         for angle in test_angles:
-            print(f"Rotating to {angle} degrees")
+            print(f"Rotating to {angle} radians")
             move_tactic = protos.MoveTactic()
             move_tactic.destination.CopyFrom(rob_pos_p)
             move_tactic.dribbler_mode = protos.DribblerMode.OFF
-            move_tactic.final_orientation.CopyFrom(
-                protos.Angle(radians=angle * math.pi / 180.0)
-            )
+            move_tactic.final_orientation.CopyFrom(protos.Angle(radians=angle))
             move_tactic.ball_collision_type = protos.BallCollisionType.AVOID
             move_tactic.auto_chip_or_kick.CopyFrom(
                 protos.AutoChipOrKick(autokick_speed_m_per_s=0.0)
@@ -72,12 +69,11 @@ def test_basic_rotation(field_test_runner):
             field_test_runner.run_test(
                 always_validation_sequence_set=[[]],
                 eventually_validation_sequence_set=[[]],
-                test_timeout_s=5,
+                test_timeout_s=3,
             )
 
             # validate by eye
             logger.info(f"robot set to {angle} orientation")
-            time.sleep(2)
 
         # Send a halt tactic after the test finishes
         field_test_runner.set_tactics(

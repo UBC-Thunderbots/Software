@@ -122,6 +122,19 @@ py_test(
 )
 
 py_test(
+    name = "ball_placement_field_test",
+    srcs = ["ball_placement_field_test.py"],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests:field_test_fixture",
+        "//software/gameplay_tests:simulated_test_fixture",
+        "//software/gameplay_tests:tbots_test_runner",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
     name = "passing_field_test",
     srcs = [
         "passing_field_test.py",
