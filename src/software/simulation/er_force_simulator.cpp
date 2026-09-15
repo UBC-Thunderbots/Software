@@ -61,7 +61,7 @@ double sampleCorrelatedNoise(std::mt19937& rng, double& bias, double dt_seconds,
 {
     stepDriftingBias(rng, bias, dt_seconds, BIAS_VARIANCE_FRACTION * total_variance);
     return bias +
-          sampleGaussianNoise(rng, (1.0 - BIAS_VARIANCE_FRACTION) * total_variance);
+           sampleGaussianNoise(rng, (1.0 - BIAS_VARIANCE_FRACTION) * total_variance);
 }
 }  // namespace
 
@@ -433,8 +433,7 @@ void ErForceSimulator::updateLocalizerVisionFromPrimitive(
 
     const Point position =
         createPoint(primitive.move().xy_traj_params().start_position());
-    const Angle orientation =
-        createAngle(primitive.move().w_traj_params().start_angle());
+    const Angle orientation = createAngle(primitive.move().w_traj_params().start_angle());
 
     localizer_it->second.localizer->update(
         RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
@@ -456,8 +455,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 
     const TeamColour team_colour =
         (side == gameController::Team::BLUE) ? TeamColour::BLUE : TeamColour::YELLOW;
-    auto& localizer_map = (side == gameController::Team::BLUE) ? blue_localizer_map
-                                                                : yellow_localizer_map;
+    auto& localizer_map =
+        (side == gameController::Team::BLUE) ? blue_localizer_map : yellow_localizer_map;
     updateRobotLocalizers(localizer_map, robot_map, time_step, team_colour);
 
     for (auto& [robot_id, primitive_executor] : robot_primitive_executor_map)
@@ -533,8 +532,8 @@ void ErForceSimulator::updateRobotLocalizers(
                     robot_constants.kalman_vision_noise_variance_rad_2,
                     robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2});
             localizer_it =
-                localizer_map.insert({robot_id, SimulatedLocalization{localizer,
-                                                                      SensorBias{}}})
+                localizer_map
+                    .insert({robot_id, SimulatedLocalization{localizer, SensorBias{}}})
                     .first;
         }
         SimulatedLocalization& localization = localizer_it->second;
@@ -561,15 +560,15 @@ void ErForceSimulator::updateRobotLocalizers(
         // filter's own orientation estimate).
         const Vector motor_velocity_noise(
             sampleCorrelatedNoise(noise_rng_, bias.motor_velocity_x, dt_seconds,
-                                 motor_variance),
+                                  motor_variance),
             sampleCorrelatedNoise(noise_rng_, bias.motor_velocity_y, dt_seconds,
-                                 motor_variance));
+                                  motor_variance));
         localizer.update(RobotLocalizer::MotorData{
             ground_truth.velocity() + motor_velocity_noise,
             ground_truth.angularVelocity() +
-                AngularVelocity::fromRadians(sampleCorrelatedNoise(
-                    noise_rng_, bias.motor_angular_velocity, dt_seconds,
-                    motor_variance))});
+                AngularVelocity::fromRadians(
+                    sampleCorrelatedNoise(noise_rng_, bias.motor_angular_velocity,
+                                          dt_seconds, motor_variance))});
 
         // Predict step: matches real Thunderloop, which currently passes a zero
         // control input (see RobotLocalizer::step call in thunderloop.cpp). Using a
