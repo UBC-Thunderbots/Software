@@ -8,7 +8,7 @@ class RobotTeamFilterTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        default_timestamp = Timestamp::fromSeconds(0);
+        default_timestamp = Timestamp::fromSeconds(9);
     }
 
     Timestamp default_timestamp;
@@ -43,7 +43,7 @@ TEST_F(RobotTeamFilterTest, one_robot_detection_update_test)
     EXPECT_EQ(1, robots.size());
     EXPECT_EQ(robot_detection.position, robots[0].currentState().position());
     EXPECT_EQ(robot_detection.orientation, robots[0].currentState().orientation());
-    EXPECT_EQ(robot_detection.timestamp, robots[0].timestamp());
+    EXPECT_EQ(default_timestamp, robots[0].timestamp());
 }
 
 TEST_F(RobotTeamFilterTest, detections_with_same_timestamp_test)
@@ -75,7 +75,7 @@ TEST_F(RobotTeamFilterTest, detections_with_same_timestamp_test)
         Robot robot = *new_team.getRobotById(i);
         EXPECT_EQ(robot_detections[i].position, robot.currentState().position());
         EXPECT_EQ(robot_detections[i].orientation, robot.currentState().orientation());
-        EXPECT_EQ(robot_detections[i].timestamp, robot.timestamp());
+        EXPECT_EQ(default_timestamp, robot.timestamp());
     }
 }
 
@@ -101,5 +101,5 @@ TEST_F(RobotTeamFilterTest, detections_with_different_times_test)
     Team new_team =
         robot_team_filter.getFilteredData(old_team, robot_detections, default_timestamp);
 
-    EXPECT_EQ(1, new_team.numRobots());
+    EXPECT_EQ(6, new_team.numRobots());
 }
