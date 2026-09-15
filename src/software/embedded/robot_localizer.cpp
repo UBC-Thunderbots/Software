@@ -1,10 +1,8 @@
 #include "robot_localizer.h"
-#include "software/logger/logger.h"
 
 #include <cmath>
 
 #include "proto/message_translation/tbots_geometry.h"
-#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 
@@ -17,12 +15,9 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
-			0.0001,
-			0.0001,
-			0.0001,
-			0.5,
-			0.5,
-			0.5,
+            config.vision_noise_variance, config.vision_noise_variance,
+            config.vision_noise_variance, config.motor_sensor_noise_variance,
+            config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
 }
@@ -225,33 +220,6 @@ RobotState RobotLocalizer::getRobotState() const
 {
     return RobotState(getPosition(), getGlobalVelocity(), getOrientation(),
                       getAngularVelocity());
-}
-
-void RobotLocalizer::logToPlotJuggler(RobotId robot_id, const std::string& tag) const
-{
-    const std::string robot_suffix = "_robot_" + std::to_string(robot_id) + tag;
-
-    const Point position         = getPosition();
-    const Vector global_velocity = getGlobalVelocity();
-
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-        {{"pos_x" + robot_suffix, position.x()},
-         {"pos_y" + robot_suffix, position.y()},
-         {"vel_x" + robot_suffix, global_velocity.x()},
-         {"vel_y" + robot_suffix, global_velocity.y()}});
-}
-
-void RobotLocalizer::logRobotStateToPlotJuggler(RobotId robot_id,
-                                                const RobotState& robot_state,
-                                                const std::string& tag)
-{
-    const std::string robot_suffix = "_robot_" + std::to_string(robot_id) + tag;
-
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-        {{"pos_x" + robot_suffix, robot_state.position().x()},
-         {"pos_y" + robot_suffix, robot_state.position().y()},
-         {"vel_x" + robot_suffix, robot_state.velocity().x()},
-         {"vel_y" + robot_suffix, robot_state.velocity().y()}});
 }
 
 // TODO: Investigate proces models/variances/etc
