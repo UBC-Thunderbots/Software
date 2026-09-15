@@ -10,11 +10,60 @@
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "shared/constants.h"
+#include "software/embedded/services/imu.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
+
+namespace
+{
+double sampleGaussianNoise(std::mt19937& rng, double variance)
+{
+    std::normal_distribution<double> distribution(0.0, std::sqrt(variance));
+    return distribution(rng);
+}
+
+// Most of a synthesized sensor channel's assumed variance is modeled as a slowly
+// drifting bias (an Ornstein-Uhlenbeck process) rather than fresh white noise, since
+// real error sources like wheel slip or calibration drift persist over time instead of
+// resetting every sample; the rest is left as fast white noise for sample-to-sample
+// jitter.
+constexpr double BIAS_VARIANCE_FRACTION     = 0.9;
+constexpr double BIAS_TIME_CONSTANT_SECONDS = 0.5;
+
+// IMU/motor noise is scaled up from the filter's own assumed variance so the
+// synthesized sensors show a visible, meaningful divergence from ground truth instead
+// of being dominated by (real, correct) vision corrections.
+constexpr double IMU_MOTOR_NOISE_SCALE_FACTOR = 3.0;
+
+// Advances a single drifting bias value by one Euler-Maruyama step of an
+// Ornstein-Uhlenbeck process, whose stationary variance equals `stationary_variance`
+// and whose fluctuations decorrelate over roughly `BIAS_TIME_CONSTANT_SECONDS`.
+void stepDriftingBias(std::mt19937& rng, double& bias, double dt_seconds,
+                      double stationary_variance)
+{
+    const double mean_reversion_rate = 1.0 / BIAS_TIME_CONSTANT_SECONDS;
+    const double diffusion_coefficient =
+        std::sqrt(2.0 * mean_reversion_rate * stationary_variance);
+    std::normal_distribution<double> distribution(0.0, 1.0);
+    bias += -mean_reversion_rate * bias * dt_seconds +
+            diffusion_coefficient * std::sqrt(dt_seconds) * distribution(rng);
+}
+
+// Combines a channel's drifting bias with a smaller fresh white-noise component, both
+// drawn from the same total variance per BIAS_VARIANCE_FRACTION.
+double sampleCorrelatedNoise(std::mt19937& rng, double& bias, double dt_seconds,
+                             double total_variance)
+{
+    stepDriftingBias(rng, bias, dt_seconds, BIAS_VARIANCE_FRACTION * total_variance);
+    return bias +
+          sampleGaussianNoise(rng, (1.0 - BIAS_VARIANCE_FRACTION) * total_variance);
+}
+}  // namespace
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
@@ -28,7 +77,8 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
-      ramping(ramping)
+      ramping(ramping),
+      noise_rng_(std::random_device{}())
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -280,14 +330,14 @@ void ErForceSimulator::setRobots(
     {
         if (side == gameController::Team::BLUE)
         {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants, id);
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                robot_constants, id, TeamColour::BLUE);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants, id);
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                robot_constants, id, TeamColour::YELLOW);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
@@ -309,6 +359,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
         {
             setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                               robot_map.at(robot_id));
+            updateLocalizerVisionFromPrimitive(robot_id, primitive, yellow_localizer_map);
         }
     }
 }
@@ -329,6 +380,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         {
             setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                               robot_map.at(robot_id));
+            updateLocalizerVisionFromPrimitive(robot_id, primitive, blue_localizer_map);
         }
     }
 }
@@ -356,6 +408,30 @@ void ErForceSimulator::setRobotPrimitive(
     }
 }
 
+void ErForceSimulator::updateLocalizerVisionFromPrimitive(
+    RobotId id, const TbotsProto::Primitive& primitive,
+    std::unordered_map<RobotId, SimulatedLocalization>& localizer_map)
+{
+    if (!primitive.has_move())
+    {
+        return;
+    }
+
+    auto localizer_it = localizer_map.find(id);
+    if (localizer_it == localizer_map.end())
+    {
+        return;
+    }
+
+    const Point position =
+        createPoint(primitive.move().xy_traj_params().start_position());
+    const Angle orientation =
+        createAngle(primitive.move().w_traj_params().start_angle());
+
+    localizer_it->second.localizer->update(
+        RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
+}
+
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
         robot_primitive_executor_map,
@@ -369,6 +445,12 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                                  ? sim_state.blue_robots()
                                  : sim_state.yellow_robots();
     const auto robot_map   = getRobotIdToRobotStateMap(sim_robots, side);
+
+    const TeamColour team_colour =
+        (side == gameController::Team::BLUE) ? TeamColour::BLUE : TeamColour::YELLOW;
+    auto& localizer_map = (side == gameController::Team::BLUE) ? blue_localizer_map
+                                                                : yellow_localizer_map;
+    updateRobotLocalizers(localizer_map, robot_map, time_step, team_colour);
 
     for (auto& [robot_id, primitive_executor] : robot_primitive_executor_map)
     {
@@ -422,6 +504,80 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;
+}
+
+void ErForceSimulator::updateRobotLocalizers(
+    std::unordered_map<RobotId, SimulatedLocalization>& localizer_map,
+    const std::map<RobotId, RobotState>& robot_map, const Duration& time_step,
+    TeamColour team_colour)
+{
+    const std::string plotjuggler_tag =
+        (team_colour == TeamColour::BLUE) ? "_blue_estimated" : "_yellow_estimated";
+
+    for (const auto& [robot_id, ground_truth] : robot_map)
+    {
+        auto localizer_it = localizer_map.find(robot_id);
+        if (localizer_it == localizer_map.end())
+        {
+            auto localizer =
+                std::make_shared<RobotLocalizer>(RobotLocalizer::RobotLocalizerConfig{
+                    robot_constants.kalman_process_noise_variance_rad_per_s_4,
+                    robot_constants.kalman_vision_noise_variance_rad_2,
+                    robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2});
+            localizer_it =
+                localizer_map.insert({robot_id, SimulatedLocalization{localizer,
+                                                                      SensorBias{}}})
+                    .first;
+        }
+        SimulatedLocalization& localization = localizer_it->second;
+        RobotLocalizer& localizer           = *localization.localizer;
+        SensorBias& bias                    = localization.bias;
+
+        const double motor_variance =
+            IMU_MOTOR_NOISE_SCALE_FACTOR *
+            robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2;
+        const double imu_variance =
+            IMU_MOTOR_NOISE_SCALE_FACTOR * ImuService::IMU_VARIANCE;
+        const double dt_seconds = time_step.toSeconds();
+
+        // IMU: noisy angular velocity, scaled up from the filter's own assumed
+        // variance (see IMU_MOTOR_NOISE_SCALE_FACTOR).
+        localizer.update(RobotLocalizer::ImuData{
+            ground_truth.angularVelocity() +
+            AngularVelocity::fromRadians(sampleCorrelatedNoise(
+                noise_rng_, bias.imu_angular_velocity, dt_seconds, imu_variance))});
+
+        // Motor sensors: noisy global-frame velocity (ground truth velocity() is
+        // already global, so no local<->global conversion is needed here, unlike real
+        // Thunderloop, which converts a local motor reading into global using the
+        // filter's own orientation estimate).
+        const Vector motor_velocity_noise(
+            sampleCorrelatedNoise(noise_rng_, bias.motor_velocity_x, dt_seconds,
+                                 motor_variance),
+            sampleCorrelatedNoise(noise_rng_, bias.motor_velocity_y, dt_seconds,
+                                 motor_variance));
+        localizer.update(RobotLocalizer::MotorData{
+            ground_truth.velocity() + motor_velocity_noise,
+            ground_truth.angularVelocity() +
+                AngularVelocity::fromRadians(sampleCorrelatedNoise(
+                    noise_rng_, bias.motor_angular_velocity, dt_seconds,
+                    motor_variance))});
+
+        // Predict step: matches real Thunderloop, which currently passes a zero
+        // control input (see RobotLocalizer::step call in thunderloop.cpp). Using a
+        // ground-truth-derived acceleration here instead would give the filter a
+        // noise-free "cheat" channel to fall back on whenever it distrusts the
+        // (deliberately noisy) measurements, undermining the whole point of this
+        // side-channel comparison.
+        localizer.step(Vector(), time_step);
+
+        // Vision is NOT synthesized here - see updateLocalizerVisionFromPrimitive(),
+        // which feeds this localizer the actual vision-derived position the AI used
+        // to plan this robot's trajectory, whenever a new primitive arrives.
+
+        RobotLocalizer::logToPlotJuggler(robot_id, localizer.getRobotState(),
+                                         plotjuggler_tag);
+    }
 }
 
 std::unique_ptr<TbotsProto::DirectControlPrimitive>
