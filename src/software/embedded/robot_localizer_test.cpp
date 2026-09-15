@@ -48,7 +48,7 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
             localToGlobalVelocity(local_velocity, localizer.getOrientation()),
             AngularVelocity::zero()});
 
-        localizer.step(Vector(0.0, 0.0), Duration::fromSeconds(DT));
+        localizer.predict(Vector(0.0, 0.0), Duration::fromSeconds(DT));
 
         // Periodic vision fix (~60 Hz). Feed the position from RTT_S/2 ago, consistent
         // with the reported age.

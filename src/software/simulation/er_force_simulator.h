@@ -1,10 +1,14 @@
 #pragma once
 
+#include <fstream>
+#include <random>
+
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/embedded/primitive_executor.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
 #include "software/world/robot_state.h"
@@ -207,6 +211,69 @@ class ErForceSimulator
         TbotsProto::DirectControlPrimitive& target_velocity_primitive,
         Duration time_to_ramp);
 
+    /**
+     * Slowly-drifting per-channel sensor biases (an Ornstein-Uhlenbeck process each),
+     * modeling correlated real-world error sources like wheel slip or calibration
+     * drift that persist over time, rather than resetting every sample. Pure
+     * independent-per-tick white noise gets averaged away almost completely by the
+     * Kalman filter at a 300 Hz update rate, which understates real tracking error.
+     */
+    struct SensorBias
+    {
+        double motor_velocity_x       = 0.0;
+        double motor_velocity_y       = 0.0;
+        double motor_angular_velocity = 0.0;
+        double imu_angular_velocity   = 0.0;
+    };
+
+    /**
+     * Per-robot state for the simulated RobotLocalizer side-channel, persisted across
+     * ticks.
+     */
+    struct SimulatedLocalization
+    {
+        std::shared_ptr<RobotLocalizer> localizer;
+
+        // Persistent drifting biases for this robot's synthesized sensors.
+        SensorBias bias;
+    };
+
+    /**
+     * Steps a RobotLocalizer per robot in robot_map with synthesized noisy motor/imu
+     * readings derived from ground truth, purely as a side-channel for comparing the
+     * filter's estimate against ground truth (logged to PlotJuggler). Ground truth
+     * still drives the robot's actual simulated control; this does not feed back into
+     * it. Vision updates are NOT synthesized here — see
+     * updateLocalizerVisionFromPrimitive(), which feeds the localizer the same
+     * vision-derived position the AI actually used to plan the robot's trajectory.
+     *
+     * @param localizer_map The per-robot localizer state to update, kept across ticks
+     * @param robot_map Ground truth state for each robot this tick
+     * @param time_step The time step to advance the localizers by
+     * @param team_colour The team these robots belong to, embedded in the PlotJuggler
+     * key so yellow and blue robots sharing an ID don't collide onto the same key
+     */
+    void updateRobotLocalizers(
+        std::unordered_map<RobotId, SimulatedLocalization>& localizer_map,
+        const std::map<RobotId, RobotState>& robot_map, const Duration& time_step,
+        TeamColour team_colour);
+
+    /**
+     * Feeds a robot's RobotLocalizer side-channel the vision-derived start
+     * position/orientation embedded in a newly-arrived move primitive (the same value
+     * the AI used to plan this trajectory), rather than synthesizing vision noise
+     * ourselves. Does nothing if the primitive isn't a move primitive, or if this
+     * robot doesn't have a localizer yet (it's lazily created on the next physics
+     * tick by updateRobotLocalizers()).
+     *
+     * @param id The id of the robot the primitive is for
+     * @param primitive The newly-arrived primitive
+     * @param localizer_map The per-robot localizer state for this robot's team
+     */
+    void updateLocalizerVisionFromPrimitive(
+        RobotId id, const TbotsProto::Primitive& primitive,
+        std::unordered_map<RobotId, SimulatedLocalization>& localizer_map);
+
     // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
         yellow_primitive_executor_map;
@@ -243,6 +310,21 @@ class ErForceSimulator
     // the real motor service
     std::unordered_map<RobotId, LocalVelocity> blue_prev_ramp_velocities;
     std::unordered_map<RobotId, LocalVelocity> yellow_prev_ramp_velocities;
+
+    // Per-robot RobotLocalizer side-channel state, kept across ticks. Purely for
+    // comparing the filter's estimate against ground truth via PlotJuggler; never
+    // fed back into control.
+    std::unordered_map<RobotId, SimulatedLocalization> blue_localizer_map;
+    std::unordered_map<RobotId, SimulatedLocalization> yellow_localizer_map;
+
+    // RNG for synthesizing Gaussian sensor noise for the RobotLocalizer side-channel.
+    std::mt19937 noise_rng_;
+
+    // Per-tick estimated-vs-ground-truth log for the RobotLocalizer side-channel. Opened
+    // once at construction (truncating any previous run's data) and appended to on every
+    // updateRobotLocalizers() call; see CSV_OUTPUT_PATH.
+    std::ofstream robot_localizer_csv_;
+    static const std::string CSV_OUTPUT_PATH;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
