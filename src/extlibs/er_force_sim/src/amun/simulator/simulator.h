@@ -21,6 +21,8 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include <deque>
+#include <map>
 #include <memory>
 #include <random>
 #include <utility>
@@ -120,6 +122,47 @@ class camun::simulator::Simulator
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
         const SSLSimulationProto::RobotControl& control, bool isBlue);
 
+    /**
+     * Passes a robot control command on to the robots it addresses, without any
+     * command delay
+     *
+     * @param control the robot control command
+     * @param isBlue whether it's blue robots or not
+     *
+     * @return the radio response feedback from the simulator
+     */
+    std::vector<robot::RadioResponse> applyRobotControlCommand(
+        const SSLSimulationProto::RobotControl& control, bool isBlue);
+
+    /**
+     * Adds the detections of a single robot to the given detection frames, simulating
+     * missing and rotated detections as configured
+     *
+     * @param robot the robot to create detections for
+     * @param teamIsBlue whether the robot is on the blue team
+     * @param detections the detection frame of each camera, to add the detections to
+     */
+    void createRobotDetection(SimRobot& robot, bool teamIsBlue,
+                              std::vector<SSLProto::SSL_DetectionFrame>& detections);
+
+    /**
+     * Returns the id of the robot pattern that the given pattern turns into when it is
+     * rotated by 90 degrees clockwise
+     *
+     * @param id the robot id to rotate
+     *
+     * @return the rotated robot id
+     */
+    static uint32_t getRotatedRobotId(uint32_t id);
+
+    /**
+     * Applies the configured realism settings that are stored on the robots themselves
+     * to the given robot. Has to be called for every newly created robot.
+     *
+     * @param robot the robot to configure
+     */
+    void applyRobotRealism(SimRobot& robot) const;
+
     void resetFlipped(RobotMap& robots, float side);
     void setTeam(RobotMap& list, float side, const robot::Team& team,
                  std::map<uint32_t, robot::Specs>& specs);
@@ -141,6 +184,16 @@ class camun::simulator::Simulator
     int64_t m_lastBallSendTime      = 0;
 
     std::map<size_t, unsigned int> m_lastFrameNumber;
+
+    // robot control commands that have been received but are not applied yet, together
+    // with the time they were received at. Only used when a command delay is configured.
+    std::deque<std::pair<SSLSimulationProto::RobotControl, int64_t>> m_blueRadioCommands;
+    std::deque<std::pair<SSLSimulationProto::RobotControl, int64_t>>
+        m_yellowRadioCommands;
+
+    // (camera id, robot id, robot is blue) -> the robot had a rotated detection in the
+    // last frame
+    std::map<std::tuple<size_t, unsigned int, bool>, bool> m_hasRotatedDetection;
 
     std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
 };
@@ -204,6 +257,11 @@ struct camun::simulator::SimulatorData
     float robotReplyPacketLoss;
     float missingBallDetections;
     bool dribblePerfect;
+    float missingRobotDetections;
+    int64_t commandDelay;
+    float robotRotationError;
+    float rotatedRobotDetectionsStart;
+    float rotatedRobotDetectionsStop;
 };
 
 #endif  // SIMULATOR_H
