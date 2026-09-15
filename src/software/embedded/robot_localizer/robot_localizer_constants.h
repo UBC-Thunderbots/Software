@@ -24,7 +24,7 @@ static constexpr double MOTOR_THETA_INITIAL_VARIANCE_M_S = 0.5;
 static constexpr double MOTOR_THETA_INITIAL_VARIANCE_M_S = 0.5;
 static constexpr double MOTOR_THETA_INITIAL_VARIANCE_M_RAD = 0.5;
 
-static constexpr double PROCESS_MODEL_INITIAL_VARIANCE = 0.5;
+static constexpr double PROCESS_MODEL_INITIAL_VARIANCE = 1;
 
 
 // Measurement models

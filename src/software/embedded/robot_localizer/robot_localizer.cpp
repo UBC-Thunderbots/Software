@@ -9,7 +9,7 @@
 RobotLocalizer::RobotLocalizer()
 {
     filter_.state_covariance =
-        Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
+       PROCESS_MODEL_INITIAL_VARIANCE * Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
