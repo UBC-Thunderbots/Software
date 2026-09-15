@@ -13,6 +13,7 @@
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
+#include "software/enmbedded/robot_localizer/robot_localizer_constants.h"
 
 /**
  * Estimates robot position, orientation, velocity, and angular velocity using an
