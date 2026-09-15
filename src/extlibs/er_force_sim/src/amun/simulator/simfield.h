@@ -54,6 +54,9 @@ class camun::simulator::SimField
     std::unique_ptr<btCollisionShape> m_plane;
     std::unique_ptr<btCollisionShape> m_goalSide;
     std::unique_ptr<btCollisionShape> m_goalBack;
+    // Only used on fields that have corner blocks / no boundary area respectively
+    std::unique_ptr<btCollisionShape> m_cornerBlock;
+    std::unique_ptr<btCollisionShape> m_goalLineBoundary;
     std::vector<std::unique_ptr<btCollisionObject>> m_objects;
 };
 

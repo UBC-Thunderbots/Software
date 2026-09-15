@@ -66,6 +66,11 @@ message SSL_GeometryFieldSize
     optional int32 goal_height                 = 13;
     optional float ball_radius                 = 14;
     optional float max_robot_radius            = 15;
+    // Width of the boundary area behind the goal lines [mm]. Defaults to
+    // boundary_width when unset.
+    optional int32 boundary_width_goal_line = 16;
+    // Width of the goal substitution area [mm]
+    optional int32 goal_substitution_area_width = 17;
 }
 
 message SSL_GeometryCameraCalibration
