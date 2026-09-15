@@ -114,34 +114,3 @@ filegroup(
     srcs = ["hash_thunderloop_binary.sh"],
 )
 
-cc_library(
-    name = "robot_localizer",
-    srcs = ["robot_localizer.cpp"],
-    hdrs = ["robot_localizer.h"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//proto/primitive:primitive_msg_factory",
-        "//software:constants",
-        "//software/embedded/services:imu",
-        "//software/geom:angle",
-        "//software/geom:angular_velocity",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//software/physics:velocity_conversion_util",
-        "//software/sensor_fusion/filter:extended_kalman_filter",
-        "//software/sensor_fusion/filter:kalman_filter",
-        "//software/world:robot_state",
-        "@eigen",
-    ],
-)
-
-cc_test(
-    name = "robot_localizer_test",
-    srcs = ["robot_localizer_test.cpp"],
-    deps = [
-        ":robot_localizer",
-        "//shared:constants",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/physics:velocity_conversion_util",
-    ],
-)
