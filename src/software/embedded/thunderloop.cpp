@@ -148,10 +148,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
     robot_localizer_ =
-        std::make_unique<RobotLocalizer>(RobotLocalizer::RobotLocalizerConfig{
-            robot_constants.kalman_process_noise_variance_rad_per_s_4,
-            robot_constants.kalman_vision_noise_variance_rad_2,
-            robot_constants.kalman_motor_sensor_noise_variance_rad_per_s_2});
+        std::make_unique<RobotLocalizer>();
     LOG(INFO) << "THUNDERLOOP: Robot Localizer initialized!";
 
     primitive_executor_ = std::make_unique<PrimitiveExecutor>(robot_constants, robot_id);

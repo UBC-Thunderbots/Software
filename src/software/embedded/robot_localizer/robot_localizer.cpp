@@ -13,9 +13,9 @@ RobotLocalizer::RobotLocalizer()
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
-            config.vision_noise_variance, config.vision_noise_variance,
-            config.vision_noise_variance, config.motor_sensor_noise_variance,
-            config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
+            VISION_X_INITIAL_VARIANCE_M, VISION_Y_INITIAL_VARIANCE_M,
+            VISION_THETA_INITIAL_VARIANCE_RAD, MOTOR_X_INITIAL_VARIANCE_M,
+            MOTOR_Y_INITIAL_VARIANCE_M, MOTOR_THETA_INITIAL_VARIANCE_RAD,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
 }
