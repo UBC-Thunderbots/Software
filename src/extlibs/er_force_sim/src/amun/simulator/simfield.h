@@ -25,6 +25,11 @@
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 
+// The friction and restitution a body experiences on the floor is the product of the
+// floor's value and the body's own value (see the note in simulator.h)
+constexpr float FLOOR_FRICTION    = 0.35f;
+constexpr float FLOOR_RESTITUTION = 0.56f;
+
 namespace camun
 {
 namespace simulator
