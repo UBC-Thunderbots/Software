@@ -28,7 +28,7 @@ static constexpr double PROCESS_MODEL_INITIAL_VARIANCE = 0.5;
 
 
 // Measurement models
-static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> VISION_MEASUREMENT_COVARIANCE << 
+static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> VISION_MEASUREMENT_MODEL << 
 1,0,0,0,0,0,0,
 0,1,0,0,0,0,0,
 0,0,1,0,0,0,0,
@@ -36,18 +36,18 @@ static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> VISIO
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0;
 
-static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> MOTOR_MEASUREMENT_COVARIANCE << 
+static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> MOTOR_MEASUREMENT_MODEL << 
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,
-0,0,0,0,0,0,0;
+0,0,0,0,0,0,0,
 0,0,0,1,0,0,0,
 0,0,0,0,1,0,0,
-0,0,0,0,0,1,0,
+0,0,0,0,0,1,0;
 
-static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> IMU_MEASUREMENT_COVARIANCE << 
+static constexpr Eigen::Matrix<double, MEASUREMENT_SIZE, MEASUREMENT_SIZE> IMU_MEASUREMENT_MODEL<< 
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,
-0,0,0,0,0,0,0;
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,
-0,0,0,0,0,0,1,
+0,0,0,0,0,0,0,
+0,0,0,0,0,0,1;

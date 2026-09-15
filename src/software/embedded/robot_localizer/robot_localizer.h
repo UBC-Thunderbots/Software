@@ -50,12 +50,6 @@ class RobotLocalizer
         AngularVelocity angular_velocity;
     };
 
-    struct RobotLocalizerConfig
-    {
-        double process_noise_variance;
-        double vision_noise_variance;
-        double motor_sensor_noise_variance;
-    };
 
     /**
      * Creates a new robot localizer.
@@ -64,7 +58,7 @@ class RobotLocalizer
      *
      * @param config Configuration for the localizer variances.
      */
-    explicit RobotLocalizer(const RobotLocalizerConfig& config);
+    explicit RobotLocalizer();
 
     /**
      * Runs one prediction step over the given elapsed time.
@@ -176,9 +170,6 @@ class RobotLocalizer
      */
     void generateMeasurementModel(FilterStepType source);
 
-    static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
-    static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
-    static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
@@ -205,12 +196,6 @@ class RobotLocalizer
     };
 
     ExtendedKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
-
-    // Process noise variance used in prediction. The linear term models how much
-    // actual velocity deviates from the commanded target velocity (a rate, per unit
-    // time); the angular term models unmeasured angular acceleration disturbance.
-    double process_linear_velocity_noise_variance_;
-    double process_angular_acceleration_noise_variance_;
 
     // History is ordered newest-first (front is the most recent step)
     std::deque<FilterStep> history;

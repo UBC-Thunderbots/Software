@@ -6,9 +6,7 @@
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 
-RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
-    : process_linear_velocity_noise_variance_(config.process_noise_variance),
-      process_angular_acceleration_noise_variance_(config.process_noise_variance)
+RobotLocalizer::RobotLocalizer()
 {
     filter_.state_covariance =
         Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
@@ -368,34 +366,15 @@ void RobotLocalizer::generateMeasurementModel(FilterStepType source)
     switch (source)
     {
         case FilterStepType::VISION_DATA:
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::VISION_X_POSITION),
-                static_cast<Eigen::Index>(StateIndex::X_POSITION)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION),
-                static_cast<Eigen::Index>(StateIndex::Y_POSITION)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION),
-                static_cast<Eigen::Index>(StateIndex::ORIENTATION)) = 1;
+            filter_.measurement_model = VISION_MEASUREMENT_MODEL;
             break;
         case FilterStepType::MOTOR_DATA:
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_X_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::X_VELOCITY)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_Y_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::Y_VELOCITY)) = 1;
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::MOTOR_ANGULAR_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            filter_.measurement_model = MOTOR_MEASUREMENT_MODEL;
             break;
         case FilterStepType::IMU_DATA:
-            filter_.measurement_model(
-                static_cast<Eigen::Index>(MeasurementIndex::IMU_ANGULAR_VELOCITY),
-                static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
+            filter_.measurement_model = IMU_MEASUREMENT_MODEL;
             break;
         case FilterStepType::PREDICT:
-            // Never called with PREDICT; predict steps use generatedPredictionMatrices.
             break;
     }
 }
