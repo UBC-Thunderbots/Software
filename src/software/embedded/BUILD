@@ -120,7 +120,6 @@ cc_library(
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
         "//software:constants",
         "//software/embedded/services:imu",
@@ -128,7 +127,8 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/geom:point",
         "//software/geom:vector",
-        "//software/logger",
+        "//software/physics:velocity_conversion_util",
+        "//software/sensor_fusion/filter:extended_kalman_filter",
         "//software/sensor_fusion/filter:kalman_filter",
         "//software/world:robot_state",
         "@eigen",
