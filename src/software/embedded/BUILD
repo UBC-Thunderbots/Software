@@ -120,7 +120,6 @@ cc_library(
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
         "//software:constants",
         "//software/embedded/services:imu",

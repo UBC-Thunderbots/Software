@@ -1,10 +1,8 @@
 #include "robot_localizer.h"
-#include "software/logger/logger.h"
 
 #include <cmath>
 
 #include "proto/message_translation/tbots_geometry.h"
-#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 
@@ -17,12 +15,9 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
-			0.0001,
-			0.0001,
-			0.0001,
-			0.5,
-			0.5,
-			0.5,
+            config.vision_noise_variance, config.vision_noise_variance,
+            config.vision_noise_variance, config.motor_sensor_noise_variance,
+            config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
 }
