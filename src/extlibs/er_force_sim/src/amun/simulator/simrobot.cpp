@@ -128,6 +128,8 @@ SimRobot::SimRobot(const robot::Specs& specs,
 
     m_shapes.push_back(std::move(wholeShape));
     m_shapes.push_back(std::move(dribblerShape));
+
+    generateVelocityCoupling();
 }
 
 SimRobot::~SimRobot()
@@ -506,16 +508,11 @@ void SimRobot::begin(SimBall& ball, double time)
     // as a certain part of the acceleration is required to compensate damping,
     // the robot will run into a speed limit! bound acceleration the speed limit
     // is acceleration * accelScale / V
-    float a_f = V * v_f + K * error_v_f + K_I * m_error_sum_v_f;
-    float a_s = V * v_s + K * error_v_s + K_I * m_error_sum_v_s;
+    const float a_f = V * v_f + K * error_v_f + K_I * m_error_sum_v_f;
+    const float a_s = V * v_s + K * error_v_s + K_I * m_error_sum_v_s;
 
     const float accelScale =
         2.f;  // let robot accelerate / brake faster than the accelerator does
-    a_f = bound(a_f, v_f, accelScale * m_specs.strategy().a_speedup_f_max(),
-                accelScale * m_specs.strategy().a_brake_f_max());
-    a_s = bound(a_s, v_s, accelScale * m_specs.strategy().a_speedup_s_max(),
-                accelScale * m_specs.strategy().a_brake_s_max());
-    const btVector3 force(a_s * m_specs.mass(), a_f * m_specs.mass(), 0);
 
     // localInertia.z() / SIMULATOR_SCALE^2 \approx
     // 1/12*mass*(robot_width^2+robot_depth^2)
@@ -532,9 +529,29 @@ void SimRobot::begin(SimBall& ball, double time)
     // the forward acceleration into rotational acceleration
     const float a_phi_with_error = a_phi + m_rotationError * a_f;
 
-    const float a_phi_bound = bound(a_phi_with_error, omega,
-                                    accelScale * m_specs.strategy().a_speedup_phi_max(),
-                                    accelScale * m_specs.strategy().a_brake_phi_max());
+    float a_f_bound, a_s_bound, a_phi_bound;
+    if (m_limitWheelAcceleration)
+    {
+        // Limit the acceleration of every wheel individually, which for example makes
+        // the robot accelerate slower diagonally than straight ahead
+        const Eigen::Vector3f limited =
+            limitAcceleration(a_f, a_s, a_phi_with_error, v_f, v_s, omega);
+        a_s_bound   = limited[0];
+        a_f_bound   = limited[1];
+        a_phi_bound = limited[2];
+    }
+    else
+    {
+        a_f_bound   = bound(a_f, v_f, accelScale * m_specs.strategy().a_speedup_f_max(),
+                            accelScale * m_specs.strategy().a_brake_f_max());
+        a_s_bound   = bound(a_s, v_s, accelScale * m_specs.strategy().a_speedup_s_max(),
+                            accelScale * m_specs.strategy().a_brake_s_max());
+        a_phi_bound = bound(a_phi_with_error, omega,
+                            accelScale * m_specs.strategy().a_speedup_phi_max(),
+                            accelScale * m_specs.strategy().a_brake_phi_max());
+    }
+
+    const btVector3 force(a_s_bound * m_specs.mass(), a_f_bound * m_specs.mass(), 0);
     const btVector3 torque(0, 0, a_phi_bound * 0.007884f);
 
     if (force.length2() > 0 || torque.length2() > 0)
@@ -543,6 +560,49 @@ void SimRobot::begin(SimBall& ball, double time)
         m_body->applyCentralForce(t * force * SIMULATOR_SCALE);
         m_body->applyTorque(torque * SIMULATOR_SCALE * SIMULATOR_SCALE);
     }
+}
+
+void SimRobot::generateVelocityCoupling()
+{
+    const auto& limits = m_specs.simulation_limits();
+    if (limits.wheel_velocity_coupling_size() !=
+        m_velocityCoupling.rows() * m_velocityCoupling.cols())
+    {
+        m_limitWheelAcceleration = false;
+        return;
+    }
+
+    for (int row = 0; row < m_velocityCoupling.rows(); row++)
+    {
+        for (int col = 0; col < m_velocityCoupling.cols(); col++)
+        {
+            m_velocityCoupling(row, col) =
+                limits.wheel_velocity_coupling(row * m_velocityCoupling.cols() + col);
+        }
+    }
+
+    m_inverseCoupling        = m_velocityCoupling.completeOrthogonalDecomposition();
+    m_limitWheelAcceleration = true;
+}
+
+Eigen::Vector3f SimRobot::limitAcceleration(float a_f, float a_s, float a_phi, float v_f,
+                                            float v_s, float omega) const
+{
+    const float wheelAccel = m_specs.simulation_limits().a_speedup_wheel_max();
+    const float wheelDecel = m_specs.simulation_limits().a_brake_wheel_max();
+
+    const Eigen::Vector3f speed{v_s, v_f, omega};
+    const Eigen::Vector4f wheelSpeed = m_velocityCoupling * speed;
+
+    const Eigen::Vector3f acceleration{a_s, a_f, a_phi};
+    Eigen::Vector4f limitedWheelAcceleration = m_velocityCoupling * acceleration;
+    for (int i = 0; i < limitedWheelAcceleration.size(); i++)
+    {
+        limitedWheelAcceleration[i] =
+            bound(limitedWheelAcceleration[i], wheelSpeed[i], wheelAccel, wheelDecel);
+    }
+
+    return m_inverseCoupling.solve(limitedWheelAcceleration);
 }
 
 // copy-paste from accelerator
