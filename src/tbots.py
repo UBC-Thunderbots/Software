@@ -81,7 +81,6 @@ def main(
     :param test_suite: run the entire test suite instead of a single target
     :param enable_thunderscope: launch with Thunderscope enabled
     :param stop_ai_on_start: start the binary with the AI paused
-    :param jobs_option: value passed to Bazel's --jobs flag
     :param runs: value passed to Bazel's --runs_per_test flag
     :param robot_name: hostname of the robot targeted by an Ansible playbook
     :param ansible_playbook: name of the Ansible playbook to run
