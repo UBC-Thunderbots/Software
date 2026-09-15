@@ -271,7 +271,7 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_stat
 {
 	// Seperate update is okay because measurement model is linear
 	if (robot_status.has_imu_status()){
-		robot_localizer_.update(RobotLocalizer::ImuData{
+		robot_localizer_->update(RobotLocalizer::ImuData{
 			createAngularVelocity(robot_status.imu_status().angular_velocity())
 				})	
 
