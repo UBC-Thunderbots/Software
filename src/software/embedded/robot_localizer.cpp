@@ -1,6 +1,8 @@
 #include "robot_localizer.h"
+#include "software/logger/logger.h"
 
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 

@@ -39,6 +39,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
+        "//software/embedded:robot_localizer",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
         "//software/math:math_functions",
@@ -119,6 +120,7 @@ cc_library(
     hdrs = ["robot_localizer.h"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
         "//software:constants",
         "//software/embedded/services:imu",
@@ -126,6 +128,7 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/geom:point",
         "//software/geom:vector",
+        "//software/logger",
         "//software/sensor_fusion/filter:kalman_filter",
         "//software/world:robot_state",
         "@eigen",
