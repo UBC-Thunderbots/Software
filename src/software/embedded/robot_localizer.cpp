@@ -17,9 +17,12 @@ RobotLocalizer::RobotLocalizer(const RobotLocalizerConfig& config)
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
-            config.vision_noise_variance, config.vision_noise_variance,
-            config.vision_noise_variance, config.motor_sensor_noise_variance,
-            config.motor_sensor_noise_variance, config.motor_sensor_noise_variance,
+			0.0001,
+			0.0001,
+			0.0001,
+			0.5,
+			0.5,
+			0.5,
             ImuService::IMU_VARIANCE)
             .asDiagonal();
 }
