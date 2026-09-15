@@ -269,13 +269,12 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
 
 void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status)
 {
-	// Seperate update is okay because measurement model is linear
-	if (robot_status.has_imu_status()){
-		robot_localizer_->update(RobotLocalizer::ImuData{
-			createAngularVelocity(robot_status.imu_status().angular_velocity())
-				});
-
-	}
+    // Separate update is okay because measurement model is linear
+    if (robot_status.has_imu_status())
+    {
+        robot_localizer_->update(RobotLocalizer::ImuData{
+            createAngularVelocity(robot_status.imu_status().angular_velocity())});
+    }
     if (robot_status.has_motor_status())
     {
         AngularVelocity res =
