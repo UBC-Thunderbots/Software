@@ -8,13 +8,18 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(
-    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id)
-    : robot_state_(), robot_constants_(robot_constants), robot_id_(robot_id)
+    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id,
+    const TeamColour team_colour)
+    : robot_state_(),
+      robot_constants_(robot_constants),
+      robot_id_(robot_id),
+      team_colour_(team_colour)
 {
 }
 

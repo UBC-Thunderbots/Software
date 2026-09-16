@@ -10,8 +10,10 @@
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
@@ -280,14 +282,14 @@ void ErForceSimulator::setRobots(
     {
         if (side == gameController::Team::BLUE)
         {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants, id);
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                robot_constants, id, TeamColour::BLUE);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants, id);
+            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+                robot_constants, id, TeamColour::YELLOW);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }

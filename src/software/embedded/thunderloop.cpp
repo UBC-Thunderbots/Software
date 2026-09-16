@@ -17,9 +17,9 @@
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
+#include "software/logger/custom_logging_levels.h"
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
-#include "software/physics/velocity_conversion_util.h"
 #include "software/time/duration.h"
 #include "software/tracy/tracy_constants.h"
 
@@ -271,17 +271,24 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_stat
 {
 	// Seperate update is okay because measurement model is linear
 	if (robot_status.has_imu_status()){
-		robot_localizer_.update(RobotLocalizer::ImuData{
-			createAngularVelocity(robot_status.imu_status().angular_velocity())
-				})	
-
+		AngularVelocity  res =  createAngularVelocity(robot_status.imu_status().angular_velocity());
+		if (res <0.1){
+			res = 0;
+		}
+		robot_localizer_->update(RobotLocalizer::ImuData{
+			createAngularVelocity(0)});
 	}
     if (robot_status.has_motor_status())
-    {
+		Vector velocity = robot_status.motor_status().local_velocity();	
+		if ( velocity.x() <0.05 && velocity.y() <0.05 ) {
+			velocity = Vector(0,0);	
+		}
+		AngularVelocity angular_velocity = robot_status.motor_status().angular_velocity();	
+		if ( angular_velocity.toRadians() <0.1 ) {
+			angular_velocity = Angle::zero();
+		}
         robot_localizer_->update(RobotLocalizer::MotorData{
-            localToGlobalVelocity(
-                createVector(robot_status.motor_status().local_velocity()),
-                robot_localizer_->getOrientation()),
-            createAngularVelocity(robot_status.motor_status().angular_velocity())});
+				velocity, angular_velocity
+});
     }
 }

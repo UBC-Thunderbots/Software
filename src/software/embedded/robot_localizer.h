@@ -5,19 +5,23 @@
 #include <optional>
 
 #include "proto/primitive.pb.h"
-#include "proto/robot_status_msg.pb.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/sensor_fusion/filter/kalman_filter.hpp"
+#include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
 
+// X_POSITION/Y_POSITION are in world space; X_VELOCITY/Y_VELOCITY are in the robot's
+// local frame (see velocity_conversion_util.h), matching what the motor sensors report
+// directly and avoiding a lossy conversion through the orientation estimate.
 MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
           ANGULAR_VELOCITY);
 
+// MOTOR_X_VELOCITY/MOTOR_Y_VELOCITY are in the robot's local frame, matching
+// StateIndex::X_VELOCITY/Y_VELOCITY.
 MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTATION,
           MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
           IMU_ANGULAR_VELOCITY);
@@ -27,8 +31,12 @@ MAKE_ENUM(ControlIndex, X_VELOCITY_TARGET, Y_VELOCITY_TARGET);
 MAKE_ENUM(FilterStepType, PREDICT, MOTOR_DATA, IMU_DATA, VISION_DATA);
 
 /**
- * Estimates robot orientation, angular velocity, and angular acceleration
- * using a Kalman filter.
+ * Estimates robot position, orientation, velocity, and angular velocity using an
+ * extended Kalman filter.
+ *
+ * The process model is nonlinear because velocity is estimated in the robot's local
+ * frame (see StateIndex) while position is in world space, so propagating position
+ * requires rotating local velocity by the current orientation estimate.
  *
  * The filter keeps a history of recent predict/update operations. When delayed
  * vision data arrives, the localizer rewinds to the matching historical state,
@@ -47,6 +55,8 @@ class RobotLocalizer
 
     struct MotorData
     {
+        // Local-frame velocity, as reported directly by the motor sensors (see
+        // velocity_conversion_util.h)
         Vector velocity;
         AngularVelocity angular_velocity;
     };
@@ -113,9 +123,20 @@ class RobotLocalizer
     /**
      * Gets the estimated velocity of the robot in world space.
      *
+     * The filter estimates velocity in the robot's local frame (see StateIndex), so
+     * this converts it to world space using the current orientation estimate.
+     *
      * @return the estimated velocity of the robot in world space
      */
-    Vector getVelocity() const;
+    Vector getGlobalVelocity() const;
+
+    /**
+     * Gets the estimated velocity of the robot in its own local frame (see StateIndex
+     * and velocity_conversion_util.h), i.e. the filter's raw velocity state.
+     *
+     * @return the estimated velocity of the robot in its local frame
+     */
+    Vector getLocalVelocity() const;
 
     /**
      * Gets the estimated orientation of the robot in world space.
@@ -148,9 +169,15 @@ class RobotLocalizer
     void updateFilterWithVision(const Point& position, const Angle& orientation);
 
     /**
-     * Computes the process model, process covariance, and control model for the
-     * given elapsed time, and writes them into the filter. Does not run the
-     * predict step itself.
+     * Computes the process model function, its Jacobian, the process covariance, and
+     * the control model for the given elapsed time, and writes them into the filter.
+     * Does not run the predict step itself.
+     *
+     * The control model also depends on the filter's current orientation estimate
+     * (used to rotate the global-frame control input into the local frame that
+     * velocity is estimated in), so this must be called with the filter's state
+     * estimate set to what it was immediately before the predict step being
+     * (re)computed.
      *
      * @param delta_time_seconds The elapsed time to generate the prediction
      * matrices for
@@ -176,8 +203,9 @@ class RobotLocalizer
     {
         FilterStepType type;
 
-        // Set iff type == PREDICT. process_model/process_covariance/control_model are
-        // recomputed from the elapsed time during replay instead of being stored (see
+        // Set iff type == PREDICT. The process model function/Jacobian, process
+        // covariance, and control model are recomputed from the elapsed time and the
+        // state estimate during replay instead of being stored (see
         // generatedPredictionMatrices).
         std::optional<Eigen::Vector<double, CONTROL_SIZE>> control_input;
 
@@ -192,7 +220,7 @@ class RobotLocalizer
         double time_seconds;
     };
 
-    KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
+    ExtendedKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
     // Process noise variance used in prediction. The linear term models how much
     // actual velocity deviates from the commanded target velocity (a rate, per unit
