@@ -1,4 +1,4 @@
-#include "software/embedded/robot_localizer.h"
+#include "robot_localizer.h"
 
 #include <gtest/gtest.h>
 
@@ -11,12 +11,6 @@
 namespace
 {
 // Mirror the values thunderloop constructs the localizer with (DivB constants).
-RobotLocalizer::RobotLocalizerConfig makeConfig()
-{
-    return RobotLocalizer::RobotLocalizerConfig{/*process_noise_variance=*/1.0,
-                                                /*vision_noise_variance=*/0.01 * 0.01,
-                                                /*motor_sensor_noise_variance=*/0.5};
-}
 
 constexpr double LOOP_HZ = 300.0;
 constexpr double DT      = 1.0 / LOOP_HZ;
@@ -27,7 +21,7 @@ constexpr double DT      = 1.0 / LOOP_HZ;
 // provided (isolates whether the periodic vision fix corrupts the velocity estimate).
 RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S / 2)
 {
-    RobotLocalizer localizer(makeConfig());
+    RobotLocalizer localizer();
 
     const Vector true_velocity(1.0, 0.0);
     const Angle true_orientation = Angle::zero();
@@ -44,7 +38,8 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
 
         const Vector local_velocity =
             globalToLocalVelocity(true_velocity, true_orientation);
-        localizer.update(RobotLocalizer::MotorData{local_velocity, AngularVelocity::zero()});
+        localizer.update(
+            RobotLocalizer::MotorData{local_velocity, AngularVelocity::zero()});
 
         localizer.predict(Vector(0.0, 0.0), Duration::fromSeconds(DT));
 
@@ -69,8 +64,9 @@ TEST(RobotLocalizer, tracks_constant_forward_velocity)
     const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/true);
 
     std::cerr << "[motor+vision] pos=(" << localizer.getPosition().x() << ", "
-              << localizer.getPosition().y() << ") vel=(" << localizer.getGlobalVelocity().x()
-              << ", " << localizer.getGlobalVelocity().y()
+              << localizer.getPosition().y() << ") vel=("
+              << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y()
               << ") orient=" << localizer.getOrientation().toDegrees() << "deg\n";
 
     // NOTE: we assert on velocity and orientation, not absolute position. RobotLocalizer

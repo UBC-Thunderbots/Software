@@ -13,22 +13,7 @@
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
-
-// X_POSITION/Y_POSITION are in world space; X_VELOCITY/Y_VELOCITY are in the robot's
-// local frame (see velocity_conversion_util.h), matching what the motor sensors report
-// directly and avoiding a lossy conversion through the orientation estimate.
-MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
-          ANGULAR_VELOCITY);
-
-// MOTOR_X_VELOCITY/MOTOR_Y_VELOCITY are in the robot's local frame, matching
-// StateIndex::X_VELOCITY/Y_VELOCITY.
-MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTATION,
-          MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
-          IMU_ANGULAR_VELOCITY);
-
-MAKE_ENUM(ControlIndex, X_VELOCITY_TARGET, Y_VELOCITY_TARGET);
-
-MAKE_ENUM(FilterStepType, PREDICT, MOTOR_DATA, IMU_DATA, VISION_DATA);
+#include "software/embedded/robot_localizer/robot_localizer_constants.h"
 
 /**
  * Estimates robot position, orientation, velocity, and angular velocity using an
@@ -66,12 +51,6 @@ class RobotLocalizer
         AngularVelocity angular_velocity;
     };
 
-    struct RobotLocalizerConfig
-    {
-        double process_noise_variance;
-        double vision_noise_variance;
-        double motor_sensor_noise_variance;
-    };
 
     /**
      * Creates a new robot localizer.
@@ -80,7 +59,7 @@ class RobotLocalizer
      *
      * @param config Configuration for the localizer variances.
      */
-    explicit RobotLocalizer(const RobotLocalizerConfig& config);
+    explicit RobotLocalizer();
 
     /**
      * Runs one prediction step over the given elapsed time.
@@ -192,9 +171,6 @@ class RobotLocalizer
      */
     void generateMeasurementModel(FilterStepType source);
 
-    static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
-    static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
-    static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
@@ -213,7 +189,7 @@ class RobotLocalizer
         // during replay (see generateMeasurementModel).
         std::optional<Eigen::Vector<double, MEASUREMENT_SIZE>> measurement;
 
-		// Post operation state
+        // Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
@@ -221,12 +197,6 @@ class RobotLocalizer
     };
 
     ExtendedKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
-
-    // Process noise variance used in prediction. The linear term models how much
-    // actual velocity deviates from the commanded target velocity (a rate, per unit
-    // time); the angular term models unmeasured angular acceleration disturbance.
-    double process_linear_velocity_noise_variance_;
-    double process_angular_acceleration_noise_variance_;
 
     // History is ordered newest-first (front is the most recent step)
     std::deque<FilterStep> history;
