@@ -16,10 +16,7 @@ Team RobotTeamFilter::getFilteredData(
     {
         if (robot_filters.find(detection.id) == robot_filters.end())
         {
-            robot_filters.insert(
-                {detection.id,
-                 RobotFilter(detection, Duration::fromMilliseconds(
-                                            ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
+            robot_filters.insert({detection.id, RobotFilter(detection)});
         }
     }
 
@@ -29,8 +26,8 @@ Team RobotTeamFilter::getFilteredData(
     std::vector<Robot> new_filtered_robot_data;
     for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
     {
-        auto data = it->second.getFilteredData(new_robot_detections, capture_timestamp,
-                                               breakbeam_tripped_id);
+        auto data = it->second.estimateRobotState(new_robot_detections, capture_timestamp,
+                                                  breakbeam_tripped_id);
         if (data)
         {
             new_filtered_robot_data.emplace_back(*data);
