@@ -142,6 +142,8 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         AngMeasurement revolution_test(best_robot_detection->orientation.toRadians());
         // To keep Kalman filter linear, we must add revolutions. Otherwise, the Kalman
         // filter cannot process a rotation, where it would exceed 2pi and return to 0.
+
+        // TODO: fix ts because ts broken asf
         if ((prev_ang_measurement.has_value()) &&
             (best_robot_detection->orientation < Angle::quarter()) &&
             (Angle::fromRadians((*prev_ang_measurement)(0)) > Angle::threeQuarter()))
