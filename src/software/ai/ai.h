@@ -67,9 +67,6 @@ class Ai final
 
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
-    std::unique_ptr<Play> override_play;
-    std::unique_ptr<Play> current_play;
-    TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 
     // inter play communication
