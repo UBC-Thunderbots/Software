@@ -273,7 +273,7 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_stat
 	if (robot_status.has_imu_status()){
 		robot_localizer_->update(RobotLocalizer::ImuData{
 			createAngularVelocity(robot_status.imu_status().angular_velocity())
-				})	
+				})	;
 
 	}
     if (robot_status.has_motor_status())
