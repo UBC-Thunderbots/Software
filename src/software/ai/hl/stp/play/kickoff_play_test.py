@@ -12,8 +12,6 @@
 # +------------------+------------------+
 # After ball leaves center: half/CC rules no longer enforced here.
 
-import threading
-
 import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
@@ -32,6 +30,8 @@ from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsNeverEntersRegion,
     RobotNeverEntersRegion,
 )
+
+NORMAL_START_DELAY_S = 4.0
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
@@ -86,14 +86,6 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             )
             blue_play = protos.PlayName.KickoffEnemyPlay
             yellow_play = protos.PlayName.KickoffFriendlyPlay
-
-        # Let robots get ready before starting kickoff
-        threading.Timer(
-            4.0,
-            lambda: simulated_test_runner.send_gamecontroller_command(
-                gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
-            ),
-        ).start()
 
         simulated_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
 
@@ -160,6 +152,9 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         setup=setup,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
+        ci_cmd_with_delay=[
+            (NORMAL_START_DELAY_S, protos.Command.Type.NORMAL_START, SslTeam.BLUE),
+        ],
         test_timeout_s=10,
     )
 
