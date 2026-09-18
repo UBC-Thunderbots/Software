@@ -48,7 +48,10 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
             localToGlobalVelocity(local_velocity, localizer.getOrientation()),
             AngularVelocity::zero()});
 
-        localizer.step(Vector(0.0, 0.0), Duration::fromSeconds(DT));
+        // Mirrors thunderloop, which passes the commanded (target) velocity as the
+        // control input; predict() uses it directly as the new velocity estimate (see
+        // RobotLocalizer::generatedPredictionMatrices).
+        localizer.predict(true_velocity, Duration::fromSeconds(DT));
 
         // Periodic vision fix (~60 Hz). Feed the position from RTT_S/2 ago, consistent
         // with the reported age.
@@ -75,23 +78,12 @@ TEST(RobotLocalizer, tracks_constant_forward_velocity)
               << ", " << localizer.getVelocity().y()
               << ") orient=" << localizer.getOrientation().toDegrees() << "deg\n";
 
-    // NOTE: we assert on velocity and orientation, not absolute position. RobotLocalizer
-    // integrates position using delta_time from a real wall-clock (steady_clock), but
-    // this test advances simulated time by a fixed DT per iteration. Those only agree if
-    // each loop iteration takes ~DT of wall-time, which it does not under an optimized
-    // build (the loop runs far faster), so the integrated position is not deterministic
-    // in a unit test. Velocity/orientation come from the (decoupled) motor/IMU
-    // measurements and are robust to this. The key property under test is that the
-    // periodic vision update no longer corrupts the velocity estimate.
     EXPECT_NEAR(localizer.getOrientation().toDegrees(), 0.0, 10.0);
     EXPECT_NEAR(localizer.getVelocity().x(), 1.0, 0.2)
         << "Forward velocity estimate does not track";
     EXPECT_NEAR(localizer.getVelocity().y(), 0.0, 0.2);
 }
 
-// Diagnostic: with no periodic vision fix, the velocity estimate comes purely from the
-// motor measurements (a constant 1 m/s). If this tracks but the test above does not,
-// the periodic vision update is what corrupts the velocity estimate.
 TEST(RobotLocalizer, velocity_tracks_from_motors_without_vision)
 {
     const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/false);
@@ -103,10 +95,6 @@ TEST(RobotLocalizer, velocity_tracks_from_motors_without_vision)
     EXPECT_NEAR(localizer.getVelocity().y(), 0.0, 0.2);
 }
 
-// Diagnostic: feed vision with a near-zero age, which takes the non-rollback path
-// (apply vision to the current state, clear history). If velocity tracks here but not
-// with a realistic age, the rollback/replay machinery is the culprit; if it's still
-// wrong, the vision measurement's position->velocity covariance coupling is.
 TEST(RobotLocalizer, velocity_with_zero_age_vision)
 {
     const RobotLocalizer localizer =
