@@ -39,38 +39,40 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         travel_distance = perimeter - travel_distance;
     }
 
-    bool wrap_flag = false;
-    while (travel_distance > 0)
+    // First segment is traversed from closest_start toward the segment end; later
+    // segments are traversed from their start vertex.
+    bool on_first_segment = true;
+    while (travel_distance > FIXED_EPSILON)
     {
-        Segment curr_segment = polygon_segments[segment_index];
-
+        Segment curr_segment  = polygon_segments[segment_index];
+        Point from_point      = curr_segment.getStart();
         double segment_length = curr_segment.length();
-        if (segment_index == start_segment_index && !wrap_flag)
+
+        if (on_first_segment)
         {
-            segment_length = distance(closest_start, curr_segment.getEnd());
-            wrap_flag      = true;
+            from_point       = closest_start;
+            segment_length   = distance(closest_start, curr_segment.getEnd());
+            on_first_segment = false;
         }
 
-        // If the remaining distance to travel is less than or equal to the length
-        // of the current segment, calculate the final point and return it
+        if (segment_length < FIXED_EPSILON)
+        {
+            // End of segment. Advance to next.
+            segment_index = (segment_index + 1) % polygon_segments.size();
+            continue;
+        }
+
         if (travel_distance <= segment_length)
         {
             double ratio = travel_distance / segment_length;
-            double newX =
-                curr_segment.getStart().x() +
-                ratio * (curr_segment.getEnd().x() - curr_segment.getStart().x());
-            double newY =
-                curr_segment.getStart().y() +
-                ratio * (curr_segment.getEnd().y() - curr_segment.getStart().y());
-            return Point{newX, newY};
+            return Point(
+                from_point.x() + ratio * (curr_segment.getEnd().x() - from_point.x()),
+                from_point.y() + ratio * (curr_segment.getEnd().y() - from_point.y()));
         }
 
-        // Subtract the length of the current segment from the total distance
         travel_distance -= segment_length;
-
-        // Update the segment index
         segment_index = (segment_index + 1) % polygon_segments.size();
     }
 
-    return start;
+    return closest_start;
 }
