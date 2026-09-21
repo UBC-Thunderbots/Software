@@ -534,3 +534,132 @@ TEST_F(ErForceSimulatorTest, simulator_state_rotation_matches_robot_orientation)
         Angle::fromRadians(2 * std::atan2(rotation.k(), rotation.real())), orientation,
         Angle::fromDegrees(1)));
 }
+
+class ErForceSimulatorRealismTest : public ::testing::Test
+{
+   protected:
+    // Creates a simulator whose realism config is the default one, with the given
+    // modification applied
+    void createSimulator(
+        const std::function<void(RealismConfigErForce&)>& configure_realism)
+    {
+        auto realism_config = ErForceSimulator::createDefaultRealismConfig();
+        configure_realism(*realism_config);
+        simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
+                                                       robot_constants, realism_config);
+        simulator->resetCurrentTime();
+    }
+
+    // Adds a single stationary yellow robot at the center of the field
+    void addYellowRobot()
+    {
+        simulator->setYellowRobots({RobotStateWithId{
+            .id          = 0,
+            .robot_state = RobotState(Point(0, 0), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())}});
+    }
+
+    // Returns all yellow robot detections across all cameras of the latest packets
+    std::vector<SSLProto::SSL_DetectionRobot> getYellowDetections()
+    {
+        std::vector<SSLProto::SSL_DetectionRobot> detections;
+        for (const auto& packet : simulator->getSSLWrapperPackets())
+        {
+            for (const auto& robot : packet.detection().robots_yellow())
+            {
+                detections.push_back(robot);
+            }
+        }
+        return detections;
+    }
+
+    std::shared_ptr<ErForceSimulator> simulator;
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
+};
+
+TEST_F(ErForceSimulatorRealismTest, robots_are_always_detected_by_default)
+{
+    createSimulator([](RealismConfigErForce&) {});
+    addYellowRobot();
+    simulator->stepSimulation(Duration::fromMilliseconds(5));
+
+    EXPECT_FALSE(getYellowDetections().empty());
+}
+
+TEST_F(ErForceSimulatorRealismTest, robots_are_never_detected_when_always_missing)
+{
+    createSimulator([](RealismConfigErForce& realism)
+                    { realism.set_missing_robot_detections(1.0f); });
+    addYellowRobot();
+    simulator->stepSimulation(Duration::fromMilliseconds(5));
+
+    EXPECT_TRUE(getYellowDetections().empty());
+}
+
+TEST_F(ErForceSimulatorRealismTest, rotated_robot_detections_are_reported_on_top)
+{
+    createSimulator(
+        [](RealismConfigErForce& realism)
+        {
+            realism.set_rotated_robot_detections_start(1.0f);
+            realism.set_rotated_robot_detections_stop(0.0f);
+        });
+    addYellowRobot();
+    simulator->stepSimulation(Duration::fromMilliseconds(5));
+
+    auto detections = getYellowDetections();
+    ASSERT_EQ(2, detections.size());
+
+    // The robot is reported once with its own id and once with the id of the pattern
+    // that its own pattern turns into when rotated by 90 degrees
+    EXPECT_EQ(0, detections[0].robot_id());
+    EXPECT_NE(detections[0].robot_id(), detections[1].robot_id());
+    EXPECT_NEAR(detections[1].x(), detections[0].x(), 1e-3);
+    EXPECT_NEAR(detections[1].y(), detections[0].y(), 1e-3);
+    EXPECT_NEAR(detections[1].orientation(), detections[0].orientation() + M_PI_2, 1e-3);
+}
+
+TEST_F(ErForceSimulatorRealismTest, commands_are_only_applied_after_the_command_delay)
+{
+    constexpr double COMMAND_DELAY_SECONDS         = 0.1;
+    constexpr double DRIVE_SPEED_METERS_PER_SECOND = 1.0;
+
+    TbotsProto::PrimitiveSet primitive_set;
+    (*primitive_set.mutable_robot_primitives())[0] = *createDirectControlPrimitive(
+        Vector(DRIVE_SPEED_METERS_PER_SECOND, 0), AngularVelocity::zero(),
+        /*dribbler_rpm=*/0, TbotsProto::AutoChipOrKick());
+
+    // Drives the robot forwards for the given duration and returns its forward velocity
+    const auto driveFor = [&](const Duration& duration)
+    {
+        for (unsigned int step = 0; step * 5 < duration.toMilliseconds(); step++)
+        {
+            simulator->setYellowRobotPrimitiveSet(primitive_set,
+                                                  std::make_unique<TbotsProto::World>());
+            simulator->stepSimulation(Duration::fromMilliseconds(5));
+        }
+        return simulator->getSimulatorState().yellow_robots(0).v_x();
+    };
+
+    // Without a command delay the robot starts driving right away
+    createSimulator([](RealismConfigErForce&) {});
+    addYellowRobot();
+    const double velocity_without_delay =
+        driveFor(Duration::fromSeconds(COMMAND_DELAY_SECONDS / 2));
+    EXPECT_GT(velocity_without_delay, 0.05);
+
+    // With a command delay the robot has not received anything yet at the same point in
+    // time, so it only drifts by the tiny amount it takes to settle onto the field
+    createSimulator(
+        [](RealismConfigErForce& realism)
+        {
+            realism.set_command_delay(
+                static_cast<int64_t>(COMMAND_DELAY_SECONDS * NANOSECONDS_PER_SECOND));
+        });
+    addYellowRobot();
+    EXPECT_NEAR(driveFor(Duration::fromSeconds(COMMAND_DELAY_SECONDS / 2)), 0.0, 0.01);
+
+    // Once the delay has passed, the robot drives just like it does without a delay
+    EXPECT_GT(driveFor(Duration::fromSeconds(1.0)), 0.1);
+}

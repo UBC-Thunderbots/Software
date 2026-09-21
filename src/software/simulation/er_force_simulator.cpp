@@ -94,8 +94,13 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConf
     realism_config->set_missing_ball_detections(0);
     realism_config->set_vision_delay(0);
     realism_config->set_vision_processing_time(0);
-    realism_config->set_missing_ball_detections(0);
     realism_config->set_simulate_dribbling(false);
+    realism_config->set_object_position_offset(0);
+    realism_config->set_missing_robot_detections(0);
+    realism_config->set_command_delay(0);
+    realism_config->set_robot_rotation_error(0);
+    realism_config->set_rotated_robot_detections_start(0);
+    realism_config->set_rotated_robot_detections_stop(0);
     return realism_config;
 }
 
@@ -116,11 +121,20 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismCo
     realism_config->set_camera_position_error(0.1f);
     realism_config->set_robot_command_loss(0.03f);
     realism_config->set_robot_response_loss(0.1f);
-    realism_config->set_missing_ball_detections(0.05f);
+    // Upstream uses 0.05 here, but this config used to set the field twice and the
+    // second value won, so 0.02 is what this has actually been doing all along
+    realism_config->set_missing_ball_detections(0.02f);
     realism_config->set_vision_delay(35000000);
     realism_config->set_vision_processing_time(10000000);
-    realism_config->set_missing_ball_detections(0.02f);
+    // Upstream simulates dribbling here, but our simulated tests rely on the perfect
+    // dribbler, so we keep gluing the ball to the dribbler
     realism_config->set_simulate_dribbling(false);
+    realism_config->set_object_position_offset(0.02f);
+    realism_config->set_missing_robot_detections(0.02f);
+    realism_config->set_command_delay(3000000);
+    realism_config->set_robot_rotation_error(0.5f);
+    realism_config->set_rotated_robot_detections_start(0.001f);
+    realism_config->set_rotated_robot_detections_stop(0.3f);
     return realism_config;
 }
 
