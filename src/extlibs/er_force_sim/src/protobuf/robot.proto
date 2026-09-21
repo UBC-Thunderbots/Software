@@ -13,6 +13,20 @@ message LimitParameters
     optional float a_brake_phi_max   = 6;
 };
 
+message SimulationLimits
+{
+    // Limits the maximum acceleration of every wheel individually in the simulator,
+    // measured at the contact point of the wheel with the field [m/s^2].
+    // NOTE: upstream ER-Force specifies these per wheel rotation [rot/s^2]. We use
+    // linear units instead, because that is what our robot constants are given in.
+    optional float a_speedup_wheel_max = 1;
+    optional float a_brake_wheel_max   = 2;
+    // Row major 4x3 matrix that maps the robot's local velocity (v_s, v_f, omega),
+    // where v_s points to the right of the robot and v_f forwards, to the speed of
+    // each of its four wheels. The limits above are only applied if this is set.
+    repeated float wheel_velocity_coupling = 3;
+};
+
 message Specs
 {
     enum GenerationType
@@ -40,6 +54,9 @@ message Specs
     optional float shoot_radius    = 17;
     optional float dribbler_height = 18;
     reserved 20;
+    // If unset, the robot's acceleration is only limited by the 'acceleration' limits
+    // above (with an additional acceleration factor)
+    optional SimulationLimits simulation_limits = 21;
 };
 
 message Generation
