@@ -16,6 +16,7 @@ geometry {
 	defense_width: 2.0
 	defense_height: 1.0
 	type: TYPE_2018
+	corner_block_cathetus_length: 0.09
 }
 camera_setup {
   camera_id: 0
