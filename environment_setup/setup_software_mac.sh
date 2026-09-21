@@ -57,7 +57,7 @@ source /opt/tbotspython/bin/activate
 
 # Install Python dependencies
 sudo pip install --upgrade pip
-sudo pip install -r macos_requirements.txt
+sudo pip install -r requirements.txt
 
 print_status_msg "Done Setting Up Python Environment"
 
