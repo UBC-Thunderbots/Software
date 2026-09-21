@@ -59,7 +59,7 @@ class BallFilter
 
    private:
     // KF Dimensions
-    // State: position x, position y, veloity x, velocity y
+    // State: position x, position y, velocity x, velocity y
     static constexpr int STATE_SIZE = 4;
     // Measurement: x and y from vision
     static constexpr int MEASUREMENT_SIZE = 2;
