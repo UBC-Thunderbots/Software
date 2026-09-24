@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <deque>
 #include <optional>
+#include <variant>
 
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -22,7 +23,9 @@ MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTA
           MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
           IMU_ANGULAR_VELOCITY);
 
-MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION);
+MAKE_ENUM(ControlIndex, X_VELOCITY_TARGET, Y_VELOCITY_TARGET);
+
+MAKE_ENUM(FilterStepType, PREDICT, MOTOR_DATA, IMU_DATA, VISION_DATA);
 
 /**
  * Estimates robot orientation, angular velocity, and angular acceleration
@@ -73,10 +76,11 @@ class RobotLocalizer
     /**
      * Runs one prediction step over the given elapsed time.
      *
-     * @param linear_acceleration The current linear acceleration of the robot
+     * @param target_velocity The global-frame linear velocity the robot is currently
+     * being commanded to achieve
      * @param delta_time The elapsed time since the previous step
      */
-    void step(const Vector& linear_acceleration, const Duration& delta_time);
+    void predict(const Vector& target_velocity, const Duration& delta_time);
 
     /**
      * Update the robot's position and orientation from data reported by vision.
@@ -144,32 +148,56 @@ class RobotLocalizer
      */
     void updateFilterWithVision(const Point& position, const Angle& orientation);
 
+    /**
+     * Computes the process model, process covariance, and control model for the
+     * given elapsed time, and writes them into the filter. Does not run the
+     * predict step itself.
+     *
+     * @param delta_time_seconds The elapsed time to generate the prediction
+     * matrices for
+     */
+    void updateFilterPredictionMatrices(double delta_time_seconds);
+
+    /**
+     * Writes the measurement model for the given data source into the filter.
+     *
+     * @param source Which sensor's measurement model to generate. Must not be
+     * FilterStepType::PREDICT.
+     */
+    void updateFilterMeasurementModel(FilterStepType source);
+
     static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
     static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
     static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
+
+    /**
+     * A predict step. process_model/process_covariance/control_model are recomputed
+     * from the elapsed time during replay instead of being stored (see
+     * updateFilterPredictionMatrices).
+     */
+    struct PredictStep
+    {
+        Eigen::Vector<double, CONTROL_SIZE> control_input;
+    };
+
+    /**
+     * An update step. The measurement model is regenerated from type during replay
+     * (see updateFilterMeasurementModel). type must not be FilterStepType::PREDICT.
+     */
+    struct UpdateStep
+    {
+        FilterStepType type;
+        Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
+    };
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
      */
     struct FilterStep
     {
-        struct Predict
-        {
-            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_model;
-            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_covariance;
-            Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE> control_model;
-            Eigen::Vector<double, CONTROL_SIZE> control_input;
-        };
+        std::variant<PredictStep, UpdateStep> step;
 
-        struct Update
-        {
-            Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> measurement_model;
-            Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
-        };
-
-        std::optional<Predict> prediction;
-        std::optional<Update> update;
-
+        // Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
@@ -178,8 +206,10 @@ class RobotLocalizer
 
     KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
-    // Process noise variance used in prediction
-    double process_linear_acceleration_noise_variance_;
+    // Process noise variance used in prediction. The linear term models how much
+    // actual velocity deviates from the commanded target velocity (a rate, per unit
+    // time); the angular term models unmeasured angular acceleration disturbance.
+    double process_linear_velocity_noise_variance_;
     double process_angular_acceleration_noise_variance_;
 
     // History is ordered newest-first (front is the most recent step)
