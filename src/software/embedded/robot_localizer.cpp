@@ -150,7 +150,8 @@ void RobotLocalizer::update(const MotorData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .step = UpdateStep{.type = FilterStepType::MOTOR_DATA, .measurement = measurement},
+        .step =
+            UpdateStep{.type = FilterStepType::MOTOR_DATA, .measurement = measurement},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
@@ -216,8 +217,17 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
     // In the current model, we use target velocity as our new velocity of the preiction
     // state, and position is derived from it. Therefore, process model keeps the
     // positions and we don't predict it using estimated velocities
-    filter_.process_model << 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-        delta_time_seconds, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1;
+    //
+    // State order: X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
+    // ANGULAR_VELOCITY
+    // clang-format off
+    filter_.process_model <<
+        1, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0,
+        0, 0, 1, 0, 0, delta_time_seconds,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1;
     // clang-format on
 
     const double delta_time_squared = delta_time_seconds * delta_time_seconds;
