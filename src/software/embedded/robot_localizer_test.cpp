@@ -44,9 +44,8 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
 
         const Vector local_velocity =
             globalToLocalVelocity(true_velocity, true_orientation);
-        localizer.update(RobotLocalizer::MotorData{
-            localToGlobalVelocity(local_velocity, localizer.getOrientation()),
-            AngularVelocity::zero()});
+        localizer.update(
+            RobotLocalizer::MotorData{local_velocity, AngularVelocity::zero()});
 
         // predict() uses the commanded (target) velocity directly as the new velocity
         // estimate (see RobotLocalizer::updateFilterPredictionMatrices).
@@ -73,25 +72,26 @@ TEST(RobotLocalizer, tracks_constant_forward_velocity)
     const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/true);
 
     std::cerr << "[motor+vision] pos=(" << localizer.getPosition().x() << ", "
-              << localizer.getPosition().y() << ") vel=(" << localizer.getVelocity().x()
-              << ", " << localizer.getVelocity().y()
+              << localizer.getPosition().y() << ") vel=("
+              << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y()
               << ") orient=" << localizer.getOrientation().toDegrees() << "deg\n";
 
     EXPECT_NEAR(localizer.getOrientation().toDegrees(), 0.0, 10.0);
-    EXPECT_NEAR(localizer.getVelocity().x(), 1.0, 0.2)
+    EXPECT_NEAR(localizer.getGlobalVelocity().x(), 1.0, 0.2)
         << "Forward velocity estimate does not track";
-    EXPECT_NEAR(localizer.getVelocity().y(), 0.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().y(), 0.0, 0.2);
 }
 
 TEST(RobotLocalizer, velocity_tracks_from_motors_without_vision)
 {
     const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/false);
 
-    std::cerr << "[motor only]   vel=(" << localizer.getVelocity().x() << ", "
-              << localizer.getVelocity().y() << ")\n";
+    std::cerr << "[motor only]   vel=(" << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y() << ")\n";
 
-    EXPECT_NEAR(localizer.getVelocity().x(), 1.0, 0.2);
-    EXPECT_NEAR(localizer.getVelocity().y(), 0.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().x(), 1.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().y(), 0.0, 0.2);
 }
 
 TEST(RobotLocalizer, velocity_with_zero_age_vision)
@@ -99,9 +99,9 @@ TEST(RobotLocalizer, velocity_with_zero_age_vision)
     const RobotLocalizer localizer =
         runConstantVelocity(/*feed_vision=*/true, /*vision_age=*/1e-6);
 
-    std::cerr << "[zero-age vision] vel=(" << localizer.getVelocity().x() << ", "
-              << localizer.getVelocity().y() << ")\n";
+    std::cerr << "[zero-age vision] vel=(" << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y() << ")\n";
 
-    EXPECT_NEAR(localizer.getVelocity().x(), 1.0, 0.2);
-    EXPECT_NEAR(localizer.getVelocity().y(), 0.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().x(), 1.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().y(), 0.0, 0.2);
 }
