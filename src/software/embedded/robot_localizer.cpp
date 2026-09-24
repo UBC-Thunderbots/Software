@@ -124,7 +124,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION)) =
         position.y();
 
-    // Integrating omega for position makes angule goes out of bounds so we wrap it around
+    // Integrating omega for position makes angle goes out of bounds so we wrap it around
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION)) =
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
