@@ -121,7 +121,7 @@ class FieldTestRunner(TbotsTestRunner):
     @override
     def send_gamecontroller_command(
         self,
-        gc_command: protos.Command,
+        gc_command: protos.Command.Type,
         team: protos.Team,
         final_ball_placement_point=None,
     ):
