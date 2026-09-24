@@ -25,7 +25,7 @@ void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delt
     const double delta_time_seconds = delta_time.toSeconds();
     current_time_seconds_ += delta_time_seconds;
 
-    generatePredictionMatrices(delta_time_seconds);
+    updateFilterPredictionMatrices(delta_time_seconds);
 
     Eigen::Vector<double, CONTROL_SIZE> control_input;
     control_input << target_velocity.x(), target_velocity.y();
@@ -91,14 +91,14 @@ void RobotLocalizer::update(const VisionData& data)
     {
         if (const auto* predict_step = std::get_if<PredictStep>(&it->step))
         {
-            generatePredictionMatrices(it->time_seconds - prev_time);
+            updateFilterPredictionMatrices(it->time_seconds - prev_time);
             filter_.predict(predict_step->control_input);
             prev_time = it->time_seconds;
         }
         else
         {
             const auto& update_step = std::get<UpdateStep>(it->step);
-            generateMeasurementModel(update_step.type);
+            updateFilterMeasurementModel(update_step.type);
             filter_.update(update_step.measurement);
         }
 
@@ -111,7 +111,7 @@ void RobotLocalizer::update(const VisionData& data)
 void RobotLocalizer::updateFilterWithVision(const Point& position,
                                             const Angle& orientation)
 {
-    generateMeasurementModel(FilterStepType::VISION_DATA);
+    updateFilterMeasurementModel(FilterStepType::VISION_DATA);
 
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
@@ -135,7 +135,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
 
 void RobotLocalizer::update(const MotorData& data)
 {
-    generateMeasurementModel(FilterStepType::MOTOR_DATA);
+    updateFilterMeasurementModel(FilterStepType::MOTOR_DATA);
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
         Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
@@ -160,7 +160,7 @@ void RobotLocalizer::update(const MotorData& data)
 
 void RobotLocalizer::update(const ImuData& data)
 {
-    generateMeasurementModel(FilterStepType::IMU_DATA);
+    updateFilterMeasurementModel(FilterStepType::IMU_DATA);
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
         Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
@@ -212,9 +212,9 @@ RobotState RobotLocalizer::getRobotState() const
 }
 
 // TODO: Investigate process models/variances/etc
-void RobotLocalizer::generatePredictionMatrices(double delta_time_seconds)
+void RobotLocalizer::updateFilterPredictionMatrices(double delta_time_seconds)
 {
-    // In the current model, we use target velocity as our new velocity of the preiction
+    // In the current model, we use target velocity as our new velocity of the prediction
     // state, and position is derived from it. Therefore, process model keeps the
     // positions and we don't predict it using estimated velocities
     //
@@ -286,7 +286,7 @@ void RobotLocalizer::generatePredictionMatrices(double delta_time_seconds)
                   static_cast<Eigen::Index>(ControlIndex::Y_VELOCITY_TARGET)) = 1;
 }
 
-void RobotLocalizer::generateMeasurementModel(FilterStepType source)
+void RobotLocalizer::updateFilterMeasurementModel(FilterStepType source)
 {
     filter_.measurement_model.setZero();
 
@@ -320,7 +320,8 @@ void RobotLocalizer::generateMeasurementModel(FilterStepType source)
                 static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
             break;
         case FilterStepType::PREDICT:
-            // Never called with PREDICT; predict steps use generatedPredictionMatrices.
+            // Never called with PREDICT; predict steps use
+            // updateFilterPredictionMatrices.
             break;
     }
 }
