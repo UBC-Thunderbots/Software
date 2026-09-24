@@ -48,9 +48,8 @@ RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S /
             localToGlobalVelocity(local_velocity, localizer.getOrientation()),
             AngularVelocity::zero()});
 
-        // Mirrors thunderloop, which passes the commanded (target) velocity as the
-        // control input; predict() uses it directly as the new velocity estimate (see
-        // RobotLocalizer::generatedPredictionMatrices).
+        // predict() uses the commanded (target) velocity directly as the new velocity
+        // estimate (see RobotLocalizer::updateFilterPredictionMatrices).
         localizer.predict(true_velocity, Duration::fromSeconds(DT));
 
         // Periodic vision fix (~60 Hz). Feed the position from RTT_S/2 ago, consistent
