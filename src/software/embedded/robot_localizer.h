@@ -156,7 +156,7 @@ class RobotLocalizer
      * @param delta_time_seconds The elapsed time to generate the prediction
      * matrices for
      */
-    void generatedPredictionMatrices(double delta_time_seconds);
+    void generatePredictionMatrices(double delta_time_seconds);
 
     /**
      * Writes the measurement model for the given data source into the filter.

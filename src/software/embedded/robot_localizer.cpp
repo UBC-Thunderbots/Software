@@ -25,7 +25,7 @@ void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delt
     const double delta_time_seconds = delta_time.toSeconds();
     current_time_seconds_ += delta_time_seconds;
 
-    generatedPredictionMatrices(delta_time_seconds);
+    generatePredictionMatrices(delta_time_seconds);
 
     Eigen::Vector<double, CONTROL_SIZE> control_input;
     control_input << target_velocity.x(), target_velocity.y();
@@ -91,7 +91,7 @@ void RobotLocalizer::update(const VisionData& data)
     {
         if (const auto* predict_step = std::get_if<PredictStep>(&it->step))
         {
-            generatedPredictionMatrices(it->time_seconds - prev_time);
+            generatePredictionMatrices(it->time_seconds - prev_time);
             filter_.predict(predict_step->control_input);
             prev_time = it->time_seconds;
         }
@@ -212,7 +212,7 @@ RobotState RobotLocalizer::getRobotState() const
 }
 
 // TODO: Investigate process models/variances/etc
-void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
+void RobotLocalizer::generatePredictionMatrices(double delta_time_seconds)
 {
     // In the current model, we use target velocity as our new velocity of the preiction
     // state, and position is derived from it. Therefore, process model keeps the
