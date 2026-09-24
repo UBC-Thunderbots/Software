@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <deque>
 #include <optional>
+#include <variant>
 
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -170,20 +171,31 @@ class RobotLocalizer
     static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
 
     /**
+     * A predict step. process_model/process_covariance/control_model are recomputed
+     * from the elapsed time during replay instead of being stored (see
+     * generatedPredictionMatrices).
+     */
+    struct PredictStep
+    {
+        Eigen::Vector<double, CONTROL_SIZE> control_input;
+    };
+
+    /**
+     * An update step. The measurement model is regenerated from type during replay
+     * (see generateMeasurementModel). type must not be FilterStepType::PREDICT.
+     */
+    struct UpdateStep
+    {
+        FilterStepType type;
+        Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
+    };
+
+    /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
      */
     struct FilterStep
     {
-        FilterStepType type;
-
-        // Set iff type == PREDICT. process_model/process_covariance/control_model are
-        // recomputed from the elapsed time during replay instead of being stored (see
-        // generatedPredictionMatrices).
-        std::optional<Eigen::Vector<double, CONTROL_SIZE>> control_input;
-
-        // Set iff type != PREDICT. The measurement model is regenerated from type
-        // during replay (see generateMeasurementModel).
-        std::optional<Eigen::Vector<double, MEASUREMENT_SIZE>> measurement;
+        std::variant<PredictStep, UpdateStep> step;
 
         // Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;

@@ -33,9 +33,7 @@ void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delt
     filter_.predict(control_input);
 
     history.push_front(FilterStep{
-        .type             = FilterStepType::PREDICT,
-        .control_input    = control_input,
-        .measurement      = std::nullopt,
+        .step             = PredictStep{.control_input = control_input},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
@@ -91,16 +89,17 @@ void RobotLocalizer::update(const VisionData& data)
     double prev_time = current_time_seconds_ - data.age_seconds;
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
-        if (it->type == FilterStepType::PREDICT)
+        if (const auto* predict_step = std::get_if<PredictStep>(&it->step))
         {
             generatedPredictionMatrices(it->time_seconds - prev_time);
-            filter_.predict(it->control_input.value());
+            filter_.predict(predict_step->control_input);
             prev_time = it->time_seconds;
         }
         else
         {
-            generateMeasurementModel(it->type);
-            filter_.update(it->measurement.value());
+            const auto& update_step = std::get<UpdateStep>(it->step);
+            generateMeasurementModel(update_step.type);
+            filter_.update(update_step.measurement);
         }
 
         // Update the history with the recomputed state so future rollbacks are correct
@@ -151,9 +150,7 @@ void RobotLocalizer::update(const MotorData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .type             = FilterStepType::MOTOR_DATA,
-        .control_input    = std::nullopt,
-        .measurement      = measurement,
+        .step = UpdateStep{.type = FilterStepType::MOTOR_DATA, .measurement = measurement},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
@@ -173,9 +170,7 @@ void RobotLocalizer::update(const ImuData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .type             = FilterStepType::IMU_DATA,
-        .control_input    = std::nullopt,
-        .measurement      = measurement,
+        .step = UpdateStep{.type = FilterStepType::IMU_DATA, .measurement = measurement},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
