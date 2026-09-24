@@ -27,7 +27,7 @@ void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delt
     const double delta_time_seconds = delta_time.toSeconds();
     current_time_seconds_ += delta_time_seconds;
 
-    generatedPredictionMatrices(delta_time_seconds);
+    updateFilterPredictionMatrices(delta_time_seconds);
 
     Eigen::Vector<double, CONTROL_SIZE> control_input;
     control_input << target_velocity.x(), target_velocity.y();
@@ -35,9 +35,7 @@ void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delt
     filter_.predict(control_input);
 
     history.push_front(FilterStep{
-        .type             = FilterStepType::PREDICT,
-        .control_input    = control_input,
-        .measurement      = std::nullopt,
+        .step             = PredictStep{.control_input = control_input},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
@@ -57,8 +55,8 @@ void RobotLocalizer::update(const VisionData& data)
         [&](const FilterStep& step)
         { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
-	// If rollback point is at the start, vision is newer than all history steps
-	// So we empty history and apply vision
+    // If rollback point is at the start, vision is newer than all history steps
+    // So we empty history and apply vision
     if (rollback_point == history.begin())
     {
         updateFilterWithVision(data.position, data.orientation);
@@ -66,8 +64,8 @@ void RobotLocalizer::update(const VisionData& data)
         return;
     }
 
-	// If rollback point is at the end, vision is older than all history steps
-	// So rollback ever step 
+    // If rollback point is at the end, vision is older than all history steps
+    // So rollback ever step
     if (rollback_point == history.end())
     {
         rollback_point = std::prev(history.end());
@@ -93,16 +91,17 @@ void RobotLocalizer::update(const VisionData& data)
     double prev_time = current_time_seconds_ - data.age_seconds;
     for (auto it = history.rbegin(); it != history.rend(); ++it)
     {
-        if (it->type == FilterStepType::PREDICT)
+        if (const auto* predict_step = std::get_if<PredictStep>(&it->step))
         {
-            generatedPredictionMatrices(it->time_seconds - prev_time);
-            filter_.predict(it->control_input.value());
+            updateFilterPredictionMatrices(it->time_seconds - prev_time);
+            filter_.predict(predict_step->control_input);
             prev_time = it->time_seconds;
         }
         else
         {
-            generateMeasurementModel(it->type);
-            filter_.update(it->measurement.value());
+            const auto& update_step = std::get<UpdateStep>(it->step);
+            updateFilterMeasurementModel(update_step.type);
+            filter_.update(update_step.measurement);
         }
 
         // Update the history with the recomputed state so future rollbacks are correct
@@ -114,7 +113,7 @@ void RobotLocalizer::update(const VisionData& data)
 void RobotLocalizer::updateFilterWithVision(const Point& position,
                                             const Angle& orientation)
 {
-    generateMeasurementModel(FilterStepType::VISION_DATA);
+    updateFilterMeasurementModel(FilterStepType::VISION_DATA);
 
     const double orientation_estimate =
         filter_.state_estimate(static_cast<Eigen::Index>(StateIndex::ORIENTATION));
@@ -127,7 +126,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_Y_POSITION)) =
         position.y();
 
-	// Integrating omega for position makes angule goes out of bounds so we wrap it around
+    // Integrating omega for position makes angle goes out of bounds so we wrap it around
     measurement(static_cast<Eigen::Index>(MeasurementIndex::VISION_ORIENTATION)) =
         orientation_estimate +
         (orientation - Angle::fromRadians(orientation_estimate)).clamp().toRadians();
@@ -138,7 +137,7 @@ void RobotLocalizer::updateFilterWithVision(const Point& position,
 
 void RobotLocalizer::update(const MotorData& data)
 {
-    generateMeasurementModel(FilterStepType::MOTOR_DATA);
+    updateFilterMeasurementModel(FilterStepType::MOTOR_DATA);
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
         Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
@@ -153,9 +152,8 @@ void RobotLocalizer::update(const MotorData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .type             = FilterStepType::MOTOR_DATA,
-        .control_input    = std::nullopt,
-        .measurement      = measurement,
+        .step =
+            UpdateStep{.type = FilterStepType::MOTOR_DATA, .measurement = measurement},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
@@ -164,7 +162,7 @@ void RobotLocalizer::update(const MotorData& data)
 
 void RobotLocalizer::update(const ImuData& data)
 {
-    generateMeasurementModel(FilterStepType::IMU_DATA);
+    updateFilterMeasurementModel(FilterStepType::IMU_DATA);
 
     Eigen::Vector<double, MEASUREMENT_SIZE> measurement =
         Eigen::Vector<double, MEASUREMENT_SIZE>::Zero();
@@ -175,9 +173,7 @@ void RobotLocalizer::update(const ImuData& data)
     filter_.update(measurement);
 
     history.push_front(FilterStep{
-        .type             = FilterStepType::IMU_DATA,
-        .control_input    = std::nullopt,
-        .measurement      = measurement,
+        .step = UpdateStep{.type = FilterStepType::IMU_DATA, .measurement = measurement},
         .state_estimate   = filter_.state_estimate,
         .state_covariance = filter_.state_covariance,
         .time_seconds     = current_time_seconds_,
@@ -222,8 +218,8 @@ RobotState RobotLocalizer::getRobotState() const
                       getAngularVelocity());
 }
 
-// TODO: Investigate proces models/variances/etc
-void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
+// TODO: Investigate process models/variances/etc
+void RobotLocalizer::updateFilterPredictionMatrices(double delta_time_seconds)
 {
     // Velocity is estimated in the robot's local frame (see StateIndex), but position
     // is in world space, so propagating position requires rotating local velocity by
@@ -369,7 +365,7 @@ void RobotLocalizer::generatedPredictionMatrices(double delta_time_seconds)
         cos_theta;
 }
 
-void RobotLocalizer::generateMeasurementModel(FilterStepType source)
+void RobotLocalizer::updateFilterMeasurementModel(FilterStepType source)
 {
     filter_.measurement_model.setZero();
 
@@ -403,7 +399,8 @@ void RobotLocalizer::generateMeasurementModel(FilterStepType source)
                 static_cast<Eigen::Index>(StateIndex::ANGULAR_VELOCITY)) = 1;
             break;
         case FilterStepType::PREDICT:
-            // Never called with PREDICT; predict steps use generatedPredictionMatrices.
+            // Never called with PREDICT; predict steps use
+            // updateFilterPredictionMatrices.
             break;
     }
 }

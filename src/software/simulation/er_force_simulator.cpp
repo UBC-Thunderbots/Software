@@ -282,14 +282,14 @@ void ErForceSimulator::setRobots(
     {
         if (side == gameController::Team::BLUE)
         {
-            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                robot_constants, id, TeamColour::BLUE);
+            auto robot_primitive_executor =
+                std::make_shared<PrimitiveExecutor>(robot_constants, id);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                robot_constants, id, TeamColour::YELLOW);
+            auto robot_primitive_executor =
+                std::make_shared<PrimitiveExecutor>(robot_constants, id);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }

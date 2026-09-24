@@ -9,7 +9,6 @@
 #include "software/geom/vector.h"
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_types.h"
 
 /**
  * "Executes" primitives, turning them into the direct control commands that
@@ -26,14 +25,9 @@ class PrimitiveExecutor
      *
      * @param robot_constants The constants for the robot using this primitive executor
      * @param robot_id The ID of the robot using this primitive executor
-     * @param team_colour The colour of the team this robot belongs to. Only matters for
-     * disambiguating PlotJuggler log keys when multiple teams share one process (e.g.
-     * the simulator, where a yellow and blue robot can have the same ID); real hardware
-     * only ever runs one robot so this can be left at its default.
      */
     explicit PrimitiveExecutor(const robot_constants::RobotConstants& robot_constants,
-                               RobotId robot_id,
-                               TeamColour team_colour = TeamColour::YELLOW);
+                               RobotId robot_id);
 
     /**
      * Starts executing a new primitive.
@@ -123,7 +117,6 @@ class PrimitiveExecutor
 
     robot_constants::RobotConstants robot_constants_;
     RobotId robot_id_;
-    TeamColour team_colour_;
 
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;

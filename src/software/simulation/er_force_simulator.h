@@ -8,7 +8,6 @@
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_types.h"
 #include "software/world/world.h"
 
 
