@@ -95,6 +95,25 @@ namespace TestUtil
     }
 }
 
+::testing::AssertionResult equalWithinTolerance(const AngularVelocity& a1,
+                                                const AngularVelocity& a2,
+                                                const AngularVelocity& tolerance)
+{
+    // subtract a fixed epsilon for error in:
+    // - angle subtraction
+    // - angle absolute value
+    // - the tolerance abs()
+    auto difference = (a1 - a2).abs() - AngularVelocity::fromRadians(FIXED_EPSILON * 4);
+    if (difference < tolerance.abs())
+    {
+        return ::testing::AssertionSuccess();
+    }
+    else
+    {
+        return ::testing::AssertionFailure()
+               << "Angular velocity 1 was " << a1 << ", angular velocity 2 was " << a2;
+    }
+}
 
 ::testing::AssertionResult equalWithinTolerance(const Vector& v1, const Vector& v2,
                                                 double tolerance)
@@ -154,8 +173,9 @@ namespace TestUtil
         equalWithinTolerance(state1.velocity(), state2.velocity(), linear_tolerance);
     auto orientation_equality_result = equalWithinTolerance(
         state1.orientation(), state2.orientation(), angular_tolerance);
-    auto angular_velocity_equality_result = equalWithinTolerance(
-        state1.angularVelocity(), state2.angularVelocity(), angular_tolerance);
+    auto angular_velocity_equality_result =
+        equalWithinTolerance(state1.angularVelocity(), state2.angularVelocity(),
+                             AngularVelocity::fromRadians(angular_tolerance.toRadians()));
 
     auto assertion_result = ::testing::AssertionSuccess();
 
