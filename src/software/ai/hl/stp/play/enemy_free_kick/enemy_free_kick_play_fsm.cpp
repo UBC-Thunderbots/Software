@@ -43,7 +43,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
     auto assignments = getAllDefenderAssignments(
-        enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
+        enemy_threats, event.common.world_ptr->field(),
         ai_config_ptr->defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)

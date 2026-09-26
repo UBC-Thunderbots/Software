@@ -7,6 +7,7 @@
 
 TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)
 {
+    // Self-passes aren't filtered out, but callers never put a robot in both lists
     Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
@@ -307,7 +308,7 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
         robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         1,      robot1};
 
-    // Despite robot2 having better shooting and scoring opporunity, robot1 has the ball
+    // Despite robot2 having better shooting and scoring opportunity, robot1 has the ball
     // so should be more threatening
     std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
@@ -402,6 +403,58 @@ TEST(SortEnemyThreatsTest,
     EXPECT_EQ(threats, expected_result);
 }
 
+TEST(SortEnemyThreatsTest, robot_with_possession_but_no_shot_is_still_the_biggest_threat)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = EnemyThreat{robot1,       true,         Angle::fromDegrees(25),
+                               std::nullopt, std::nullopt, 0,
+                               std::nullopt};
+
+    auto threat2 = EnemyThreat{
+        robot2, false, Angle::fromDegrees(19), Angle::fromDegrees(11), Point(-4, 0),
+        1,      robot1};
+
+    // Possession outranks everything else, so robot1 is more threatening even with no
+    // shot at all while robot2 has a clear one
+    std::vector<EnemyThreat> expected_result = {threat1, threat2};
+
+    std::vector<EnemyThreat> threats = {threat2, threat1};
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
+TEST(SortEnemyThreatsTest, both_robots_have_possession_but_only_one_has_a_shot)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = EnemyThreat{robot1,       true,         Angle::fromDegrees(50),
+                               std::nullopt, std::nullopt, 0,
+                               std::nullopt};
+
+    auto threat2 = EnemyThreat{
+        robot2, true,        Angle::fromDegrees(30), Angle::fromDegrees(20), Point(-4, 0),
+        0,      std::nullopt};
+
+    // Both have the ball, so they are ranked by their shot. An empty best_shot_angle
+    // sorts below any real angle, making robot1 the less threatening of the two
+    std::vector<EnemyThreat> expected_result = {threat2, threat1};
+
+    std::vector<EnemyThreat> threats = {threat1, threat2};
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
 TEST(EnemyThreatTest, no_enemies_on_field)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
@@ -453,6 +506,90 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     ASSERT_FALSE(threat.passer);
 }
 
+TEST(EnemyThreatTest, enemy_goalie_included_and_excluded)
+{
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Robot enemy_goalie =
+        Robot(0, world->field().enemyGoalCenter(), Vector(0, 0), Angle::half(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(2, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_goalie, enemy_robot_1});
+    enemy_team.assignGoalie(0);
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(world,
+                                Point(world->field().friendlyGoalCenter()) +
+                                    Vector(2 - DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+                                Timestamp::fromSeconds(0));
+
+    auto threats_without_goalie = getAllEnemyThreats(
+        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(), false);
+    ASSERT_EQ(threats_without_goalie.size(), 1);
+    EXPECT_EQ(threats_without_goalie.at(0).robot, enemy_robot_1);
+
+    auto threats_with_goalie = getAllEnemyThreats(
+        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(), true);
+    ASSERT_EQ(threats_with_goalie.size(), 2);
+    // Enemy robot 1 has the ball, so it is the most threatening of the two
+    EXPECT_EQ(threats_with_goalie.at(0).robot, enemy_robot_1);
+    EXPECT_EQ(threats_with_goalie.at(1).robot, enemy_goalie);
+}
+
+TEST(EnemyThreatTest, two_enemies_with_the_ball_carrier_screened)
+{
+    // Two friendly robots screen the enemy holding the ball, leaving it almost no shot,
+    // while the other enemy is unmarked with a much better view of the net
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(2.3, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(1.9, 1.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2});
+    world->updateEnemyTeamState(enemy_team);
+
+    Robot friendly_goalie =
+        Robot(0, world->field().friendlyGoalCenter() + Vector(0.2, 0), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(1.6, 0.15), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(1.6, -0.15), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromSeconds(1));
+    friendly_team.updateRobots({friendly_goalie, friendly_robot_1, friendly_robot_2});
+    world->updateFriendlyTeamState(friendly_team);
+
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 2);
+
+    // Possession is currently weighted above shot quality, so the screened enemy is
+    // ranked first even though the unmarked enemy has the better shot
+    EXPECT_EQ(result.at(0).robot, enemy_robot_1);
+    EXPECT_TRUE(result.at(0).has_ball);
+    EXPECT_EQ(result.at(1).robot, enemy_robot_2);
+    EXPECT_FALSE(result.at(1).has_ball);
+
+    ASSERT_TRUE(result.at(0).best_shot_angle);
+    ASSERT_TRUE(result.at(1).best_shot_angle);
+    EXPECT_LT(result.at(0).best_shot_angle->toDegrees(),
+              result.at(1).best_shot_angle->toDegrees());
+}
+
 TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
 {
     // This test evaluates the enemy threat for a 3-vs-1 scenario
@@ -478,9 +615,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     // Enemy robot 1 is the most threatening because it has the ball and has a good view
     // of the goal. Enemy robot 2 is the second most threatening because it also has a
     // good view of the goal, and can receive the ball quickly via a pass from enemy 1.
-    // Finally, enemy robot 3 is the least threatening because it would take 2 passes to
-    // get the ball, and doesn't have a great angle on the goal because it's off to
-    // the side
+    // Finally, enemy robot 3 is the least threatening because it doesn't have a great
+    // angle on the goal because it's off to the side
 
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
@@ -553,4 +689,247 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     EXPECT_EQ(threat_2.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_2.passer);
     EXPECT_EQ(threat_2.passer, enemy_robot_1);
+}
+
+TEST(EnemyThreatTest, four_enemies_with_the_pass_to_the_best_position_blocked)
+{
+    // Enemy robot 3 is parked right in front of our net and has by far the best view of
+    // it, but enemy robot 4 blocks the only direct pass to it, so it takes two passes to
+    // reach. Enemies that can be reached sooner are considered more threatening.
+    //
+    //                                 enemy robot 2
+    //
+    //                                                       enemy robot 1
+    //      | friendly net |    enemy robot 3   enemy robot 4    ball
+    //      ----------------
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(3.0, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(2.0, 1.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_3 =
+        Robot(3, world->field().friendlyGoalCenter() + Vector(0.8, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_4 =
+        Robot(4, world->field().friendlyGoalCenter() + Vector(2.0, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3, enemy_robot_4});
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 4);
+
+    EXPECT_EQ(result.at(0).robot, enemy_robot_1);
+    EXPECT_TRUE(result.at(0).has_ball);
+    EXPECT_EQ(result.at(1).robot, enemy_robot_4);
+    EXPECT_EQ(result.at(2).robot, enemy_robot_2);
+    EXPECT_EQ(result.at(3).robot, enemy_robot_3);
+
+    // Ranked last despite having the best view of our net
+    EXPECT_GT(result.at(3).goal_angle, result.at(1).goal_angle);
+    EXPECT_EQ(result.at(1).num_passes_to_get_possession, 1);
+    EXPECT_EQ(result.at(2).num_passes_to_get_possession, 1);
+    EXPECT_EQ(result.at(3).num_passes_to_get_possession, 2);
+    ASSERT_TRUE(result.at(3).passer);
+    EXPECT_EQ(result.at(3).passer, enemy_robot_4);
+}
+
+TEST(EnemyThreatTest, three_enemies_one_pass_away_with_different_goal_angles)
+{
+    // Enemy robots 2 and 3 are both one pass away, so the tie is broken by their view
+    // of the net. Enemy robot 2 is head on, enemy robot 3 is off to the side.
+    //                                                     enemy robot 3
+    //
+    //                                                            enemy robot 1
+    //      | friendly net |            enemy robot 2                  ball
+    //      ----------------
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(3.0, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(1.5, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_3 =
+        Robot(3, world->field().friendlyGoalCenter() + Vector(1.5, 2.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3});
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 3);
+
+    EXPECT_EQ(result.at(0).robot, enemy_robot_1);
+    EXPECT_TRUE(result.at(0).has_ball);
+
+    EXPECT_EQ(result.at(1).robot, enemy_robot_2);
+    EXPECT_EQ(result.at(2).robot, enemy_robot_3);
+    EXPECT_EQ(result.at(1).num_passes_to_get_possession, 1);
+    EXPECT_EQ(result.at(2).num_passes_to_get_possession, 1);
+    EXPECT_GT(result.at(1).goal_angle, result.at(2).goal_angle);
+}
+
+TEST(EnemyThreatTest, pass_data_is_copied_into_the_right_threat)
+{
+    // getAllEnemyThreats looks each enemy up in one shared pass search rather than
+    // searching per enemy, so check every threat ends up with its own pass count and
+    // passer. This cannot catch a bug in the search itself, since getNumPassesToRobot
+    // is implemented by the same search
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(3.0, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(2.0, 1.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_3 =
+        Robot(3, world->field().friendlyGoalCenter() + Vector(0.8, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_4 =
+        Robot(4, world->field().friendlyGoalCenter() + Vector(2.0, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3, enemy_robot_4});
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 4);
+    ASSERT_TRUE(result.at(0).has_ball);
+    Robot ball_carrier = result.at(0).robot;
+
+    for (const auto& threat : result)
+    {
+        auto pass_data = getNumPassesToRobot(ball_carrier, threat.robot,
+                                             world->enemyTeam(), world->friendlyTeam());
+
+        ASSERT_TRUE(pass_data);
+        EXPECT_EQ(threat.num_passes_to_get_possession, pass_data->first);
+        EXPECT_EQ(threat.passer, pass_data->second);
+    }
+}
+
+TEST(EnemyThreatTest, three_enemies_with_one_behind_the_goal_line)
+{
+    // Enemy robot 3 is behind the goal line, just outside the near post. It's closer to
+    // both goalposts than enemy robot 2, so it would get the wider goal angle and come
+    // out on top even though it can't shoot from there
+    //
+    //                    enemy robot 1 + ball
+    //
+    //                    enemy robot 2
+    //
+    //                  | friendly net |
+    //                  ----------------
+    //             enemy robot 3
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot enemy_robot_1 =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(3.5, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world->field().friendlyGoalCenter() + Vector(1.5, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_3 =
+        Robot(3, world->field().friendlyGoalCenter() + Vector(-0.15, 0.6), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3});
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 3);
+
+    EXPECT_EQ(result.at(0).robot, enemy_robot_1);
+    EXPECT_TRUE(result.at(0).has_ball);
+
+    // Both enemies can be reached in a single pass, so the tie is broken by their view
+    // of the net
+    EXPECT_EQ(result.at(1).robot, enemy_robot_2);
+    EXPECT_EQ(result.at(2).robot, enemy_robot_3);
+    EXPECT_EQ(result.at(1).num_passes_to_get_possession, 1);
+    EXPECT_EQ(result.at(2).num_passes_to_get_possession, 1);
+
+    EXPECT_EQ(result.at(2).goal_angle, Angle::zero());
+    EXPECT_GT(result.at(1).goal_angle, Angle::zero());
+}
+
+TEST(EnemyThreatTest, enemies_in_and_behind_the_goal_mouth_have_no_view_of_the_net)
+{
+    // A robot needs to be at least its own radius ahead of the goal line before it has
+    // a net to shoot at. Inside that, on the line, or behind it, the angle is zero
+    //
+    // Field always puts the friendly goal at negative x, so only that orientation can
+    // be tested here
+
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+
+    Robot clear_of_the_mouth =
+        Robot(1, world->field().friendlyGoalCenter() + Vector(1.0, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot in_the_mouth = Robot(
+        2, world->field().friendlyGoalCenter() + Vector(ROBOT_MAX_RADIUS_METERS / 2, 0),
+        Vector(0, 0), Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot on_the_line =
+        Robot(3, world->field().friendlyGoalCenter(), Vector(0, 0), Angle::half(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot behind_the_line =
+        Robot(4, world->field().friendlyGoalCenter() + Vector(-0.05, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots(
+        {clear_of_the_mouth, in_the_mouth, on_the_line, behind_the_line});
+    world->updateEnemyTeamState(enemy_team);
+
+    ::TestUtil::setBallPosition(world, world->field().enemyGoalCenter(),
+                                Timestamp::fromSeconds(0));
+
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
+
+    ASSERT_EQ(result.size(), 4);
+
+    std::map<RobotId, Angle> goal_angle_by_id;
+    for (const auto& threat : result)
+    {
+        goal_angle_by_id[threat.robot.id()] = threat.goal_angle;
+    }
+
+    EXPECT_GT(goal_angle_by_id.at(clear_of_the_mouth.id()), Angle::zero());
+    EXPECT_EQ(goal_angle_by_id.at(in_the_mouth.id()), Angle::zero());
+    EXPECT_EQ(goal_angle_by_id.at(on_the_line.id()), Angle::zero());
+    EXPECT_EQ(goal_angle_by_id.at(behind_the_line.id()), Angle::zero());
 }
