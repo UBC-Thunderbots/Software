@@ -67,6 +67,22 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
 
 namespace
 {
+/**
+ * Returns whether a robot at the given position could shoot on the friendly goal
+ */
+bool canShootOnFriendlyGoal(const Field& field, const Point& position)
+{
+    // Compare along the axis between the two goals so this doesn't depend on which
+    // side of the field we are defending
+    Vector towards_enemy_goal = field.enemyGoalCenter() - field.friendlyGoalCenter();
+    Vector goal_to_position   = position - field.friendlyGoalCenter();
+
+    // A robot level with the goal line sits between the goalposts rather than in front
+    // of them, so require it to be at least its own radius ahead of the line before we
+    // treat it as having anything to shoot at
+    return goal_to_position.dot(towards_enemy_goal.normalize()) > ROBOT_MAX_RADIUS_METERS;
+}
+
 // Maps a robot to the number of passes needed to reach it and the robot it receives from
 using NumPassesToRobotMap =
     std::map<Robot, std::pair<int, std::optional<Robot>>, Robot::cmpRobotByID>;
@@ -171,7 +187,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
 
     // If we have checked all the robots we can and still haven't found the robot we
     // are looking for, it must be blocked and unable to be passed to in the current
-    // state. Therefore return an std::nullopt
+    // state. Therefore, we return an std::nullopt
     if (pass_data == num_passes_to_robot.end())
     {
         return std::nullopt;
@@ -222,7 +238,7 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
                 // the robot with a smaller view of the net is considered less
                 // threatening. The reason we use goal_angle here rather than the
                 // best_shot_angle is that the goal_angle doesn't change if the robot is
-                // blocked from shooting (ex: by a defender). This makes the evaluation
+                // blocked from shooting (e.g. by a defender). This makes the evaluation
                 // more stable since the value won't change drastically as our robots
                 // move into defensive positions and change the best_shot_angle. If we had
                 // fewer robots than the enemy team and were using the best_shot_angle,
@@ -234,7 +250,8 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
         }
     };
 
-    // Sort threats from highest threat to lowest threat in descending order
+    // Sort threats from highest threat to lowest threat
+    // Use reverse iterators to sort the vector in descending order
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
 }
 
@@ -264,12 +281,19 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
         bool has_ball = robot.isNearDribbler(ball.position());
 
         // Get the angle from the robot to each friendly goalpost, then find the
-        // difference between these angles to get the goal_angle for the robot
-        auto friendly_goalpost_angle_1 =
-            (field.friendlyGoalpostPos() - robot.position()).orientation();
-        auto friendly_goalpost_angle_2 =
-            (field.friendlyGoalpostNeg() - robot.position()).orientation();
-        Angle goal_angle = friendly_goalpost_angle_1.minDiff(friendly_goalpost_angle_2);
+        // difference between these angles to get the goal_angle for the robot.
+        // Robots in or behind our goal mouth are close to both goalposts, so the angle
+        // between them is wide even though they have no net to shoot at. Give them an
+        // angle of zero
+        Angle goal_angle = Angle::zero();
+        if (canShootOnFriendlyGoal(field, robot.position()))
+        {
+            auto friendly_goalpost_angle_1 =
+                (field.friendlyGoalpostPos() - robot.position()).orientation();
+            auto friendly_goalpost_angle_2 =
+                (field.friendlyGoalpostNeg() - robot.position()).orientation();
+            goal_angle = friendly_goalpost_angle_1.minDiff(friendly_goalpost_angle_2);
+        }
 
         std::optional<Angle> best_shot_angle  = std::nullopt;
         std::optional<Point> best_shot_target = std::nullopt;
@@ -301,7 +325,8 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
         threats.emplace_back(threat);
     }
 
-    // Sort the threats so the "most threatening threat" is first in the vector.
+    // Sort the threats so the "most threatening threat" is first in the vector, and the
+    // "least threatening threat" is last in the vector
     sortThreatsInDecreasingOrder(threats);
 
     return threats;

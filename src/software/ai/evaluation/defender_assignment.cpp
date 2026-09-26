@@ -6,7 +6,7 @@
 #include "software/math/math_functions.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat>& threats, const Field& field, const Ball& ball,
+    const std::vector<EnemyThreat>& threats, const Field& field,
     const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig& config)
 {
     if (threats.size() == 0)
@@ -55,10 +55,6 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     for (unsigned int i = 0; i < relevant_threats.size(); i++)
     {
         auto threat_position = relevant_threats.at(i).robot.position();
-        if (i == 0)
-        {
-            threat_position = ball.position();
-        }
 
         // Clamp threat position to field lines
         threat_position.setX(std::clamp(threat_position.x(), field.fieldLines().xMin(),
