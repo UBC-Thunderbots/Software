@@ -135,6 +135,7 @@ SimRobot::~SimRobot()
     if (m_holdBallConstraint)
     {
         m_world->removeConstraint(m_holdBallConstraint.get());
+        m_world->removeConstraint(m_notTipOverConstraint.get());
     }
     m_world->removeConstraint(m_dribblerConstraint.get());
     m_world->removeRigidBody(m_dribblerBody.get());
@@ -164,18 +165,29 @@ void SimRobot::dribble(const SimBall& ball, float speed)
     {
         if (canKickBall(ball) && !m_holdBallConstraint)
         {
-            btTransform localA, localB;
-            localA.setIdentity();
-            localB.setIdentity();
+            const btTransform robotWorldTransform = m_body->getWorldTransform();
+            const btTransform worldToRobot        = robotWorldTransform.inverse();
 
-            auto worldToRobot = m_body->getWorldTransform().inverse();
-            localA.setOrigin(worldToRobot * ball.position());
-            localA.setRotation(btQuaternion(worldToRobot * btVector3(0, 1, 0), M_PI_2));
-            localB.setRotation(btQuaternion(worldToRobot * btVector3(0, 1, 0), M_PI_2));
+            const btVector3 localA = worldToRobot * ball.position();
+            const btVector3 localB(0, 0, 0);
 
-            m_holdBallConstraint = std::make_unique<btHingeConstraint>(
+            m_holdBallConstraint = std::make_unique<btPoint2PointConstraint>(
                 *m_body, *ball.body(), localA, localB);
             m_world->addConstraint(m_holdBallConstraint.get(), true);
+
+            // Add a constraint that keeps the robot from tipping over. Without it,
+            // two robots duelling for the ball regularly flipped each other over, and
+            // a flipped robot is teleported off to the side by resetFlipped.
+            // This is an ugly hack, but then again so is the hold ball constraint.
+            // Note that in bullet a lower limit greater than the upper limit means
+            // that the axis is free, so only the x and y rotations are locked here.
+            m_notTipOverConstraint = std::make_unique<btGeneric6DofSpring2Constraint>(
+                *m_body, robotWorldTransform);
+            m_notTipOverConstraint->setAngularLowerLimit(btVector3(0, 0, 1));
+            m_notTipOverConstraint->setAngularUpperLimit(btVector3(0, 0, 0));
+            m_notTipOverConstraint->setLinearLowerLimit(btVector3(1, 1, 1));
+            m_notTipOverConstraint->setLinearUpperLimit(btVector3(0, 0, 0));
+            m_world->addConstraint(m_notTipOverConstraint.get(), true);
         }
     }
     else
@@ -197,7 +209,9 @@ void SimRobot::stopDribbling()
     if (m_holdBallConstraint)
     {
         m_world->removeConstraint(m_holdBallConstraint.get());
+        m_world->removeConstraint(m_notTipOverConstraint.get());
         m_holdBallConstraint.reset();
+        m_notTipOverConstraint.reset();
     }
 }
 
@@ -705,10 +719,10 @@ void SimRobot::update(world::SimRobot& robot, const SimBall& ball) const
 
     const btQuaternion q = transform.getRotation();
     auto* rotation       = robot.mutable_rotation();
-    rotation->set_real(q.getX());
-    rotation->set_i(q.getY());
-    rotation->set_j(q.getZ());
-    rotation->set_k(q.getW());
+    rotation->set_i(q.getX());
+    rotation->set_j(q.getY());
+    rotation->set_k(q.getZ());
+    rotation->set_real(q.getW());
 
     // Get robot orientation relative to the Z axis
     float x = 0;
@@ -750,8 +764,8 @@ void SimRobot::restoreState(const world::SimRobot& robot)
 {
     btVector3 position(robot.p_x(), robot.p_y(), robot.p_z());
     m_body->getWorldTransform().setOrigin(position * SIMULATOR_SCALE);
-    btQuaternion rotation(robot.rotation().real(), robot.rotation().i(),
-                          robot.rotation().j(), robot.rotation().k());
+    btQuaternion rotation(robot.rotation().i(), robot.rotation().j(),
+                          robot.rotation().k(), robot.rotation().real());
     m_body->getWorldTransform().setRotation(rotation);
     btVector3 velocity(robot.v_x(), robot.v_y(), robot.v_z());
     m_body->setLinearVelocity(velocity * SIMULATOR_SCALE);

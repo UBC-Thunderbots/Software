@@ -50,7 +50,7 @@ SimField::SimField(std::shared_ptr<btDiscreteDynamicsWorld> world,
     addObject(m_plane.get(),
               btTransform(btQuaternion(btVector3(1, 0, 0), 0),
                           btVector3(0, 0, 0) * SIMULATOR_SCALE),
-              0.56, 0.35);
+              FLOOR_RESTITUTION, FLOOR_FRICTION);
     // Roof
     addObject(m_plane.get(),
               btTransform(btQuaternion(btVector3(1, 0, 0), M_PI),
