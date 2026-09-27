@@ -5,8 +5,8 @@ Description=thunderloop service
 PartOf=thunderbots.service
 
 # At startup, start this unit after the thunderbots.service start
-After=thunderbots.service network.target network-online.target
-Wants=network-online.target
+After=thunderbots.service network.target
+Wants=thunderbots.service
 
 [Service]
 ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
@@ -15,7 +15,8 @@ ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
 TimeoutStopSec=15s
 
 # Always restart on crash
-Restart=always
+Restart=on-failure
+RestartSec=0.5
 
 [Install]
 # This unit should be run at startup
