@@ -105,6 +105,18 @@ py_test(
 )
 
 cc_library(
+    name = "kalman_filter_base",
+    srcs = [],
+    hdrs = ["kalman_filter_base.hpp"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@eigen",
+    ],
+)
+
+cc_library(
     name = "kalman_filter",
     srcs = [],
     hdrs = ["kalman_filter.hpp"],
@@ -113,6 +125,7 @@ cc_library(
     ],
     deps = [
         "@eigen",
+        ":kalman_filter_base",
     ],
 )
 
@@ -125,8 +138,11 @@ cc_library(
     ],
     deps = [
         "@eigen",
+        ":kalman_filter_base",
     ],
 )
+
+
 
 cc_test(
     name = "kalman_filter_test",

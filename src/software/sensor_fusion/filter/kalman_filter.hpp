@@ -3,29 +3,21 @@
 #include <Eigen/Dense>
 #include <cmath>
 
+#include "software/sensor_fusion/filter/kalman_filter_base.hpp"
+
 /**
  * Linear Kalman filter for discrete-time state estimation.
  *
- * A Kalman filter combines a process model (how the state evolves over time)
- * with noisy measurements (what sensors report) to produce an optimal estimate
- * of the system state over time (assuming system model and noise are Gaussian).
- *
- * It alternates between two steps:
- * 1) predict: propagate state/covariance forward through the process model
- * 2) update: correct that prediction with a new measurement
- *
- * Resources:
- * - https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/
- * - https://kalmanfilter.net/
- * - https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python
- * - https://web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
+ * When the process and measurement models are linear and the noise is Gaussian,
+ * this gives the optimal state estimate. See KalmanFilterBase for an overview of
+ * the predict/update cycle.
  *
  * @tparam DimX The dimension of the state
  * @tparam DimY The dimension of measurement space
  * @tparam DimU The dimension of control space
  */
 template <int DimX, int DimY, int DimU>
-class KalmanFilter
+class KalmanFilter : public KalmanFilterBase<DimX, DimY, DimU>
 {
    public:
     /**
@@ -53,67 +45,22 @@ class KalmanFilter
                  Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance);
 
     /**
-     * Predict the next state estimate.
+     * Predict the next state estimate:
+     *
+     *     x = F * x + B * u
+     *     P = F * P * F^T + Q
      *
      * @param control_input Control input vector
      */
-    void predict(Eigen::Vector<double, DimU> control_input);
+    void predict(Eigen::Vector<double, DimU> control_input) override;
 
-    /**
-     * Correct the current state estimate with the given measurement.
-     *
-     * @param measurement Measurement vector
-     */
-    void update(Eigen::Vector<double, DimY> measurement);
-
-    /**
-     * Returns the squared Mahalanobis distance between the given measurement and the
-     * measurement the current state estimate predicts.
-     *
-     * Unlike a plain Euclidean distance, this scales the discrepancy by how uncertain
-     * the filter currently is, so a measurement that is far away but within a poorly
-     * constrained direction is not penalized as heavily as one that contradicts a
-     * confident estimate. This makes it a useful gate for rejecting outlier
-     * measurements before they are fed to update().
-     *
-     * @param measurement Measurement vector
-     *
-     * @return The squared Mahalanobis distance of the measurement
-     */
-    double mahalanobisDistance(Eigen::Vector<double, DimY> measurement) const;
-
-    Eigen::Vector<double, DimX> state_estimate;
-    Eigen::Matrix<double, DimX, DimX> state_covariance;
     Eigen::Matrix<double, DimX, DimX> process_model;
-    Eigen::Matrix<double, DimX, DimX> process_covariance;
-    Eigen::Matrix<double, DimX, DimU> control_model;
-    Eigen::Matrix<double, DimY, DimX> measurement_model;
-    Eigen::Matrix<double, DimY, DimY> measurement_covariance;
-
-   private:
-    /**
-     * Returns the inverse of the innovation covariance S = H*P*H' + R, which describes
-     * the expected spread of the difference between an actual and a predicted
-     * measurement.
-     *
-     * Near-zero entries are zeroed out and a pseudo-inverse is used, so a singular S
-     * (e.g. an uninitialized filter with zero covariance) yields a zero matrix rather
-     * than infinities.
-     *
-     * @return The inverse of the innovation covariance
-     */
-    Eigen::Matrix<double, DimY, DimY> innovationCovarianceInverse() const;
 };
 
 template <int DimX, int DimY, int DimU>
 KalmanFilter<DimX, DimY, DimU>::KalmanFilter()
-    : state_estimate(Eigen::Vector<double, DimX>::Zero()),
-      state_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
-      process_model(Eigen::Matrix<double, DimX, DimX>::Zero()),
-      process_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
-      control_model(Eigen::Matrix<double, DimX, DimU>::Zero()),
-      measurement_model(Eigen::Matrix<double, DimY, DimX>::Zero()),
-      measurement_covariance(Eigen::Matrix<double, DimY, DimY>::Zero())
+    : KalmanFilterBase<DimX, DimY, DimU>(),
+      process_model(Eigen::Matrix<double, DimX, DimX>::Zero())
 {
 }
 
@@ -126,13 +73,11 @@ KalmanFilter<DimX, DimY, DimU>::KalmanFilter(
     Eigen::Matrix<double, DimX, DimU> initial_control_model,
     Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
     Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance)
-    : state_estimate(initial_state),
-      state_covariance(initial_state_covariance),
-      process_model(initial_process_model),
-      process_covariance(initial_process_covariance),
-      control_model(initial_control_model),
-      measurement_model(initial_measurement_model),
-      measurement_covariance(initial_measurement_covariance)
+    : KalmanFilterBase<DimX, DimY, DimU>(initial_state, initial_state_covariance,
+                                         initial_process_covariance,
+                                         initial_control_model, initial_measurement_model,
+                                         initial_measurement_covariance),
+      process_model(initial_process_model)
 {
 }
 
@@ -140,59 +85,9 @@ template <int DimX, int DimY, int DimU>
 void KalmanFilter<DimX, DimY, DimU>::predict(Eigen::Vector<double, DimU> control_input)
 {
     // Project the current estimate through the process model
-    state_estimate = process_model * state_estimate + control_model * control_input;
-    state_covariance =
-        process_model * state_covariance * process_model.transpose() + process_covariance;
-}
-
-template <int DimX, int DimY, int DimU>
-void KalmanFilter<DimX, DimY, DimU>::update(Eigen::Vector<double, DimY> measurement)
-{
-    // Innovation between actual and predicted measurement
-    const Eigen::Vector<double, DimY> innovation =
-        measurement - measurement_model * state_estimate;
-
-    // Kalman gain defines how much the input measurement will influence the
-    // state estimate, i.e., how strongly we trust measurement vs. prediction
-    const Eigen::Matrix<double, DimX, DimY> kalman_gain =
-        state_covariance *
-        (measurement_model.transpose() * innovationCovarianceInverse());
-
-    // Correct state estimate with innovation weighted by Kalman gain
-    state_estimate = state_estimate + kalman_gain * innovation;
-
-    // Correct state covariance
-    // Joseph form is more numerically stable than P = (I - K*H) * P
-    const Eigen::Matrix<double, DimX, DimX> posterior_covariance_factor =
-        Eigen::Matrix<double, DimX, DimX>::Identity() - kalman_gain * measurement_model;
-    state_covariance = posterior_covariance_factor * state_covariance *
-                           posterior_covariance_factor.transpose() +
-                       kalman_gain * measurement_covariance * kalman_gain.transpose();
-}
-
-template <int DimX, int DimY, int DimU>
-double KalmanFilter<DimX, DimY, DimU>::mahalanobisDistance(
-    Eigen::Vector<double, DimY> measurement) const
-{
-    // Innovation between actual and predicted measurement
-    const Eigen::Vector<double, DimY> innovation =
-        measurement - measurement_model * state_estimate;
-
-    return innovation.transpose() * innovationCovarianceInverse() * innovation;
-}
-
-template <int DimX, int DimY, int DimU>
-Eigen::Matrix<double, DimY, DimY>
-KalmanFilter<DimX, DimY, DimU>::innovationCovarianceInverse() const
-{
-    // Innovation covariance (measurement uncertainty in innovation space)
-    const Eigen::Matrix<double, DimY, DimY> innovation_covariance =
-        measurement_model * state_covariance * measurement_model.transpose() +
-        measurement_covariance;
-    const Eigen::Matrix<double, DimY, DimY> regularized_innovation_covariance =
-        innovation_covariance.unaryExpr(
-            [](double value) { return (std::abs(value) < 1.0e-20) ? 0.0 : value; });
-
-    return regularized_innovation_covariance.completeOrthogonalDecomposition()
-        .pseudoInverse();
+    this->state_estimate =
+        process_model * this->state_estimate + this->control_model * control_input;
+    this->state_covariance =
+        process_model * this->state_covariance * process_model.transpose() +
+        this->process_covariance;
 }

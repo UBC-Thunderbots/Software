@@ -5,12 +5,12 @@
 #include <functional>
 #include <utility>
 
+#include "software/sensor_fusion/filter/kalman_filter_base.hpp"
+
 /**
  * Extended Kalman filter for discrete-time state estimation.
  *
- * A Kalman filter combines a process model (how the state evolves over time)
- * with noisy measurements (what sensors report) to produce an estimate of the
- * system state over time. The plain Kalman filter requires the process model to
+ * The plain Kalman filter requires the process model to
  * be linear, i.e. a constant state transition matrix F. The extended Kalman
  * filter lifts that restriction by linearizing a nonlinear process model about
  * the current estimate at every step, so instead of F it takes:
@@ -21,10 +21,6 @@
  * the constant matrix H (measurement_model). That is sufficient when every sensor
  * reports a linear combination of state variables. Supporting a nonlinear h(x)
  * would require giving the update step the same function/Jacobian treatment.
- *
- * It alternates between two steps:
- * 1) predict: propagate state/covariance forward through the process model
- * 2) update: correct that prediction with a new measurement
  *
  * Because the linearization is only a first-order approximation, the estimate is
  * not optimal in the way the linear Kalman filter's is, and a poor initial
@@ -41,7 +37,7 @@
  * @tparam DimU The dimension of control space
  */
 template <int DimX, int DimY, int DimU>
-class ExtendedKalmanFilter
+class ExtendedKalmanFilter : public KalmanFilterBase<DimX, DimY, DimU>
 {
    public:
     /**
@@ -104,39 +100,17 @@ class ExtendedKalmanFilter
      *
      * @param control_input Control input vector
      */
-    void predict(Eigen::Vector<double, DimU> control_input);
+    void predict(Eigen::Vector<double, DimU> control_input) override;
 
-    /**
-     * Correct the current state estimate with the given measurement.
-     *
-     * This step is the same as the linear Kalman filter's, because measurements are
-     * assumed to relate to the state through the constant matrix H
-     * (measurement_model) rather than a nonlinear function.
-     *
-     * @param measurement Measurement vector
-     */
-    void update(Eigen::Vector<double, DimY> measurement);
-
-    Eigen::Vector<double, DimX> state_estimate;
-    Eigen::Matrix<double, DimX, DimX> state_covariance;
     ProcessModelFunction process_model_function;
     ProcessModelJacobianFunction process_model_jacobian_function;
-    Eigen::Matrix<double, DimX, DimX> process_covariance;
-    Eigen::Matrix<double, DimX, DimU> control_model;
-    Eigen::Matrix<double, DimY, DimX> measurement_model;
-    Eigen::Matrix<double, DimY, DimY> measurement_covariance;
 };
 
 template <int DimX, int DimY, int DimU>
 ExtendedKalmanFilter<DimX, DimY, DimU>::ExtendedKalmanFilter()
-    : state_estimate(Eigen::Vector<double, DimX>::Zero()),
-      state_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
+    : KalmanFilterBase<DimX, DimY, DimU>(),
       process_model_function(),
-      process_model_jacobian_function(),
-      process_covariance(Eigen::Matrix<double, DimX, DimX>::Zero()),
-      control_model(Eigen::Matrix<double, DimX, DimU>::Zero()),
-      measurement_model(Eigen::Matrix<double, DimY, DimX>::Zero()),
-      measurement_covariance(Eigen::Matrix<double, DimY, DimY>::Zero())
+      process_model_jacobian_function()
 {
 }
 
@@ -144,22 +118,18 @@ template <int DimX, int DimY, int DimU>
 ExtendedKalmanFilter<DimX, DimY, DimU>::ExtendedKalmanFilter(
     Eigen::Vector<double, DimX> initial_state,
     Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
-    typename ExtendedKalmanFilter<DimX, DimY, DimU>::ProcessModelFunction
-        initial_process_model_function,
-    typename ExtendedKalmanFilter<DimX, DimY, DimU>::ProcessModelJacobianFunction
-        initial_process_model_jacobian_function,
+    ProcessModelFunction initial_process_model_function,
+    ProcessModelJacobianFunction initial_process_model_jacobian_function,
     Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
     Eigen::Matrix<double, DimX, DimU> initial_control_model,
     Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
     Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance)
-    : state_estimate(initial_state),
-      state_covariance(initial_state_covariance),
+    : KalmanFilterBase<DimX, DimY, DimU>(initial_state, initial_state_covariance,
+                                         initial_process_covariance,
+                                         initial_control_model, initial_measurement_model,
+                                         initial_measurement_covariance),
       process_model_function(std::move(initial_process_model_function)),
-      process_model_jacobian_function(std::move(initial_process_model_jacobian_function)),
-      process_covariance(initial_process_covariance),
-      control_model(initial_control_model),
-      measurement_model(initial_measurement_model),
-      measurement_covariance(initial_measurement_covariance)
+      process_model_jacobian_function(std::move(initial_process_model_jacobian_function))
 {
 }
 
@@ -168,48 +138,11 @@ void ExtendedKalmanFilter<DimX, DimY, DimU>::predict(
     Eigen::Vector<double, DimU> control_input)
 {
     const Eigen::Matrix<double, DimX, DimX> evaluated_jacobian =
-        process_model_jacobian_function(state_estimate);
-
+        process_model_jacobian_function(this->state_estimate);
     // Project the current estimate through the process model
-    state_estimate =
-        process_model_function(state_estimate) + control_model * control_input;
-    state_covariance =
-        evaluated_jacobian * state_covariance * evaluated_jacobian.transpose() +
-        process_covariance;
-}
-
-template <int DimX, int DimY, int DimU>
-void ExtendedKalmanFilter<DimX, DimY, DimU>::update(
-    Eigen::Vector<double, DimY> measurement)
-{
-    // Innovation between actual and predicted measurement
-    const Eigen::Vector<double, DimY> innovation =
-        measurement - measurement_model * state_estimate;
-
-    // Innovation covariance (measurement uncertainty in innovation space)
-    const Eigen::Matrix<double, DimY, DimY> innovation_covariance =
-        measurement_model * state_covariance * measurement_model.transpose() +
-        measurement_covariance;
-    const Eigen::Matrix<double, DimY, DimY> regularized_innovation_covariance =
-        innovation_covariance.unaryExpr(
-            [](double value) { return (std::abs(value) < 1.0e-20) ? 0.0 : value; });
-
-    // Kalman gain defines how much the input measurement will influence the
-    // state estimate, i.e., how strongly we trust measurement vs. prediction
-    const Eigen::Matrix<double, DimX, DimY> kalman_gain =
-        state_covariance *
-        (measurement_model.transpose() *
-         regularized_innovation_covariance.completeOrthogonalDecomposition()
-             .pseudoInverse());
-
-    // Correct state estimate with innovation weighted by Kalman gain
-    state_estimate = state_estimate + kalman_gain * innovation;
-
-    // Correct state covariance
-    // Joseph form is more numerically stable than P = (I - K*H) * P
-    const Eigen::Matrix<double, DimX, DimX> posterior_covariance_factor =
-        Eigen::Matrix<double, DimX, DimX>::Identity() - kalman_gain * measurement_model;
-    state_covariance = posterior_covariance_factor * state_covariance *
-                           posterior_covariance_factor.transpose() +
-                       kalman_gain * measurement_covariance * kalman_gain.transpose();
+    this->state_estimate = process_model_function(this->state_estimate) +
+                           this->control_model * control_input;
+    this->state_covariance =
+        evaluated_jacobian * this->state_covariance * evaluated_jacobian.transpose() +
+        this->process_covariance;
 }
