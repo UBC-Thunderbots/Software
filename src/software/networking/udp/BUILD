@@ -26,6 +26,19 @@ cc_test(
 )
 
 cc_library(
+    name = "threaded_io_context",
+    srcs = [
+        "threaded_io_context.cpp",
+    ],
+    hdrs = [
+        "threaded_io_context.h",
+    ],
+    deps = [
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
     name = "proto_udp_listener",
     hdrs = [
         "proto_udp_listener.hpp",
@@ -61,6 +74,7 @@ cc_library(
     ],
     deps = [
         ":proto_udp_listener",
+        ":threaded_io_context",
         "@boost//:asio",
     ],
 )
@@ -110,6 +124,7 @@ cc_library(
         "threaded_udp_sender.h",
     ],
     deps = [
+        ":threaded_io_context",
         ":udp_sender",
     ],
 )

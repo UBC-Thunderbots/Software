@@ -24,7 +24,7 @@ class ProtoUdpListener
      * @throws TbotsNetworkException if the multicast group could not be joined if the
      * multicast option is requested
      *
-     * @param io_service The io_service to use to service incoming ReceiveProtoT data
+     * @param io_context The io_context to use to service incoming ReceiveProtoT data
      * @param ip_address The ip address of on which to listen for the given ReceiveProtoT
      * packets (IPv4 in dotted decimal or IPv6 in hex string) example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8
@@ -34,7 +34,7 @@ class ProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
+     ProtoUdpListener(boost::asio::io_context& io_context, const std::string& ip_address,
                      unsigned short port, const std::string& listen_interface,
                      std::function<void(ReceiveProtoT&)> receive_callback,
                      bool multicast);
@@ -48,12 +48,12 @@ class ProtoUdpListener
      * @throws TbotsNetworkException if the multicast group could not be joined if the
      * multicast option is requested
      *
-     * @param io_service The io_service to use to service incoming ReceiveProtoT data
+     * @param io_context The io_context to use to service incoming ReceiveProtoT data
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      */
-    ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
+     ProtoUdpListener(boost::asio::io_context& io_context, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback);
 
     /**
@@ -87,10 +87,10 @@ class ProtoUdpListener
 
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
-    boost::asio::io_service& io_service, const std::string& ip_address,
+    boost::asio::io_context& io_context, const std::string& ip_address,
     const unsigned short port, const std::string& listen_interface,
     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast)
-    : udp_listener_(io_service, ip_address, port, listen_interface, multicast,
+    : udp_listener_(io_context, ip_address, port, listen_interface, multicast,
                     std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this,
                               std::placeholders::_1, std::placeholders::_2)),
       receive_callback(receive_callback)
@@ -99,9 +99,9 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
-    boost::asio::io_service& io_service, const unsigned short port,
+    boost::asio::io_context& io_context, const unsigned short port,
     std::function<void(ReceiveProtoT&)> receive_callback)
-    : udp_listener_(io_service, port,
+    : udp_listener_(io_context, port,
                     std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this,
                               std::placeholders::_1, std::placeholders::_2)),
       receive_callback(receive_callback)

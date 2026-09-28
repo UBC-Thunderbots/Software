@@ -1,8 +1,10 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 
 #include "software/networking/udp/threaded_udp_sender.h"
 
@@ -16,6 +18,7 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      *
      * @throws TbotsNetworkException if we detect an issue with setting up this sender
      *
+     * @param io_context The shared service used to process asynchronous send operations
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
@@ -23,11 +26,10 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * @param port The port to send SendProto data on
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
-     * @param error An optional user-provided string that will be set to an error message
-     * if an error occurs
      */
-    ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port,
-                           const std::string& interface, bool multicast);
+     ThreadedProtoUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
+                            const std::string& ip_address, unsigned short port,
+                            const std::string& interface, bool multicast);
 
     /**
      * Get the interface that this sender is sending on.
@@ -59,11 +61,10 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
 };
 
 template <class SendProto>
-ThreadedProtoUdpSender<SendProto>::ThreadedProtoUdpSender(const std::string& ip_address,
-                                                          unsigned short port,
-                                                          const std::string& interface,
-                                                          bool multicast)
-    : ThreadedUdpSender(ip_address, port, interface, multicast)
+ThreadedProtoUdpSender<SendProto>::ThreadedProtoUdpSender(
+    std::shared_ptr<ThreadedIoContext> io_context, const std::string& ip_address,
+    unsigned short port, const std::string& interface, bool multicast)
+    : ThreadedUdpSender(std::move(io_context), ip_address, port, interface, multicast)
 {
 }
 
