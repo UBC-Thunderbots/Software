@@ -58,17 +58,20 @@ class ThreadedProtoUdpListener
 
     /**
      * Closes this listener's socket without stopping the shared io_context.
+     * The shared ThreadedIoContext remains available to service other UDP objects.
      */
     void close();
 
     /**
      * Destructor closes the socket and releases this listener's service ownership.
+     * It does not stop or join the shared io_context thread.
      */
     ~ThreadedProtoUdpListener();
 
 
    private:
-    // Keeps the shared service alive while the UDP socket exists.
+    // Keeps the shared service alive while the UDP socket exists. The service owns the
+    // io_context and the single thread that runs it for all shared UDP objects.
     std::shared_ptr<ThreadedIoContext> io_context_;
     std::function<void(ReceiveProtoT)> receive_callback_;
     ProtoUdpListener<ReceiveProtoT> udp_listener_;

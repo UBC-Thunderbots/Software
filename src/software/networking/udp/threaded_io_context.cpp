@@ -10,7 +10,14 @@ ThreadedIoContext::ThreadedIoContext()
 
 ThreadedIoContext::~ThreadedIoContext()
 {
+    // Stop the io_context. This is safe to call from another thread.
+    // This MUST be done before attempting to join the thread because otherwise the
+    // io_context will not stop and the thread will not join.
     io_context_.stop();
+
+    // Join the io_context thread so that we wait for it to exit before destructing
+    // the thread object. If we do not wait for the thread to finish executing, it will
+    // call std::terminate when the thread object is destroyed.
     io_context_thread_.join();
 }
 

@@ -33,6 +33,9 @@ class ThreadedUdpSender
 
     /**
      * Destructor releases this sender's ownership of the shared io_context.
+     *
+     * The shared ThreadedIoContext owns the io_context thread and is responsible
+     * for stopping and joining it after all UDP objects release their ownership.
      */
     ~ThreadedUdpSender() = default;
 
