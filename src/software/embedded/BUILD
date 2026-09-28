@@ -79,6 +79,7 @@ cc_library(
         "//software/embedded/services/network",
         "//software/embedded/toml_config",
         "//software/logger:network_logger",
+        "//software/networking/udp:threaded_io_context",
         "//software/physics:velocity_conversion_util",
         "//software/tracy:tracy_constants",
         "@tracy",
