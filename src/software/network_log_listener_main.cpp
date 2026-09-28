@@ -106,7 +106,7 @@ int main(int argc, char** argv)
     };
 
     auto io_context = std::make_shared<ThreadedIoContext>();
-    auto log_input = ThreadedProtoUdpListener<TbotsProto::RobotLog>(
+    auto log_input  = ThreadedProtoUdpListener<TbotsProto::RobotLog>(
         io_context, ROBOT_LOGS_PORT, robot_log_callback);
 
     LOG(INFO) << "Network logger listening on channel "

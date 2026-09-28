@@ -34,7 +34,7 @@ class ProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-     ProtoUdpListener(boost::asio::io_context& io_context, const std::string& ip_address,
+    ProtoUdpListener(boost::asio::io_context& io_context, const std::string& ip_address,
                      unsigned short port, const std::string& listen_interface,
                      std::function<void(ReceiveProtoT&)> receive_callback,
                      bool multicast);
@@ -53,7 +53,7 @@ class ProtoUdpListener
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      */
-     ProtoUdpListener(boost::asio::io_context& io_context, unsigned short port,
+    ProtoUdpListener(boost::asio::io_context& io_context, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback);
 
     /**

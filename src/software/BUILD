@@ -107,6 +107,7 @@ pybind_library(
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/math:math_functions",
+        "//software/networking/udp:threaded_io_context",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
         "//software/uart:boost_uart_communication",

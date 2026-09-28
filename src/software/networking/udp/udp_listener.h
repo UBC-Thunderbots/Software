@@ -25,7 +25,7 @@ class UdpListener
      * and `interface`
      * @param receive_callback The callback to call when a new message is received
      */
-     UdpListener(boost::asio::io_context& io_context, const std::string& ip_address,
+    UdpListener(boost::asio::io_context& io_context, const std::string& ip_address,
                 unsigned short port, const std::string& interface, bool multicast,
                 ReceiveCallback receive_callback);
 
@@ -41,7 +41,7 @@ class UdpListener
      * @param port The port to listen on
      * @param receive_callback The callback to call when a new message is received
      */
-     UdpListener(boost::asio::io_context& io_context, const unsigned short port,
+    UdpListener(boost::asio::io_context& io_context, const unsigned short port,
                 ReceiveCallback receive_callback);
 
     /**
