@@ -21,6 +21,9 @@ class ThreadedIoContext
 
     /**
      * Stops the io_context and joins its service thread.
+     *
+     * The io_context must be stopped before joining the thread. Otherwise,
+     * run() may continue waiting for work and the join will not complete.
      */
     ~ThreadedIoContext();
 
@@ -33,6 +36,8 @@ class ThreadedIoContext
 
    private:
     boost::asio::io_context io_context_;
+    // Keeps the io_context thread running while shared UDP objects are idle.
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard_;
+    // Runs the io_context for the lifetime of this service.
     std::thread io_context_thread_;
 };

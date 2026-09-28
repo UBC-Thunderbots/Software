@@ -105,6 +105,8 @@ void UdpListener::close()
     boost::system::error_code error;
     socket_.shutdown(boost::asio::ip::udp::socket::shutdown_both, error);
 
+    // UDP sockets do not need a connected peer, so shutdown can report
+    // not_connected during normal cleanup. Only log unexpected errors.
     if (error && error != boost::asio::error::not_connected)
     {
         LOG(WARNING)
