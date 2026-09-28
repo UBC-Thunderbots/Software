@@ -12,7 +12,7 @@ class UdpSender
      *
      * @throws TbotsNetworkException if the listener could not be created
      *
-     * @param io_service The io_service to use to service outgoing SendString data
+     * @param io_context The io_context to use to service outgoing SendString data
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
@@ -21,7 +21,7 @@ class UdpSender
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
+     UdpSender(boost::asio::io_context& io_context, const std::string& ip_address,
               unsigned short port, const std::string& interface, bool multicast);
 
     /**

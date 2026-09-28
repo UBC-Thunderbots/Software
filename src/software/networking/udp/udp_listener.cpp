@@ -4,11 +4,11 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/network_utils.h"
 
-UdpListener::UdpListener(boost::asio::io_service& io_service,
+UdpListener::UdpListener(boost::asio::io_context& io_context,
                          const std::string& ip_address, unsigned short port,
                          const std::string& listen_interface, bool multicast,
                          ReceiveCallback receive_callback)
-    : running_(true), socket_(io_service), receive_callback_(receive_callback)
+    : running_(true), socket_(io_context), receive_callback_(receive_callback)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
     if (isIpv6(ip_address))
@@ -42,9 +42,9 @@ UdpListener::UdpListener(boost::asio::io_service& io_service,
     startListen();
 }
 
-UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned short port,
+UdpListener::UdpListener(boost::asio::io_context& io_context, const unsigned short port,
                          ReceiveCallback receive_callback)
-    : running_(true), socket_(io_service), receive_callback_(receive_callback)
+    : running_(true), socket_(io_context), receive_callback_(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
     socket_.open(listen_endpoint.protocol());
