@@ -6,7 +6,8 @@
 #include "software/networking/tbots_network_exception.h"
 
 NetworkService::NetworkService(const NetworkConfig& config)
-    : multicast_ip(config.multicast_ip),
+    : io_context_(std::make_shared<ThreadedIoContext>()),
+      multicast_ip(config.multicast_ip),
       interface(config.interface),
       robot_status_sender_port(config.robot_status_sender_port)
 {
@@ -16,7 +17,8 @@ NetworkService::NetworkService(const NetworkConfig& config)
     {
         fullsystem_to_robot_ip_listener =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
-                config.multicast_ip, config.full_system_to_robot_ip_notification_port,
+                io_context_, config.multicast_ip,
+                config.full_system_to_robot_ip_notification_port,
                 config.interface,
                 [&](const TbotsProto::IpNotification& ip_notification)
                 { onFullSystemIpNotification(ip_notification); },
@@ -24,12 +26,13 @@ NetworkService::NetworkService(const NetworkConfig& config)
 
         robot_to_fullsystem_ip_sender =
             std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
-                config.multicast_ip, config.robot_to_full_system_ip_notification_port,
+                io_context_, config.multicast_ip,
+                config.robot_to_full_system_ip_notification_port,
                 config.interface, false);
 
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
-                config.primitive_listener_port,
+                io_context_, config.primitive_listener_port,
                 [&](const TbotsProto::Primitive& prim) { primitiveCallback(prim); });
     }
     catch (const TbotsNetworkException& e)
@@ -54,7 +57,7 @@ void NetworkService::waitForNetworkUp()
     try
     {
         network_tester = std::make_unique<ThreadedUdpSender>(
-            multicast_ip, NETWORK_COMM_TEST_PORT, interface, true);
+            io_context_, multicast_ip, NETWORK_COMM_TEST_PORT, interface, true);
     }
     catch (TbotsNetworkException& e)
     {
@@ -105,10 +108,11 @@ void NetworkService::onFullSystemIpNotification(
         {
             robot_status_sender =
                 std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-                    fullsystem_ip.value(), robot_status_sender_port, interface, false);
+                    io_context_, fullsystem_ip.value(), robot_status_sender_port, interface,
+                    false);
             robot_log_sender =
                 std::make_shared<ThreadedProtoUdpSender<TbotsProto::RobotLog>>(
-                    fullsystem_ip.value(), ROBOT_LOGS_PORT, interface, false);
+                    io_context_, fullsystem_ip.value(), ROBOT_LOGS_PORT, interface, false);
             NetworkLoggerSingleton::replaceUdpSender(robot_log_sender);
         }
         catch (const TbotsNetworkException& error)
