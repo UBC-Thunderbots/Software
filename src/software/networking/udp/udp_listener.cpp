@@ -105,7 +105,7 @@ void UdpListener::close()
     boost::system::error_code error;
     socket_.shutdown(boost::asio::ip::udp::socket::shutdown_both, error);
 
-    if (error)
+    if (error && error != boost::asio::error::not_connected)
     {
         LOG(WARNING)
             << "An unknown network error occurred when attempting to close UDP socket. The boost system error is: "
