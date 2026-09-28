@@ -18,8 +18,7 @@ NetworkService::NetworkService(const NetworkConfig& config)
         fullsystem_to_robot_ip_listener =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
                 io_context_, config.multicast_ip,
-                config.full_system_to_robot_ip_notification_port,
-                config.interface,
+                config.full_system_to_robot_ip_notification_port, config.interface,
                 [&](const TbotsProto::IpNotification& ip_notification)
                 { onFullSystemIpNotification(ip_notification); },
                 true);
@@ -27,8 +26,8 @@ NetworkService::NetworkService(const NetworkConfig& config)
         robot_to_fullsystem_ip_sender =
             std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
                 io_context_, config.multicast_ip,
-                config.robot_to_full_system_ip_notification_port,
-                config.interface, false);
+                config.robot_to_full_system_ip_notification_port, config.interface,
+                false);
 
         udp_listener_primitive =
             std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
@@ -108,11 +107,12 @@ void NetworkService::onFullSystemIpNotification(
         {
             robot_status_sender =
                 std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-                    io_context_, fullsystem_ip.value(), robot_status_sender_port, interface,
-                    false);
+                    io_context_, fullsystem_ip.value(), robot_status_sender_port,
+                    interface, false);
             robot_log_sender =
                 std::make_shared<ThreadedProtoUdpSender<TbotsProto::RobotLog>>(
-                    io_context_, fullsystem_ip.value(), ROBOT_LOGS_PORT, interface, false);
+                    io_context_, fullsystem_ip.value(), ROBOT_LOGS_PORT, interface,
+                    false);
             NetworkLoggerSingleton::replaceUdpSender(robot_log_sender);
         }
         catch (const TbotsNetworkException& error)

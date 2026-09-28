@@ -27,9 +27,9 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
      */
-     ThreadedProtoUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
-                            const std::string& ip_address, unsigned short port,
-                            const std::string& interface, bool multicast);
+    ThreadedProtoUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
+                           const std::string& ip_address, unsigned short port,
+                           const std::string& interface, bool multicast);
 
     /**
      * Get the interface that this sender is sending on.

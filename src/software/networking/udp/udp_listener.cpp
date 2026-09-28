@@ -94,6 +94,11 @@ UdpListener::~UdpListener() {}
 
 void UdpListener::close()
 {
+    if (!running_)
+    {
+        return;
+    }
+
     running_ = false;
 
     // Shutdown both the read and write on the socket

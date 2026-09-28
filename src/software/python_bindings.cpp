@@ -43,6 +43,7 @@
 #include "software/geom/vector.h"
 #include "software/math/math_functions.h"
 #include "software/networking/tbots_network_exception.h"
+#include "software/networking/udp/threaded_io_context.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/uart/boost_uart_communication.h"
@@ -70,7 +71,8 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<const std::string&, unsigned short, const std::string&, bool>())
+        .def(py::init<std::shared_ptr<ThreadedIoContext>, const std::string&,
+                      unsigned short, const std::string&, bool>())
         .def("get_interface", &Class::getInterface)
         .def("get_ip_address", &Class::getIpAddress)
         .def("send_proto", &Class::sendProto, py::arg("message"),
@@ -90,9 +92,11 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<const std::string&, unsigned short, const std::string&,
-                      const std::function<void(T)>&, bool>())
-        .def(py::init<unsigned short, const std::function<void(T)>&>())
+        .def(py::init<std::shared_ptr<ThreadedIoContext>, const std::string&,
+                      unsigned short, const std::string&, const std::function<void(T)>&,
+                      bool>())
+        .def(py::init<std::shared_ptr<ThreadedIoContext>, unsigned short,
+                      const std::function<void(T)>&>())
         .def("close", &Class::close);
 }
 
@@ -429,6 +433,10 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
+    py::class_<ThreadedIoContext, std::shared_ptr<ThreadedIoContext>>(m,
+                                                                      "ThreadedIoContext")
+        .def(py::init<>());
+
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

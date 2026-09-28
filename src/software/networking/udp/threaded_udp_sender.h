@@ -27,14 +27,14 @@ class ThreadedUdpSender
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
      */
-     ThreadedUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
-                       const std::string& ip_address, unsigned short port,
-                       const std::string& interface, bool multicast);
+    ThreadedUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
+                      const std::string& ip_address, unsigned short port,
+                      const std::string& interface, bool multicast);
 
     /**
      * Destructor releases this sender's ownership of the shared io_context.
      */
-     ~ThreadedUdpSender() = default;
+    ~ThreadedUdpSender() = default;
 
     /**
      * Get the interface that this sender is sending on.
@@ -61,9 +61,9 @@ class ThreadedUdpSender
     void sendString(const std::string& message, bool async = false);
 
    private:
-     // Keeps the shared service alive while the UDP socket exists.
-     std::shared_ptr<ThreadedIoContext> io_context_;
+    // Keeps the shared service alive while the UDP socket exists.
+    std::shared_ptr<ThreadedIoContext> io_context_;
 
-     // The UdpSender that will be used to send data over the network
-     UdpSender udp_sender_;
+    // The UdpSender that will be used to send data over the network
+    UdpSender udp_sender_;
 };

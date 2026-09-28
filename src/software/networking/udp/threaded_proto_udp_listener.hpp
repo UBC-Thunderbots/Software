@@ -31,9 +31,9 @@ class ThreadedProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-     ThreadedProtoUdpListener(std::shared_ptr<ThreadedIoContext> io_context,
-                              const std::string& ip_address, unsigned short port,
-                               const std::string& interface,
+    ThreadedProtoUdpListener(std::shared_ptr<ThreadedIoContext> io_context,
+                             const std::string& ip_address, unsigned short port,
+                             const std::string& interface,
                              std::function<void(ReceiveProtoT)> receive_callback,
                              bool multicast);
 
@@ -52,9 +52,9 @@ class ThreadedProtoUdpListener
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      */
-     ThreadedProtoUdpListener(std::shared_ptr<ThreadedIoContext> io_context,
-                              unsigned short port,
-                              std::function<void(ReceiveProtoT)> receive_callback);
+    ThreadedProtoUdpListener(std::shared_ptr<ThreadedIoContext> io_context,
+                             unsigned short port,
+                             std::function<void(ReceiveProtoT)> receive_callback);
 
     /**
      * Closes this listener's socket without stopping the shared io_context.
@@ -68,18 +68,17 @@ class ThreadedProtoUdpListener
 
 
    private:
-     // Keeps the shared service alive while the UDP socket exists.
-     std::shared_ptr<ThreadedIoContext> io_context_;
+    // Keeps the shared service alive while the UDP socket exists.
+    std::shared_ptr<ThreadedIoContext> io_context_;
     std::function<void(ReceiveProtoT)> receive_callback_;
-     ProtoUdpListener<ReceiveProtoT> udp_listener_;
+    ProtoUdpListener<ReceiveProtoT> udp_listener_;
 };
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     std::shared_ptr<ThreadedIoContext> io_context, const std::string& ip_address,
-    const unsigned short port,
-    const std::string& interface, std::function<void(ReceiveProtoT)> receive_callback,
-    bool multicast)
+    const unsigned short port, const std::string& interface,
+    std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
     : io_context_(std::move(io_context)),
       receive_callback_(std::move(receive_callback)),
       udp_listener_(io_context_->getIoContext(), ip_address, port, interface,

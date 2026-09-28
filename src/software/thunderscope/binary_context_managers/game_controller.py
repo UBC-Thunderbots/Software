@@ -65,6 +65,7 @@ class Gamecontroller:
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
         self.parallelized = parallelized
+        self.io_context = tbots_cpp.ThreadedIoContext()
 
         self.use_conventional_port = use_conventional_port
         self.referee_port = None
@@ -261,6 +262,7 @@ class Gamecontroller:
                 autoref_proto_unix_io.send_proto(protos.Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
+            self.io_context,
             Gamecontroller.REFEREE_IP,
             self.referee_port,
             self.__get_referee_multicast_interface(),
