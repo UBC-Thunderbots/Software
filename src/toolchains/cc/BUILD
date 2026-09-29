@@ -109,7 +109,7 @@ filegroup(
     srcs = [
         ":linux_gcc_wrapper",
     ] + select({
-        "@bazel_tools//src/conditions:linux": [
+        "@bazel_tools//src/conditions:linux_x86_64": [
             "@linux_k8_gcc//:includes",
             "@linux_k8_gcc//:libs",
             "@linux_k8_gcc//:runtime_libs",
@@ -124,7 +124,7 @@ filegroup(
     srcs = [
         ":linux_gcc_wrapper",
     ] + select({
-        "@bazel_tools//src/conditions:linux": [
+        "@bazel_tools//src/conditions:linux_aarch64": [
             "@linux_aarch64_gcc//:includes",
             "@linux_aarch64_gcc//:libs",
             "@linux_aarch64_gcc//:runtime_libs",
@@ -172,13 +172,13 @@ cc_toolchain(
     compiler_files = ":linux_k8_gcc_all",
     dwp_files = ":linux_k8_gcc_all",
     dynamic_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux": "@linux_k8_gcc//:runtime_libs",
+        "@bazel_tools//src/conditions:linux_x86_64": "@linux_k8_gcc//:runtime_libs",
         "//conditions:default": ":empty",
     }),
     linker_files = ":linux_k8_gcc_all",
     objcopy_files = ":linux_k8_gcc_all",
     static_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux": "@linux_k8_gcc//:static_libs",
+        "@bazel_tools//src/conditions:linux_x86_64": "@linux_k8_gcc//:static_libs",
         "//conditions:default": ":empty",
     }),
     strip_files = ":linux_k8_gcc_all",
@@ -199,13 +199,13 @@ cc_toolchain(
     compiler_files = ":linux_aarch64_gcc_all",
     dwp_files = ":linux_aarch64_gcc_all",
     dynamic_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux": "@linux_aarch64_gcc//:runtime_libs",
+        "@bazel_tools//src/conditions:linux_aarch64": "@linux_aarch64_gcc//:runtime_libs",
         "//conditions:default": ":empty",
     }),
     linker_files = ":linux_aarch64_gcc_all",
     objcopy_files = ":linux_aarch64_gcc_all",
     static_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux": "@linux_aarch64_gcc//:static_libs",
+        "@bazel_tools//src/conditions:linux_aarch64": "@linux_aarch64_gcc//:static_libs",
         "//conditions:default": ":empty",
     }),
     strip_files = ":linux_aarch64_gcc_all",
