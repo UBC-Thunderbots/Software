@@ -7,7 +7,11 @@
 # The layout under /opt/tbotspython is referenced by src/MODULE.bazel and
 # src/toolchains/cc/BUILD, so the paths below must not change.
 
-PYTHON_VERSION="3.12"
+# Full version of the CPython source release used for the cross compile headers.
+# The minor version is what the interpreter and the Bazel toolchain expect, and
+# what the python.org download directories are named after.
+PYTHON_SOURCE_VERSION="3.12.0"
+PYTHON_VERSION="${PYTHON_SOURCE_VERSION%.*}"
 VENV_DIR="/opt/tbotspython"
 DOWNLOAD_CACHE="/tmp/tbots_download_cache"
 
@@ -103,21 +107,29 @@ install_python_cross_compile_headers() {
     return 0
   fi
 
-  local source_dir="Python-3.12.0"
-  local archive="$DOWNLOAD_CACHE/python-${PYTHON_VERSION}.tar.xz"
+  # Absolute paths throughout, so that a failed cd can never leave these files
+  # behind in the directory the setup was launched from.
+  local source_dir="$DOWNLOAD_CACHE/Python-${PYTHON_SOURCE_VERSION}"
+  local archive="$DOWNLOAD_CACHE/python-${PYTHON_SOURCE_VERSION}.tar.xz"
+  local config_site="$DOWNLOAD_CACHE/config.site-aarch64"
 
-  fetch "https://www.python.org/ftp/python/${PYTHON_VERSION}/${source_dir}.tar.xz" "$archive"
+  fetch "https://www.python.org/ftp/python/${PYTHON_SOURCE_VERSION}/Python-${PYTHON_SOURCE_VERSION}.tar.xz" "$archive"
   tar -xf "$archive" -C "$DOWNLOAD_CACHE"
+
+  if [ ! -d "$source_dir" ]; then
+    fail "Extracting $archive did not produce $source_dir."
+  fi
+
+  # The configuration is taken from the examples provided in
+  # https://docs.python.org/3.12/using/configure.html
+  echo ac_cv_buggy_getaddrinfo=no >"$config_site"
+  echo ac_cv_file__dev_ptmx=yes >>"$config_site"
+  echo ac_cv_file__dev_ptc=no >>"$config_site"
+
   (
-    cd "$DOWNLOAD_CACHE/$source_dir"
+    cd "$source_dir"
 
-    # The configuration is taken from the examples provided in
-    # https://docs.python.org/3.12/using/configure.html
-    echo ac_cv_buggy_getaddrinfo=no >config.site-aarch64
-    echo ac_cv_file__dev_ptmx=yes >>config.site-aarch64
-    echo ac_cv_file__dev_ptc=no >>config.site-aarch64
-
-    CONFIG_SITE=config.site-aarch64 ./configure \
+    CONFIG_SITE="$config_site" ./configure \
       --build="$HOST_TRIPLE" \
       --host="$TARGET_TRIPLE" \
       "-with-build-python=$(python_interpreter_path)" \
@@ -125,7 +137,7 @@ install_python_cross_compile_headers() {
       --prefix="$VENV_DIR/cross_compile_headers" >/dev/null
     make inclinstall -j"$(getconf _NPROCESSORS_ONLN)" >/dev/null
   )
-  rm -rf "$DOWNLOAD_CACHE/$source_dir" "$archive"
+  rm -rf "$source_dir" "$config_site" "$archive"
 }
 
 install_python_toolchain_headers() {
