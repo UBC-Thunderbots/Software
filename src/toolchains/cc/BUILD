@@ -93,9 +93,10 @@ filegroup(
 
 filegroup(
     name = "k8_aarch64_linux_everything",
-    srcs = [
-        "@k8_aarch64_linux_gcc//:everything",
-    ] + glob(["wrapper/k8_aarch64_linux_*"]),
+    srcs = glob(["wrapper/k8_aarch64_linux_*"]) + select({
+        "@bazel_tools//src/conditions:linux": ["@k8_aarch64_linux_gcc//:everything"],
+        "//conditions:default": [],
+    }),
 )
 
 filegroup(
@@ -107,22 +108,30 @@ filegroup(
     name = "linux_k8_gcc_all",
     srcs = [
         ":linux_gcc_wrapper",
-        "@linux_k8_gcc//:includes",
-        "@linux_k8_gcc//:libs",
-        "@linux_k8_gcc//:runtime_libs",
-        "@linux_k8_gcc//:static_libs",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:linux": [
+            "@linux_k8_gcc//:includes",
+            "@linux_k8_gcc//:libs",
+            "@linux_k8_gcc//:runtime_libs",
+            "@linux_k8_gcc//:static_libs",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 filegroup(
     name = "linux_aarch64_gcc_all",
     srcs = [
         ":linux_gcc_wrapper",
-        "@linux_aarch64_gcc//:includes",
-        "@linux_aarch64_gcc//:libs",
-        "@linux_aarch64_gcc//:runtime_libs",
-        "@linux_aarch64_gcc//:static_libs",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:linux": [
+            "@linux_aarch64_gcc//:includes",
+            "@linux_aarch64_gcc//:libs",
+            "@linux_aarch64_gcc//:runtime_libs",
+            "@linux_aarch64_gcc//:static_libs",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 filegroup(
@@ -162,10 +171,16 @@ cc_toolchain(
     as_files = ":linux_k8_gcc_all",
     compiler_files = ":linux_k8_gcc_all",
     dwp_files = ":linux_k8_gcc_all",
-    dynamic_runtime_lib = "@linux_k8_gcc//:runtime_libs",
+    dynamic_runtime_lib = select({
+        "@bazel_tools//src/conditions:linux": "@linux_k8_gcc//:runtime_libs",
+        "//conditions:default": ":empty",
+    }),
     linker_files = ":linux_k8_gcc_all",
     objcopy_files = ":linux_k8_gcc_all",
-    static_runtime_lib = "@linux_k8_gcc//:static_libs",
+    static_runtime_lib = select({
+        "@bazel_tools//src/conditions:linux": "@linux_k8_gcc//:static_libs",
+        "//conditions:default": ":empty",
+    }),
     strip_files = ":linux_k8_gcc_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
@@ -183,10 +198,16 @@ cc_toolchain(
     as_files = ":linux_aarch64_gcc_all",
     compiler_files = ":linux_aarch64_gcc_all",
     dwp_files = ":linux_aarch64_gcc_all",
-    dynamic_runtime_lib = "@linux_aarch64_gcc//:runtime_libs",
+    dynamic_runtime_lib = select({
+        "@bazel_tools//src/conditions:linux": "@linux_aarch64_gcc//:runtime_libs",
+        "//conditions:default": ":empty",
+    }),
     linker_files = ":linux_aarch64_gcc_all",
     objcopy_files = ":linux_aarch64_gcc_all",
-    static_runtime_lib = "@linux_aarch64_gcc//:static_libs",
+    static_runtime_lib = select({
+        "@bazel_tools//src/conditions:linux": "@linux_aarch64_gcc//:static_libs",
+        "//conditions:default": ":empty",
+    }),
     strip_files = ":linux_aarch64_gcc_all",
     supports_param_files = True,
     toolchain_config = ":linux_aarch64_gcc",
@@ -314,8 +335,10 @@ filegroup(
     name = "macos_robot_everything",
     srcs = [
         "wrapper/macos_robot_gcc",
-        "@macos_robot_gcc//:everything",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["@macos_robot_gcc//:everything"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_toolchain(
