@@ -36,7 +36,7 @@ venv_bin() {
 # Header directory of the interpreter that the virtual environment is built
 # from, which is what the Bazel Python toolchain expects.
 python_include_dir() {
-  "$(python_interpreter)" -c 'import sysconfig; print(sysconfig.get_paths()["include"])'
+  "$(python_interpreter_path)" -c 'import sysconfig; print(sysconfig.get_paths()["include"])'
 }
 
 init_download_cache() {

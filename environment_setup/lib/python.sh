@@ -10,7 +10,9 @@ create_tbotspython_venv() {
   # The directory is recreated from scratch so that packages removed from
   # requirements.txt do not linger across runs.
   as_root rm -rf "$VENV_DIR"
-  as_root "$(python_interpreter)" -m venv "$VENV_DIR" "${args[@]}"
+  # Resolve the interpreter to an absolute path first: sudo resets PATH, so a
+  # Homebrew interpreter would not be found otherwise.
+  as_root "$(python_interpreter_path)" -m venv "$VENV_DIR" "${args[@]}"
   as_root "$(venv_bin pip)" install --upgrade pip
 
   # Install into the venv's own pip rather than whatever is on PATH.
