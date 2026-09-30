@@ -9,7 +9,8 @@
 RobotLocalizer::RobotLocalizer()
 {
     filter_.state_covariance =
-       PROCESS_MODEL_INITIAL_VARIANCE * Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
+        PROCESS_MODEL_INITIAL_VARIANCE *
+        Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
@@ -300,22 +301,22 @@ void RobotLocalizer::updateFilterPredictionMatrices(double delta_time_seconds)
 
     const double linear_position_variance =
         delta_time_cubed * PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE;
-    
+
     const double linear_position_velocity_covariance =
         delta_time_squared * PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE;
-    
+
     const double linear_velocity_variance =
         delta_time_seconds * PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE;
-    
+
     const double angular_position_variance =
         (delta_time_fourth / 4.0) * PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE;
-    
+
     const double angular_position_velocity_covariance =
         (delta_time_cubed / 2.0) * PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE;
-    
+
     const double angular_velocity_variance =
         delta_time_squared * PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE;
- 
+
     // State order: X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
     // ANGULAR_VELOCITY
     // clang-format off

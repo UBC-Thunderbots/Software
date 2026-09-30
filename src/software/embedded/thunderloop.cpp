@@ -147,8 +147,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     imu_service_ = std::make_unique<ImuService>();
     LOG(INFO) << "THUNDERLOOP: IMU Service initialized!";
 
-    robot_localizer_ =
-        std::make_unique<RobotLocalizer>();
+    robot_localizer_ = std::make_unique<RobotLocalizer>();
     LOG(INFO) << "THUNDERLOOP: Robot Localizer initialized!";
 
     primitive_executor_ = std::make_unique<PrimitiveExecutor>(robot_constants, robot_id);

@@ -6,6 +6,7 @@
 #include <variant>
 
 #include "proto/primitive.pb.h"
+#include "software/embedded/robot_localizer/robot_localizer_constants.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
@@ -14,7 +15,6 @@
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
-#include "software/embedded/robot_localizer/robot_localizer_constants.h"
 
 /**
  * Estimates robot position, orientation, velocity, and angular velocity using an

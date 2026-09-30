@@ -39,9 +39,9 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
-        "//software/embedded/robot_localizer:robot_localizer",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
+        "//software/embedded/robot_localizer",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/time:duration",
@@ -71,8 +71,8 @@ cc_library(
     }),
     deps = [
         ":primitive_executor",
-        "//software/embedded/robot_localizer:robot_localizer",
         "//proto:tbots_cc_proto",
+        "//software/embedded/robot_localizer",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
@@ -112,4 +112,3 @@ filegroup(
     name = "hash_thunderloop_binary",
     srcs = ["hash_thunderloop_binary.sh"],
 )
-
