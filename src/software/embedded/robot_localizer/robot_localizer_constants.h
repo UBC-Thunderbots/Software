@@ -1,4 +1,9 @@
+#pragma once
+
 #include <Eigen/Dense>
+
+#include "software/util/make_enum/make_enum.hpp"
+
 MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
           ANGULAR_VELOCITY);
 

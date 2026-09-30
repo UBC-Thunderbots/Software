@@ -22,6 +22,7 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/geom:point",
         "//software/geom:vector",
+        "//software/util/make_enum",
         "//software/physics:velocity_conversion_util",
         "//software/sensor_fusion/filter:extended_kalman_filter",
         "//software/sensor_fusion/filter:kalman_filter",
