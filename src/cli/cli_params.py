@@ -128,7 +128,7 @@ class BuildConfig:
     debug_powerloop: bool = False
     disable_power_service: bool = False
     disable_motor_service: bool = False
-
+    robot_platform: bool = False
 
 class BazelFlag(tuple, Enum):
     DEBUG_BUILD = ("-c", "dbg")
@@ -182,6 +182,7 @@ class InteractiveCli:
         TEST = "test"
         FLASH = "flash"
         REPEAT = "repeat"  # this value is not used, only the enum is checked
+        BUILD = "build"
 
     CATEGORY_CHOICES = [
         questionary.Choice(
@@ -203,6 +204,11 @@ class InteractiveCli:
             title="Flash",
             value=("Flash ", Category.FLASH),
             description="Deploy software or firmware to a robot via Ansible",
+        ),
+        questionary.Choice(
+            title="Build",
+            value=("Build ", Category.BUILD),
+            description="Builds selected target after fuzzy search",
         ),
     ]
 
@@ -289,6 +295,19 @@ class InteractiveCli:
             title="Disable Motor Service",
             value=("without motor service, ", DeployOption.DISABLE_MOTOR_SERVICE),
             description="Compile Thunderloop without the Motor Service (no motorboard)",
+        ),
+    ]
+
+    BUILD_PLATFORM_CHOICES = [
+        questionary.Choice(
+            title="Local/default",
+            value=("local/default", False),
+            description="Build locally on this device (if able)",
+        ),
+        questionary.Choice(
+            title="Robot",
+            value=("robot", True),
+            description="Cross-compile for the robot",
         ),
     ]
 
@@ -497,5 +516,26 @@ class InteractiveCli:
                 config.ssh_password = questionary.password(
                     "SSH password?", style=InteractiveCli.INTERACTIVE_STYLE
                 ).unsafe_ask()
+
+            case InteractiveCli.Category.BUILD:
+                config.action = ActionArgument.build
+                term_name = questionary.text(
+                    "Enter target names or Bazel patterns, separated by spaces:",
+                    style=InteractiveCli.INTERACTIVE_STYLE,
+                ).unsafe_ask()
+
+                platform_label, robot_platform = questionary.select(
+                    "Build for which platform?",
+                    choices=InteractiveCli.BUILD_PLATFORM_CHOICES,
+                    style=InteractiveCli.INTERACTIVE_STYLE,
+                ).unsafe_ask()
+
+                config.robot_platform = robot_platform
+                cmd_title += platform_label + " for "
+                config.search_query = term_name.strip()
+                config.interactive_search = True
+                cmd_title += config.search_query
+
+
 
         return cmd_title, config, extra_args
