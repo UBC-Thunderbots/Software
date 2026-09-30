@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <utility>
 
 #include "software/networking/udp/proto_udp_listener.hpp"
@@ -75,6 +76,7 @@ class ThreadedProtoUdpListener
     std::shared_ptr<ThreadedIoContext> io_context_;
     std::function<void(ReceiveProtoT)> receive_callback_;
     ProtoUdpListener<ReceiveProtoT> udp_listener_;
+    std::once_flag close_once_;
 };
 
 template <class ReceiveProtoT>
@@ -109,5 +111,10 @@ ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 template <class ReceiveProtoT>
 void ThreadedProtoUdpListener<ReceiveProtoT>::close()
 {
-    udp_listener_.close();
+    std::call_once(close_once_,
+                   [this]
+                   {
+                       udp_listener_.close();
+                       io_context_->waitForHandlersToDrain();
+                   });
 }

@@ -2,6 +2,7 @@
 
 #include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/io_context.hpp>
+#include <future>
 #include <thread>
 
 /**
@@ -33,6 +34,13 @@ class ThreadedIoContext
      * @return The io_context used to service asynchronous operations
      */
     boost::asio::io_context& getIoContext();
+
+    /**
+     * Waits until handlers already queued on this context have completed.
+     *
+     * This must not be called from the io_context worker thread.
+     */
+    void waitForHandlersToDrain();
 
    private:
     boost::asio::io_context io_context_;

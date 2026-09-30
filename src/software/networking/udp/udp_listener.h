@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <mutex>
 
 typedef std::function<void(const char*, const size_t&)> ReceiveCallback;
 
@@ -83,6 +84,8 @@ class UdpListener
 
     // Whether this listener should continue running
     bool running_;
+    // Protects shutdown and receive re-registration against each other.
+    std::mutex state_mutex_;
 
     // The raw data received from the network
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;

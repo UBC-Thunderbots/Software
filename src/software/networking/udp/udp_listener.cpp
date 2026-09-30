@@ -94,12 +94,14 @@ UdpListener::~UdpListener() {}
 
 void UdpListener::close()
 {
-    if (!running_)
     {
-        return;
+        std::scoped_lock lock(state_mutex_);
+        if (!running_)
+        {
+            return;
+        }
+        running_ = false;
     }
-
-    running_ = false;
 
     // Shutdown both the read and write on the socket
     boost::system::error_code error;
@@ -130,9 +132,12 @@ void UdpListener::startListen()
 void UdpListener::handleDataReception(const boost::system::error_code& error,
                                       std::size_t num_bytes_received)
 {
-    if (!running_)
     {
-        return;
+        std::scoped_lock lock(state_mutex_);
+        if (!running_)
+        {
+            return;
+        }
     }
 
     if (!error)
@@ -155,5 +160,11 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
     }
 
     // Start listening for more data
-    startListen();
+    {
+        std::scoped_lock lock(state_mutex_);
+        if (running_)
+        {
+            startListen();
+        }
+    }
 }

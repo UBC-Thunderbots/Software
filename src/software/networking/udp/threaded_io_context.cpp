@@ -1,6 +1,7 @@
 #include "software/networking/udp/threaded_io_context.h"
 
 #include <boost/asio/executor_work_guard.hpp>
+#include <boost/asio/post.hpp>
 
 ThreadedIoContext::ThreadedIoContext()
     : work_guard_(boost::asio::make_work_guard(io_context_)),
@@ -24,4 +25,13 @@ ThreadedIoContext::~ThreadedIoContext()
 boost::asio::io_context& ThreadedIoContext::getIoContext()
 {
     return io_context_;
+}
+
+void ThreadedIoContext::waitForHandlersToDrain()
+{
+    std::promise<void> completion;
+    auto completion_future = completion.get_future();
+
+    boost::asio::post(io_context_, [&completion] { completion.set_value(); });
+    completion_future.wait();
 }
