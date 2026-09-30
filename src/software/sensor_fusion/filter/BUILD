@@ -23,7 +23,7 @@ cc_library(
     srcs = ["ball_filter.cpp"],
     hdrs = ["ball_filter.h"],
     deps = [
-        ":kalman_filter",
+        ":linear_kalman_filter",
         ":vision_detection",
         "//shared:constants",
         "//software/geom/algorithms",
@@ -117,15 +117,15 @@ cc_library(
 )
 
 cc_library(
-    name = "kalman_filter",
+    name = "linear_kalman_filter",
     srcs = [],
-    hdrs = ["kalman_filter.hpp"],
+    hdrs = ["linear_kalman_filter.hpp"],
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "@eigen",
         ":kalman_filter_base",
+        "@eigen",
     ],
 )
 
@@ -137,19 +137,17 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@eigen",
         ":kalman_filter_base",
+        "@eigen",
     ],
 )
-
-
 
 cc_test(
     name = "kalman_filter_test",
     srcs = ["kalman_filter_test.cpp"],
     deps = [
         ":extended_kalman_filter",
-        ":kalman_filter",
+        ":linear_kalman_filter",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

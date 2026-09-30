@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <cmath>
 
 #include "software/sensor_fusion/filter/kalman_filter_base.hpp"
 
@@ -17,13 +16,13 @@
  * @tparam DimU The dimension of control space
  */
 template <int DimX, int DimY, int DimU>
-class KalmanFilter : public KalmanFilterBase<DimX, DimY, DimU>
+class LinearKalmanFilter : public KalmanFilterBase<DimX, DimY, DimU>
 {
    public:
     /**
      * Creates a Kalman filter with all internal matrices and vectors set to zero.
      */
-    KalmanFilter();
+    LinearKalmanFilter();
 
     /**
      * Creates a Kalman filter with the given initial state and model parameters.
@@ -36,13 +35,13 @@ class KalmanFilter : public KalmanFilterBase<DimX, DimY, DimU>
      * @param initial_measurement_model Initial state-to-measurement transformation (H)
      * @param initial_measurement_covariance Initial measurement noise covariance (R)
      */
-    KalmanFilter(Eigen::Vector<double, DimX> initial_state,
-                 Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
-                 Eigen::Matrix<double, DimX, DimX> initial_process_model,
-                 Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
-                 Eigen::Matrix<double, DimX, DimU> initial_control_model,
-                 Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
-                 Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance);
+    LinearKalmanFilter(Eigen::Vector<double, DimX> initial_state,
+                       Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
+                       Eigen::Matrix<double, DimX, DimX> initial_process_model,
+                       Eigen::Matrix<double, DimX, DimX> initial_process_covariance,
+                       Eigen::Matrix<double, DimX, DimU> initial_control_model,
+                       Eigen::Matrix<double, DimY, DimX> initial_measurement_model,
+                       Eigen::Matrix<double, DimY, DimY> initial_measurement_covariance);
 
     /**
      * Predict the next state estimate:
@@ -58,14 +57,14 @@ class KalmanFilter : public KalmanFilterBase<DimX, DimY, DimU>
 };
 
 template <int DimX, int DimY, int DimU>
-KalmanFilter<DimX, DimY, DimU>::KalmanFilter()
+LinearKalmanFilter<DimX, DimY, DimU>::LinearKalmanFilter()
     : KalmanFilterBase<DimX, DimY, DimU>(),
       process_model(Eigen::Matrix<double, DimX, DimX>::Zero())
 {
 }
 
 template <int DimX, int DimY, int DimU>
-KalmanFilter<DimX, DimY, DimU>::KalmanFilter(
+LinearKalmanFilter<DimX, DimY, DimU>::LinearKalmanFilter(
     Eigen::Vector<double, DimX> initial_state,
     Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
     Eigen::Matrix<double, DimX, DimX> initial_process_model,
@@ -82,7 +81,8 @@ KalmanFilter<DimX, DimY, DimU>::KalmanFilter(
 }
 
 template <int DimX, int DimY, int DimU>
-void KalmanFilter<DimX, DimY, DimU>::predict(Eigen::Vector<double, DimU> control_input)
+void LinearKalmanFilter<DimX, DimY, DimU>::predict(
+    Eigen::Vector<double, DimU> control_input)
 {
     // Project the current estimate through the process model
     this->state_estimate =

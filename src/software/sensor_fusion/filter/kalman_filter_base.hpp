@@ -48,6 +48,10 @@ class KalmanFilterBase
      * @param initial_control_model Initial control-to-state transformation (B)
      * @param initial_measurement_model Initial state-to-measurement transformation (H)
      * @param initial_measurement_covariance Initial measurement noise covariance (R)
+     *
+     * The base implementation assumes a linear measurement model (z = Hx + v).
+     * Variants that require a non-linear measurement model can override update to
+     * implement the appropriate measurement function and linearization.
      */
     KalmanFilterBase(Eigen::Vector<double, DimX> initial_state,
                      Eigen::Matrix<double, DimX, DimX> initial_state_covariance,
@@ -61,6 +65,10 @@ class KalmanFilterBase
     /**
      * Propagate state_estimate and state_covariance forward by
      * one time step through the subclass's process model.
+     *
+     * The form of the process model depends on the filter implementation. For
+     * example, a linear Kalman filter uses a state transition matrix, while an
+     * extended Kalman filter uses a nonlinear state transition function and its Jacobian.
      *
      * @param control_input Control input vector
      */
@@ -105,15 +113,16 @@ class KalmanFilterBase
 
    private:
     /**
-     * Returns the inverse of the innovation covariance S = H*P*H' + R, which describes
-     * the expected spread of the difference between an actual and a predicted
+     * Returns the pseudo inverse of the innovation covariance S = H*P*H' + R, which
+     * describes the expected spread of the difference between an actual and a predicted
      * measurement.
      *
-     * Near-zero entries are zeroed out and a pseudo-inverse is used, so a singular S
-     * (e.g. an uninitialized filter with zero covariance) yields a zero matrix rather
-     * than infinities.
+     * The pseudo-inverse is used instead of a regular inverse so the filter remains
+     * numerically stable when S is singular or nearly singular. Since S^{-1} is used
+     * in the Kalman gain, very small values are treated as zero before computing the
+     * pseudo-inverse to avoid amplifying floating-point noise into very large values.
      *
-     * @return The inverse of the innovation covariance
+     * @return The pseudo-inverse of the innovation covariance
      */
     Eigen::Matrix<double, DimY, DimY> innovationCovarianceInverse() const;
 };

@@ -10,7 +10,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/sensor_fusion/filter/kalman_filter.hpp"
+#include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
@@ -176,7 +176,7 @@ class RobotLocalizer
         double time_seconds;
     };
 
-    KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
+    LinearKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
     // Process noise variance used in prediction
     double process_linear_acceleration_noise_variance_;

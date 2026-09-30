@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <cmath>
 #include <functional>
 #include <utility>
 
@@ -25,12 +24,6 @@
  * Because the linearization is only a first-order approximation, the estimate is
  * not optimal in the way the linear Kalman filter's is, and a poor initial
  * estimate can cause the filter to diverge.
- *
- * Resources:
- * - https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/
- * - https://kalmanfilter.net/
- * - https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python
- * - https://web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
  *
  * @tparam DimX The dimension of the state
  * @tparam DimY The dimension of measurement space
