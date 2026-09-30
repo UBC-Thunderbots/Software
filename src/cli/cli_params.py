@@ -130,6 +130,7 @@ class BuildConfig:
     disable_motor_service: bool = False
     robot_platform: bool = False
 
+
 class BazelFlag(tuple, Enum):
     DEBUG_BUILD = ("-c", "dbg")
     OPTIMIZED = ("--copt=-O3",)
@@ -535,7 +536,5 @@ class InteractiveCli:
                 config.search_query = term_name.strip()
                 config.interactive_search = True
                 cmd_title += config.search_query
-
-
 
         return cmd_title, config, extra_args

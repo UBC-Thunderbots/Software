@@ -160,10 +160,12 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     elif config.action == ActionArgument.build:
         targets = []
         for query in config.search_query.split():
-            if(query.startswith("//")):
+            if query.startswith("//"):
                 targets.append(query)
             else:
-                targets.append(fuzzy_find_target(config.action, query, config.interactive_search))
+                targets.append(
+                    fuzzy_find_target(config.action, query, config.interactive_search)
+                )
     else:
         target = fuzzy_find_target(
             config.action, config.search_query, config.interactive_search
@@ -177,8 +179,10 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.DEBUG_BUILD: config.debug_build or bool(config.select_debug_binaries),
         BazelFlag.OPTIMIZED: not config.debug_build
         and (not config.no_optimized_build or bool(config.flash_robots)),
-        BazelFlag.ROBOT_PLATFORM: (config.robot_platform or bool(config.flash_robots or config.ansible_playbook)),
-        # BazelFlag.ROBOT_PLATFORM: bool(config.flash_robots or config.ansible_playbook),
+        BazelFlag.ROBOT_PLATFORM: (
+            config.robot_platform
+            or bool(config.flash_robots or config.ansible_playbook)
+        ),
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
@@ -208,7 +212,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         if DebugBinary.yellow in config.select_debug_binaries:
             runtime_args.append("--debug_yellow_full_system")
 
-    if(config.action== ActionArgument.build):
+    if config.action == ActionArgument.build:
         command += targets
     else:
         command += [target]
@@ -321,7 +325,7 @@ def fuzzy_find_target(
         if selected_name is None:
             print("Cancelled.")
             sys.exit(0)
-        target = target_dict[selected_name].decode("utf-8") #target = str(target_dict[selected_name.encode()], encoding="utf-8")
+        target = target_dict[selected_name].decode("utf-8")
     else:
         print(f"Found target {target} (confidence {confidence})")
 
