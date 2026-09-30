@@ -216,6 +216,12 @@ if __name__ == "__main__":
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
     parser.add_argument(
+        "--div_a",
+        action="store_true",
+        default=False,
+        help="Run the autoref and gamecontroller with Division A rules",
+    )
+    parser.add_argument(
         "--show_autoref_gui",
         action="store_true",
         default=False,
@@ -473,6 +479,7 @@ if __name__ == "__main__":
                     suppress_logs=(not args.verbose),
                     tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
                     show_gui=args.show_autoref_gui,
+                    div_a=args.div_a,
                 )
                 if args.enable_autoref
                 else contextlib.nullcontext()

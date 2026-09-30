@@ -50,6 +50,7 @@ class TigersAutoref:
         buffer_size: int = 5,
         suppress_logs: bool = True,
         show_gui: bool = False,
+        div_a: bool = False,
     ) -> None:
         """Constructor
 
@@ -60,6 +61,7 @@ class TigersAutoref:
         :param buffer_size:     buffer size for the SSL wrapper and referee packets
         :param suppress_logs:   true silences logs from the Autoref binary, otherwise shows them (its very verbose)
         :param show_gui:        true shows the Tigers' autoref GUI, false runs it in headless mode
+        :param div_a:           true runs the autoref with Division A rules and geometry
         """
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
@@ -72,6 +74,7 @@ class TigersAutoref:
         self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
+        self.division = protos.Division.DIV_A if div_a else protos.Division.DIV_B
         self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
@@ -114,7 +117,11 @@ class TigersAutoref:
         ci_input = protos.AutoRefCiInput()
         ci_input.detection.append(ssl_wrapper.detection)
 
-        field = tbots_cpp.Field.createSSLDivisionBField()
+        field = (
+            tbots_cpp.Field.createSSLDivisionAField()
+            if self.division == protos.Division.DIV_A
+            else tbots_cpp.Field.createSSLDivisionBField()
+        )
         ci_input.geometry.CopyFrom(tbots_cpp.createGeometryData(field, 0.3))
 
         self.ci_socket.send(ci_input)
@@ -158,7 +165,7 @@ class TigersAutoref:
 
         self._force_gamecontroller_to_accept_all_events()
         self._send_geometry()
-        self.gamecontroller.reset_match()
+        self.gamecontroller.reset_match(division=self.division)
 
         self.gamecontroller.send_gc_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN

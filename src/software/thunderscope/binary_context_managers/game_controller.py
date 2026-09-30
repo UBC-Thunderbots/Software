@@ -357,9 +357,12 @@ class Gamecontroller:
 
         return ci_output_list
 
-    def reset_match(self) -> list[protos.CiOutput]:
+    def reset_match(
+        self, division: int = protos.Division.DIV_B
+    ) -> list[protos.CiOutput]:
         """Sends a message to the Gamecontroller to reset match information to our defaults.
 
+        :param division: the SSL division to use for the match
         :return: a list of CiOutput protos from the Gamecontroller
         """
         ci_input = protos.CiInput(timestamp=int(time.time_ns()))
@@ -368,9 +371,7 @@ class Gamecontroller:
         input_reset_match.reset_match = True
 
         input_set_match_config = protos.Input()
-        input_set_match_config.change.update_config_change.division = (
-            protos.Division.DIV_B
-        )
+        input_set_match_config.change.update_config_change.division = division
         input_set_match_config.change.update_config_change.match_type = (
             protos.MatchType.FRIENDLY
         )
