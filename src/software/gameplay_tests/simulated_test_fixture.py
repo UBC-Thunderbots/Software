@@ -435,8 +435,8 @@ def get_runtime_dir():
 
     TODO: Refactor #3744
 
-    Creates a new persistent directory for each test so that tests
-    running in parallel do not interfere with each other.
+    Each test process gets a unique persistent /tmp/tbots_<uuid> directory so
+    parallel Bazel tests do not interfere and replay logs remain easy to find.
 
     :return: The path to the runtime directory.
     """
@@ -454,7 +454,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False) -> argparse.Na
     """Load command line arguments.
 
     We aren't using pytest.ini because it does not allow for dynamic defaults,
-    which we need to use TEST_TMPDIR when it's available.
+    which we need to pick a runtime directory based on the test environment.
 
     We aren't using conftest.py's pytest_addoption because we want to be able to
     run the gamecontroller script directly from python without pytest.

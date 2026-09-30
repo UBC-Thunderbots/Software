@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <deque>
 #include <optional>
+#include <variant>
 
 #include "proto/primitive.pb.h"
 #include "software/embedded/services/imu.h"
@@ -161,7 +162,7 @@ class RobotLocalizer
      * @param delta_time_seconds The elapsed time to generate the prediction
      * matrices for
      */
-    void generatedPredictionMatrices(double delta_time_seconds);
+    void updateFilterPredictionMatrices(double delta_time_seconds);
 
     /**
      * Writes the measurement model for the given data source into the filter.
@@ -169,25 +170,35 @@ class RobotLocalizer
      * @param source Which sensor's measurement model to generate. Must not be
      * FilterStepType::PREDICT.
      */
-    void generateMeasurementModel(FilterStepType source);
+    void updateFilterMeasurementModel(FilterStepType source);
 
+
+    /**
+     * A predict step. process_model/process_covariance/control_model are recomputed
+     * from the elapsed time during replay instead of being stored (see
+     * updateFilterPredictionMatrices).
+     */
+    struct PredictStep
+    {
+        Eigen::Vector<double, CONTROL_SIZE> control_input;
+    };
+
+    /**
+     * An update step. The measurement model is regenerated from type during replay
+     * (see updateFilterMeasurementModel). type must not be FilterStepType::PREDICT.
+     */
+    struct UpdateStep
+    {
+        FilterStepType type;
+        Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
+    };
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
      */
     struct FilterStep
     {
-        FilterStepType type;
-
-        // Set iff type == PREDICT. The process model function/Jacobian, process
-        // covariance, and control model are recomputed from the elapsed time and the
-        // state estimate during replay instead of being stored (see
-        // generatedPredictionMatrices).
-        std::optional<Eigen::Vector<double, CONTROL_SIZE>> control_input;
-
-        // Set iff type != PREDICT. The measurement model is regenerated from type
-        // during replay (see generateMeasurementModel).
-        std::optional<Eigen::Vector<double, MEASUREMENT_SIZE>> measurement;
+        std::variant<PredictStep, UpdateStep> step;
 
         // Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;

@@ -25,7 +25,6 @@ cc_library(
         "//software/physics:velocity_conversion_util",
         "//software/world",
         "//software/world:field",
-        "//software/world:team_colour",
     ],
 )
 

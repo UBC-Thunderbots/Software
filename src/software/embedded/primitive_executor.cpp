@@ -14,12 +14,8 @@
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(
-    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id,
-    const TeamColour team_colour)
-    : robot_state_(),
-      robot_constants_(robot_constants),
-      robot_id_(robot_id),
-      team_colour_(team_colour)
+    const robot_constants::RobotConstants& robot_constants, const RobotId robot_id)
+    : robot_state_(), robot_constants_(robot_constants), robot_id_(robot_id)
 {
 }
 

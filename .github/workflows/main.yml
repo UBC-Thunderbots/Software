@@ -169,8 +169,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blue-sim-test-proto-logs
-          path: |
-            /tmp/tbots/blue/test/*/proto_*
+          path: /tmp/tbots_*/blue/test/*/proto_*
 
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
@@ -178,8 +177,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: yellow-sim-test-proto-logs
-          path: |
-            /tmp/tbots/yellow/test/*/proto_*
+          path: /tmp/tbots_*/yellow/test/*/proto_*
 
   autorefd-game:
     needs: check-and-clear-cache

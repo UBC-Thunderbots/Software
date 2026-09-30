@@ -10,10 +10,10 @@
 **Welcome to our main software and firmware repository!** 
 Our team is building software that controls our fleet of autonomous soccer-playing robots competing in the [RoboCup Small Size League](https://ssl.robocup.org/).
 
-- To get started with building and setting up our software, please see [Getting Started](docs/getting-started.md). Please thoroughly read this guide, along with our [style guide](docs/code-style-guide.md), before making *any* contributions.
+- To get started with building and setting up our software, please see [Getting Started](docs/getting_started/getting-started.md). Please thoroughly read this guide, along with our [style guide](docs/getting_started/code-style-guide.md), before making *any* contributions.
 
-- Check out our [software architecture and design](docs/software-architecture-and-design.md) docs for an overview of how our software works and explanations of key systems and components.
+- Check out our [software architecture and design](docs/working_with_software/software-architecture-and-design.md) docs for an overview of how our software works and explanations of key systems and components.
 
 - Want to learn more about the RoboCup Small Size League? (teams, rules, etc.) Check out the [Official RoboCup SSL Website](https://ssl.robocup.org/).
 
-- Want to edit these docs? If you're planning on editing diagrams, read the guide on [editing the docs](docs/editing-the-docs.md).
+- Want to edit these docs? If you're planning on editing diagrams, read the guide on [editing the docs](docs/getting_started/editing-the-docs.md).
