@@ -88,6 +88,7 @@ cc_test(
         ":threaded_proto_udp_listener",
         "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
+        "@boost//:asio",
         "@protobuf//:empty_cc_proto",
     ],
 )
