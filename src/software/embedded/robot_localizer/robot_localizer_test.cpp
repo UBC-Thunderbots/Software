@@ -7,6 +7,7 @@
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/time/duration.h"
+#include "software/world/robot.h"
 
 namespace
 {
@@ -21,7 +22,7 @@ constexpr double DT      = 1.0 / LOOP_HZ;
 // provided (isolates whether the periodic vision fix corrupts the velocity estimate).
 RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S / 2)
 {
-    RobotLocalizer localizer();
+    RobotLocalizer localizer= RobotLocalizer();
 
     const Vector true_velocity(1.0, 0.0);
     const Angle true_orientation = Angle::zero();
