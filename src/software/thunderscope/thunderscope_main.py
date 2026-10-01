@@ -474,6 +474,7 @@ if __name__ == "__main__":
             Gamecontroller(
                 suppress_logs=(not args.verbose),
                 automate_referee=args.enable_autogc,
+                div_a=args.div_a,
             ) as gamecontroller,
             (
                 # Here we only initialize autoref if the --enable_autoref flag is requested.

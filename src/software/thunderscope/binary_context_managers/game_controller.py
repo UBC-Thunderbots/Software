@@ -22,6 +22,7 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
 )
 from software.py_constants import (
+    DIV_A_NUM_ROBOTS,
     DIV_B_NUM_ROBOTS,
     SECONDS_PER_NANOSECOND,
     SSL_REFEREE_PORT,
@@ -54,6 +55,7 @@ class Gamecontroller:
         use_conventional_port: bool = False,
         automate_referee: bool = False,
         parallelized: bool = False,
+        div_a: bool = False,
     ) -> None:
         """Run Gamecontroller
 
@@ -61,10 +63,12 @@ class Gamecontroller:
         :param use_conventional_port: True when using static referee port. False for dynamic port assignments.
         :param automate_referee: True if referee commands should be automated.
         :param parallelized: True when this is one of many Gamecontrollers running at once.
+        :param div_a: whether to use Division A match rules
         """
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
         self.parallelized = parallelized
+        self.division = protos.Division.DIV_A if div_a else protos.Division.DIV_B
 
         self.use_conventional_port = use_conventional_port
         self.referee_port = None
@@ -368,9 +372,7 @@ class Gamecontroller:
         input_reset_match.reset_match = True
 
         input_set_match_config = protos.Input()
-        input_set_match_config.change.update_config_change.division = (
-            protos.Division.DIV_B
-        )
+        input_set_match_config.change.update_config_change.division = self.division
         input_set_match_config.change.update_config_change.match_type = (
             protos.MatchType.FRIENDLY
         )
@@ -557,7 +559,14 @@ class Gamecontroller:
     def __reset_world_state(self) -> None:
         """Resets the robot and ball positions"""
         self.simulator_proto_unix_io.send_proto(
-            protos.WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+            protos.WorldState,
+            create_default_world_state(
+                num_robots=(
+                    DIV_A_NUM_ROBOTS
+                    if self.division == protos.Division.DIV_A
+                    else DIV_B_NUM_ROBOTS
+                )
+            ),
         )
         self.send_gc_command(gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN)
 
