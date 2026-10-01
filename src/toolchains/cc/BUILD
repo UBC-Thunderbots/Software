@@ -70,6 +70,35 @@ platform(
     ],
 )
 
+# The toolchain filegroups below are only needed on the host OS they were built for.
+# Selecting on the host platform keeps Bazel from fetching the other platforms' toolchains.
+
+config_setting(
+    name = "is_linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+config_setting(
+    name = "is_linux_x86_64",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+config_setting(
+    name = "is_linux_aarch64",
+    constraint_values = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+)
+
+config_setting(
+    name = "is_darwin",
+    constraint_values = ["@platforms//os:darwin"],
+)
+
 # This represents a mapping of CPU -> Compiler To Use
 cc_toolchain_suite(
     name = "toolchain",
@@ -94,7 +123,7 @@ filegroup(
 filegroup(
     name = "k8_aarch64_linux_everything",
     srcs = glob(["wrapper/k8_aarch64_linux_*"]) + select({
-        "@bazel_tools//src/conditions:linux": ["@k8_aarch64_linux_gcc//:everything"],
+        ":is_linux": ["@k8_aarch64_linux_gcc//:everything"],
         "//conditions:default": [],
     }),
 )
@@ -109,7 +138,7 @@ filegroup(
     srcs = [
         ":linux_gcc_wrapper",
     ] + select({
-        "@bazel_tools//src/conditions:linux_x86_64": [
+        ":is_linux_x86_64": [
             "@linux_k8_gcc//:includes",
             "@linux_k8_gcc//:libs",
             "@linux_k8_gcc//:runtime_libs",
@@ -124,7 +153,7 @@ filegroup(
     srcs = [
         ":linux_gcc_wrapper",
     ] + select({
-        "@bazel_tools//src/conditions:linux_aarch64": [
+        ":is_linux_aarch64": [
             "@linux_aarch64_gcc//:includes",
             "@linux_aarch64_gcc//:libs",
             "@linux_aarch64_gcc//:runtime_libs",
@@ -172,13 +201,13 @@ cc_toolchain(
     compiler_files = ":linux_k8_gcc_all",
     dwp_files = ":linux_k8_gcc_all",
     dynamic_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@linux_k8_gcc//:runtime_libs",
+        ":is_linux_x86_64": "@linux_k8_gcc//:runtime_libs",
         "//conditions:default": ":empty",
     }),
     linker_files = ":linux_k8_gcc_all",
     objcopy_files = ":linux_k8_gcc_all",
     static_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@linux_k8_gcc//:static_libs",
+        ":is_linux_x86_64": "@linux_k8_gcc//:static_libs",
         "//conditions:default": ":empty",
     }),
     strip_files = ":linux_k8_gcc_all",
@@ -199,13 +228,13 @@ cc_toolchain(
     compiler_files = ":linux_aarch64_gcc_all",
     dwp_files = ":linux_aarch64_gcc_all",
     dynamic_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux_aarch64": "@linux_aarch64_gcc//:runtime_libs",
+        ":is_linux_aarch64": "@linux_aarch64_gcc//:runtime_libs",
         "//conditions:default": ":empty",
     }),
     linker_files = ":linux_aarch64_gcc_all",
     objcopy_files = ":linux_aarch64_gcc_all",
     static_runtime_lib = select({
-        "@bazel_tools//src/conditions:linux_aarch64": "@linux_aarch64_gcc//:static_libs",
+        ":is_linux_aarch64": "@linux_aarch64_gcc//:static_libs",
         "//conditions:default": ":empty",
     }),
     strip_files = ":linux_aarch64_gcc_all",
@@ -336,7 +365,7 @@ filegroup(
     srcs = [
         "wrapper/macos_robot_gcc",
     ] + select({
-        "@bazel_tools//src/conditions:darwin": ["@macos_robot_gcc//:everything"],
+        ":is_darwin": ["@macos_robot_gcc//:everything"],
         "//conditions:default": [],
     }),
 )

@@ -59,7 +59,7 @@ py_cc_toolchain(
 py_cc_toolchain(
     name = "k8_aarch64_linux_py_cc_toolchain_data",
     headers = select({
-        "@bazel_tools//src/conditions:linux": "@py_cc_toolchain_for_k8_aarch64_linux//:headers",
+        "//toolchains/cc:is_linux": "@py_cc_toolchain_for_k8_aarch64_linux//:headers",
         "//conditions:default": ":empty",
     }),
     libs = ":empty",
