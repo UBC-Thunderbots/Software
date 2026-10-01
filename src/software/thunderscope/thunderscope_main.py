@@ -219,7 +219,7 @@ if __name__ == "__main__":
         "--div_a",
         action="store_true",
         default=False,
-        help="Run the autoref and gamecontroller with Division A rules",
+        help="Run the autoref with Division A geometry and rules",
     )
     parser.add_argument(
         "--show_autoref_gui",

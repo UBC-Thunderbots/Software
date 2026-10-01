@@ -165,7 +165,7 @@ class TigersAutoref:
 
         self._force_gamecontroller_to_accept_all_events()
         self._send_geometry()
-        self.gamecontroller.reset_match(division=self.division)
+        self.gamecontroller.reset_match()
 
         self.gamecontroller.send_gc_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
