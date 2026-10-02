@@ -37,6 +37,7 @@ class Simulator:
         simulator_runtime_dir: os.PathLike = None,
         debug_simulator: bool = False,
         enable_realism: bool = False,
+        div_a: bool = False,
     ) -> None:
         """Run Simulator
 
@@ -46,6 +47,7 @@ class Simulator:
         :param simulator_runtime_dir: The directory to run the simulator in
         :param debug_simulator: Whether to run the simulator in debug mode
         :param enable_realism: a argument (--enable_realism) that is going to be passed to er_force_simulator_main binary
+        :param div_a: whether to use the Division A simulator field
         """
         self.simulator_runtime_dir = simulator_runtime_dir
         self.generic_command = [
@@ -58,6 +60,7 @@ class Simulator:
         self.debug_simulator = debug_simulator
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
+        self.div_a = div_a
 
     def __enter__(self) -> Simulator:
         """Enter the simulator context manager.
@@ -79,6 +82,9 @@ class Simulator:
 
         if self.enable_realism:
             simulator_command += " --enable_realism"
+
+        if self.div_a:
+            simulator_command += " --division=div_a"
 
         if self.debug_simulator:
             # We don't want to check the exact command because this binary could

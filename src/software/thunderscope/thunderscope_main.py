@@ -20,6 +20,7 @@ from google.protobuf.internal import api_implementation
 from pyqtgraph.Qt.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
 from software.py_constants import (
     DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+    DIV_A_NUM_ROBOTS,
     DIV_B_NUM_ROBOTS,
     SECONDS_PER_MINUTE,
     SSL_REFEREE_PORT,
@@ -214,6 +215,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
+    )
+    parser.add_argument(
+        "--div_a",
+        action="store_true",
+        default=False,
+        help="Run the autoref with Division A geometry and rules",
     )
     parser.add_argument(
         "--show_autoref_gui",
@@ -415,7 +422,9 @@ if __name__ == "__main__":
             """
             sync_simulation(
                 tscope,
-                0 if args.empty else DIV_B_NUM_ROBOTS,
+                0
+                if args.empty
+                else (DIV_A_NUM_ROBOTS if args.div_a else DIV_B_NUM_ROBOTS),
             )
 
             if args.ci_mode:
@@ -437,7 +446,10 @@ if __name__ == "__main__":
         # Launch all binaries
         with (
             Simulator(
-                args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
+                args.simulator_runtime_dir,
+                args.debug_simulator,
+                args.enable_realism,
+                args.div_a,
             ) as simulator,
             FullSystem(
                 path_to_binary=runtime_config.get_blue_runtime_path(),
@@ -462,6 +474,7 @@ if __name__ == "__main__":
             Gamecontroller(
                 suppress_logs=(not args.verbose),
                 automate_referee=args.enable_autogc,
+                div_a=args.div_a,
             ) as gamecontroller,
             (
                 # Here we only initialize autoref if the --enable_autoref flag is requested.
@@ -473,6 +486,7 @@ if __name__ == "__main__":
                     suppress_logs=(not args.verbose),
                     tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
                     show_gui=args.show_autoref_gui,
+                    div_a=args.div_a,
                 )
                 if args.enable_autoref
                 else contextlib.nullcontext()

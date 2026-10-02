@@ -22,6 +22,7 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
 )
 from software.py_constants import (
+    DIV_A_NUM_ROBOTS,
     DIV_B_NUM_ROBOTS,
     SECONDS_PER_NANOSECOND,
     SSL_REFEREE_PORT,
@@ -44,6 +45,7 @@ class Gamecontroller:
     REFEREE_IP = "224.5.23.1"
     RESET_MATCH_DELAY_S = 1
     NO_GAME_PROGRESS_DURATION_S = 120
+    ROBOT_COUNT_UPDATE_RETRY_DELAY_S = 0.5
 
     GC_PORT_LOCK = "/tmp/tbots_gc_port.lock"
     GC_PORT_STATE = "/tmp/tbots_gc_last_port.txt"
@@ -54,6 +56,7 @@ class Gamecontroller:
         use_conventional_port: bool = False,
         automate_referee: bool = False,
         parallelized: bool = False,
+        div_a: bool = False,
     ) -> None:
         """Run Gamecontroller
 
@@ -61,10 +64,12 @@ class Gamecontroller:
         :param use_conventional_port: True when using static referee port. False for dynamic port assignments.
         :param automate_referee: True if referee commands should be automated.
         :param parallelized: True when this is one of many Gamecontrollers running at once.
+        :param div_a: whether to use Division A match rules
         """
         self.suppress_logs = suppress_logs
         self.automate_referee = automate_referee
         self.parallelized = parallelized
+        self.division = protos.Division.DIV_A if div_a else protos.Division.DIV_B
 
         self.use_conventional_port = use_conventional_port
         self.referee_port = None
@@ -84,6 +89,8 @@ class Gamecontroller:
         self.processed_event_ids = set()
         self.last_stage_time_left = None
         self.pause_start_timestamp = None
+        self.last_robot_count_update_state = None
+        self.last_robot_count_update_time = 0.0
 
     def get_referee_port(self) -> int:
         """Sometimes, the port that we are using changes depending on context.
@@ -368,9 +375,7 @@ class Gamecontroller:
         input_reset_match.reset_match = True
 
         input_set_match_config = protos.Input()
-        input_set_match_config.change.update_config_change.division = (
-            protos.Division.DIV_B
-        )
+        input_set_match_config.change.update_config_change.division = self.division
         input_set_match_config.change.update_config_change.match_type = (
             protos.MatchType.FRIENDLY
         )
@@ -413,13 +418,29 @@ class Gamecontroller:
         if self.automate_referee:
             self.__automate_referee(referee)
 
-        if (
-            len(self.latest_world.friendly_team.team_robots)
-            != referee.blue.max_allowed_bots
-            or len(self.latest_world.enemy_team.team_robots)
-            != referee.yellow.max_allowed_bots
+        friendly_robot_count = len(self.latest_world.friendly_team.team_robots)
+        enemy_robot_count = len(self.latest_world.enemy_team.team_robots)
+        target_robot_counts = (
+            friendly_robot_count,
+            enemy_robot_count,
+            referee.blue.max_allowed_bots,
+            referee.yellow.max_allowed_bots,
+        )
+        robot_count_matches = (
+            friendly_robot_count == referee.blue.max_allowed_bots
+            and enemy_robot_count == referee.yellow.max_allowed_bots
+        )
+
+        if robot_count_matches:
+            self.last_robot_count_update_state = None
+        elif (
+            target_robot_counts != self.last_robot_count_update_state
+            or time.monotonic() - self.last_robot_count_update_time
+            >= self.ROBOT_COUNT_UPDATE_RETRY_DELAY_S
         ):
             self.__update_max_allowed_robots(referee)
+            self.last_robot_count_update_state = target_robot_counts
+            self.last_robot_count_update_time = time.monotonic()
 
     def __automate_referee(self, referee: protos.Referee) -> None:
         """Automate referee events by handling possible goals, ball placement failures,
@@ -557,7 +578,14 @@ class Gamecontroller:
     def __reset_world_state(self) -> None:
         """Resets the robot and ball positions"""
         self.simulator_proto_unix_io.send_proto(
-            protos.WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+            protos.WorldState,
+            create_default_world_state(
+                num_robots=(
+                    DIV_A_NUM_ROBOTS
+                    if self.division == protos.Division.DIV_A
+                    else DIV_B_NUM_ROBOTS
+                )
+            ),
         )
         self.send_gc_command(gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN)
 
@@ -632,15 +660,36 @@ class Gamecontroller:
                 velocity.y_component_meters = 0
             else:
                 removed_robot_ids.put(robot.id)
-        # Add robots, since we are missing some
+        # Add robots, since we are missing some. Removed robots are preferred so
+        # substitutions can reuse their IDs, but startup can also reach this path
+        # before any robots have been removed.
         robots_diff: int = max_robots - len(team.team_robots)
         if robots_diff <= 0:
             return
+
+        current_robot_ids = {robot.id for robot in team.team_robots}
         for _ in range(robots_diff):
-            try:
-                robot_states[removed_robot_ids.get_nowait()].CopyFrom(place_state)
-            except queue.Empty:
-                return
+            robot_id = None
+            while robot_id is None:
+                try:
+                    candidate_id = removed_robot_ids.get_nowait()
+                except queue.Empty:
+                    candidate_id = next(
+                        (
+                            robot_id
+                            for robot_id in range(max_robots)
+                            if robot_id not in current_robot_ids
+                        ),
+                        None,
+                    )
+                    if candidate_id is None:
+                        return
+
+                if candidate_id not in current_robot_ids:
+                    robot_id = candidate_id
+
+            robot_states[robot_id].CopyFrom(place_state)
+            current_robot_ids.add(robot_id)
 
     @staticmethod
     def __get_referee_multicast_interface() -> str:
