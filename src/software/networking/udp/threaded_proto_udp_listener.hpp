@@ -1,9 +1,10 @@
 #pragma once
 
+#include <functional>
 #include <memory>
-#include <mutex>
 #include <utility>
 
+#include "software/logger/logger.h"
 #include "software/networking/udp/proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_io_context.h"
 
@@ -58,14 +59,20 @@ class ThreadedProtoUdpListener
                              std::function<void(ReceiveProtoT)> receive_callback);
 
     /**
-     * Closes this listener's socket without stopping the shared io_context.
-     * The shared ThreadedIoContext remains available to service other UDP objects.
+     * Closes this listener's socket without stopping the shared io_context, and blocks
+     * until the listener has fully stopped: no user callback is running and no further
+     * callback will be invoked.
+     *
+     * This must be called from a thread other than the shared io_context worker thread.
+     * Calling it from the worker thread requests a stop without blocking, since waiting
+     * on the worker thread would deadlock.
      */
     void close();
 
     /**
-     * Destructor closes the socket and releases this listener's service ownership.
-     * It does not stop or join the shared io_context thread.
+     * Destructor closes the socket and releases this listener's service ownership. It
+     * provides the same shutdown guarantee as close() and does not stop or join the
+     * shared io_context thread.
      */
     ~ThreadedProtoUdpListener();
 
@@ -74,9 +81,7 @@ class ThreadedProtoUdpListener
     // Keeps the shared service alive while the UDP socket exists. The service owns the
     // io_context and the single thread that runs it for all shared UDP objects.
     std::shared_ptr<ThreadedIoContext> io_context_;
-    std::function<void(ReceiveProtoT)> receive_callback_;
     ProtoUdpListener<ReceiveProtoT> udp_listener_;
-    std::once_flag close_once_;
 };
 
 template <class ReceiveProtoT>
@@ -85,9 +90,8 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     const unsigned short port, const std::string& interface,
     std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
     : io_context_(std::move(io_context)),
-      receive_callback_(std::move(receive_callback)),
       udp_listener_(io_context_->getIoContext(), ip_address, port, interface,
-                    receive_callback_, multicast)
+                    std::move(receive_callback), multicast)
 {
 }
 
@@ -96,8 +100,7 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     std::shared_ptr<ThreadedIoContext> io_context, const unsigned short port,
     std::function<void(ReceiveProtoT)> receive_callback)
     : io_context_(std::move(io_context)),
-      receive_callback_(std::move(receive_callback)),
-      udp_listener_(io_context_->getIoContext(), port, receive_callback_)
+      udp_listener_(io_context_->getIoContext(), port, std::move(receive_callback))
 {
 }
 
@@ -111,10 +114,18 @@ ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 template <class ReceiveProtoT>
 void ThreadedProtoUdpListener<ReceiveProtoT>::close()
 {
-    std::call_once(close_once_,
-                   [this]
-                   {
-                       udp_listener_.close();
-                       io_context_->waitForHandlersToDrain();
-                   });
+    if (io_context_->isInWorkerThread())
+    {
+        // A blocking close from the worker thread would wait on itself and deadlock.
+        // Current callers always close externally; request a stop without waiting.
+        LOG(WARNING)
+            << "ThreadedProtoUdpListener::close() called from the shared io_context "
+               "worker thread; stopping without blocking. The shutdown guarantee is "
+               "only provided for external callers."
+            << std::endl;
+        udp_listener_.requestStop();
+        return;
+    }
+
+    udp_listener_.close();
 }

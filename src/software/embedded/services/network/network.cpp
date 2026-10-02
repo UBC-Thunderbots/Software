@@ -1,12 +1,14 @@
 #include "software/embedded/services/network/network.h"
 
 #include <Tracy.hpp>
+#include <utility>
 
 #include "software/logger/network_logger.h"
 #include "software/networking/tbots_network_exception.h"
 
-NetworkService::NetworkService(const NetworkConfig& config)
-    : io_context_(std::make_shared<ThreadedIoContext>()),
+NetworkService::NetworkService(const NetworkConfig& config,
+                               std::shared_ptr<ThreadedIoContext> io_context)
+    : io_context_(std::move(io_context)),
       multicast_ip(config.multicast_ip),
       interface(config.interface),
       robot_status_sender_port(config.robot_status_sender_port)
@@ -47,6 +49,20 @@ NetworkService::NetworkService(const NetworkConfig& config)
     else
     {
         LOG(FATAL) << "Failed to get IP addresses associated with " << config.interface;
+    }
+}
+
+NetworkService::~NetworkService()
+{
+    // Drain the receive listeners before the members their callbacks access are
+    // destroyed.
+    if (udp_listener_primitive)
+    {
+        udp_listener_primitive->close();
+    }
+    if (fullsystem_to_robot_ip_listener)
+    {
+        fullsystem_to_robot_ip_listener->close();
     }
 }
 

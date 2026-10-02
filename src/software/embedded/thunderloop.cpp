@@ -84,6 +84,7 @@ extern "C" void tbotsExit(const int signal_num)
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          const bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
+      io_context_(std::make_shared<ThreadedIoContext>()),
       loop_hz_(loop_hz)
 {
     const RobotId robot_id = std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY));
@@ -122,7 +123,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
         .interface = network_interface,
     };
 
-    network_service_ = std::make_unique<NetworkService>(network_config);
+    network_service_ = std::make_unique<NetworkService>(network_config, io_context_);
     LOG(INFO) << "THUNDERLOOP: Network Service initialized!";
 
 #ifndef DISABLE_POWER_SERVICE

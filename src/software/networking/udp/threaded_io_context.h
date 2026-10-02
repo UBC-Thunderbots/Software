@@ -2,7 +2,6 @@
 
 #include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/io_context.hpp>
-#include <future>
 #include <thread>
 
 /**
@@ -19,6 +18,8 @@ class ThreadedIoContext
     /**
      * Stops the io_context and joins its service thread.
      *
+     * All listeners and senders sharing this context must be closed before this object
+     * is destroyed, otherwise their pending handlers will never be serviced.
      */
     ~ThreadedIoContext();
 
@@ -30,11 +31,13 @@ class ThreadedIoContext
     boost::asio::io_context& getIoContext();
 
     /**
-     * Waits until handlers already queued on this context have completed.
+     * Returns whether the calling thread is the thread that runs this context's
+     * io_context event loop. Blocking operations that wait on this thread must not be
+     * called from it.
      *
-     * This must not be called from the io_context worker thread.
+     * @return true if the calling thread is the io_context worker thread
      */
-    void waitForHandlersToDrain();
+    bool isInWorkerThread() const;
 
    private:
     boost::asio::io_context io_context_;

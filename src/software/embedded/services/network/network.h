@@ -54,8 +54,16 @@ class NetworkService
      * Constructs a NetworkService and opens all the required network ports.
      *
      * @param config The configuration for the network service
+     * @param io_context The shared context used by this service's network objects.
      */
-    explicit NetworkService(const NetworkConfig& config);
+    NetworkService(const NetworkConfig& config,
+                   std::shared_ptr<ThreadedIoContext> io_context);
+
+    /**
+     * Destructor. Stops and drains the receive listeners before the members their
+     * callbacks reference are destroyed.
+     */
+    ~NetworkService();
 
     /**
      * Polls the network service: sends the robot status to fullsystem, and,

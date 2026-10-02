@@ -90,14 +90,49 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
 {
     using Class              = ThreadedProtoUdpListener<T>;
     std::string pyclass_name = name + "ProtoListener";
+
+    // Custom deleter that closes the listener without holding the GIL (so the shared
+    // io_context worker can acquire it to finish any in-flight Python callback), then
+    // reacquires the GIL before destroying Python-owned callback members.
+    auto deleter = [](Class* self)
+    {
+        {
+            py::gil_scoped_release release;
+            self->close();
+        }
+        delete self;
+    };
+
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::shared_ptr<ThreadedIoContext>, const std::string&,
-                      unsigned short, const std::string&, const std::function<void(T)>&,
-                      bool>())
-        .def(py::init<std::shared_ptr<ThreadedIoContext>, unsigned short,
-                      const std::function<void(T)>&>())
-        .def("close", &Class::close);
+        .def(py::init(
+                 [deleter](std::shared_ptr<ThreadedIoContext> io_context,
+                           const std::string& ip_address, unsigned short port,
+                           const std::string& interface,
+                           const std::function<void(T)>& receive_callback, bool multicast)
+                 {
+                     return std::shared_ptr<Class>(
+                         new Class(io_context, ip_address, port, interface,
+                                   receive_callback, multicast),
+                         deleter);
+                 }),
+             py::arg("io_context"), py::arg("ip_address"), py::arg("port"),
+             py::arg("interface"), py::arg("receive_callback"), py::arg("multicast"))
+        .def(py::init(
+                 [deleter](std::shared_ptr<ThreadedIoContext> io_context,
+                           unsigned short port,
+                           const std::function<void(T)>& receive_callback)
+                 {
+                     return std::shared_ptr<Class>(
+                         new Class(io_context, port, receive_callback), deleter);
+                 }),
+             py::arg("io_context"), py::arg("port"), py::arg("receive_callback"))
+        .def("close",
+             [](Class& self)
+             {
+                 py::gil_scoped_release release;
+                 self.close();
+             });
 }
 
 template <typename T>

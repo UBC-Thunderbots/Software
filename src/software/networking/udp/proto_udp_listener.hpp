@@ -1,10 +1,9 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <condition_variable>
-#include <mutex>
+#include <functional>
 #include <string>
-#include <thread>
+#include <utility>
 
 #include "software/logger/logger.h"
 #include "software/networking/udp/network_utils.h"
@@ -57,9 +56,15 @@ class ProtoUdpListener
                      std::function<void(ReceiveProtoT&)> receive_callback);
 
     /**
-     * Closes the socket associated to the UDP listener
+     * Closes the socket associated to the UDP listener and blocks until the listener is
+     * fully stopped. Must not be called from the io_context worker thread.
      */
     virtual void close();
+
+    /**
+     * Requests a stop of the underlying listener without blocking.
+     */
+    void requestStop();
 
     /**
      * Destructor
@@ -67,22 +72,7 @@ class ProtoUdpListener
     virtual ~ProtoUdpListener();
 
    private:
-    /**
-     * This function is setup as the callback to handle packets received over the network.
-     *
-     * @param buffer A buffer containing the raw data received
-     * @param num_bytes_received The number of bytes received that is valid in the buffer
-     */
-    void handleDataReception(const char* buffer, const size_t& num_bytes_received);
-
-    /**
-     * Start listening for data
-     */
-    void startListen();
-
     UdpListener udp_listener_;  // The underlying UDP listener
-    // The function to call on every received packet of ReceiveProtoT data
-    std::function<void(ReceiveProtoT&)> receive_callback;
 };
 
 template <class ReceiveProtoT>
@@ -91,9 +81,14 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     const unsigned short port, const std::string& listen_interface,
     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast)
     : udp_listener_(io_context, ip_address, port, listen_interface, multicast,
-                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this,
-                              std::placeholders::_1, std::placeholders::_2)),
-      receive_callback(receive_callback)
+                    [receive_callback = std::move(receive_callback)](
+                        const char* buffer, const size_t& num_bytes_received)
+                    {
+                        auto packet_data = ReceiveProtoT();
+                        std::ignore      = packet_data.ParseFromArray(
+                                 buffer, static_cast<int>(num_bytes_received));
+                        receive_callback(packet_data);
+                    })
 {
 }
 
@@ -102,20 +97,15 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_context& io_context, const unsigned short port,
     std::function<void(ReceiveProtoT&)> receive_callback)
     : udp_listener_(io_context, port,
-                    std::bind(&ProtoUdpListener<ReceiveProtoT>::handleDataReception, this,
-                              std::placeholders::_1, std::placeholders::_2)),
-      receive_callback(receive_callback)
+                    [receive_callback = std::move(receive_callback)](
+                        const char* buffer, const size_t& num_bytes_received)
+                    {
+                        auto packet_data = ReceiveProtoT();
+                        std::ignore      = packet_data.ParseFromArray(
+                                 buffer, static_cast<int>(num_bytes_received));
+                        receive_callback(packet_data);
+                    })
 {
-}
-
-template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
-    const char* buffer, const size_t& num_bytes_received)
-{
-    auto packet_data = ReceiveProtoT();
-    std::ignore =
-        packet_data.ParseFromArray(buffer, static_cast<int>(num_bytes_received));
-    receive_callback(packet_data);
 }
 
 template <class ReceiveProtoT>
@@ -127,4 +117,10 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::close()
 {
     udp_listener_.close();
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::requestStop()
+{
+    udp_listener_.requestStop();
 }
