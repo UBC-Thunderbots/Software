@@ -63,15 +63,13 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ### Operating systems
 
-We currently only support Linux, specifically Ubuntu.
+We currently support Linux and macOS.
 
-If you have a X86_64 machine, we support Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+We support Ubuntu 24.04 LTS on both X86_64 (AMD64) and ARM64 (AARCH64), and macOS on Apple Silicon.
 
-If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
+You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work. Note that `setup_software.sh` only installs dependencies for the platforms listed above, and will refuse to run on an unsupported version of Ubuntu.
 
-You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
-
-You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+You can use Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
@@ -104,12 +102,13 @@ You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows 
 
 ### Installing Software Dependencies
 
-We have several setup scripts to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following scripts, which can all be found in `Software/environment_setup`
+We have a setup script to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following script, which can be found in `Software/environment_setup`
 
 * Inside a terminal, navigate to the environment_setup folder. e.g. `cd path/to/the/repository/Software/environment_setup`
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
-  * This script will install everything necessary in order to build and run our software 
+  * This script detects whether you are on Ubuntu or macOS and installs the appropriate dependencies in order to build and run our software
+  * The work is split into numbered scripts in `environment_setup/modules`, which are run in order. The script is safe to re-run, so if it fails partway through you can just run it again
 
 ### Installing an IDE
 
