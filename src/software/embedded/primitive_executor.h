@@ -65,6 +65,13 @@ class PrimitiveExecutor
     TbotsProto::DirectControlPrimitive stepPrimitive(
         TbotsProto::RobotStatus& robot_status, const Duration& delta_time);
 
+    /**
+     * Gets the global-frame velocity commanded on the last call to stepPrimitive.
+     *
+     * @return The global-frame velocity commanded on the last step
+     */
+    Vector getPrevCommandedVelocity() const;
+
    private:
     /**
      * Tracks the planned trajectory to compute the robot's next target local linear
