@@ -95,8 +95,8 @@ config_setting(
 )
 
 config_setting(
-    name = "is_darwin",
-    constraint_values = ["@platforms//os:darwin"],
+    name = "is_macos",
+    constraint_values = ["@platforms//os:macos"],
 )
 
 # This represents a mapping of CPU -> Compiler To Use
@@ -365,7 +365,7 @@ filegroup(
     srcs = [
         "wrapper/macos_robot_gcc",
     ] + select({
-        ":is_darwin": ["@macos_robot_gcc//:everything"],
+        ":is_macos": ["@macos_robot_gcc//:everything"],
         "//conditions:default": [],
     }),
 )
@@ -389,7 +389,7 @@ cc_toolchain(
 toolchain(
     name = "cc_toolchain_for_macos_robot",
     exec_compatible_with = [
-        "@platforms//os:osx",
+        "@platforms//os:macos",
         "@platforms//cpu:aarch64",
     ],
     target_compatible_with = [
