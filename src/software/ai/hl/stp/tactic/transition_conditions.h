@@ -38,7 +38,7 @@ bool robotStopped(const Robot& robot, double SPEED_THRESHOLD = 0.05);
  * @param pt2 The second point
  * @param DISTANCE_THRESHOLD The threshold for how close the two points are
  */
-bool comparePoints(const Point& pt1, const Point& pt2, double DISTANCE_THRESHOLD = 0.02);
+bool comparePoints(const Point& pt1, const Point& pt2, double DISTANCE_THRESHOLD = 0.05);
 
 /**
  * Compares two angles and returns true if within ANGLE_THRESHOLD

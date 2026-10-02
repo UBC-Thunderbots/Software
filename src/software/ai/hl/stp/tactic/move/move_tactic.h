@@ -61,5 +61,5 @@ class MoveTactic : public TacticBase<MoveFSM>
 COPY_TACTIC(PenaltySetupTactic, MoveTactic)
 COPY_TACTIC(MoveGoalieToGoalLineTactic, MoveTactic)
 COPY_TACTIC(PrepareKickoffMoveTactic, MoveTactic)
-COPY_TACTIC(PlaceBallMoveTactic, MoveTactic)
+COPY_TACTIC(BallPlacementMoveTactic, MoveTactic)
 COPY_TACTIC(AvoidInterferenceTactic, MoveTactic)
