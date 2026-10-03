@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <mutex>
 
 typedef std::function<void(const char*, const size_t&)> ReceiveCallback;
 
@@ -15,7 +16,7 @@ class UdpListener
      *
      * @throws TbotsNetworkException if the listener could not be created
      *
-     * @param io_service The service thread to use for the network communication resource
+     * @param io_context The io_context to use for the network communication resource
      * @param ip_address If multicast is true, this address is the multicast group to
      * join. Otherwise, this is the IP address of the local interface to listen on
      * @param port The port to listen on
@@ -25,7 +26,7 @@ class UdpListener
      * and `interface`
      * @param receive_callback The callback to call when a new message is received
      */
-    UdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
+    UdpListener(boost::asio::io_context& io_context, const std::string& ip_address,
                 unsigned short port, const std::string& interface, bool multicast,
                 ReceiveCallback receive_callback);
 
@@ -37,11 +38,11 @@ class UdpListener
      *
      * @throws TbotsNetworkException if the listener could not be created
      *
-     * @param io_service The service thread to use for the network communication resource
+     * @param io_context The io_context to use for the network communication resource
      * @param port The port to listen on
      * @param receive_callback The callback to call when a new message is received
      */
-    UdpListener(boost::asio::io_service& io_service, const unsigned short port,
+    UdpListener(boost::asio::io_context& io_context, const unsigned short port,
                 ReceiveCallback receive_callback);
 
     /**
@@ -83,6 +84,8 @@ class UdpListener
 
     // Whether this listener should continue running
     bool running_;
+    // Protects shutdown and receive re-registration against each other.
+    std::mutex state_mutex_;
 
     // The raw data received from the network
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;

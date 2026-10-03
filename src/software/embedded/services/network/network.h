@@ -10,6 +10,7 @@
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "software/embedded/services/network/primitive_tracker.h"
+#include "software/networking/udp/threaded_io_context.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/time/duration.h"
@@ -164,6 +165,9 @@ class NetworkService
     // Mutex protects the fullsystem IP address
     std::mutex fullsystem_ip_mutex;
     std::optional<std::string> fullsystem_ip;
+
+    // Services all UDP sockets owned by this NetworkService on one thread.
+    std::shared_ptr<ThreadedIoContext> io_context_;
 
     // Mutex protects the robot status sender
     std::mutex robot_status_sender_mutex;
