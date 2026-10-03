@@ -19,6 +19,8 @@ struct EnemyThreat
     // This does not account for obstacles
     // For example, robots in the corner would have a very small angle
     // while robots directly in front of the net would have a large angle
+    // Robots in or behind the friendly goal mouth have an angle of zero since they
+    // have no net to shoot at from there
     Angle goal_angle;
 
     // The largest angle the robot has to shoot on the friendly net, taking obstacles

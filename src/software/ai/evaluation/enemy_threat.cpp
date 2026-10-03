@@ -65,21 +65,44 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
     return receiver_passer_pairs;
 }
 
-std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
-    const Robot& initial_passer, const Robot& final_receiver, const Team& passing_team,
-    const Team& other_team)
+namespace
 {
-    if (initial_passer == final_receiver)
-    {
-        return std::make_pair(0, std::nullopt);
-    }
+/**
+ * Returns whether a robot at the given position could shoot on the friendly goal
+ */
+bool canShootOnFriendlyGoal(const Field& field, const Point& position)
+{
+    // Compare along the axis between the two goals so this doesn't depend on which
+    // side of the field we are defending
+    Vector towards_enemy_goal = field.enemyGoalCenter() - field.friendlyGoalCenter();
+    Vector goal_to_position   = position - field.friendlyGoalCenter();
+
+    // A robot level with the goal line sits between the goalposts rather than in front
+    // of them, so require it to be at least its own radius ahead of the line before we
+    // treat it as having anything to shoot at
+    return goal_to_position.dot(towards_enemy_goal.normalize()) > ROBOT_MAX_RADIUS_METERS;
+}
+
+// Maps a robot to the number of passes needed to reach it and the robot it receives from
+using NumPassesToRobotMap =
+    std::map<Robot, std::pair<int, std::optional<Robot>>, Robot::cmpRobotByID>;
+
+/**
+ * Returns how many passes it would take for the initial passer to pass the ball to each
+ * robot on its team, and the robot each of them would receive the ball from. Robots that
+ * cannot be passed to at all are absent from the returned map.
+ */
+NumPassesToRobotMap getNumPassesToAllRobots(const Robot& initial_passer,
+                                            const Team& passing_team,
+                                            const Team& other_team)
+{
+    NumPassesToRobotMap num_passes_to_robot = {{initial_passer, {0, std::nullopt}}};
 
     // We calculate the minimum number of passes it would take for the initial_passer
-    // robot to pass the ball to the final_receiver, assuming both robots are on the given
-    // team
+    // robot to pass the ball to each other robot on the given team
     //
     // This algorithm essentially treats the team of robots like a Directed Acyclic
-    // Graph and "traverses" the graph to find the shortest path to the robot
+    // Graph and "traverses" the graph to find the shortest path to each robot
 
     // The robots that could have the ball and make a pass at each iteration. They
     // are on the "frontier" of the graph search
@@ -110,10 +133,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     // * We have iterated up to the size of the team. This is a fallback case to
     //   prevent any infinite loops, just in case
     //
-    // We already check the case where the passer and receiver are the same. If this was
-    // the case, 0 passes would be required. Since that case is already checked, when we
-    // start the loop we are checking for the possibility of the receiver getting the ball
-    // in 1 pass. This is why pass_num starts at 1.
+    // The initial passer is already recorded as needing 0 passes, so pass_num starts at 1
     for (unsigned pass_num = 1; pass_num < passing_team.numRobots() &&
                                 !current_passers.empty() && !unvisited_robots.empty();
          pass_num++)
@@ -121,24 +141,17 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
         std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> receiver_passer_pairs =
             findAllReceiverPasserPairs(current_passers, unvisited_robots, all_robots);
 
-        // If the robot we are looking for is a receiver, return the number of
-        // passes and the passer to this robot
-        if (receiver_passer_pairs.count(final_receiver) > 0)
-        {
-            // If there are multiple robots that can pass to the robot, we assume
-            // it will receive the ball from the closest one since this is more
-            // likely
-            auto closest_passer = Team::getNearestRobot(
-                receiver_passer_pairs.at(final_receiver), final_receiver.position());
-            return std::make_pair(pass_num, closest_passer);
-        }
-
         // Create a list of all robots that could receive the ball this iteration
         std::vector<Robot> all_receivers;
-        for (auto it = receiver_passer_pairs.begin(); it != receiver_passer_pairs.end();
-             it++)
+        for (const auto& [receiver, passers] : receiver_passer_pairs)
         {
-            all_receivers.emplace_back(it->first);
+            // If there are multiple robots that can pass to the robot, we assume it
+            // will receive the ball from the closest one since this is more likely
+            num_passes_to_robot.emplace(
+                receiver,
+                std::make_pair(static_cast<int>(pass_num),
+                               Team::getNearestRobot(passers, receiver.position())));
+            all_receivers.emplace_back(receiver);
         }
 
         // All robots that could have received the ball now become passers
@@ -155,10 +168,32 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
                                unvisited_robots.end());
     }
 
+    return num_passes_to_robot;
+}
+}  // namespace
+
+std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
+    const Robot& initial_passer, const Robot& final_receiver, const Team& passing_team,
+    const Team& other_team)
+{
+    if (initial_passer == final_receiver)
+    {
+        return std::make_pair(0, std::nullopt);
+    }
+
+    auto num_passes_to_robot =
+        getNumPassesToAllRobots(initial_passer, passing_team, other_team);
+    auto pass_data = num_passes_to_robot.find(final_receiver);
+
     // If we have checked all the robots we can and still haven't found the robot we
     // are looking for, it must be blocked and unable to be passed to in the current
     // state. Therefore, we return an std::nullopt
-    return std::nullopt;
+    if (pass_data == num_passes_to_robot.end())
+    {
+        return std::nullopt;
+    }
+
+    return pass_data->second;
 }
 
 void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
@@ -203,7 +238,7 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
                 // the robot with a smaller view of the net is considered less
                 // threatening. The reason we use goal_angle here rather than the
                 // best_shot_angle is that the goal_angle doesn't change if the robot is
-                // blocked from shooting (eg. by a defender). This makes the evaluation
+                // blocked from shooting (e.g. by a defender). This makes the evaluation
                 // more stable since the value won't change drastically as our robots
                 // move into defensive positions and change the best_shot_angle. If we had
                 // fewer robots than the enemy team and were using the best_shot_angle,
@@ -231,17 +266,34 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
 
     std::vector<EnemyThreat> threats;
 
+    auto robot_with_effective_possession =
+        getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+
+    NumPassesToRobotMap num_passes_to_robot;
+    if (robot_with_effective_possession)
+    {
+        num_passes_to_robot = getNumPassesToAllRobots(
+            robot_with_effective_possession.value(), enemy_team, friendly_team);
+    }
+
     for (const auto& robot : enemy_team.getAllRobots())
     {
         bool has_ball = robot.isNearDribbler(ball.position());
 
         // Get the angle from the robot to each friendly goalpost, then find the
-        // difference between these angles to get the goal_angle for the robot
-        auto friendly_goalpost_angle_1 =
-            (field.friendlyGoalpostPos() - robot.position()).orientation();
-        auto friendly_goalpost_angle_2 =
-            (field.friendlyGoalpostNeg() - robot.position()).orientation();
-        Angle goal_angle = friendly_goalpost_angle_1.minDiff(friendly_goalpost_angle_2);
+        // difference between these angles to get the goal_angle for the robot.
+        // Robots in or behind our goal mouth are close to both goalposts, so the angle
+        // between them is wide even though they have no net to shoot at. Give them an
+        // angle of zero
+        Angle goal_angle = Angle::zero();
+        if (canShootOnFriendlyGoal(field, robot.position()))
+        {
+            auto friendly_goalpost_angle_1 =
+                (field.friendlyGoalpostPos() - robot.position()).orientation();
+            auto friendly_goalpost_angle_2 =
+                (field.friendlyGoalpostNeg() - robot.position()).orientation();
+            goal_angle = friendly_goalpost_angle_1.minDiff(friendly_goalpost_angle_2);
+        }
 
         std::optional<Angle> best_shot_angle  = std::nullopt;
         std::optional<Point> best_shot_target = std::nullopt;
@@ -259,17 +311,11 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
         // passer to be an empty optional
         int num_passes              = static_cast<int>(enemy_team.numRobots());
         std::optional<Robot> passer = std::nullopt;
-        auto robot_with_effective_possession =
-            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
-        if (robot_with_effective_possession)
+        auto pass_data              = num_passes_to_robot.find(robot);
+        if (pass_data != num_passes_to_robot.end())
         {
-            auto pass_data = getNumPassesToRobot(robot_with_effective_possession.value(),
-                                                 robot, enemy_team, friendly_team);
-            if (pass_data)
-            {
-                num_passes = pass_data->first;
-                passer     = pass_data->second;
-            }
+            num_passes = pass_data->second.first;
+            passer     = pass_data->second.second;
         }
 
         EnemyThreat threat{robot,           has_ball,         goal_angle,
