@@ -158,14 +158,11 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
                       -//toolchains/...                   \\
                       -//software:unix_full_system_tar_gen"""
     elif config.action == ActionArgument.build:
-        targets = []
-        for query in config.search_query.split():
-            if query.startswith("//"):
-                targets.append(query)
-            else:
-                targets.append(
-                    fuzzy_find_target(config.action, query, config.interactive_search)
-                )
+        query = config.search_query
+        if query.startswith("//..."):
+            target = query
+        else:
+            target = fuzzy_find_target(config.action, query, config.interactive_search)
     else:
         target = fuzzy_find_target(
             config.action, config.search_query, config.interactive_search
@@ -212,10 +209,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         if DebugBinary.yellow in config.select_debug_binaries:
             runtime_args.append("--debug_yellow_full_system")
 
-    if config.action == ActionArgument.build:
-        command += targets
-    else:
-        command += [target]
+    command += [target]
 
     # Separator for runtime arguments
     if config.action == ActionArgument.run:

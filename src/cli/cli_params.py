@@ -521,7 +521,7 @@ class InteractiveCli:
             case InteractiveCli.Category.BUILD:
                 config.action = ActionArgument.build
                 term_name = questionary.text(
-                    "Enter target names or Bazel patterns, separated by spaces:",
+                    "Enter the target name or bazel pattern (leave empty to build //...): ",
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
 
@@ -533,7 +533,7 @@ class InteractiveCli:
 
                 config.robot_platform = robot_platform
                 cmd_title += platform_label + " for "
-                config.search_query = term_name.strip()
+                config.search_query = term_name.strip() or "//..."
                 config.interactive_search = True
                 cmd_title += config.search_query
 
