@@ -156,7 +156,6 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
     if config.test_suite and config.action == ActionArgument.test:
         target = """-- //...                              \\
                       -//software/gameplay_tests/...      \\
-                      -//toolchains/...                   \\
                       -//software:unix_full_system_tar_gen"""
     else:
         target = fuzzy_find_target(
@@ -190,7 +189,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
             command += list(flag.value)
 
     if config.test_suite and config.action == ActionArgument.test:
-        command += ["--build_tests_only"]
+        command += ["--build_tests_only", "--test_output=errors"]
 
     if config.jobs_option:
         command += [f"--jobs={config.jobs_option}"]

@@ -81,7 +81,6 @@ jobs:
             -//software/gameplay_tests/...         \
             -//software/ai/hl/...                   \
             -//software/embedded/...                \
-            -//toolchains/cc/...                    \
             -//software:unix_full_system_tar_gen
 
       - name: Raspberry Pi Build Test
@@ -123,7 +122,6 @@ jobs:
             -//software/gameplay_tests/...  \
             -//software/ai/hl/...            \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...             \
             -//software:unix_full_system_tar_gen
 
   robot-tests:
@@ -169,8 +167,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blue-sim-test-proto-logs
-          path: |
-            /tmp/tbots/blue/test/*/proto_*
+          path: /tmp/tbots_*/blue/test/*/proto_*
 
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
@@ -178,8 +175,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: yellow-sim-test-proto-logs
-          path: |
-            /tmp/tbots/yellow/test/*/proto_*
+          path: /tmp/tbots_*/yellow/test/*/proto_*
 
   autorefd-game:
     needs: check-and-clear-cache

@@ -258,8 +258,8 @@ def get_runtime_dir():
 
     TODO: Refactor #3744
 
-    Creates a new persistent directory for each test so that tests
-    running in parallel do not interfere with each other.
+    Each test process gets a unique persistent /tmp/tbots_<uuid> directory so
+    parallel Bazel tests do not interfere and replay logs remain easy to find.
 
     :return: The path to the runtime directory.
     """
