@@ -156,6 +156,12 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         target = """-- //...                              \\
                       -//software/gameplay_tests/...      \\
                       -//software:unix_full_system_tar_gen"""
+    elif config.action == ActionArgument.build:
+        query = config.search_query
+        if query.startswith("//..."):
+            target = query
+        else:
+            target = fuzzy_find_target(config.action, query, config.interactive_search)
     else:
         target = fuzzy_find_target(
             config.action, config.search_query, config.interactive_search
@@ -169,7 +175,10 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.DEBUG_BUILD: config.debug_build or bool(config.select_debug_binaries),
         BazelFlag.OPTIMIZED: not config.debug_build
         and (not config.no_optimized_build or bool(config.flash_robots)),
-        BazelFlag.ROBOT_PLATFORM: bool(config.flash_robots or config.ansible_playbook),
+        BazelFlag.ROBOT_PLATFORM: (
+            config.robot_platform
+            or bool(config.flash_robots or config.ansible_playbook)
+        ),
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
@@ -306,7 +315,10 @@ def fuzzy_find_target(
             search_query, list(target_dict.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
         )
         selected_name = iterfzf.iterfzf(iter([name for name, _ in filtered]))
-        target = str(target_dict[selected_name.encode()], encoding="utf-8")
+        if selected_name is None:
+            print("Cancelled.")
+            sys.exit(0)
+        target = target_dict[selected_name].decode("utf-8")
     else:
         print(f"Found target {target} (confidence {confidence})")
 
