@@ -5,7 +5,7 @@
 
 #include "software/constants.h"
 #include "software/geom/point.h"
-#include "software/sensor_fusion/filter/kalman_filter.hpp"
+#include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
@@ -76,9 +76,9 @@ class RobotFilter
     int revolutions = 0;
 
     using PosKalmanFilter =
-        KalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
+        LinearKalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
     using AngKalmanFilter =
-        KalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
+        LinearKalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
 
     // Will be keeping Position and Angle in double, in units of metres and radians
     // respectively
