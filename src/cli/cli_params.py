@@ -331,7 +331,7 @@ class InteractiveCli:
         if not os.path.exists(InteractiveCli.HISTORY_FILE):
             return []
         with open(InteractiveCli.HISTORY_FILE) as f:
-            lines = [line.strip() for line in f.readlines()]
+            lines = [line.strip() for line in f]
         return [line.replace("\\n", "\n") for line in lines if line]
 
     @staticmethod
