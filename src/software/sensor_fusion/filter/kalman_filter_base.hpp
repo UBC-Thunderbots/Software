@@ -104,22 +104,6 @@ class KalmanFilterBase
      */
     double mahalanobisDistance(Eigen::Vector<double, DimY> measurement) const;
 
-    /**
-     * Returns the squared Mahalanobis distance between the given measurement and the
-     * measurement the current state estimate predicts.
-     *
-     * Unlike a plain Euclidean distance, this scales the discrepancy by how uncertain
-     * the filter currently is, so a measurement that is far away but within a poorly
-     * constrained direction is not penalized as heavily as one that contradicts a
-     * confident estimate. This makes it a useful gate for rejecting outlier
-     * measurements before they are fed to update().
-     *
-     * @param measurement Measurement vector
-     *
-     * @return The squared Mahalanobis distance of the measurement
-     */
-    double mahalanobisDistance(Eigen::Vector<double, DimY> measurement) const;
-
     Eigen::Vector<double, DimX> state_estimate;
     Eigen::Matrix<double, DimX, DimX> state_covariance;
     Eigen::Matrix<double, DimX, DimX> process_covariance;

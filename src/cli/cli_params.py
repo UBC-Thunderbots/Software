@@ -5,8 +5,9 @@ from enum import Enum
 from typing import Annotated
 
 import questionary
-from cli.multi_option import MultiOption
 from typer import Argument, Option
+
+from cli.multi_option import MultiOption
 
 
 class ActionArgument(str, Enum):
@@ -138,7 +139,6 @@ class BazelFlag(tuple, Enum):
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)
     DEBUG_POWERLOOP = ("--//software/power:debug_powerloop",)
-    SERIAL_TESTS = ("",)
     DISABLE_POWER_SERVICE = ("--//software/embedded:disable_power_service",)
     DISABLE_MOTOR_SERVICE = ("--//software/embedded:disable_motor_service",)
 
@@ -332,7 +332,7 @@ class InteractiveCli:
         if not os.path.exists(InteractiveCli.HISTORY_FILE):
             return []
         with open(InteractiveCli.HISTORY_FILE) as f:
-            lines = [line.strip() for line in f.readlines()]
+            lines = [line.strip() for line in f]
         return [line.replace("\\n", "\n") for line in lines if line]
 
     @staticmethod
