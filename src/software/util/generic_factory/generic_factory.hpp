@@ -190,7 +190,7 @@ std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate, ConfigType
     else
     {
         const std::string msg("No constructor for '" + generic_name +
-            "' found in the GenericFactory");
+                              "' found in the GenericFactory");
         throw std::invalid_argument(msg);
     }
 }
