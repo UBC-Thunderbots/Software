@@ -1,4 +1,5 @@
 #include <boost/program_options.hpp>
+#include <cmath>
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
@@ -11,9 +12,64 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
-// CSV file that the filtered ball state is logged to, alongside the ground truth
-// ball state from the simulator, for evaluating the ball filter
-static const std::string BALL_FILTER_CSV_FILE_NAME = "realistic_ball_filter_v13.csv";
+// CSV file that the filtered robot state is logged to, alongside the ground truth
+// robot state from the simulator, for evaluating the robot filter
+static const std::string ROBOT_FILTER_CSV_FILE_NAME = "realistic_robot_filter_v1.csv";
+
+// Wraps an angle to [-pi, pi] so detected and actual orientations are directly
+// comparable (e.g. -3.1 rad and 3.1 rad aren't reported as a ~6.2 rad error)
+static double wrapAngle(double radians)
+{
+    return std::atan2(std::sin(radians), std::cos(radians));
+}
+
+/**
+ * Logs one CSV row per robot of the given team, containing the robot state detected
+ * by the robot filter (taken from the team's World) next to the ground truth robot
+ * state from the simulator. Robots that haven't been detected yet are skipped.
+ *
+ * @param team "blue" or "yellow"
+ * @param timestamp_s Seconds since the first vision message was received
+ * @param actual_robots Ground truth robots of this team from the simulator
+ * @param detected_world The World (post robot filter) received from this team's AI
+ */
+static void logRobotStates(
+    const std::string& team, double timestamp_s,
+    const google::protobuf::RepeatedPtrField<world::SimRobot>& actual_robots,
+    const TbotsProto::World& detected_world)
+{
+    for (const auto& actual : actual_robots)
+    {
+        // Find the detected robot with the same id
+        const TbotsProto::Robot* detected_robot = nullptr;
+        for (const auto& robot : detected_world.friendly_team().team_robots())
+        {
+            if (robot.id() == actual.id())
+            {
+                detected_robot = &robot;
+                break;
+            }
+        }
+
+        if (detected_robot == nullptr)
+        {
+            continue;
+        }
+
+        const auto& detected = detected_robot->current_state();
+        LOG(CSV, ROBOT_FILTER_CSV_FILE_NAME)
+            << timestamp_s << "," << team << "," << actual.id() << ","
+            << detected.global_position().x_meters() << ","
+            << detected.global_position().y_meters() << ","
+            << detected.global_velocity().x_component_meters() << ","
+            << detected.global_velocity().y_component_meters() << ","
+            << wrapAngle(detected.global_orientation().radians()) << ","
+            << detected.global_angular_velocity().radians_per_second() << ","
+            << actual.p_x() << "," << actual.p_y() << "," << actual.v_x() << ","
+            << actual.v_y() << "," << wrapAngle(actual.angle()) << "," << actual.r_z()
+            << "\n";
+    }
+}
 
 int main(int argc, char** argv)
 {
@@ -52,9 +108,12 @@ int main(int argc, char** argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
-        LOG(CSV, BALL_FILTER_CSV_FILE_NAME)
-            << "timestamp_s,fused_x,fused_y,fused_vel_x,fused_vel_y,truth_x,truth_y,"
-               "true_vel_x,true_vel_y,is_occluded\n";
+        LOG(CSV, ROBOT_FILTER_CSV_FILE_NAME)
+            << "timestamp_s,team,robot_id,"
+               "detected_x,detected_y,detected_vel_x,detected_vel_y,"
+               "detected_orientation,detected_angular_vel,"
+               "actual_x,actual_y,actual_vel_x,actual_vel_y,"
+               "actual_orientation,actual_angular_vel\n";
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -66,8 +125,7 @@ int main(int argc, char** argv)
          *   SimulatorTick        │                            │
          *   ─────────────────────►                            │
          *                        │     ER Force Simulator     │
-         *                        │            Main            │
-         *   WorldState           │                            │
+         *   WorldState           │            Main            │
          *   ─────────────────────►                            │ SSL_WrapperPacket
          *                        │                            ├───────────────────►
          *   Blue Primitive Set   │                            │
@@ -235,24 +293,31 @@ int main(int argc, char** argv)
 
                 auto simulator_state = er_force_sim->getSimulatorState();
 
-                double current_timestamp_s =
+                // Each team's detected robot state is timestamped by when that
+                // team's vision (World) was sent. A timestamp of 0 means no vision
+                // has been received from that team yet.
+                double blue_timestamp_s =
+                    blue_vision.time_sent().epoch_timestamp_seconds();
+                double yellow_timestamp_s =
                     yellow_vision.time_sent().epoch_timestamp_seconds();
+
                 if (start_timestamp_s == 0.0)
                 {
-                    start_timestamp_s = current_timestamp_s;
+                    start_timestamp_s =
+                        blue_timestamp_s != 0.0 ? blue_timestamp_s : yellow_timestamp_s;
                 }
 
-                const auto& fused_ball = yellow_vision.ball().current_state();
-                LOG(CSV, BALL_FILTER_CSV_FILE_NAME)
-                    << (current_timestamp_s - start_timestamp_s) << ","
-                    << fused_ball.global_position().x_meters() << ","
-                    << fused_ball.global_position().y_meters() << ","
-                    << fused_ball.global_velocity().x_component_meters() << ","
-                    << fused_ball.global_velocity().y_component_meters() << ","
-                    << simulator_state.ball().p_x() << "," << simulator_state.ball().p_y()
-                    << "," << simulator_state.ball().v_x() << ","
-                    << simulator_state.ball().v_y() << ","
-                    << !er_force_sim->isBallVisible() << "\n";
+                if (blue_timestamp_s != 0.0)
+                {
+                    logRobotStates("blue", blue_timestamp_s - start_timestamp_s,
+                                   simulator_state.blue_robots(), blue_vision);
+                }
+
+                if (yellow_timestamp_s != 0.0)
+                {
+                    logRobotStates("yellow", yellow_timestamp_s - start_timestamp_s,
+                                   simulator_state.yellow_robots(), yellow_vision);
+                }
 
                 simulator_state_output.sendProto(simulator_state);
             });

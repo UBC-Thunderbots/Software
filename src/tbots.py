@@ -6,6 +6,9 @@ import sys
 from subprocess import PIPE, run
 
 import iterfzf
+from thefuzz import process
+from typer import Argument, Context, Typer
+
 from cli.cli_params import (
     ActionArgument,
     AnsiblePlaybook,
@@ -28,8 +31,6 @@ from cli.cli_params import (
     TestSuiteOption,
     TracyOption,
 )
-from thefuzz import process
-from typer import Argument, Context, Typer
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
@@ -81,8 +82,7 @@ def main(
     :param test_suite: run the entire test suite instead of a single target
     :param enable_thunderscope: launch with Thunderscope enabled
     :param stop_ai_on_start: start the binary with the AI paused
-    :param jobs_option: value passed to Bazel's --jobs flag. Also opts tests back
-        into running in parallel, which they do not do by default
+    :param jobs_option: value passed to Bazel's --jobs flag
     :param runs: value passed to Bazel's --runs_per_test flag
     :param robot_name: hostname of the robot targeted by an Ansible playbook
     :param ansible_playbook: name of the Ansible playbook to run
@@ -174,12 +174,6 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
-        # Tests run one at a time unless asked otherwise. Simulated tests each spawn a
-        # full system and stream their logs to the same terminal, so running several at
-        # once interleaves the output of unrelated tests with nothing marking which line
-        # came from which. Only test execution is serialized; the build stays parallel.
-        BazelFlag.SERIAL_TESTS: config.action == ActionArgument.test
-        and not config.jobs_option,
         BazelFlag.DEBUG_POWERLOOP: config.debug_powerloop,
         BazelFlag.DISABLE_POWER_SERVICE: config.disable_power_service,
         BazelFlag.DISABLE_MOTOR_SERVICE: config.disable_motor_service,
