@@ -6,9 +6,6 @@ import sys
 from subprocess import PIPE, run
 
 import iterfzf
-from thefuzz import process
-from typer import Argument, Context, Typer
-
 from cli.cli_params import (
     ActionArgument,
     AnsiblePlaybook,
@@ -31,6 +28,8 @@ from cli.cli_params import (
     TestSuiteOption,
     TracyOption,
 )
+from thefuzz import process
+from typer import Argument, Context, Typer
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 NUM_FILTERED_MATCHES_TO_SHOW = 10
