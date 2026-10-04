@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/example/example_play_fsm.h"
+#include "software/ai/stp/play/example/example_play_fsm.h"
 
 ExamplePlayFSM::ExamplePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<ExamplePlayFSM>(ai_config_ptr), move_tactics(DIV_A_NUM_ROBOTS)

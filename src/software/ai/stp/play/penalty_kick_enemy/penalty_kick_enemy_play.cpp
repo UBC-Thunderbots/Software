@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
+#include "software/ai/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"

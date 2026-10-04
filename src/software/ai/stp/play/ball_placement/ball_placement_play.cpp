@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/ball_placement/ball_placement_play.h"
+#include "software/ai/stp/play/ball_placement/ball_placement_play.h"
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "software/util/generic_factory/generic_factory.h"

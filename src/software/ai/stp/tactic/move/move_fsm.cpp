@@ -1,6 +1,6 @@
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
+#include "software/ai/stp/tactic/move/move_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
 
 MoveFSM::MoveFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticFSM<MoveFSM>(ai_config_ptr)

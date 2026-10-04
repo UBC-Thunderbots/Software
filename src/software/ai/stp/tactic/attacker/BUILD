@@ -18,9 +18,9 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:keep_away",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/keep_away:keep_away_tactic",
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
+        "//software/ai/stp/tactic",
+        "//software/ai/stp/tactic/keep_away:keep_away_tactic",
+        "//software/ai/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/passing:pass",
         "//software/logger",
         "//software/world:ball",

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/ai/stp/tactic/stop_primitive.h"
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 StopPrimitive::generatePrimitiveProtoMessage(

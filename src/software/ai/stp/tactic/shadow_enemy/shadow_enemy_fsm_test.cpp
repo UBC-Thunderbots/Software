@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
+#include "software/ai/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
 #include <gtest/gtest.h>
 

@@ -1,11 +1,11 @@
-#include "software/ai/hl/stp/stp.h"
+#include "software/ai/stp/stp.h"
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
 #include <exception>
 
-#include "software/ai/hl/stp/play/halt_play/halt_play.h"
+#include "software/ai/stp/play/halt_play/halt_play.h"
 #include "software/test_util/test_util.h"
 
 class STPTest : public ::testing::Test

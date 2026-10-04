@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play_fsm.h"
+#include "software/ai/stp/play/kickoff_friendly/kickoff_friendly_play_fsm.h"
 
 KickoffFriendlyPlayFSM::KickoffFriendlyPlayFSM(
     const std::shared_ptr<const TbotsProto::AiConfig>& ai_config_ptr)

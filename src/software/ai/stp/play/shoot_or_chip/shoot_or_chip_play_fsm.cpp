@@ -1,14 +1,14 @@
-#include "software/ai/hl/stp/play/shoot_or_chip/shoot_or_chip_play_fsm.h"
+#include "software/ai/stp/play/shoot_or_chip/shoot_or_chip_play_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
-#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
+#include "software/ai/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/stp/tactic/move/move_tactic.h"
+#include "software/ai/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
 ShootOrChipPlayFSM::ShootOrChipPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

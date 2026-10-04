@@ -1,7 +1,7 @@
 #include "defender_fsm_base.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool DefenderFSMBase::ballNearbyWithoutThreat(

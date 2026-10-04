@@ -17,7 +17,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/tactic",
+        "//software/ai/stp/tactic",
         "//software/logger",
     ],
 )

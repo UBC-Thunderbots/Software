@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play.h"
+#include "software/ai/stp/play/kickoff_friendly/kickoff_friendly_play.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

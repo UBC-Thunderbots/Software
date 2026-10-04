@@ -1,10 +1,10 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
+#include "software/ai/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
+#include "software/ai/stp/tactic/move/move_fsm.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 

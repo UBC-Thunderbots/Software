@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/stp/tactic/attacker/attacker_tactic.h"
 #include "software/test_util/test_util.h"
 
 TEST(FsmStateTest, test_get_fsm_state)

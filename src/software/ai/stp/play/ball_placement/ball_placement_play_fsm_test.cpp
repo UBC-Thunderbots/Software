@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
+#include "software/ai/stp/play/ball_placement/ball_placement_play_fsm.h"
 
 #include <gtest/gtest.h>
 

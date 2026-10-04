@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/stp/play/play.h"
 
 /**
  * A base play class for all other plays based on FSMs to extend from

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/stp/tactic/attacker/attacker_tactic.h"
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"

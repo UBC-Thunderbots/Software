@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
+#include "software/ai/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

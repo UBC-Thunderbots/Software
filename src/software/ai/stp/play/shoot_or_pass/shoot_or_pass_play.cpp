@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
+#include "software/ai/stp/play/shoot_or_pass/shoot_or_pass_play.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

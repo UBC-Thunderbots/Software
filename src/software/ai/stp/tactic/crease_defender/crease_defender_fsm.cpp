@@ -1,7 +1,7 @@
-#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
+#include "software/ai/stp/tactic/crease_defender/crease_defender_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/stp/tactic/dribble/dribble_fsm.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"

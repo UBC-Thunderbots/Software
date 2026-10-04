@@ -6,8 +6,8 @@
 #include "proto/parameters.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/ai/hl/stp/tactic/primitive.h"
-#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/ai/stp/tactic/primitive.h"
+#include "software/ai/stp/tactic/stop_primitive.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 

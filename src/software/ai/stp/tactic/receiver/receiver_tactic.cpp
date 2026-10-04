@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/stp/tactic/receiver/receiver_tactic.h"
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"

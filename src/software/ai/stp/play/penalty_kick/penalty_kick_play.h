@@ -1,9 +1,9 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h"
-#include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_base.hpp"
+#include "software/ai/stp/play/penalty_kick/penalty_kick_play_fsm.h"
+#include "software/ai/stp/play/play.h"
+#include "software/ai/stp/play/play_base.hpp"
 
 /**
  * Play for shooting penalty kicks

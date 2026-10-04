@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/stp/tactic/dribble/dribble_fsm.h"
 
 #include <gtest/gtest.h>
 

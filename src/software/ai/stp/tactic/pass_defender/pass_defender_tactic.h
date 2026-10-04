@@ -1,8 +1,8 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/tactic/pass_defender/pass_defender_fsm.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
 #include "software/geom/point.h"
 
 /**

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
 
 #include <cmath>
 

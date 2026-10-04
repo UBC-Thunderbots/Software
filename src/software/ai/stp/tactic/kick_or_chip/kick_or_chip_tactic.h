@@ -2,8 +2,8 @@
 
 #include <queue>
 
-#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
 
 /**
  * The KickOrChipTactic will move the assigned robot to the given kick origin and then

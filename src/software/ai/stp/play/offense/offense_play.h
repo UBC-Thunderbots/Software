@@ -1,9 +1,9 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
-#include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_base.hpp"
+#include "software/ai/stp/play/offense/offense_play_fsm.h"
+#include "software/ai/stp/play/play.h"
+#include "software/ai/stp/play/play_base.hpp"
 
 /**
  * Play that tries to find a shot on net, passes if it couldn't, while keeping some robots

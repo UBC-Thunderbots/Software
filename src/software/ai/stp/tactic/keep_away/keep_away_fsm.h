@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/keep_away.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/stp/tactic/dribble/dribble_fsm.h"
 
 /**
  * Finite State Machine class for Keep Away

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
+#include "software/ai/stp/play/crease_defense/crease_defense_play_fsm.h"
 
 #include <gtest/gtest.h>
 

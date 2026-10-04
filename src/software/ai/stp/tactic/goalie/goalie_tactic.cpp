@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
+#include "software/ai/stp/tactic/goalie/goalie_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/geom/algorithms/contains.h"

@@ -12,6 +12,6 @@ cc_library(
     ],
     deps = [
         "//software/ai/evaluation:keep_away",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/stp/tactic/dribble:dribble_tactic",
     ],
 )

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "proto/play.pb.h"
-#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/stp/play/play.h"
 
 /**
  * Creates a play given a play proto

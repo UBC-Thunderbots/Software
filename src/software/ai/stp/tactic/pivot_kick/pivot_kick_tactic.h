@@ -2,8 +2,8 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/tactic/pivot_kick/pivot_kick_fsm.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
 #include "software/geom/segment.h"
 
 /**

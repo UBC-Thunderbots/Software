@@ -3,8 +3,8 @@
 #include <exception>
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/halt_play/halt_play.h"
-#include "software/ai/hl/stp/stp.h"
+#include "software/ai/stp/play/halt_play/halt_play.h"
+#include "software/ai/stp/stp.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h"
+#include "software/ai/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h"
 
 EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/stp/tactic/crease_defender/crease_defender_tactic.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

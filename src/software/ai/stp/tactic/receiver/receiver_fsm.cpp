@@ -1,6 +1,6 @@
-#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
+#include "software/ai/stp/tactic/receiver/receiver_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
 
 ReceiverFSM::ReceiverFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticFSM<ReceiverFSM>(ai_config_ptr)

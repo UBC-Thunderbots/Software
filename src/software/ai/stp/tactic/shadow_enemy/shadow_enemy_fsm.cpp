@@ -1,7 +1,7 @@
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
+#include "software/ai/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/distance.h"
 
 ShadowEnemyFSM::ShadowEnemyFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

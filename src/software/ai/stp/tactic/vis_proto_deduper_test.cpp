@@ -1,5 +1,5 @@
 
-#include "software/ai/hl/stp/tactic/vis_proto_deduper.h"
+#include "software/ai/stp/tactic/vis_proto_deduper.h"
 
 #include <gtest/gtest.h>
 

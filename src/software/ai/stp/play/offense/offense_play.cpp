@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/offense/offense_play.h"
+#include "software/ai/stp/play/offense/offense_play.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

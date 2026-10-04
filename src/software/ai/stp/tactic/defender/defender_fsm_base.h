@@ -2,9 +2,9 @@
 
 #include "proto/tactic.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
-#include "software/ai/hl/stp/tactic/tactic_fsm.h"
+#include "software/ai/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/tactic/tactic_fsm.h"
 #include "software/logger/logger.h"
 
 /**

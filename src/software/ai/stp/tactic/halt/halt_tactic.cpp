@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
+#include "software/ai/stp/tactic/halt/halt_tactic.h"
 
 #include <algorithm>
 

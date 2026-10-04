@@ -16,9 +16,9 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/stp/play",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
         "//software/util/generic_factory",
         "//software/world:game_state",
     ],

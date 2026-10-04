@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/tactic/penalty_kick/penalty_kick_fsm.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
 #include "software/logger/logger.h"
 
 

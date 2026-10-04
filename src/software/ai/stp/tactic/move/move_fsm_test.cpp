@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
+#include "software/ai/stp/tactic/move/move_fsm.h"
 
 #include <gtest/gtest.h>
 

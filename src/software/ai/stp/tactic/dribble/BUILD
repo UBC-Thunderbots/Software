@@ -18,8 +18,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:time_to_travel",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/stp/tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
         "//software/logger",
     ],
 )

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
+#include "software/ai/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
 #include <Tracy.hpp>
 #include <algorithm>

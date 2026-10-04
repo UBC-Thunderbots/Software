@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/play_fsm.hpp"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/tactic_base.hpp"
+#include "software/ai/stp/play/play_fsm.hpp"
+#include "software/ai/stp/tactic/goalie/goalie_tactic.h"
+#include "software/ai/stp/tactic/tactic_base.hpp"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects

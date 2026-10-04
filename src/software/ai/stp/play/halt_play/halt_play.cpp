@@ -1,6 +1,6 @@
-#include "software/ai/hl/stp/play/halt_play/halt_play.h"
+#include "software/ai/stp/play/halt_play/halt_play.h"
 
-#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
+#include "software/ai/stp/tactic/halt/halt_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 HaltPlay::HaltPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

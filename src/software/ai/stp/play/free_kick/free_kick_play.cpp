@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
+#include "software/ai/stp/play/free_kick/free_kick_play.h"
 
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"

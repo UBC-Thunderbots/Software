@@ -2,9 +2,9 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/play/assigned_tactics_play.h"
-#include "software/ai/hl/stp/play/play_factory.h"
-#include "software/ai/hl/stp/tactic/tactic_factory.h"
+#include "software/ai/stp/play/assigned_tactics_play.h"
+#include "software/ai/stp/play/play_factory.h"
+#include "software/ai/stp/tactic/tactic_factory.h"
 #include "software/multithreading/thread_safe_buffer.hpp"
 
 ThreadedAi::ThreadedAi(const TbotsProto::AiConfig& ai_config)

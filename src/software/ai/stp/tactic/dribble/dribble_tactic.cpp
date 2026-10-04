@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/stp/tactic/dribble/dribble_tactic.h"
 
 #include <algorithm>
 

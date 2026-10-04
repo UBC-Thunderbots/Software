@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/stp/tactic/tactic_visitor.h"
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
  * This can be thought of as a "position" on a typical soccer team. Some examples are:

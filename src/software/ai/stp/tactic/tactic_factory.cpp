@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/tactic_factory.h"
+#include "software/ai/stp/tactic/tactic_factory.h"
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"

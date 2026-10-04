@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
+#include "software/ai/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
 PenaltyKickTactic::PenaltyKickTactic(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

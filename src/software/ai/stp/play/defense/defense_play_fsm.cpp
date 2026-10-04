@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/defense/defense_play_fsm.h"
+#include "software/ai/stp/play/defense/defense_play_fsm.h"
 
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"

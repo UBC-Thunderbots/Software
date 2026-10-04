@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/assigned_tactics_play.h"
+#include "software/ai/stp/play/assigned_tactics_play.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

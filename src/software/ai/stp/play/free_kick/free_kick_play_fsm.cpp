@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h"
+#include "software/ai/stp/play/free_kick/free_kick_play_fsm.h"
 
 FreeKickPlayFSM::FreeKickPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
+#include "software/ai/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
 
 #include "software/util/generic_factory/generic_factory.h"
 

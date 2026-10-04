@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "shared/robot_constants.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
-#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/stop_primitive.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
 

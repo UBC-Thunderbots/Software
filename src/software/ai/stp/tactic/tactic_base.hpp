@@ -2,11 +2,11 @@
 
 #include <Tracy.hpp>
 
-#include "software/ai/hl/stp/tactic/primitive.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/hl/stp/tactic/tactic_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/transition_conditions.h"
+#include "software/ai/stp/tactic/primitive.h"
+#include "software/ai/stp/tactic/tactic.h"
+#include "software/ai/stp/tactic/tactic_fsm.h"
+#include "software/ai/stp/tactic/tactic_visitor.h"
+#include "software/ai/stp/tactic/transition_conditions.h"
 #include "software/world/world.h"
 
 /**

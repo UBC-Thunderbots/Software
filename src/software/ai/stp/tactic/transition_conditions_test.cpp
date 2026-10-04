@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/transition_conditions.h"
+#include "software/ai/stp/tactic/transition_conditions.h"
 
 #include <gtest/gtest.h>
 

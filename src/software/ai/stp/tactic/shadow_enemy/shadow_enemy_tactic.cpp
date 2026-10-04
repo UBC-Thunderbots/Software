@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
+#include "software/ai/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

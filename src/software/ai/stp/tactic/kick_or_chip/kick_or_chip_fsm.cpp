@@ -1,7 +1,7 @@
-#include "software/ai/hl/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
+#include "software/ai/stp/tactic/kick_or_chip/kick_or_chip_fsm.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/stp/tactic/move_primitive.h"
 
 KickOrChipFSM::KickOrChipFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : TacticFSM<KickOrChipFSM>(ai_config_ptr)

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
+#include "software/ai/stp/play/offense/offense_play_fsm.h"
 
 OffensePlayFSM::OffensePlayFSM(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayFSM<OffensePlayFSM>(ai_config_ptr),

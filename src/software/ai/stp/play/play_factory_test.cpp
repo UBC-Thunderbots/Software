@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/stp/play/play_factory.h"
 
 #include <gtest/gtest.h>
 

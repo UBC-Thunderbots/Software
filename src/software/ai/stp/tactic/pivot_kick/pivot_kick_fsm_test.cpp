@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
+#include "software/ai/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 
 #include <gtest/gtest.h>
 
