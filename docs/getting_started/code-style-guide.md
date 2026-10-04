@@ -191,7 +191,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
   #include "tactic.h"
 
   // Correct
-  #include "software/ai/hl/stp/tactic/tactic.h"
+  #include "software/ai/stp/tactic/tactic.h"
   ```
 
 ### Namespaces
