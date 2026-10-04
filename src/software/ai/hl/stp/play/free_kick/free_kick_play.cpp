@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
 
 #include "shared/constants.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<FreeKickPlayFSM>(ai_config_ptr, true)

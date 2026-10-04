@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/example/example_play.h"
 
 #include "shared/constants.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 ExamplePlay::ExamplePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<ExamplePlayFSM>(ai_config_ptr, false)

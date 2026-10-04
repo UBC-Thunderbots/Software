@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 DefensePlay::DefensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<DefensePlayFSM>(ai_config_ptr, true)
