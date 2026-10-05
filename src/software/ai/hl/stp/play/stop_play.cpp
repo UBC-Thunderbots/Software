@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 StopPlay::StopPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<StopPlayFSM>(ai_config_ptr, true)

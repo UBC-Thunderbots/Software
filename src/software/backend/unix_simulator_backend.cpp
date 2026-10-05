@@ -10,7 +10,7 @@
 #include "software/constants.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/subject.hpp"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 UnixSimulatorBackend::UnixSimulatorBackend(
     std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger)

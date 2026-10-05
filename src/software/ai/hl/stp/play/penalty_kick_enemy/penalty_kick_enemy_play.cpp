@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 
 #include "shared/constants.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

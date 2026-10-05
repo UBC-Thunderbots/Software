@@ -4,7 +4,7 @@
 #include "shared/constants.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 AssignedTacticsPlay::AssignedTacticsPlay(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
