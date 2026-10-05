@@ -159,7 +159,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
                       -//software:unix_full_system_tar_gen"""
     elif config.action == ActionArgument.build:
         query = config.search_query
-        if query.startswith("//..."):
+        if query.startswith("//"):
             target = query
         else:
             target = fuzzy_find_target(config.action, query, config.interactive_search)
