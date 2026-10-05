@@ -81,7 +81,6 @@ jobs:
             -//software/gameplay_tests/...         \
             -//software/ai/stp/...                   \
             -//software/embedded/...                \
-            -//toolchains/cc/...                    \
             -//software:unix_full_system_tar_gen
 
       - name: Raspberry Pi Build Test
@@ -123,7 +122,6 @@ jobs:
             -//software/gameplay_tests/...  \
             -//software/ai/stp/...            \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...             \
             -//software:unix_full_system_tar_gen
 
   robot-tests:

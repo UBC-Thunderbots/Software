@@ -1,0 +1,14 @@
+# tbots.py
+iterfzf==1.9.0.67.0
+python-levenshtein==0.25.1
+questionary==2.1.1
+thefuzz==0.19.0
+typer==0.21.0
+
+# lint_and_format.sh
+ansible-lint==26.4.0
+md-toc==9.0.0
+ruff==0.5.5
+
+# (ubuntu installs platformio through different means)
+platformio==6.1.18; sys_platform == 'darwin'
