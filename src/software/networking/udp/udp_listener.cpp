@@ -95,7 +95,6 @@ void UdpListener::setupMulticast(boost::asio::ip::udp::socket& socket,
 
 UdpListener::~UdpListener()
 {
-    // Non-blocking cleanup; the threaded wrapper drains via close() before this runs.
     requestStop();
 }
 
@@ -134,9 +133,6 @@ void UdpListener::requestStop()
 
 void UdpListener::startListen(const std::shared_ptr<ReceiveState>& state)
 {
-    // Start listening for data asynchronously.
-    // See here for a great explanation about asynchronous operations:
-    // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
     state->receive_in_flight.store(true);
     state->socket.async_receive_from(
         boost::asio::buffer(state->raw_received_data, MAX_BUFFER_LENGTH),
@@ -155,8 +151,6 @@ void UdpListener::handleDataReception(const std::shared_ptr<ReceiveState>& state
 {
     if (state->stopping)
     {
-        // Closed while this receive was outstanding; do not invoke the callback or
-        // re-arm.
         maybeSignalShutdown(state);
         return;
     }

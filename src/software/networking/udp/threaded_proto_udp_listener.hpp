@@ -59,27 +59,16 @@ class ThreadedProtoUdpListener
                              std::function<void(ReceiveProtoT)> receive_callback);
 
     /**
-     * Closes this listener's socket without stopping the shared io_context, and blocks
-     * until the listener has fully stopped: no user callback is running and no further
-     * callback will be invoked.
-     *
-     * This must be called from a thread other than the shared io_context worker thread.
-     * Calling it from the worker thread requests a stop without blocking, since waiting
-     * on the worker thread would deadlock.
+     * Closes the socket and waits until no callback is running or can start. Must be
+     * called outside the io_context worker thread; there it only requests a stop.
      */
     void close();
 
-    /**
-     * Destructor closes the socket and releases this listener's service ownership. It
-     * provides the same shutdown guarantee as close() and does not stop or join the
-     * shared io_context thread.
-     */
     ~ThreadedProtoUdpListener();
 
 
    private:
-    // Keeps the shared service alive while the UDP socket exists. The service owns the
-    // io_context and the single thread that runs it for all shared UDP objects.
+    // Keeps the shared worker alive for this listener.
     std::shared_ptr<ThreadedIoContext> io_context_;
     ProtoUdpListener<ReceiveProtoT> udp_listener_;
 };
@@ -116,8 +105,7 @@ void ThreadedProtoUdpListener<ReceiveProtoT>::close()
 {
     if (io_context_->isInWorkerThread())
     {
-        // A blocking close from the worker thread would wait on itself and deadlock.
-        // Current callers always close externally; request a stop without waiting.
+        // Waiting on the worker thread would deadlock.
         LOG(WARNING)
             << "ThreadedProtoUdpListener::close() called from the shared io_context "
                "worker thread; stopping without blocking. The shutdown guarantee is "

@@ -31,12 +31,6 @@ class ThreadedUdpSender
                       const std::string& ip_address, unsigned short port,
                       const std::string& interface, bool multicast);
 
-    /**
-     * Destructor releases this sender's ownership of the shared io_context.
-     *
-     * The shared ThreadedIoContext owns the io_context thread and is responsible
-     * for stopping and joining it after all UDP objects release their ownership.
-     */
     ~ThreadedUdpSender() = default;
 
     /**
@@ -64,9 +58,8 @@ class ThreadedUdpSender
     void sendString(const std::string& message, bool async = false);
 
    private:
-    // Keeps the shared service alive while the UDP socket exists.
+    // Keeps the shared context alive for this sender.
     std::shared_ptr<ThreadedIoContext> io_context_;
 
-    // The UdpSender that will be used to send data over the network
     UdpSender udp_sender_;
 };

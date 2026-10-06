@@ -56,8 +56,8 @@ class ProtoUdpListener
                      std::function<void(ReceiveProtoT&)> receive_callback);
 
     /**
-     * Closes the socket associated to the UDP listener and blocks until the listener is
-     * fully stopped. Must not be called from the io_context worker thread.
+     * Closes the listener and waits until no callback can run again. Must not be called
+     * from the io_context worker thread.
      */
     virtual void close();
 
@@ -66,9 +66,6 @@ class ProtoUdpListener
      */
     void requestStop();
 
-    /**
-     * Destructor
-     */
     virtual ~ProtoUdpListener();
 
    private:

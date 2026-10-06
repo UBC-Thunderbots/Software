@@ -60,8 +60,7 @@ class NetworkService
                    std::shared_ptr<ThreadedIoContext> io_context);
 
     /**
-     * Destructor. Stops and drains the receive listeners before the members their
-     * callbacks reference are destroyed.
+     * Drains listener callbacks before destroying the members they may access.
      */
     ~NetworkService();
 
@@ -174,7 +173,6 @@ class NetworkService
     std::mutex fullsystem_ip_mutex;
     std::optional<std::string> fullsystem_ip;
 
-    // Services all UDP sockets owned by this NetworkService on one thread.
     std::shared_ptr<ThreadedIoContext> io_context_;
 
     // Mutex protects the robot status sender

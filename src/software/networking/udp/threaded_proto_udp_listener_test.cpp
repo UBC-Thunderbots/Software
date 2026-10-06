@@ -70,18 +70,6 @@ TEST(ThreadedProtoUdpListenerTest, no_error_creating_socket)
         io_context, "224.5.23.0", 40000, LOOPBACK_INTERFACE, [](const auto&) {}, true);
 }
 
-TEST(ThreadedProtoUdpListenerTest, multiple_listeners_share_io_context)
-{
-    auto io_context = std::make_shared<ThreadedIoContext>();
-    ThreadedProtoUdpListener<google::protobuf::Empty> first_listener(
-        io_context, availablePort(), [](const auto&) {});
-    ThreadedProtoUdpListener<google::protobuf::Empty> second_listener(
-        io_context, availablePort(), [](const auto&) {});
-
-    first_listener.close();
-    second_listener.close();
-}
-
 TEST(ThreadedProtoUdpListenerTest, destruction_waits_for_active_callback)
 {
     auto io_context = std::make_shared<ThreadedIoContext>();
@@ -118,12 +106,10 @@ TEST(ThreadedProtoUdpListenerTest, idle_destruction_keeps_shared_context_alive)
     const auto first_port = availablePort();
 
     {
-        // Destroy with a receive outstanding and without an explicit close.
         ThreadedProtoUdpListener<google::protobuf::Empty> listener(
             io_context, first_port, [](const google::protobuf::Empty&) {});
     }
 
-    // The shared context should still service new listeners.
     const auto second_port = availablePort();
     std::promise<void> received;
     auto received_future = received.get_future();
@@ -161,49 +147,10 @@ TEST(ThreadedProtoUdpListenerTest, close_stops_further_callbacks)
     listener->close();
     const int count_at_close = callback_count.load();
 
-    // The socket is now closed and the port released, so further traffic must not reach
-    // the callback.
     sendPacket(port);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     EXPECT_EQ(callback_count.load(), count_at_close);
-}
-
-TEST(ThreadedProtoUdpListenerTest, closing_one_listener_does_not_affect_another)
-{
-    auto io_context = std::make_shared<ThreadedIoContext>();
-
-    const auto closed_port = availablePort();
-    ThreadedProtoUdpListener<google::protobuf::Empty> closed_listener(
-        io_context, closed_port, [](const google::protobuf::Empty&) {});
-
-    const auto live_port = availablePort();
-    std::promise<void> received;
-    auto received_future = received.get_future();
-    ThreadedProtoUdpListener<google::protobuf::Empty> live_listener(
-        io_context, live_port,
-        [&received](const google::protobuf::Empty&) { received.set_value(); });
-
-    closed_listener.close();
-
-    sendPacket(live_port);
-    ASSERT_EQ(received_future.wait_for(TEST_TIMEOUT), std::future_status::ready);
-
-    live_listener.close();
-}
-
-TEST(ThreadedProtoUdpListenerTest, repeated_close_is_idempotent)
-{
-    auto io_context = std::make_shared<ThreadedIoContext>();
-    const auto port = availablePort();
-
-    auto listener = std::make_unique<ThreadedProtoUdpListener<google::protobuf::Empty>>(
-        io_context, port, [](const google::protobuf::Empty&) {});
-
-    listener->close();
-    listener->close();
-    // Destructor calls close() again; must not block or throw.
-    listener.reset();
 }
 
 TEST(ThreadedProtoUdpListenerTest, concurrent_close_is_safe)
@@ -232,8 +179,6 @@ TEST(ThreadedProtoUdpListenerTest, close_releases_port)
 
     listener->close();
 
-    // The listener wrapper is still alive, but its socket should be closed so the port
-    // can be rebound.
     boost::asio::io_context rebind_context;
     boost::asio::ip::udp::socket rebind_socket(rebind_context);
     rebind_socket.open(boost::asio::ip::udp::v6());

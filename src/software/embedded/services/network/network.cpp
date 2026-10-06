@@ -54,8 +54,6 @@ NetworkService::NetworkService(const NetworkConfig& config,
 
 NetworkService::~NetworkService()
 {
-    // Drain the receive listeners before the members their callbacks access are
-    // destroyed.
     if (udp_listener_primitive)
     {
         udp_listener_primitive->close();

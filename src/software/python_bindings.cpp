@@ -91,9 +91,7 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     using Class              = ThreadedProtoUdpListener<T>;
     std::string pyclass_name = name + "ProtoListener";
 
-    // Custom deleter that closes the listener without holding the GIL (so the shared
-    // io_context worker can acquire it to finish any in-flight Python callback), then
-    // reacquires the GIL before destroying Python-owned callback members.
+    // Release the GIL while close waits for callbacks that may need it.
     auto deleter = [](Class* self)
     {
         {
