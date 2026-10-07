@@ -1,6 +1,6 @@
 #include "software/ai/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
 
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 EnemyBallPlacementPlay::EnemyBallPlacementPlay(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

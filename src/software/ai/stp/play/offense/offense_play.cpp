@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 OffensePlay::OffensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)
     : PlayBase<OffensePlayFSM>(ai_config_ptr, true)

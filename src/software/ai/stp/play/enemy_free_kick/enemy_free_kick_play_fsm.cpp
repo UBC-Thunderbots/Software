@@ -8,7 +8,7 @@
 #include "software/ai/stp/tactic/move/move_tactic.h"
 #include "software/ai/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr)

@@ -16,7 +16,7 @@
 
 # Robot Software Diagram
 
-![Robot Software Diagram](images/robot_software_diagram.svg)
+![Robot Software Diagram](/docs/images/robot_software_diagram.svg)
 
 # Tools
 
