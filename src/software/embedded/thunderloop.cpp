@@ -278,7 +278,8 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_stat
     }
     if (robot_status.has_motor_status())
     {
-        const Vector velocity = createVector(robot_status.motor_status().local_velocity());
+        const Vector velocity =
+            createVector(robot_status.motor_status().local_velocity());
         const AngularVelocity angular_velocity =
             createAngularVelocity(robot_status.motor_status().angular_velocity());
         robot_localizer_->update(RobotLocalizer::MotorData{velocity, angular_velocity});
