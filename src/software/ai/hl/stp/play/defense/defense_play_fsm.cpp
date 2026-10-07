@@ -65,8 +65,7 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
     auto defender_assignment_config =
         ai_config_ptr->defense_play_config().defender_assignment_config();
     auto assignments = getAllDefenderAssignments(
-        enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
-        defender_assignment_config);
+        enemy_threats, event.common.world_ptr->field(), defender_assignment_config);
     if (assignments.size() == 0)
     {
         return;

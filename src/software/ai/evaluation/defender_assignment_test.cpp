@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/test_util/test_util.h"
@@ -27,8 +29,7 @@ TEST_F(GetAllDefenderAssignmentsTest, no_threats)
     auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
                                       world->enemyTeam(), world->ball(), false);
 
-    auto assignments =
-        getAllDefenderAssignments(threats, world->field(), world->ball(), config);
+    auto assignments = getAllDefenderAssignments(threats, world->field(), config);
 
     // Make sure we got the correct number of assignments
     EXPECT_EQ(assignments.size(), 0);
@@ -48,16 +49,54 @@ TEST_F(GetAllDefenderAssignmentsTest, single_threat)
     auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
                                       world->enemyTeam(), world->ball(), false);
 
-    auto assignments =
-        getAllDefenderAssignments(threats, world->field(), world->ball(), config);
+    auto assignments = getAllDefenderAssignments(threats, world->field(), config);
 
     // Make sure we got the correct number of assignments
     EXPECT_EQ(assignments.size(), 1);
 
-    // Crease defenders should target ball, not the primary threat
+    // Crease defenders should target the threat itself, not the ball
     auto assignment = assignments[0];
     EXPECT_EQ(assignment.type, DefenderAssignmentType::CREASE_DEFENDER);
-    EXPECT_EQ(assignment.target, ball_position);
+    EXPECT_EQ(assignment.target, threat_position);
+}
+
+TEST_F(GetAllDefenderAssignmentsTest, every_threat_is_defended_from_its_own_position)
+{
+    auto world = TestUtil::createBlankTestingWorld();
+
+    // No enemy is near enough to the ball to have it, which is the usual case while we
+    // have possession. The first threat is then the enemy that would reach the ball
+    // first, which is not a position the ball is at
+    Robot first_threat  = Robot(0, Point(1, 1), Vector(), Angle::zero(),
+                                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot second_threat = Robot(1, Point(2, 0), Vector(), Angle::zero(),
+                                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    std::vector<EnemyThreat> threats = {
+        EnemyThreat{first_threat, false, Angle::fromDegrees(30), Angle::fromDegrees(30),
+                    Point(-4.5, 0), 0, std::nullopt},
+        EnemyThreat{second_threat, false, Angle::fromDegrees(20), Angle::fromDegrees(20),
+                    Point(-4.5, 0), 1, first_threat},
+    };
+
+    auto assignments = getAllDefenderAssignments(threats, world->field(), config);
+
+    std::vector<Point> crease_targets;
+    for (const auto& assignment : assignments)
+    {
+        if (assignment.type == DefenderAssignmentType::CREASE_DEFENDER)
+        {
+            crease_targets.emplace_back(assignment.target);
+        }
+    }
+
+    // Each threat gets a goal lane starting at its own position, including the first one
+    EXPECT_NE(
+        std::find(crease_targets.begin(), crease_targets.end(), first_threat.position()),
+        crease_targets.end());
+    EXPECT_NE(
+        std::find(crease_targets.begin(), crease_targets.end(), second_threat.position()),
+        crease_targets.end());
 }
 
 TEST_F(FilterOutSimilarThreatsTest, no_similar_threats)

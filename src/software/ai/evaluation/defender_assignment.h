@@ -80,14 +80,13 @@ struct GoalLane : ShootingLane
  * @param threats all enemy threats to consider in determining defender assignments,
  * in order of decreasing threat
  * @param field the field being played on
- * @param ball the ball
  * @param config the DefenderAssignmentConfig used for tuning assignments
  *
  * @return a list of all possible defender assignments in order of decreasing
  * coverage rating
  */
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat>& threats, const Field& field, const Ball& ball,
+    const std::vector<EnemyThreat>& threats, const Field& field,
     const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig& config);
 
 /**
