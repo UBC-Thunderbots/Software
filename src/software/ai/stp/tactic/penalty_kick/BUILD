@@ -1,0 +1,49 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "penalty_kick_tactic",
+    srcs = [
+        "penalty_kick_fsm.cpp",
+        "penalty_kick_tactic.cpp",
+    ],
+    hdrs = [
+        "penalty_kick_fsm.h",
+        "penalty_kick_tactic.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/stp/tactic",
+        "//software/ai/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/stp/tactic/kick_or_chip:kick_or_chip_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/geom/algorithms",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "penalty_kick_fsm_test",
+    srcs = ["penalty_kick_fsm_test.cpp"],
+    deps = [
+        ":penalty_kick_tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+py_test(
+    name = "penalty_kick_tactic_test",
+    srcs = ["penalty_kick_tactic_test.py"],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

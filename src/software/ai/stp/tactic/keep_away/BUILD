@@ -1,0 +1,17 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "keep_away_tactic",
+    srcs = [
+        "keep_away_fsm.cpp",
+    ],
+    hdrs = [
+        "keep_away_fsm.h",
+    ],
+    deps = [
+        "//software/ai/evaluation:keep_away",
+        "//software/ai/stp/tactic/dribble:dribble_tactic",
+    ],
+)

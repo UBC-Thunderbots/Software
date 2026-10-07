@@ -1,6 +1,6 @@
 #include "software/ai/motion_constraint/motion_constraint_visitor.h"
 
-#include "software/ai/hl/stp/tactic/all_tactics.h"
+#include "software/ai/stp/tactic/all_tactics.h"
 
 void MotionConstraintVisitor::visit(const GoalieTactic& tactic)
 {

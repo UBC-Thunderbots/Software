@@ -2,7 +2,7 @@
 
 #include <Tracy.hpp>
 
-#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/stp/play/play_factory.h"
 #include "software/tracy/tracy_constants.h"
 
 

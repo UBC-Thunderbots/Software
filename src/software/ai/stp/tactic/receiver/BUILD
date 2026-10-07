@@ -1,0 +1,48 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "receiver_tactic",
+    srcs = [
+        "receiver_fsm.cpp",
+        "receiver_tactic.cpp",
+    ],
+    hdrs = [
+        "receiver_fsm.h",
+        "receiver_tactic.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/passing:pass",
+        "//software/ai/stp/tactic",
+        "//software/ai/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/logger",
+        "//software/world:ball",
+    ],
+)
+
+cc_test(
+    name = "receiver_fsm_test",
+    srcs = ["receiver_fsm_test.cpp"],
+    deps = [
+        ":receiver_tactic",
+        "//software/test_util",
+        "@googletest//:gtest_main",
+    ],
+)
+
+py_test(
+    name = "receiver_tactic_test",
+    srcs = ["receiver_tactic_test.py"],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

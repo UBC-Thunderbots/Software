@@ -1,0 +1,76 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+# We force linking for all plays so that the static variables required for the
+# "factory" design pattern to work are linked in
+# https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+
+cc_library(
+    name = "defense_play",
+    srcs = [
+        "defense_play.cpp",
+        "defense_play_fsm.cpp",
+    ],
+    hdrs = [
+        "defense_play.h",
+        "defense_play_fsm.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:defender_assignment",
+        "//software/ai/stp/play",
+        "//software/ai/stp/play/defense:defense_play_base",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/pass_defender:pass_defender_tactic",
+        "//software/ai/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+        "@sml",
+    ],
+    alwayslink = True,
+)
+
+py_test(
+    name = "defense_play_test",
+    srcs = [
+        "defense_play_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
+
+cc_test(
+    name = "defense_play_fsm_test",
+    srcs = ["defense_play_fsm_test.cpp"],
+    deps = [
+        ":defense_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "defense_play_base",
+    srcs = [
+        "defense_play_base.cpp",
+    ],
+    hdrs = [
+        "defense_play_base.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:defender_assignment",
+        "//software/ai/stp/play",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/pass_defender:pass_defender_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+    ],
+)
