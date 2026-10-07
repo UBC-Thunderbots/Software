@@ -65,7 +65,7 @@ void RobotLocalizer::update(const VisionData& data)
     }
 
     // If rollback point is at the end, vision is older than all history steps
-    // So rollback ever step
+    // So rollback every step
     if (rollback_point == history.end())
     {
         rollback_point = std::prev(history.end());
@@ -218,7 +218,6 @@ RobotState RobotLocalizer::getRobotState() const
                       getAngularVelocity());
 }
 
-// TODO: Investigate process models/variances/etc
 void RobotLocalizer::updateFilterPredictionMatrices(double delta_time_seconds)
 {
     // Velocity is estimated in the robot's local frame (see StateIndex), but position
