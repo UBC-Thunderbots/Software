@@ -2,10 +2,10 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/passing/pass.h"
 #include "software/ai/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/stp/tactic/move/move_fsm.h"
 #include "software/ai/stp/tactic/tactic_base.hpp"
-#include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 

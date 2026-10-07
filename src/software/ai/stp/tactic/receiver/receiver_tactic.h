@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/evaluation/shot.h"
+#include "software/ai/passing/pass.h"
 #include "software/ai/stp/tactic/receiver/receiver_fsm.h"
 #include "software/ai/stp/tactic/tactic_base.hpp"
-#include "software/ai/passing/pass.h"
 #include "software/geom/ray.h"
 
 /**

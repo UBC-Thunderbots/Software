@@ -1,8 +1,8 @@
 #pragma once
 
+#include "software/ai/passing/pass.h"
 #include "software/ai/stp/tactic/attacker/attacker_fsm.h"
 #include "software/ai/stp/tactic/tactic_base.hpp"
-#include "software/ai/passing/pass.h"
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with

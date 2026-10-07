@@ -3,10 +3,10 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
+#include "software/ai/passing/pass.h"
 #include "software/ai/stp/tactic/keep_away/keep_away_fsm.h"
 #include "software/ai/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/stp/tactic/tactic_base.hpp"
-#include "software/ai/passing/pass.h"
 
 struct AttackerFSM : TacticFSM<AttackerFSM>
 {

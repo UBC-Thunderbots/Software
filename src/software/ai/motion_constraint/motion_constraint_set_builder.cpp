@@ -1,7 +1,7 @@
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 
-#include "software/ai/stp/tactic/all_tactics.h"
 #include "software/ai/motion_constraint/motion_constraint_visitor.h"
+#include "software/ai/stp/tactic/all_tactics.h"
 
 std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
     const GameState& game_state, const Tactic& tactic)

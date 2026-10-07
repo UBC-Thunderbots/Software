@@ -2,14 +2,14 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/stp/play/play_fsm.hpp"
-#include "software/ai/stp/tactic/attacker/attacker_tactic.h"
-#include "software/ai/stp/tactic/move/move_tactic.h"
-#include "software/ai/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/receiver_position_generator.hpp"
+#include "software/ai/stp/play/play_fsm.hpp"
+#include "software/ai/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/stp/tactic/move/move_tactic.h"
+#include "software/ai/stp/tactic/receiver/receiver_tactic.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
