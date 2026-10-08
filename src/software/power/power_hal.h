@@ -3,9 +3,7 @@
 #include <cstdint>
 
 /**
- * An abstract interface for the power board hardware. Decouples the power
- * state machine from the underlying hardware so it can be driven by either
- * the ESP32 firmware or a host-side simulation.
+ * An abstract interface for the power board hardware.
  */
 class PowerHAL
 {
@@ -28,16 +26,12 @@ class PowerHAL
 
     // Chicker break beam
     /**
-     * Returns whether the break beam has been tripped.
-     *
      * @return true if the break beam is tripped, false otherwise
      */
     virtual bool getBreakBeamTripped() = 0;
 
     // Dribbler
     /**
-     * Sets the target dribbler speed.
-     *
      * @param speed_rpm target dribbler speed in RPM
      */
     virtual void setDribblerSpeed(uint32_t speed_rpm) = 0;
@@ -56,24 +50,18 @@ class PowerHAL
     /**
      * Updates the capacitor charger and recharges if necessary.
      */
-    virtual void updateCharger()        = 0;
+    virtual void updateCharger() = 0;
     /**
-     * Returns the capacitor voltage.
-     *
      * @return the capacitor voltage in volts
      */
     virtual float getCapacitorVoltage() = 0;
 
     // Power monitor
     /**
-     * Returns the battery voltage.
-     *
      * @return the battery voltage in volts
      */
     virtual float getBatteryVoltage() = 0;
     /**
-     * Returns the current draw.
-     *
      * @return the current draw in amps
      */
     virtual float getCurrentDrawAmp() = 0;
