@@ -4,11 +4,11 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/network_utils.h"
 
-UdpListener::UdpListener(boost::asio::io_service& io_service,
+UdpListener::UdpListener(boost::asio::io_context& io_context,
                          const std::string& ip_address, unsigned short port,
                          const std::string& listen_interface, bool multicast,
                          ReceiveCallback receive_callback)
-    : running_(true), socket_(io_service), receive_callback_(receive_callback)
+    : running_(true), socket_(io_context), receive_callback_(receive_callback)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
     if (isIpv6(ip_address))
@@ -42,9 +42,9 @@ UdpListener::UdpListener(boost::asio::io_service& io_service,
     startListen();
 }
 
-UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned short port,
+UdpListener::UdpListener(boost::asio::io_context& io_context, const unsigned short port,
                          ReceiveCallback receive_callback)
-    : running_(true), socket_(io_service), receive_callback_(receive_callback)
+    : running_(true), socket_(io_context), receive_callback_(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
     socket_.open(listen_endpoint.protocol());
@@ -94,13 +94,22 @@ UdpListener::~UdpListener() {}
 
 void UdpListener::close()
 {
-    running_ = false;
+    {
+        std::scoped_lock lock(state_mutex_);
+        if (!running_)
+        {
+            return;
+        }
+        running_ = false;
+    }
 
     // Shutdown both the read and write on the socket
     boost::system::error_code error;
     socket_.shutdown(boost::asio::ip::udp::socket::shutdown_both, error);
 
-    if (error)
+    // UDP sockets do not need a connected peer, so shutdown can report
+    // not_connected during normal cleanup. Only log unexpected errors.
+    if (error && error != boost::asio::error::not_connected)
     {
         LOG(WARNING)
             << "An unknown network error occurred when attempting to close UDP socket. The boost system error is: "
@@ -123,9 +132,12 @@ void UdpListener::startListen()
 void UdpListener::handleDataReception(const boost::system::error_code& error,
                                       std::size_t num_bytes_received)
 {
-    if (!running_)
     {
-        return;
+        std::scoped_lock lock(state_mutex_);
+        if (!running_)
+        {
+            return;
+        }
     }
 
     if (!error)
@@ -148,5 +160,11 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
     }
 
     // Start listening for more data
-    startListen();
+    {
+        std::scoped_lock lock(state_mutex_);
+        if (running_)
+        {
+            startListen();
+        }
+    }
 }

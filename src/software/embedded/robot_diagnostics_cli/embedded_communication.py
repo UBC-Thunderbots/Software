@@ -30,6 +30,7 @@ class EmbeddedCommunication:
         self.embedded_data = EmbeddedData()
         self.channel_id = int(self.embedded_data.get_channel_id())
         self.robot_id = int(self.embedded_data.get_robot_id())
+        self.io_context = tbots_cpp.ThreadedIoContext()
 
         self.sequence_number = 0
         self.command_duration_seconds = 2.0
@@ -37,6 +38,7 @@ class EmbeddedCommunication:
 
         # Localhost IP Broadcaster
         self.fullsystem_ip_broadcaster = tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
+            self.io_context,
             getRobotMulticastChannel(int(self.embedded_data.get_channel_id())),
             FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
             self.embedded_data.get_network_interface(),
@@ -155,11 +157,12 @@ class EmbeddedCommunication:
 
         # Unicast Receiver
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
-            ROBOT_STATUS_PORT, self.__receive_robot_status
+            self.io_context, ROBOT_STATUS_PORT, self.__receive_robot_status
         )
 
         # Unicast Sender
         self.primitive_sender = tbots_cpp.PrimitiveProtoUdpSender(
+            self.io_context,
             EmbeddedCommunication.LOCALHOST_IP,
             PRIMITIVE_PORT,
             self.embedded_data.get_network_interface(),

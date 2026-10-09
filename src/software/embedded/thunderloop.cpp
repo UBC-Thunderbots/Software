@@ -70,8 +70,9 @@ extern "C" void tbotsExit(const int signal_num)
     crash_msg.set_exit_signal(g3::signalToStr(signal_num));
     *(crash_msg.mutable_status()) = *crash_context.robot_status;
 
-    auto sender = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(crash_context.channel_id)),
+    auto io_context = std::make_shared<ThreadedIoContext>();
+    auto sender     = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
+        io_context, std::string(ROBOT_MULTICAST_CHANNELS.at(crash_context.channel_id)),
         ROBOT_CRASH_PORT, crash_context.network_interface, true);
     sender.sendProto(crash_msg);
     std::cerr << "Broadcasting robot crash msg";
