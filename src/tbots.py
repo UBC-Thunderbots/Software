@@ -150,9 +150,11 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         target = """-- //...                              \\
                       -//software/gameplay_tests/...      \\
                       -//software:unix_full_system_tar_gen"""
+    elif config.exact_match_only:
+        target = config.search_query
     elif config.action == ActionArgument.build:
         query = config.search_query
-        if query.startswith("//") or config.exact_match_only:
+        if query.startswith("//"):
             target = query
         else:
             target = fuzzy_find_target(config.action, query, config.interactive_search)
