@@ -1,11 +1,8 @@
 #!/opt/tbotspython/bin/python3
 
-import itertools
 import os
 import sys
-from subprocess import PIPE, run
 
-import iterfzf
 from cli.cli_params import (
     ActionArgument,
     AnsiblePlaybook,
@@ -28,11 +25,8 @@ from cli.cli_params import (
     TestSuiteOption,
     TracyOption,
 )
-from thefuzz import process
+from cli.fuzzy_target import fuzzy_find_target
 from typer import Argument, Context, Typer
-
-THEFUZZ_MATCH_RATIO_THRESHOLD = 50
-NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 app = Typer()
 
@@ -156,6 +150,8 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         target = """-- //...                              \\
                       -//software/gameplay_tests/...      \\
                       -//software:unix_full_system_tar_gen"""
+    elif config.exact_match_only:
+        target = config.search_query
     elif config.action == ActionArgument.build:
         query = config.search_query
         if query.startswith("//"):
@@ -269,60 +265,6 @@ def execute_command(command: list[str], print_only: bool = False):
         print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{cmd_str}\n\n{'=' * 81}\n")
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
-
-
-def fuzzy_find_target(
-    action: ActionArgument, search_query: str, interactive_search: bool
-) -> str:
-    """Resolve a search query to a concrete Bazel target via fuzzy matching.
-
-    Queries Bazel for the candidate targets relevant to the action (tests,
-    binaries, and/or libraries) and fuzzy-matches the search query against
-    their names. If interactive search is requested, or the best match falls
-    below the confidence threshold, the user picks from the top matches via an
-    fzf prompt; otherwise the best match is used directly.
-
-    :param action: the Bazel action, which determines the candidate target kinds
-    :param search_query: the query to match against target names
-    :param interactive_search: force the interactive fzf picker
-    :return: the fully-qualified Bazel target label
-    """
-    test_query = ["bazel", "query", "tests(//...)"]
-    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
-    library_query = ["bazel", "query", "kind(.*_library,//...)"]
-
-    bazel_queries = {
-        ActionArgument.test: [test_query],
-        ActionArgument.run: [test_query, binary_query],
-        ActionArgument.build: [library_query, test_query, binary_query],
-    }
-
-    targets = list(
-        itertools.chain.from_iterable(
-            run(q, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
-            for q in bazel_queries[action]
-        )
-    )
-    target_dict = {target.split(b":")[-1]: target for target in targets}
-
-    most_similar_target_name, confidence = process.extract(
-        search_query, list(target_dict.keys()), limit=1
-    )[0]
-    target = str(target_dict[most_similar_target_name], encoding="utf-8")
-
-    if interactive_search or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
-        filtered = process.extract(
-            search_query, list(target_dict.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
-        )
-        selected_name = iterfzf.iterfzf(iter([name for name, _ in filtered]))
-        if selected_name is None:
-            print("Cancelled.")
-            sys.exit(0)
-        target = target_dict[selected_name].decode("utf-8")
-    else:
-        print(f"Found target {target} (confidence {confidence})")
-
-    return target
 
 
 if __name__ == "__main__":

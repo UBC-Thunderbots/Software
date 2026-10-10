@@ -5,14 +5,10 @@ from enum import Enum
 from typing import Annotated
 
 import questionary
+from cli.action_argument import ActionArgument
+from cli.fuzzy_target import fuzzy_find_target
 from cli.multi_option import MultiOption
 from typer import Argument, Option
-
-
-class ActionArgument(str, Enum):
-    build = "build"
-    test = "test"
-    run = "run"
 
 
 class DebugBinary(str, Enum):
@@ -111,6 +107,7 @@ AnsiblePlaybook = Annotated[
 class BuildConfig:
     action: ActionArgument
     search_query: str | None = None
+    exact_match_only: bool = False
     no_optimized_build: bool = False
     debug_build: bool = False
     select_debug_binaries: list | None = None
@@ -209,7 +206,7 @@ class InteractiveCli:
         questionary.Choice(
             title="Build",
             value=("Build ", Category.BUILD),
-            description="Builds selected target after fuzzy search",
+            description="Build a target, Bazel pattern, or everything",
         ),
     ]
 
@@ -454,14 +451,30 @@ class InteractiveCli:
 
             case InteractiveCli.Category.TEST:
                 config.action = ActionArgument.test
-                test_name = questionary.text(
-                    "Enter test name (leave empty for entire suite)",
+                test_scope = questionary.select(
+                    "Which tests?",
+                    choices=[
+                        questionary.Choice(
+                            title="Specific test",
+                            value="one",
+                            description="Search for a test to run",
+                        ),
+                        questionary.Choice(
+                            title="All tests",
+                            value="all",
+                            description="Run the entire test suite",
+                        ),
+                    ],
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-                if not test_name:
+                if test_scope == "all":
                     config.test_suite = True
                 else:
-                    config.search_query = test_name
+                    config.search_query = fuzzy_find_target(
+                        ActionArgument.test, "", interactive_search=True
+                    )
+                    config.exact_match_only = True
+
                     runs_str = questionary.text(
                         "Number of times to run each test (leave empty for 1):",
                         style=InteractiveCli.INTERACTIVE_STYLE,
@@ -520,10 +533,45 @@ class InteractiveCli:
 
             case InteractiveCli.Category.BUILD:
                 config.action = ActionArgument.build
-                term_name = questionary.text(
-                    "Enter the target name or bazel pattern (leave empty to build //...): ",
+
+                build_scope = questionary.select(
+                    "What would you like to build?",
+                    choices=[
+                        questionary.Choice(
+                            title="Specific target",
+                            value="one",
+                            description="Search for a target to build",
+                        ),
+                        questionary.Choice(
+                            title="Bazel pattern",
+                            value="pattern",
+                            description="Build matching targets, e.g. //software/world/...",
+                        ),
+                        questionary.Choice(
+                            title="All",
+                            value="all",
+                            description="Build everything (//...)",
+                        ),
+                    ],
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
+                if build_scope == "all":
+                    term_name = "//..."
+                elif build_scope == "pattern":
+                    term_name = (
+                        questionary.text(
+                            "Enter Bazel pattern:",
+                            style=InteractiveCli.INTERACTIVE_STYLE,
+                            validate=lambda value: value.strip().startswith("//"),
+                        )
+                        .unsafe_ask()
+                        .strip()
+                    )
+                else:
+                    term_name = fuzzy_find_target(
+                        ActionArgument.build, "", interactive_search=True
+                    )
+                    config.exact_match_only = True
 
                 platform_label, robot_platform = questionary.select(
                     "Build for which platform?",
@@ -533,8 +581,7 @@ class InteractiveCli:
 
                 config.robot_platform = robot_platform
                 cmd_title += platform_label + " for "
-                config.search_query = term_name.strip() or "//..."
-                config.interactive_search = True
+                config.search_query = term_name
                 cmd_title += config.search_query
 
         return cmd_title, config, extra_args
