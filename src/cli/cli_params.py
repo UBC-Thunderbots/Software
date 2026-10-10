@@ -206,7 +206,7 @@ class InteractiveCli:
         questionary.Choice(
             title="Build",
             value=("Build ", Category.BUILD),
-            description="Builds selected target after fuzzy search",
+            description="Build a target, Bazel pattern, or everything",
         ),
     ]
 
@@ -343,27 +343,6 @@ class InteractiveCli:
         ),
     ]
 
-    class OneOrAllOption(str, Enum):
-        ALL = ("ALL",)
-        ONE = "ONE"
-
-    @staticmethod
-    def one_or_all_choices(
-        noun_being_selected: str, verb: str
-    ) -> list[questionary.Choice]:
-        return [
-            questionary.Choice(
-                title=f"Chose a single {noun_being_selected}",
-                value=InteractiveCli.OneOrAllOption.ONE,
-                description=f"Choose a specific {noun_being_selected} to {verb}",
-            ),
-            questionary.Choice(
-                title=f"All {noun_being_selected}s",
-                value=InteractiveCli.OneOrAllOption.ALL,
-                description=f"{verb} all {noun_being_selected}s",
-            ),
-        ]
-
     @staticmethod
     def load_history() -> list[str]:
         if not os.path.exists(InteractiveCli.HISTORY_FILE):
@@ -472,12 +451,23 @@ class InteractiveCli:
 
             case InteractiveCli.Category.TEST:
                 config.action = ActionArgument.test
-                one_or_all = questionary.select(
-                    "One or all?",
-                    choices=InteractiveCli.one_or_all_choices("test", "run"),
+                test_scope = questionary.select(
+                    "Which tests?",
+                    choices=[
+                        questionary.Choice(
+                            title="Specific test",
+                            value="one",
+                            description="Search for a test to run",
+                        ),
+                        questionary.Choice(
+                            title="All tests",
+                            value="all",
+                            description="Run the entire test suite",
+                        ),
+                    ],
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-                if one_or_all == InteractiveCli.OneOrAllOption.ALL:
+                if test_scope == "all":
                     config.test_suite = True
                 else:
                     config.search_query = fuzzy_find_target(
@@ -544,13 +534,39 @@ class InteractiveCli:
             case InteractiveCli.Category.BUILD:
                 config.action = ActionArgument.build
 
-                one_or_all = questionary.select(
-                    "One or all?",
-                    choices=InteractiveCli.one_or_all_choices("target", "build"),
+                build_scope = questionary.select(
+                    "What would you like to build?",
+                    choices=[
+                        questionary.Choice(
+                            title="Specific target",
+                            value="one",
+                            description="Search for a target to build",
+                        ),
+                        questionary.Choice(
+                            title="Bazel pattern",
+                            value="pattern",
+                            description="Build matching targets, e.g. //software/world/...",
+                        ),
+                        questionary.Choice(
+                            title="All",
+                            value="all",
+                            description="Build everything (//...)",
+                        ),
+                    ],
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-                if one_or_all == InteractiveCli.OneOrAllOption.ALL:
+                if build_scope == "all":
                     term_name = "//..."
+                elif build_scope == "pattern":
+                    term_name = (
+                        questionary.text(
+                            "Enter Bazel pattern:",
+                            style=InteractiveCli.INTERACTIVE_STYLE,
+                            validate=lambda value: value.strip().startswith("//"),
+                        )
+                        .unsafe_ask()
+                        .strip()
+                    )
                 else:
                     term_name = fuzzy_find_target(
                         ActionArgument.build, "", interactive_search=True
