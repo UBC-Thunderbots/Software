@@ -5,14 +5,10 @@ from enum import Enum
 from typing import Annotated
 
 import questionary
+from cli.action_argument import ActionArgument
+from cli.fuzzy_target import fuzzy_find_target
 from cli.multi_option import MultiOption
 from typer import Argument, Option
-
-
-class ActionArgument(str, Enum):
-    build = "build"
-    test = "test"
-    run = "run"
 
 
 class DebugBinary(str, Enum):
@@ -346,6 +342,25 @@ class InteractiveCli:
         ),
     ]
 
+    class OneOrAllOption(str, Enum):
+        ALL = "ALL",
+        ONE = "ONE"
+
+    @staticmethod
+    def one_or_all_choices(noun_being_selected: str, verb: str) -> list[questionary.Choice]:
+        return [
+            questionary.Choice(
+                title=f"Chose a single {noun_being_selected}",
+                value=InteractiveCli.OneOrAllOption.ONE,
+                description=f"Choose a specific {noun_being_selected} to {verb}"
+            ),
+            questionary.Choice(
+                title=f"All {noun_being_selected}s",
+                value=InteractiveCli.OneOrAllOption.ALL,
+                description=f"{verb} all {noun_being_selected}s"
+            )
+        ]
+
     @staticmethod
     def load_history() -> list[str]:
         if not os.path.exists(InteractiveCli.HISTORY_FILE):
@@ -454,14 +469,15 @@ class InteractiveCli:
 
             case InteractiveCli.Category.TEST:
                 config.action = ActionArgument.test
-                test_name = questionary.text(
-                    "Enter test name (leave empty for entire suite)",
+                one_or_all = questionary.select(
+                    "One or all?",
+                    choices=InteractiveCli.one_or_all_choices("test", "run"),
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
-                if not test_name:
+                if one_or_all == InteractiveCli.OneOrAllOption.ALL:
                     config.test_suite = True
                 else:
-                    config.search_query = test_name
+                    config.search_query = fuzzy_find_target(ActionArgument.test, "", interactive_search=True)
                     runs_str = questionary.text(
                         "Number of times to run each test (leave empty for 1):",
                         style=InteractiveCli.INTERACTIVE_STYLE,
@@ -520,10 +536,16 @@ class InteractiveCli:
 
             case InteractiveCli.Category.BUILD:
                 config.action = ActionArgument.build
-                term_name = questionary.text(
-                    "Enter the target name or bazel pattern (leave empty to build //...): ",
+
+                one_or_all = questionary.select(
+                    "One or all?",
+                    choices=InteractiveCli.one_or_all_choices("target", "build"),
                     style=InteractiveCli.INTERACTIVE_STYLE,
                 ).unsafe_ask()
+                if one_or_all == InteractiveCli.OneOrAllOption.ALL:
+                    term_name = "//..."
+                else:
+                    term_name = fuzzy_find_target(ActionArgument.build, "", interactive_search=True)
 
                 platform_label, robot_platform = questionary.select(
                     "Build for which platform?",
@@ -533,8 +555,7 @@ class InteractiveCli:
 
                 config.robot_platform = robot_platform
                 cmd_title += platform_label + " for "
-                config.search_query = term_name.strip() or "//..."
-                config.interactive_search = True
+                config.search_query = term_name
                 cmd_title += config.search_query
 
         return cmd_title, config, extra_args
