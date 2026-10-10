@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/stp/play/play.h"
 
 struct PlaySelectionFSM
 {

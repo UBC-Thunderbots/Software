@@ -1,0 +1,39 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "enemy_ball_placement_play",
+    srcs = [
+        "enemy_ball_placement_play.cpp",
+        "enemy_ball_placement_play_fsm.cpp",
+    ],
+    hdrs = [
+        "enemy_ball_placement_play.h",
+        "enemy_ball_placement_play_fsm.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/stp/play",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/util/generic_factory",
+        "//software/world:game_state",
+    ],
+    alwayslink = True,
+)
+
+py_test(
+    name = "enemy_ball_placement_play_test",
+    srcs = [
+        "enemy_ball_placement_play_test.py",
+    ],
+    flaky = True,
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

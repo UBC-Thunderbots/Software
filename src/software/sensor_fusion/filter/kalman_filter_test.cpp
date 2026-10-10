@@ -1,10 +1,9 @@
-#include "software/sensor_fusion/filter/kalman_filter.hpp"
-
 #include <gtest/gtest.h>
 
 #include <limits>
 
 #include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
+#include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 
 struct KalmanParamsMath
 {
@@ -42,7 +41,7 @@ class MathTests1D : public testing::TestWithParam<KalmanParamsMath>
     static constexpr int DimY = 1;
     static constexpr int DimU = 1;
 
-    KalmanFilter<DimX, DimY, DimU> filter{};
+    LinearKalmanFilter<DimX, DimY, DimU> filter{};
 
     Eigen::Matrix<double, DimU, 1> control_input;
     Eigen::Matrix<double, DimY, 1> measurement_input;
@@ -129,7 +128,7 @@ class BehaviourTests
     : public testing::TestWithParam<KalmanParamsBehaviour<DimX, DimY, DimU>>
 {
    protected:
-    KalmanFilter<DimX, DimY, DimU> filter{};
+    LinearKalmanFilter<DimX, DimY, DimU> filter{};
 
     Eigen::Vector<double, DimX> expected_state_estimate;
     Eigen::Matrix<double, DimX, DimX> expected_state_covariance;
@@ -315,9 +314,9 @@ TEST(ExtendedKalmanFilterTest, LinearProcessModelMatchesKalmanFilter)
     const Eigen::Matrix<double, 1, 2> measurement_model{{1.0, 0.0}};
     const Eigen::Matrix<double, 1, 1> measurement_covariance{0.5};
 
-    KalmanFilter<2, 1, 1> kalman_filter(initial_state, initial_state_covariance,
-                                        process_model, process_covariance, control_model,
-                                        measurement_model, measurement_covariance);
+    LinearKalmanFilter<2, 1, 1> kalman_filter(
+        initial_state, initial_state_covariance, process_model, process_covariance,
+        control_model, measurement_model, measurement_covariance);
 
     ExtendedKalmanFilter<2, 1, 1> extended_kalman_filter(
         initial_state, initial_state_covariance,

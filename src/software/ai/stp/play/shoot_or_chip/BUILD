@@ -1,0 +1,46 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "shoot_or_chip_play",
+    srcs = [
+        "shoot_or_chip_play.cpp",
+        "shoot_or_chip_play_fsm.cpp",
+    ],
+    hdrs = [
+        "shoot_or_chip_play.h",
+        "shoot_or_chip_play_fsm.h",
+    ],
+    deps = [
+        "//proto/message_translation:tbots_protobuf",
+        "//shared:constants",
+        "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
+        "//software/ai/evaluation:possession",
+        "//software/ai/stp/play",
+        "//software/ai/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/halt:halt_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/ai/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+        "//software/world:game_state",
+    ],
+    alwayslink = True,
+)
+
+py_test(
+    name = "shoot_or_chip_play_test",
+    srcs = [
+        "shoot_or_chip_play_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
