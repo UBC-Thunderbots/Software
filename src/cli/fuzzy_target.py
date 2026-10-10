@@ -1,11 +1,13 @@
 import itertools
-from subprocess import run, PIPE
+import sys
+from subprocess import PIPE, run
 
-from cli.cli_params import ActionArgument
 import iterfzf
+from cli.cli_params import ActionArgument
 from thefuzz import process
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 65
+
 
 def fuzzy_find_target(
     action: "ActionArgument", search_query: str, interactive_search: bool
@@ -51,9 +53,11 @@ def fuzzy_find_target(
     if interactive_search or too_vague_needs_selection:
         selected_name = iterfzf.iterfzf(
             target_names,
-            header="Search and select target" if interactive_search else "No match was strong enough, search and select target",
+            header="Search and select target"
+            if interactive_search
+            else "No match was strong enough, search and select target",
             prompt="Type to search > ",
-            query=search_query
+            query=search_query,
         )
         if selected_name is None:
             print("Cancelled.")

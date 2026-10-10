@@ -343,22 +343,24 @@ class InteractiveCli:
     ]
 
     class OneOrAllOption(str, Enum):
-        ALL = "ALL",
+        ALL = ("ALL",)
         ONE = "ONE"
 
     @staticmethod
-    def one_or_all_choices(noun_being_selected: str, verb: str) -> list[questionary.Choice]:
+    def one_or_all_choices(
+        noun_being_selected: str, verb: str
+    ) -> list[questionary.Choice]:
         return [
             questionary.Choice(
                 title=f"Chose a single {noun_being_selected}",
                 value=InteractiveCli.OneOrAllOption.ONE,
-                description=f"Choose a specific {noun_being_selected} to {verb}"
+                description=f"Choose a specific {noun_being_selected} to {verb}",
             ),
             questionary.Choice(
                 title=f"All {noun_being_selected}s",
                 value=InteractiveCli.OneOrAllOption.ALL,
-                description=f"{verb} all {noun_being_selected}s"
-            )
+                description=f"{verb} all {noun_being_selected}s",
+            ),
         ]
 
     @staticmethod
@@ -477,7 +479,9 @@ class InteractiveCli:
                 if one_or_all == InteractiveCli.OneOrAllOption.ALL:
                     config.test_suite = True
                 else:
-                    config.search_query = fuzzy_find_target(ActionArgument.test, "", interactive_search=True)
+                    config.search_query = fuzzy_find_target(
+                        ActionArgument.test, "", interactive_search=True
+                    )
                     runs_str = questionary.text(
                         "Number of times to run each test (leave empty for 1):",
                         style=InteractiveCli.INTERACTIVE_STYLE,
@@ -545,7 +549,9 @@ class InteractiveCli:
                 if one_or_all == InteractiveCli.OneOrAllOption.ALL:
                     term_name = "//..."
                 else:
-                    term_name = fuzzy_find_target(ActionArgument.build, "", interactive_search=True)
+                    term_name = fuzzy_find_target(
+                        ActionArgument.build, "", interactive_search=True
+                    )
 
                 platform_label, robot_platform = questionary.select(
                     "Build for which platform?",

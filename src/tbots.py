@@ -1,9 +1,7 @@
 #!/opt/tbotspython/bin/python3
 
-import itertools
 import os
 import sys
-from subprocess import run
 
 from cli.cli_params import (
     ActionArgument,
@@ -265,7 +263,6 @@ def execute_command(command: list[str], print_only: bool = False):
         print(f"\n{'=' * 33} Running: {'=' * 38}\n\n{cmd_str}\n\n{'=' * 81}\n")
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
-
 
 
 if __name__ == "__main__":
