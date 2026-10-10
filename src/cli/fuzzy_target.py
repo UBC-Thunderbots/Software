@@ -3,7 +3,7 @@ import sys
 from subprocess import PIPE, run
 
 import iterfzf
-from cli.cli_params import ActionArgument
+from cli.action_argument import ActionArgument
 from thefuzz import process
 
 THEFUZZ_MATCH_RATIO_THRESHOLD = 65
