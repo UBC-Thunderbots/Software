@@ -59,7 +59,7 @@ void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
     *ai_config_ptr    = config.ai_config();
     ai_control_config = config.ai_config().ai_control_config();
 
-    ai.updateAiConfig();
+    ai.markAiConfigUpdated();
 }
 
 void ThreadedAi::runAiAndSendPrimitives(const WorldPtr& world_ptr)
