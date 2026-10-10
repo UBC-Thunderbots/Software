@@ -31,7 +31,7 @@ void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
     overridePlay(std::move(createPlay(play_proto, ai_config_ptr)));
 }
 
-void Ai::updateAiConfig()
+void Ai::markAiConfigUpdated()
 {
     ai_config_changed = true;
 }
