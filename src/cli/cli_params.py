@@ -107,6 +107,7 @@ AnsiblePlaybook = Annotated[
 class BuildConfig:
     action: ActionArgument
     search_query: str | None = None
+    exact_match_only: bool = False
     no_optimized_build: bool = False
     debug_build: bool = False
     select_debug_binaries: list | None = None
@@ -482,6 +483,8 @@ class InteractiveCli:
                     config.search_query = fuzzy_find_target(
                         ActionArgument.test, "", interactive_search=True
                     )
+                    config.exact_match_only = True
+
                     runs_str = questionary.text(
                         "Number of times to run each test (leave empty for 1):",
                         style=InteractiveCli.INTERACTIVE_STYLE,
@@ -552,6 +555,7 @@ class InteractiveCli:
                     term_name = fuzzy_find_target(
                         ActionArgument.build, "", interactive_search=True
                     )
+                    config.exact_match_only = True
 
                 platform_label, robot_platform = questionary.select(
                     "Build for which platform?",
