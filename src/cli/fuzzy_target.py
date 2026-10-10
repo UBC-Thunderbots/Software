@@ -25,9 +25,16 @@ def fuzzy_find_target(
     :param interactive_search: force the interactive fzf picker
     :return: the fully-qualified Bazel target label
     """
-    test_query = ["bazel", "query", "tests(//...)"]
-    binary_query = ["bazel", "query", "kind(.*_binary,//...)"]
-    library_query = ["bazel", "query", "kind(.*_library,//...)"]
+    bazel_query = [
+        "bazel",
+        "--quiet",
+        "query",
+        "--noshow_progress",
+        "--noshow_loading_progress",
+    ]  # Keep Bazel status messages out of the target picker.
+    test_query = [*bazel_query, "tests(//...)"]
+    binary_query = [*bazel_query, "kind(.*_binary,//...)"]
+    library_query = [*bazel_query, "kind(.*_library,//...)"]
 
     bazel_queries = {
         ActionArgument.test: [test_query],
@@ -44,13 +51,14 @@ def fuzzy_find_target(
     target_dict = {target.split(b":")[-1]: target for target in targets}
     target_names = list(target_dict.keys())
 
-    most_similar_target_name, confidence = process.extract(
-        search_query, target_names, limit=1
-    )[0]
-    target = str(target_dict[most_similar_target_name], encoding="utf-8")
-    too_vague_needs_selection = confidence < THEFUZZ_MATCH_RATIO_THRESHOLD
+    needs_selection = interactive_search or not search_query
+    if not needs_selection:
+        most_similar_target_name, confidence = process.extract(
+            search_query, target_names, limit=1
+        )[0]
+        needs_selection = confidence < THEFUZZ_MATCH_RATIO_THRESHOLD
 
-    if interactive_search or too_vague_needs_selection:
+    if needs_selection:
         selected_name = iterfzf.iterfzf(
             target_names,
             header="Search and select target"
@@ -64,6 +72,7 @@ def fuzzy_find_target(
             sys.exit(0)
         target = target_dict[selected_name].decode("utf-8")
     else:
+        target = target_dict[most_similar_target_name].decode("utf-8")
         print(f"Found target {target} (confidence {confidence})")
 
     return target
