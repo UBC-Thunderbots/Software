@@ -77,6 +77,7 @@ py_library(
         "//software/thunderscope:estop_helpers",
         "//software/thunderscope:qt_dependency_bootstrap",
         "//software/thunderscope:robot_communication",
+        "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
@@ -104,6 +105,17 @@ py_test(
         "//software:conftest",
         "//software/gameplay_tests:tbots_test_runner",
         "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
+    name = "open_loop_movement_field_test",
+    srcs = [
+        "open_loop_movement_field_test.py",
+    ],
+    deps = [
+        "//software:conftest",
         requirement("pytest"),
     ],
 )
