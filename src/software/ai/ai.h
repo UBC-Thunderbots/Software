@@ -57,7 +57,7 @@ class Ai final
 
     /**
      * Mark the shared AI config as updated.
-     * 
+     *
      * Only used so we can adjust to changes in the control config's play override, other
      * config fields just get read on demand from the shared config.
      */
