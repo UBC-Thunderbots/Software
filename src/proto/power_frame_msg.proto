@@ -28,8 +28,7 @@ message PowerPulseControl
         }
     }
 
-    ChickerControl chicker  = 1;
-
+    ChickerControl chicker = 1;
 }
 
 message DribblerControl

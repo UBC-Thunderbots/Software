@@ -255,7 +255,6 @@ class ChickerWidget(QtWidgets.QWidget):
         # Send kick, chip, autokick, or autochip primitive
         power_control = protos.PowerControl()
 
-
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = kick_power
         elif command == ChickerCommandMode.CHIP:
