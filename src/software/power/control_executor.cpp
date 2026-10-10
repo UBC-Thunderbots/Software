@@ -3,8 +3,7 @@
 #include <utility>
 
 ControlExecutor::ControlExecutor(std::shared_ptr<Charger> charger,
-                                 std::shared_ptr<Chicker> chicker
-                                 )
+                                 std::shared_ptr<Chicker> chicker)
     : charger(std::move(charger)), chicker(std::move(chicker))
 {
 }

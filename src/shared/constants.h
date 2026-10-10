@@ -242,7 +242,6 @@ static const unsigned THUNDERLOOP_HZ = 300u;
 
 
 
-
 static constexpr double RTT_S = 0.03;
 
 // Robot diagnostics constants

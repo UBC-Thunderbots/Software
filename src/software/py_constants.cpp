@@ -146,7 +146,7 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("REPLAY_FILE_VERSION")        = REPLAY_FILE_VERSION;
 
 
-    m.attr("CHICKER_TIMEOUT")   = CHICKER_TIMEOUT;
+    m.attr("CHICKER_TIMEOUT") = CHICKER_TIMEOUT;
 
     m.attr("MAX_ROBOT_IDS_PER_SIDE") = MAX_ROBOT_IDS_PER_SIDE;
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
