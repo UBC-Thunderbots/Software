@@ -11,6 +11,7 @@ targets:
   # This can slow down symbol loading, but it's much more reliable then picking
   # and choosing targets.
   //...
+  -//toolchains/...
 
 additional_languages:
   # Uncomment any additional languages you want supported

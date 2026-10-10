@@ -4,7 +4,7 @@
 #include "constants_platformio.h"
 #include "control_executor.h"
 #include "dribbler.h"
-#include "geneva.h"
+
 #include "power_frame_msg_platformio.h"
 #include "power_monitor.h"
 #include "proto/power_frame_msg.nanopb.h"
@@ -19,7 +19,6 @@
 #include "software/power/chicker.h"
 #include "software/power/control_executor.h"
 #include "software/power/dribbler.h"
-#include "software/power/geneva.h"
 #include "software/power/power_monitor.h"
 #endif
 
@@ -43,7 +42,6 @@ uint32_t sequence_num;
 std::shared_ptr<Charger> charger;
 std::shared_ptr<Chicker> chicker;
 std::shared_ptr<PowerMonitor> monitor;
-std::shared_ptr<Geneva> geneva;
 std::shared_ptr<ControlExecutor> executor;
 std::shared_ptr<Dribbler> dribbler;
 
@@ -55,8 +53,7 @@ void setup()
     charger      = std::make_shared<Charger>();
     chicker      = std::make_shared<Chicker>(charger);
     monitor      = std::make_shared<PowerMonitor>();
-    geneva       = std::make_shared<Geneva>();
-    executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
+    executor     = std::make_shared<ControlExecutor>(charger, chicker);
     dribbler     = std::make_shared<Dribbler>();
     charger->setCapacitorPin(HIGH);
 }
@@ -108,7 +105,7 @@ void loop()
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
+        monitor->getCurrentDrawAmp(), sequence_num++,
         chicker->getBreakBeamTripped());
 
     // Write sensor values out to Serial
