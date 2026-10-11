@@ -38,6 +38,7 @@ Makefile
 .vscode/
 .vscode/.*
 !.vscode/extensions.json
+*.code-workspace
 
 # Vim
 *.swo
