@@ -5,7 +5,7 @@
 
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
-#include "software/sensor_fusion/filter/kalman_filter.hpp"
+#include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
@@ -66,8 +66,9 @@ class BallFilter
     // No control
     static constexpr int CONTROL_SIZE = 1;
 
-    using BallKalmanFilter = KalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE>;
-    using Measurement      = Eigen::Vector<double, MEASUREMENT_SIZE>;
+    using BallKalmanFilter =
+        LinearKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE>;
+    using Measurement = Eigen::Vector<double, MEASUREMENT_SIZE>;
 
     /**
      * Returns the detection we should treat as the ball this frame, which is the

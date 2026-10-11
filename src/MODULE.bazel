@@ -52,6 +52,7 @@ pip.parse(
     target_platforms = [
         "linux_x86_64",
         "linux_aarch64",
+        "osx_aarch64",
     ],
 )
 use_repo(pip, "ansible_deps")
@@ -70,6 +71,7 @@ pip.parse(
     target_platforms = [
         "linux_x86_64",
         "linux_aarch64",
+        "osx_aarch64",
     ],
 )
 use_repo(pip, "robot_diagnostics_cli_deps")

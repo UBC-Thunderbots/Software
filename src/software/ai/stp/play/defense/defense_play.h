@@ -1,0 +1,31 @@
+#pragma once
+
+#include "proto/parameters.pb.h"
+#include "software/ai/stp/play/defense/defense_play_fsm.h"
+#include "software/ai/stp/play/play.h"
+#include "software/ai/stp/play/play_base.hpp"
+
+/**
+ * Play that sets up defenders to block shots on net and intercept
+ * passes between enemy robots
+ */
+class DefensePlay : public PlayBase<DefensePlayFSM>
+{
+   public:
+    /**
+     * Constructor for DefensePlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    DefensePlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
+    void updateTactics(const PlayUpdate& play_update) override;
+
+    /**
+     * Update control params for this play
+     *
+     * @param max_allowed_speed_mode the mode of maximum speed allowed
+     */
+    void updateControlParams(TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+};
