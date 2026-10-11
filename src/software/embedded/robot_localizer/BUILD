@@ -24,7 +24,6 @@ cc_library(
         "//software/geom:vector",
         "//software/physics:velocity_conversion_util",
         "//software/sensor_fusion/filter:extended_kalman_filter",
-        "//software/sensor_fusion/filter:kalman_filter",
         "//software/util/make_enum",
         "//software/world:robot_state",
         "@eigen",

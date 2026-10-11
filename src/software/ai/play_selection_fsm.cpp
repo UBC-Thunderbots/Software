@@ -1,16 +1,16 @@
 #include "software/ai/play_selection_fsm.h"
 
-#include "software/ai/hl/stp/play/ball_placement/ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play.h"
-#include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
-#include "software/ai/hl/stp/play/halt_play/halt_play.h"
-#include "software/ai/hl/stp/play/kickoff_enemy/kickoff_enemy_play.h"
-#include "software/ai/hl/stp/play/kickoff_friendly/kickoff_friendly_play.h"
-#include "software/ai/hl/stp/play/offense/offense_play.h"
-#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
-#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
-#include "software/ai/hl/stp/play/stop_play.h"
+#include "software/ai/stp/play/ball_placement/ball_placement_play.h"
+#include "software/ai/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
+#include "software/ai/stp/play/enemy_free_kick/enemy_free_kick_play.h"
+#include "software/ai/stp/play/free_kick/free_kick_play.h"
+#include "software/ai/stp/play/halt_play/halt_play.h"
+#include "software/ai/stp/play/kickoff_enemy/kickoff_enemy_play.h"
+#include "software/ai/stp/play/kickoff_friendly/kickoff_friendly_play.h"
+#include "software/ai/stp/play/offense/offense_play.h"
+#include "software/ai/stp/play/penalty_kick/penalty_kick_play.h"
+#include "software/ai/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
+#include "software/ai/stp/play/stop_play.h"
 
 
 PlaySelectionFSM::PlaySelectionFSM(
