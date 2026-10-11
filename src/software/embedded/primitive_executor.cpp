@@ -8,6 +8,7 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
+#include "software/embedded/robot_localizer.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
