@@ -40,5 +40,10 @@ elif [ "$OS" = "Linux" ]; then
 fi
 chmod +x /opt/tbots/bin/gamecontroller
 
+# Install TIGERS AutoReferee
+wget -O /opt/tbots/autoReferee.zip https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip
+unzip /opt/tbots/autoReferee.zip -d /opt/tbots/autoReferee
+rm /opt/tbots/autoReferee.zip
+
 echo "Setup successful!"
 echo "source /opt/tbots/bin/activate"
