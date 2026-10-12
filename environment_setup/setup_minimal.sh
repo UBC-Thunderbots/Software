@@ -18,7 +18,7 @@ OS="$(uname -s)"
 
 # Create our tbots directory
 mkdir -p /opt/tbots/bin
-chown -R $USER /opt/tbots
+chown -R $SUDO_USER /opt/tbots
 
 echo 'export PATH="/opt/tbots/bin:$PATH"' > /opt/tbots/bin/activate
 
