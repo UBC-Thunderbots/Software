@@ -29,25 +29,26 @@ bazel_dep(name = "bazel_lib", version = "3.1.0")
 ##############################################
 # Load PIP packages and our Requirements
 ##############################################
+PYTHON_VERSION = "3.12"
+
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.defaults(python_version = "3.12")
-python.toolchain(
-    is_default = True,
-    python_version = "3.12",
-)
+python.toolchain(python_version = PYTHON_VERSION)
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "thunderscope_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/thunderscope:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
 )
 use_repo(pip, "thunderscope_deps")
 pip.parse(
     hub_name = "ansible_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
     target_platforms = [
         "linux_x86_64",
@@ -58,15 +59,18 @@ pip.parse(
 use_repo(pip, "ansible_deps")
 pip.parse(
     hub_name = "gameplay_tests_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/gameplay_tests:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
 )
 use_repo(pip, "gameplay_tests_deps")
 pip.parse(
     hub_name = "robot_diagnostics_cli_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
     target_platforms = [
         "linux_x86_64",
@@ -77,8 +81,7 @@ pip.parse(
 use_repo(pip, "robot_diagnostics_cli_deps")
 pip.parse(
     hub_name = "nanopb_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//starlark/nanopb:requirements_lock.txt",
 )
 use_repo(pip, "nanopb_deps")
@@ -251,21 +254,21 @@ http_archive(
 ##############################################
 # Register our Toolchains
 ##############################################
-register_toolchains("//toolchains/python:py_toolchain")
-
-register_toolchains(
-    "//toolchains/python:k8_aarch64_linux_py_cc_toolchain",
-    "//toolchains/python:py_cc_toolchain_host_x86_64",
-    "//toolchains/python:py_cc_toolchain_host_aarch64",
-)
-
-register_toolchains(
-    "//toolchains/cc:cc_toolchain_for_macos_robot",
-    "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
-    "//toolchains/cc:cc_toolchain_for_k8",
-    "//toolchains/cc:cc_toolchain_for_aarch64",
-    "//toolchains/cc:cc_toolchain_for_stm32",
-)
+# register_toolchains("//toolchains/python:py_toolchain")
+#
+# register_toolchains(
+#     "//toolchains/python:k8_aarch64_linux_py_cc_toolchain",
+#     "//toolchains/python:py_cc_toolchain_host_x86_64",
+#     "//toolchains/python:py_cc_toolchain_host_aarch64",
+# )
+#
+# register_toolchains(
+#     "//toolchains/cc:cc_toolchain_for_macos_robot",
+#     "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
+#     "//toolchains/cc:cc_toolchain_for_k8",
+#     "//toolchains/cc:cc_toolchain_for_aarch64",
+#     "//toolchains/cc:cc_toolchain_for_stm32",
+# )
 
 ##############################################
 # New local repos for our toolchains/compilers
@@ -291,35 +294,35 @@ new_local_repository(
     path = "/usr/lib/llvm-6.0/",
 )
 
-new_local_repository(
-    name = "k8_aarch64_linux_gcc",
-    build_file = "@//extlibs:k8_aarch64_linux_gcc.bzl",
-    path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
-)
-
-new_local_repository(
-    name = "macos_robot_gcc",
-    build_file = "@//extlibs:macos_robot_gcc.bzl",
-    path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
-)
-
-new_local_repository(
-    name = "motor_board_gcc",
-    build_file = "@//extlibs:motor_board_gcc.bzl",
-    path = "/opt/tbotspython/arm-none-eabi-gcc/",
-)
-
-new_local_repository(
-    name = "py_cc_toolchain_host",
-    build_file = "@//extlibs:py_cc_toolchain.bzl",
-    path = "/opt/tbotspython/py_headers/include/python3.12/",
-)
-
-new_local_repository(
-    name = "py_cc_toolchain_for_k8_aarch64_linux",
-    build_file = "@//extlibs:py_cc_toolchain.bzl",
-    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
-)
+# new_local_repository(
+#     name = "k8_aarch64_linux_gcc",
+#     build_file = "@//extlibs:k8_aarch64_linux_gcc.bzl",
+#     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
+# )
+#
+# new_local_repository(
+#     name = "macos_robot_gcc",
+#     build_file = "@//extlibs:macos_robot_gcc.bzl",
+#     path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
+# )
+#
+# new_local_repository(
+#     name = "motor_board_gcc",
+#     build_file = "@//extlibs:motor_board_gcc.bzl",
+#     path = "/opt/tbotspython/arm-none-eabi-gcc/",
+# )
+#
+# new_local_repository(
+#     name = "py_cc_toolchain_host",
+#     build_file = "@//extlibs:py_cc_toolchain.bzl",
+#     path = "/opt/tbotspython/py_headers/include/python3.12/",
+# )
+#
+# new_local_repository(
+#     name = "py_cc_toolchain_for_k8_aarch64_linux",
+#     build_file = "@//extlibs:py_cc_toolchain.bzl",
+#     path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
+# )
 
 ##############################################
 # Workarounds and Fixes Below (hacks)
