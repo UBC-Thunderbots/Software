@@ -4,7 +4,7 @@
 
 #include "shared/robot_constants.h"
 #include "software/embedded/primitive_executor.h"
-#include "software/embedded/robot_localizer.h"
+#include "software/embedded/robot_localizer/robot_localizer.h"
 #include "software/embedded/services/imu.h"
 #include "software/embedded/services/motor.h"
 #include "software/embedded/services/network/network.h"

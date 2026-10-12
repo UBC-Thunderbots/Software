@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["motion_constraint_visitor.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/ai/hl/stp/tactic:all_tactics",
+        "//software/ai/stp/tactic:all_tactics",
         "//software/world:game_state",
     ],
 )

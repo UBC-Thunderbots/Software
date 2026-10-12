@@ -4,7 +4,7 @@
 
 #include <set>
 
-#include "software/ai/hl/stp/tactic/all_tactics.h"
+#include "software/ai/stp/tactic/all_tactics.h"
 #include "software/test_util/test_util.h"
 #include "software/world/game_state.h"
 

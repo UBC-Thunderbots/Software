@@ -41,11 +41,11 @@ cc_library(
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
+        "//software/embedded/robot_localizer",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/time:duration",
         "//software/world:robot_state",
-        "//software/world:team_colour",
         "@tracy",
     ],
 )
@@ -71,8 +71,8 @@ cc_library(
     }),
     deps = [
         ":primitive_executor",
-        ":robot_localizer",
         "//proto:tbots_cc_proto",
+        "//software/embedded/robot_localizer",
         "//software/embedded/services:imu",
         "//software/embedded/services:motor",
         "//software/embedded/services:power",
@@ -111,34 +111,4 @@ sh_binary(
 filegroup(
     name = "hash_thunderloop_binary",
     srcs = ["hash_thunderloop_binary.sh"],
-)
-
-cc_library(
-    name = "robot_localizer",
-    srcs = ["robot_localizer.cpp"],
-    hdrs = ["robot_localizer.h"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//proto/primitive:primitive_msg_factory",
-        "//software:constants",
-        "//software/embedded/services:imu",
-        "//software/geom:angle",
-        "//software/geom:angular_velocity",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//software/sensor_fusion/filter:linear_kalman_filter",
-        "//software/world:robot_state",
-        "@eigen",
-    ],
-)
-
-cc_test(
-    name = "robot_localizer_test",
-    srcs = ["robot_localizer_test.cpp"],
-    deps = [
-        ":robot_localizer",
-        "//shared:constants",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/physics:velocity_conversion_util",
-    ],
 )

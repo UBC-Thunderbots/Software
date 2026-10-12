@@ -8,6 +8,7 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
+#include "software/embedded/robot_localizer/robot_localizer.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
@@ -60,6 +61,11 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 void PrimitiveExecutor::updateRobotState(const RobotState& robot_state)
 {
     robot_state_ = robot_state;
+}
+
+Vector PrimitiveExecutor::getPrevCommandedVelocity() const
+{
+    return prev_target_global_velocity_;
 }
 
 Vector PrimitiveExecutor::stepTargetLinearVelocity(const Duration& delta_time)
