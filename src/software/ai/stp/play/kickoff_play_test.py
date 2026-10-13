@@ -150,7 +150,7 @@ def test_kickoff_play(gameplay_test_runner, is_friendly_test):
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
-        ci_cmd_with_delay=[
+        gc_cmd_with_delay=[
             (NORMAL_START_DELAY_S, protos.Command.Type.NORMAL_START, SslTeam.BLUE),
         ],
         test_timeout_s=10,

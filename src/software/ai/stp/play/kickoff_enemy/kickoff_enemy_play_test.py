@@ -45,10 +45,10 @@ def test_kickoff_enemy_play(gameplay_test_runner):
         )
 
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
+            gc_command=protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
         )
         gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.KickoffEnemyPlay,

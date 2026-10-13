@@ -46,10 +46,10 @@ def test_halt_play(gameplay_test_runner):
         )
 
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.protos.Command.Type.FORCE_START, team=SslTeam.UNKNOWN
+            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.UNKNOWN
         )
 
     gameplay_test_runner.run_test(
