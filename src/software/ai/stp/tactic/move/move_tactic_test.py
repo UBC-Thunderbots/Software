@@ -4,11 +4,20 @@ import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.validation.duration_validation import DurationValidation
 from software.gameplay_tests.util import pytest_main
+from software.gameplay_tests.validation.robot_at_angular_velocity import (
+    RobotEventuallyAtAngularVelocity,
+)
 from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
 from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
+)
+from software.gameplay_tests.validation.ball_kicked_in_direction import (
+    BallEventuallyKickedInDirection,
+)
+from software.gameplay_tests.validation.ball_is_off_ground import (
+    BallIsEventuallyOffGround,
 )
 
 

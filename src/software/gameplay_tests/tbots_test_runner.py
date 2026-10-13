@@ -1,7 +1,18 @@
+# Qt libs must be preloaded before any Qt binding is imported, so the imports
+# below deliberately come after preload_bundled_qt_libs().
+# ruff: noqa: E402
+
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
+preload_bundled_qt_libs()
+
 import threading
 import time
 
 import pytest
+
+import proto.import_all_protos as protos
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
@@ -129,7 +140,7 @@ class TbotsTestRunner:
         )
 
     @abstractmethod
-    def set_world_state(self, world_state: WorldState):
+    def set_world_state(self, world_state: protos.WorldState):
         """Sets the initial world state of the test.
 
         :param world_state: The WorldState proto to use
@@ -245,18 +256,3 @@ class TbotsTestRunner:
         :param worldstate: the worldstate proto to use
         """
         raise NotImplementedError("abstract class method called set_world_state")
-
-    @abstractmethod
-    def run_test(
-        self,
-        always_validation_sequence_set=[[]],
-        eventually_validation_sequence_set=[[]],
-        test_timeout_s=3,
-    ):
-        """Begins validating a test based on incoming world protos
-
-        :param always_validation_sequence_set: validation set that must always be true
-        :param eventually_validation_sequence_set: validation set that must eventually be true
-        :param test_timeout_s: how long the test will run
-        """
-        raise NotImplementedError("abstract method run_test called from base class")
