@@ -52,7 +52,7 @@ class StSpinMotorController : public MotorController
     static constexpr unsigned int MAX_SPI_TRANSFER_ATTEMPTS = 100;
 
     // clang-format off
-    static const inline std::unordered_map<MotorIndex, const char*> SPI_PATHS = {
+    static const inline std::unordered_map<MotorIndex, const std::string> SPI_PATHS = {
         {MotorIndex::FRONT_LEFT,  "/dev/spidev0.3"},
         {MotorIndex::FRONT_RIGHT, "/dev/spidev0.2"},
         {MotorIndex::BACK_LEFT,   "/dev/spidev0.1"},

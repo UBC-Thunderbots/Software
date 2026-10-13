@@ -2,20 +2,35 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import subprocess
 import threading
 import time
 from subprocess import Popen, TimeoutExpired
-import re
 
-from software.py_constants import *
-from software.python_bindings import *
-
-from proto.import_all_protos import *
-from software.py_constants import *
+import proto.import_all_protos as protos
+from software.py_constants import (
+    DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
+    MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC,
+    PLAY_OVERRIDE_PATH,
+    PRIMITIVE_PATH,
+    REPLAY_BOOKMARK_PATH,
+    ROBOT_CRASH_PATH,
+    ROBOT_LOG_PATH,
+    ROBOT_STATUS_PATH,
+    SENSOR_PROTO_PATH,
+    SSL_REFEREE_PATH,
+    SSL_WRAPPER_PATH,
+    TACTIC_OVERRIDE_PATH,
+    VALIDATION_PROTO_SET_PATH,
+    VIRTUAL_OBSTACLES_UNIX_PATH,
+    WORLD_PATH,
+)
+from software.thunderscope.binary_context_managers.util import (
+    is_cmd_running,
+    kill_cmd_if_running,
+)
 from software.thunderscope.constants import LogLevels
-from software.thunderscope.binary_context_managers.util import *
-from software.thunderscope.gl.layers.gl_obstacle_layer import ObstacleList
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -90,7 +105,7 @@ class FullSystem:
         # Setup unix socket directory
         try:
             os.makedirs(self.full_system_runtime_dir)
-        except:
+        except OSError:
             pass
 
         supported_flags = self.discover_supported_flags(self.path_to_binary)
@@ -215,15 +230,15 @@ gdb --args bazel-bin/{self.full_system}
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for proto_class in [
-            PathVisualization,
-            PassVisualization,
-            AttackerVisualization,
-            CostVisualization,
-            NamedValue,
-            PlayInfo,
-            ObstacleList,
-            DebugShapes,
-            BallPlacementVisualization,
+            protos.PathVisualization,
+            protos.PassVisualization,
+            protos.AttackerVisualization,
+            protos.CostVisualization,
+            protos.NamedValue,
+            protos.PlayInfo,
+            protos.ObstacleList,
+            protos.DebugShapes,
+            protos.BallPlacementVisualization,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,
@@ -232,30 +247,30 @@ gdb --args bazel-bin/{self.full_system}
             )
 
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir, "/log", RobotLog
+            self.full_system_runtime_dir, "/log", protos.RobotLog
         )
 
         # Outputs from full_system
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir, WORLD_PATH, World
+            self.full_system_runtime_dir, WORLD_PATH, protos.World
         )
         proto_unix_io.attach_unix_receiver(
-            self.full_system_runtime_dir, PRIMITIVE_PATH, PrimitiveSet
+            self.full_system_runtime_dir, PRIMITIVE_PATH, protos.PrimitiveSet
         )
 
         # Inputs to full_system
         for arg in [
-            (ROBOT_STATUS_PATH, RobotStatus),
-            (SSL_WRAPPER_PATH, SSL_WrapperPacket),
-            (SSL_REFEREE_PATH, Referee),
-            (SENSOR_PROTO_PATH, SensorProto),
-            (TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams),
-            (PLAY_OVERRIDE_PATH, Play),
-            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig),
-            (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
-            (ROBOT_LOG_PATH, RobotLog),
-            (ROBOT_CRASH_PATH, RobotCrash),
-            (VIRTUAL_OBSTACLES_UNIX_PATH, VirtualObstacles),
-            (REPLAY_BOOKMARK_PATH, ReplayBookmark),
+            (ROBOT_STATUS_PATH, protos.RobotStatus),
+            (SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
+            (SSL_REFEREE_PATH, protos.Referee),
+            (SENSOR_PROTO_PATH, protos.SensorProto),
+            (TACTIC_OVERRIDE_PATH, protos.AssignedTacticPlayControlParams),
+            (PLAY_OVERRIDE_PATH, protos.Play),
+            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, protos.ThunderbotsConfig),
+            (VALIDATION_PROTO_SET_PATH, protos.ValidationProtoSet),
+            (ROBOT_LOG_PATH, protos.RobotLog),
+            (ROBOT_CRASH_PATH, protos.RobotCrash),
+            (VIRTUAL_OBSTACLES_UNIX_PATH, protos.VirtualObstacles),
+            (REPLAY_BOOKMARK_PATH, protos.ReplayBookmark),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)

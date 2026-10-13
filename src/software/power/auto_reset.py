@@ -1,8 +1,9 @@
-Import("env")
-import time
 import os
 import subprocess
+import time
 from enum import Enum
+
+Import("env")  # noqa: F821
 
 BOOT_GPIO = 24
 RESET_GPIO = 23
@@ -90,5 +91,5 @@ def after_upload(source, target, env) -> None:
 
 
 # Attach pre-upload and post-upload hooks
-env.AddPreAction("upload", before_upload)
-env.AddPostAction("upload", after_upload)
+env.AddPreAction("upload", before_upload)  # noqa: F821
+env.AddPostAction("upload", after_upload)  # noqa: F821

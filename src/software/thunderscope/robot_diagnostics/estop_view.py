@@ -1,19 +1,17 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import *
-from software.py_constants import *
-from proto.estop_state_pb2 import EstopState
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtWidgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class EstopView(QLabel):
+class EstopView(QtWidgets.QLabel):
     """Class to show whether the estop is playing or stopped"""
 
     def __init__(self) -> None:
         super().__init__()
 
-        self.estop_state_buffer = ThreadSafeBuffer(1, EstopState)
+        self.estop_state_buffer = ThreadSafeBuffer(1, protos.EstopState)
 
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setText("Disconnected")
         self.setStyleSheet("background-color: blue")
 

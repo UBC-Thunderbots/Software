@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_library")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,6 +11,9 @@ py_library(
     ],
     data = [
         "//software:er_force_simulator_main",
+    ],
+    deps = [
+        requirement("psutil"),
     ],
 )
 
@@ -25,6 +29,7 @@ py_library(
         "//software/thunderscope:util",
         "//software/thunderscope/common:thread_safe_circular_buffer",
         requirement("netifaces"),
+        requirement("psutil"),
     ],
 )
 
@@ -36,6 +41,9 @@ py_library(
     ],
     data = [
         "//software:unix_full_system",
+    ],
+    deps = [
+        requirement("psutil"),
     ],
 )
 
@@ -59,5 +67,8 @@ py_library(
         "runtime_installer.py",
         "runtime_loader.py",
         "runtime_manager.py",
+    ],
+    deps = [
+        requirement("requests"),
     ],
 )

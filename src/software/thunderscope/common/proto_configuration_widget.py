@@ -1,18 +1,17 @@
-import os
-from proto.import_all_protos import *
-from software.py_constants import MILLISECONDS_PER_SECOND
-from software.thunderscope.constants import ProtoConfigurationConstant
 import logging
-from pyqtgraph.Qt.QtCore import QTimer
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph import parametertree
-from proto.import_all_protos import *
-from software.thunderscope.common import proto_parameter_tree_util
+import os
 from typing import Any, Callable
-from PyQt6.QtWidgets import *
+
+import proto.import_all_protos as protos
+from pyqtgraph import parametertree
+from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt.QtCore import QTimer
+from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.common import proto_parameter_tree_util
+from software.thunderscope.constants import ProtoConfigurationConstant
 
 
-class ProtoConfigurationWidget(QWidget):
+class ProtoConfigurationWidget(QtWidgets.QWidget):
     """Creates a searchable parameter widget that can take any protobuf,
     and convert it into a pyqtgraph ParameterTree. This will allow users
     to modify the values.
@@ -25,7 +24,7 @@ class ProtoConfigurationWidget(QWidget):
 
     def __init__(
         self,
-        on_change_callback: Callable[[Any, Any, ThunderbotsConfig], None],
+        on_change_callback: Callable[[Any, Any, protos.ThunderbotsConfig], None],
         is_yellow: bool,
         search_filter_threshold: int = 60,
     ):
@@ -39,14 +38,14 @@ class ProtoConfigurationWidget(QWidget):
         :param search_filter_threshold: How close should the search query be?
                         100 is an exact match (not ideal), 0 lets everything through
         """
-        QWidget.__init__(self)
-        layout = QVBoxLayout()
+        QtWidgets.QWidget.__init__(self)
+        layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
 
         self.on_change_callback = on_change_callback
 
         # Create search query bar
-        self.search_query = QLineEdit()
+        self.search_query = QtWidgets.QLineEdit()
         self.search_query.setPlaceholderText("Search Parameters")
 
         self.search_query.textChanged.connect(self.__handle_search_query_changed)
@@ -84,25 +83,25 @@ class ProtoConfigurationWidget(QWidget):
             self.send_proto_to_fullsystem,
         )
 
-    def create_widget(self) -> tuple[QHBoxLayout, QHBoxLayout]:
+    def create_widget(self) -> tuple[QtWidgets.QHBoxLayout, QtWidgets.QHBoxLayout]:
         """Creating widgets that are used to load, save parameters
 
         :return: the top of the layout, the bottom of the layout, and edit box widget
         """
-        save_button = QPushButton("Save Parameters")
-        load_proto_button = QPushButton("Load Parameters")
-        reset_button = QPushButton("Reset All Parameters")
+        save_button = QtWidgets.QPushButton("Save Parameters")
+        load_proto_button = QtWidgets.QPushButton("Load Parameters")
+        reset_button = QtWidgets.QPushButton("Reset All Parameters")
 
         reset_button.clicked.connect(self.reset_button_callback)
         save_button.clicked.connect(self.save_proto_callback)
         load_proto_button.clicked.connect(self.load_proto_with_file_explorer)
 
-        save_hbox_bottom = QHBoxLayout()
+        save_hbox_bottom = QtWidgets.QHBoxLayout()
         save_hbox_bottom.addWidget(load_proto_button)
         save_hbox_bottom.addWidget(reset_button)
         save_hbox_bottom.addWidget(save_button)
 
-        save_hbox_top = QHBoxLayout()
+        save_hbox_top = QtWidgets.QHBoxLayout()
 
         return save_hbox_top, save_hbox_bottom
 
@@ -115,7 +114,7 @@ class ProtoConfigurationWidget(QWidget):
             logging.info(
                 "No previously saved ThunderbotsConfig found. Creating a new default one."
             )
-            self.proto_to_configure = ThunderbotsConfig()
+            self.proto_to_configure = protos.ThunderbotsConfig()
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
                 self.is_yellow
             )
@@ -126,7 +125,7 @@ class ProtoConfigurationWidget(QWidget):
 
         logging.info("Loading protobuf from file: {}".format(path_to_file))
         with open(path_to_file, "rb") as f:
-            self.proto_to_configure = ThunderbotsConfig()
+            self.proto_to_configure = protos.ThunderbotsConfig()
             self.proto_to_configure.ParseFromString(f.read())
 
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
@@ -144,11 +143,11 @@ class ProtoConfigurationWidget(QWidget):
     def save_proto_callback(self) -> None:
         """Callback for a button that saves the current protobuf to disk"""
         try:
-            save_to_path, should_save = QFileDialog.getSaveFileName(
+            save_to_path, should_save = QtWidgets.QFileDialog.getSaveFileName(
                 self,
                 "Select Protobufs",
                 ProtoConfigurationConstant.DEFAULT_SAVE_PATH,
-                options=QFileDialog.Option.DontUseNativeDialog,
+                options=QtWidgets.QFileDialog.Option.DontUseNativeDialog,
             )
 
             if not should_save:
@@ -174,11 +173,11 @@ class ProtoConfigurationWidget(QWidget):
     def load_proto_with_file_explorer(self) -> None:
         """Load the current protobuf through file explorer"""
         try:
-            path_to_file, should_open = QFileDialog.getOpenFileName(
+            path_to_file, should_open = QtWidgets.QFileDialog.getOpenFileName(
                 self,
                 "Select Protobufs",
                 ProtoConfigurationConstant.DEFAULT_SAVE_PATH,
-                options=QFileDialog.Option.DontUseNativeDialog,
+                options=QtWidgets.QFileDialog.Option.DontUseNativeDialog,
             )
             if not should_open:
                 return
@@ -213,7 +212,7 @@ class ProtoConfigurationWidget(QWidget):
 
     def reset_button_callback(self) -> None:
         """Resetting the protobufs when the reset button has been clicked"""
-        self.proto_to_configure = ThunderbotsConfig()
+        self.proto_to_configure = protos.ThunderbotsConfig()
         self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
             self.is_yellow
         )

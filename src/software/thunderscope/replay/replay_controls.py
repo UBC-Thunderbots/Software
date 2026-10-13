@@ -1,32 +1,30 @@
 import time
-
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
-
-from software.thunderscope.replay.bookmark_marker import BookmarkMarker
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.common import common_widgets
-from software.py_constants import *
 from typing import override
 
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
+from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.common import common_widgets
+from software.thunderscope.replay.bookmark_marker import BookmarkMarker
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
-class ReplayControls(QWidget):
+
+class ReplayControls(QtWidgets.QWidget):
     def __init__(self, player: ProtoPlayer) -> None:
         """Setup the replay controls.
 
         :param player: The player to control.
         """
-        QGroupBox.__init__(self)
+        QtWidgets.QGroupBox.__init__(self)
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.setFocus()
 
         self.player = player
 
-        self.controls_layout = QVBoxLayout()
+        self.controls_layout = QtWidgets.QVBoxLayout()
         self.controls_layout.setContentsMargins(12, 12, 12, 12)
-        self.buttons_layout = QHBoxLayout()
+        self.buttons_layout = QtWidgets.QHBoxLayout()
 
         for button in [
             ("⏮\nStart", partial(self.seek_absolute, 0)),
@@ -34,19 +32,19 @@ class ReplayControls(QWidget):
             ("↶\n10 s", partial(self.seek_relative, -10)),
             ("↶\n1 s", partial(self.seek_relative, -1)),
         ]:
-            qbutton = QPushButton()
+            qbutton = QtWidgets.QPushButton()
             qbutton.setText(button[0])
             qbutton.clicked.connect(button[1])
             self.buttons_layout.addWidget(qbutton)
 
         # Set up play button
-        self.play_pause = QPushButton()
+        self.play_pause = QtWidgets.QPushButton()
         self.play_pause.setText("⏸\nPause")
         self.play_pause.clicked.connect(self.__on_play_pause_clicked)
         self.buttons_layout.addWidget(self.play_pause)
 
         # Setup playback speed combo box
-        self.playback_speed_combo_box = QComboBox(self)
+        self.playback_speed_combo_box = QtWidgets.QComboBox(self)
 
         for item in ["3", "2", "1", "0.5", "0.2", "0.1", "0.05", "0.01"]:
             self.playback_speed_combo_box.addItem(item)
@@ -65,13 +63,13 @@ class ReplayControls(QWidget):
             ("↷\n1 min", partial(self.seek_relative, 60)),
             ("⏭\nEnd", partial(self.seek_absolute, self.player.end_time)),
         ]:
-            qbutton = QPushButton()
+            qbutton = QtWidgets.QPushButton()
             qbutton.setText(button[0])
             qbutton.clicked.connect(button[1])
             self.buttons_layout.addWidget(qbutton)
 
         # Set up save clip button
-        self.save_clip = QPushButton()
+        self.save_clip = QtWidgets.QPushButton()
         self.save_clip.setText("Start\nClip")
         self.save_clip.clicked.connect(self.__on_save_clip_clicked)
         self.buttons_layout.addWidget(self.save_clip)
@@ -213,11 +211,11 @@ class ReplayControls(QWidget):
         if self.clipping and self.player.current_packet_time > self.clip_start:
             self.player.pause()
             end_time = self.player.current_packet_time
-            filename, _ = QFileDialog.getSaveFileName(
+            filename, _ = QtWidgets.QFileDialog.getSaveFileName(
                 self,
                 "Save clip",
                 "~/log_clip_{}.replay".format(int(time.time())),
-                options=QFileDialog.Option.DontUseNativeDialog,
+                options=QtWidgets.QFileDialog.Option.DontUseNativeDialog,
             )
             self.player.save_clip(filename, self.clip_start, end_time)
             self.clipping = False

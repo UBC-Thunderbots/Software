@@ -1,24 +1,24 @@
 from __future__ import annotations
 
-from proto.import_all_protos import *
+import logging
+import os
+import queue
+import threading
+import time
+from subprocess import Popen
+
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import (
-    SslSocketProtoParseException,
     SslSocket,
+    SslSocketProtoParseException,
 )
-import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
-from subprocess import Popen
-
-import queue
-import logging
-import os
-import threading
-import time
 
 
 class TigersAutoref:
@@ -66,8 +66,8 @@ class TigersAutoref:
         self.auto_ref_wrapper_thread = None
         self.ci_mode = ci_mode
         self.end_autoref = threading.Event()
-        self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
+        self.wrapper_buffer = ThreadSafeBuffer(buffer_size, protos.SSL_WrapperPacket)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, protos.Referee)
         self.gamecontroller = gc
         self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
@@ -93,17 +93,17 @@ class TigersAutoref:
 
         return self
 
-    def _force_gamecontroller_to_accept_all_events(self) -> list[CiOutput]:
+    def _force_gamecontroller_to_accept_all_events(self) -> list[protos.CiOutput]:
         """Force the Gamecontroller to accept all game events proposed by the Autoref
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
-        gc_engine_config = Config()
+        gc_engine_config = protos.Config()
         gc_engine_config.auto_continue = True
 
-        for game_event in GameEvent.Type.DESCRIPTOR.values_by_name:
+        for game_event in protos.GameEvent.Type.DESCRIPTOR.values_by_name:
             gc_engine_config.game_event_behavior[game_event] = (
-                Config.Behavior.BEHAVIOR_ACCEPT
+                protos.Config.Behavior.BEHAVIOR_ACCEPT
             )
 
         return self.gamecontroller.update_game_engine_config(gc_engine_config)
@@ -111,7 +111,7 @@ class TigersAutoref:
     def _send_geometry(self) -> None:
         """Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes."""
         ssl_wrapper = self.wrapper_buffer.get(block=True)
-        ci_input = AutoRefCiInput()
+        ci_input = protos.AutoRefCiInput()
         ci_input.detection.append(ssl_wrapper.detection)
 
         field = tbots_cpp.Field.createSSLDivisionBField()
@@ -121,7 +121,7 @@ class TigersAutoref:
 
         while True:
             try:
-                response_data = self.ci_socket.receive(AutoRefCiOutput)
+                response_data = self.ci_socket.receive(protos.AutoRefCiOutput)
                 break
             except SslSocketProtoParseException as parse_err:
                 logging.info("error with sending geometry data: \n" + parse_err.args)
@@ -161,7 +161,7 @@ class TigersAutoref:
         self.gamecontroller.reset_match()
 
         self.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
         while not self.end_autoref.is_set():
@@ -171,13 +171,13 @@ class TigersAutoref:
                 )
                 referee_packet = self.referee_buffer.get(block=False)
 
-                ci_input = AutoRefCiInput()
+                ci_input = protos.AutoRefCiInput()
                 ci_input.detection.append(ssl_wrapper.detection)
                 if referee_packet.IsInitialized():
                     ci_input.referee_message.CopyFrom(referee_packet)
 
                 self.ci_socket.send(ci_input)
-                response_data = self.ci_socket.receive(AutoRefCiOutput)
+                response_data = self.ci_socket.receive(protos.AutoRefCiOutput)
 
                 for ci_output in response_data:
                     self._forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
@@ -193,8 +193,8 @@ class TigersAutoref:
                 )
 
     def _forward_to_gamecontroller(
-        self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
-    ) -> list[CiOutput]:
+        self, tracker_wrapper: protos.TrackerWrapperPacket
+    ) -> list[protos.CiOutput]:
         """Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
         given tracker_wrapper to support asynchronous ticking.
 
@@ -202,13 +202,13 @@ class TigersAutoref:
 
         :return: a list of CiOutput protos received from the Gamecontroller
         """
-        ci_input = CiInput(
+        ci_input = protos.CiInput(
             timestamp=int(
                 self.initial_timestamp + time_provider_instance.elapsed_time_ns()
             )
         )
 
-        ci_input.api_inputs.append(Input())
+        ci_input.api_inputs.append(protos.Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)
 
         return self.gamecontroller.send_ci_input(ci_input)
@@ -248,8 +248,10 @@ class TigersAutoref:
 
         :param autoref_proto_unix_io: the proto unix io for the Autoref to receive SSLWrapperPackets
         """
-        autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
-        autoref_proto_unix_io.register_observer(Referee, self.referee_buffer)
+        autoref_proto_unix_io.register_observer(
+            protos.SSL_WrapperPacket, self.wrapper_buffer
+        )
+        autoref_proto_unix_io.register_observer(protos.Referee, self.referee_buffer)
 
     def __exit__(self, type, value, traceback) -> None:
         self.end_autoref.set()

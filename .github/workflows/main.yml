@@ -79,9 +79,8 @@ jobs:
           bazel build --show_timestamps --copt=-O3 --verbose_failures \
             -- //... -//software:unix_full_system   \
             -//software/gameplay_tests/...         \
-            -//software/ai/hl/...                   \
+            -//software/ai/stp/...                   \
             -//software/embedded/...                \
-            -//toolchains/cc/...                    \
             -//software:unix_full_system_tar_gen
 
       - name: Raspberry Pi Build Test
@@ -121,9 +120,8 @@ jobs:
           bazel test --copt=-O3 --show_timestamps --verbose_failures \
             -- //... -//software:unix_full_system \
             -//software/gameplay_tests/...  \
-            -//software/ai/hl/...            \
+            -//software/ai/stp/...            \
             -//software/ai/navigator/...     \
-            -//toolchains/cc/...             \
             -//software:unix_full_system_tar_gen
 
   robot-tests:
@@ -153,13 +151,12 @@ jobs:
       - name: Simulated Test Run
         run: |
           cd src
-          bazel test //software/gameplay_tests:requirements_test
+          bazel test //software/gameplay_tests:requirements.test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
-            --test_arg="--ci_mode"                       \
-            -- //software:unix_full_system               \
-            -//software/gameplay_tests:requirements_test \
-            //software/simulation/...                    \
-            //software/ai/hl/...                         \
+            --test_arg="--ci_mode"            \
+            -- //software:unix_full_system       \
+            -//software/gameplay_tests:requirements.test \
+            //software/ai/stp/...              \
             //software/ai/navigator/...
             
       - name: Upload simulated test proto logs
@@ -168,8 +165,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blue-sim-test-proto-logs
-          path: |
-            /tmp/tbots/blue/test/*/proto_*
+          path: /tmp/tbots_*/blue/test/*/proto_*
 
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
@@ -177,8 +173,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: yellow-sim-test-proto-logs
-          path: |
-            /tmp/tbots/yellow/test/*/proto_*
+          path: /tmp/tbots_*/yellow/test/*/proto_*
 
   autorefd-game:
     needs: check-and-clear-cache

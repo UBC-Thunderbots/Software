@@ -1,11 +1,9 @@
-from typing import Optional, Sequence, Any
-from software.thunderscope.common.frametime_counter import FrameTimeCounter
-
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.dockarea import *
-
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Optional, Sequence
+
+from pyqtgraph import dockarea
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 
 class WidgetPosition(Enum):
@@ -78,10 +76,10 @@ class TScopeTab:
         self.widgets_map: dict[str, TScopeWidget] = {}
 
         # Mapping of widget names to dock areas
-        self.dock_map: dict[str, DockArea] = {}
+        self.dock_map: dict[str, dockarea.DockArea] = {}
 
         # make dock area
-        self.dock_area = DockArea()
+        self.dock_area = dockarea.DockArea()
         self.dock_area.layout.setContentsMargins(12, 12, 12, 12)
 
         # first widget is initial anchor widget
@@ -101,7 +99,7 @@ class TScopeTab:
         :param data: the data describing the widget of type TScopeWidget
         """
         self.widgets_map[data.name] = data
-        new_dock = Dock(data.name)
+        new_dock = dockarea.Dock(data.name)
         new_dock.addWidget(data.widget.win if data.in_window else data.widget)
         self.dock_map[data.name] = new_dock
 

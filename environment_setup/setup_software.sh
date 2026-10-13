@@ -121,7 +121,7 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
 fi
 
 if [[ $(lsb_release -rs) == "24.04" ]]; then
-    sudo /opt/tbotspython/bin/pip3 install -r ubuntu24_requirements.txt
+    sudo /opt/tbotspython/bin/pip3 install -r requirements.txt
 fi
 
 sudo chown -R $USER:$USER /opt/tbotspython

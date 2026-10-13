@@ -1,14 +1,6 @@
+import proto.import_all_protos as protos
 import pytest
-
 import software.python_bindings as tbots_cpp
-from software.gameplay_tests.validation.robot_enters_region import *
-from software.gameplay_tests.validation.ball_enters_region import *
-from software.gameplay_tests.validation.ball_moves_in_direction import *
-from software.gameplay_tests.validation.friendly_has_ball_possession import *
-from software.gameplay_tests.validation.ball_speed_threshold import *
-from software.gameplay_tests.validation.robot_speed_threshold import *
-from software.gameplay_tests.validation.ball_stops_in_region import *
-from software.gameplay_tests.validation.excessive_dribbling import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.util import pytest_main
 

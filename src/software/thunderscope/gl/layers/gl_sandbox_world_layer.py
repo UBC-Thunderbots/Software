@@ -1,12 +1,14 @@
 import math
 from typing import Optional, override
-from proto.import_all_protos import *
-from pyqtgraph.Qt.QtCore import *
-from pyqtgraph.Qt.QtGui import *
-from pyqtgraph.opengl import *
-from software.py_constants import *
-from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
+
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtGui
+from software.py_constants import (
+    MILLIMETERS_PER_METER,
+    ROBOT_MAX_RADIUS_MILLIMETERS,
+)
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -37,8 +39,8 @@ class EnemyAtMousePositionError(Exception):
 class GLSandboxWorldLayer(GLWorldLayer):
     """GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field"""
 
-    undo_toggle_enabled_signal = pyqtSignal(bool)
-    redo_toggle_enabled_signal = pyqtSignal(bool)
+    undo_toggle_enabled_signal = QtCore.pyqtSignal(bool)
+    redo_toggle_enabled_signal = QtCore.pyqtSignal(bool)
 
     DEFAULT_ROBOT_ANGLE = 0
 
@@ -79,11 +81,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # map of robot id to a tuple with the robot coordinates and orientation
         # or None if the robot has been removed already
         # (easier to keep track of robots rather than removing the entry entirely)
-        self.local_robot_positions: dict[int, tuple[QVector3D, float]] = {}
+        self.local_robot_positions: dict[int, tuple[QtGui.QVector3D, float]] = {}
 
         # the state of robots before running the simulator
         # the robot state if only manual moves are considered
-        self.pre_sim_robot_positions: dict[int, tuple[QVector3D, float]] = {}
+        self.pre_sim_robot_positions: dict[int, tuple[QtGui.QVector3D, float]] = {}
 
         # stacks for undo and redo operations
         self.undo_operations = []
@@ -103,7 +105,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         super().mouse_in_scene_pressed(event)
 
         # only allow robot editing if Ctrl + Shift is pressed to avoid conflicting with the ball placement
-        if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+        if (
+            not event.mouse_event.modifiers()
+            & QtCore.Qt.KeyboardModifier.ControlModifier
+        ):
             return
 
         try:
@@ -134,7 +139,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         super().mouse_in_scene_dragged(event)
 
         # only allow robot editing if Ctrl + Shift is pressed to avoid conflicting with the ball placement
-        if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+        if (
+            not event.mouse_event.modifiers()
+            & QtCore.Qt.KeyboardModifier.ControlModifier
+        ):
             return
 
         # if robot is selected
@@ -207,7 +215,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             for robot in self.cached_world.friendly_team.team_robots:
                 self.curr_robot_ids.add(robot.id)
                 self.pre_sim_robot_positions[robot.id] = (
-                    QVector3D(
+                    QtGui.QVector3D(
                         robot.current_state.global_position.x_meters,
                         robot.current_state.global_position.y_meters,
                         0,
@@ -356,7 +364,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         else:
             # start a remove double click
             self.robot_remove_double_click = event.multi_plane_points[index]
-            QTimer.singleShot(500, self.__toggle_robot_remove_double_click)
+            QtCore.QTimer.singleShot(500, self.__toggle_robot_remove_double_click)
 
     def __handle_new_robot_event(self, event: MouseInSceneEvent) -> None:
         """Handles a mouse event when an empty position is clicked
@@ -384,7 +392,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         else:
             # start a double click
             self.robot_add_double_click = event.point_in_scene
-            QTimer.singleShot(500, self.__toggle_robot_add_double_click)
+            QtCore.QTimer.singleShot(500, self.__toggle_robot_add_double_click)
 
     def __get_next_robot_id(self, curr_next_id: int) -> int:
         """Gets the id of the next robot to add based on the currently added robot ids
@@ -411,8 +419,12 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_remove_double_click = None
 
     def __add_robot_to_state(
-        self, world_state: WorldState, id: int, pos: QVector3D, orientation: float
-    ) -> WorldState:
+        self,
+        world_state: protos.WorldState,
+        id: int,
+        pos: QtGui.QVector3D,
+        orientation: float,
+    ) -> protos.WorldState:
         """Adds a robot with the given state and id to the given world state
         To the right team based on current team color
         Converts position and orientation if needed
@@ -428,21 +440,23 @@ class GLSandboxWorldLayer(GLWorldLayer):
             converted_orientation,
         ) = self.__invert_robot_if_defending_negative_half(pos, orientation)
         # build the robot state
-        robot_state = RobotState(
-            global_position=Point(
+        robot_state = protos.RobotState(
+            global_position=protos.Point(
                 x_meters=converted_pos.x(),
                 y_meters=converted_pos.y(),
             ),
-            global_orientation=Angle(radians=converted_orientation),
+            global_orientation=protos.Angle(radians=converted_orientation),
         )
 
         if self.friendly_colour_yellow:
-            world_state.yellow_robots[id].CopyFrom(robot_state)
+            world_state.yellow_robots.robot_states[id].CopyFrom(robot_state)
         else:
-            world_state.blue_robots[id].CopyFrom(robot_state)
+            world_state.blue_robots.robot_states[id].CopyFrom(robot_state)
         return world_state
 
-    def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
+    def __remove_robot_from_state(
+        self, world_state: protos.WorldState, id: int
+    ) -> protos.WorldState:
         """Removes a robot with the given id from the right team in the given world state
         Based on current team color
 
@@ -450,13 +464,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param id: the id of the robot to remove
         """
         if self.friendly_colour_yellow:
-            del world_state.yellow_robots[id]
+            del world_state.yellow_robots.robot_states[id]
         else:
-            del world_state.blue_robots[id]
+            del world_state.blue_robots.robot_states[id]
         return world_state
 
     def __identify_robot(
-        self, multi_plane_points: list[QVector3D]
+        self, multi_plane_points: list[QtGui.QVector3D]
     ) -> tuple[Optional[int], Optional[int]]:
         """Identify which robot was clicked on the team
 
@@ -527,7 +541,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
     def __update_world_state(
         self,
         new_robot_id: int,
-        new_pos: Optional[QVector3D],
+        new_pos: Optional[QtGui.QVector3D],
         new_orientation: float,
         clear_redo=True,
     ) -> None:
@@ -541,14 +555,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param clear_redo: If True, indicates a new action instead of an action from the undo/redo list.
                             clears redo list if True
         """
-        world_state = WorldState()
+        world_state = protos.WorldState()
 
         # copy over existing robots for the current team
         for robot_ in self.cached_world.friendly_team.team_robots:
             world_state = self.__add_robot_to_state(
                 world_state,
                 robot_.id,
-                QVector3D(
+                QtGui.QVector3D(
                     robot_.current_state.global_position.x_meters,
                     robot_.current_state.global_position.y_meters,
                     0,
@@ -577,15 +591,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.redo_operations.clear()
 
         # send out world state
-        self.simulator_io.send_proto(WorldState, world_state)
+        self.simulator_io.send_proto(protos.WorldState, world_state)
 
     def __update_with_new_position(
         self,
-        world_state: WorldState,
+        world_state: protos.WorldState,
         robot_id: int,
-        new_pos: Optional[QVector3D],
+        new_pos: Optional[QtGui.QVector3D],
         new_orientation: float = 0,
-    ) -> WorldState:
+    ) -> protos.WorldState:
         """Updates the world state with the new robot position for the given id
         New position is defined if adding / moving a robot and None if removing one
 
@@ -618,8 +632,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         return world_state
 
     def __invert_robot_if_defending_negative_half(
-        self, point: QVector3D, orientation: float
-    ) -> tuple[QVector3D, float]:
+        self, point: QtGui.QVector3D, orientation: float
+    ) -> tuple[QtGui.QVector3D, float]:
         """If we are defending the negative half of the field, we invert the position and orientation
         of a robot  to match up with the visualization.
 

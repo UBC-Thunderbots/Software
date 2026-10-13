@@ -1,12 +1,13 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph import parametertree
-from proto.import_all_protos import *
-from software.thunderscope.common import proto_parameter_tree_util
-from google.protobuf.message import Message
 from typing import override
 
+import proto.import_all_protos as protos
+from google.protobuf.message import Message
+from pyqtgraph import parametertree
+from pyqtgraph.Qt import QtWidgets
+from software.thunderscope.common import proto_parameter_tree_util
 
-class RobotStatusView(QWidget):
+
+class RobotStatusView(QtWidgets.QWidget):
     """Class to show a detailed view of the robot's current state
 
     Displays all the information in the RobotStatus message in a collapsible
@@ -21,14 +22,14 @@ class RobotStatusView(QWidget):
 
         self.robot_status_visible = True
 
-        layout = QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
 
         self.param_group = parametertree.Parameter.create(
             name="RobotStatus",
             type="group",
             children=proto_parameter_tree_util.config_proto_to_field_list(
-                RobotStatus(), read_only=True, search_term=None
+                protos.RobotStatus(), read_only=True, search_term=None
             ),
         )
 

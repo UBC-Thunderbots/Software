@@ -1,5 +1,6 @@
 import os
 from enum import IntEnum
+
 import software.python_bindings as tbots_cpp
 
 DEFAULT_PRIMITIVE_DURATION = 2.0

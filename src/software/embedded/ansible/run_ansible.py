@@ -1,15 +1,15 @@
+import argparse
+import os
+import subprocess
+
 from ansible import context
 from ansible.cli import CLI
-from ansible.module_utils.common.collections import ImmutableDict
 from ansible.executor.playbook_executor import PlaybookExecutor
-from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
-from ansible.vars.manager import VariableManager
+from ansible.module_utils.common.collections import ImmutableDict
+from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.loader import init_plugin_loader
-
-import os
-import argparse
-import subprocess
+from ansible.vars.manager import VariableManager
 
 # Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
 # documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
