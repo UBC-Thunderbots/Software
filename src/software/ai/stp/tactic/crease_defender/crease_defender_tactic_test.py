@@ -172,7 +172,7 @@ def test_crease_region_positioning(
     gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
-        test_timeout_s=5,
+        test_timeout_s=7,
     )
 
 

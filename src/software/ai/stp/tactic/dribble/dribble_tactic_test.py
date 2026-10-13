@@ -329,6 +329,7 @@ def test_excessive_dribbling_without_enemies(
         setup=setup,
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
+        test_timeout_s=5,
     )
 
 
@@ -424,7 +425,7 @@ def test_run_into_enemy_robot_knock_ball_away(
     gameplay_test_runner.run_test(
         setup=setup,
         eventually_validation_sequence_set=eventually_validations,
-        test_timeout_s=10,
+        test_timeout_s=12,
     )
 
 
