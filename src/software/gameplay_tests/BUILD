@@ -47,7 +47,6 @@ py_library(
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/thunderscope",
-        "//software/thunderscope:qt_dependency_bootstrap",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
@@ -84,7 +83,6 @@ py_library(
         "//software/logger:py_logger",
         "//software/thunderscope",
         "//software/thunderscope:estop_helpers",
-        "//software/thunderscope:qt_dependency_bootstrap",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -99,6 +97,7 @@ py_library(
         "util.py",
     ],
     deps = [
+        "//software/thunderscope:qt_dependency_bootstrap",
         requirement("pytest"),
     ],
 )

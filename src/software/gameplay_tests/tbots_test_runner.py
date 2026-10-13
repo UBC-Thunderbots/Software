@@ -1,12 +1,3 @@
-# Qt libs must be preloaded before any Qt binding is imported, so the imports
-# below deliberately come after preload_bundled_qt_libs().
-# ruff: noqa: E402
-
-from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
-
-# Must run before importing any Qt bindings (see qt_dependency_bootstrap).
-preload_bundled_qt_libs()
-
 import threading
 import time
 from abc import abstractmethod

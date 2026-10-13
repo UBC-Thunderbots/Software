@@ -1,3 +1,12 @@
+# Qt libs must be preloaded before any Qt binding is imported, so the imports
+# below deliberately come after preload_bundled_qt_libs(). This is necessary
+# for the Qt libs used in validation geometries.
+# ruff: noqa: E402
+
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+preload_bundled_qt_libs()
+
 import argparse
 import os
 import sys
