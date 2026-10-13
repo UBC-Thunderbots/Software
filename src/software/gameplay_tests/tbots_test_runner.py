@@ -9,14 +9,12 @@ preload_bundled_qt_libs()
 
 import threading
 import time
-
-import pytest
-
-import proto.import_all_protos as protos
-
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from abc import abstractmethod
 from typing import Any
+
+import proto.import_all_protos as protos
+import pytest
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 PAUSE_AFTER_FAIL_DELAY_S = 3
 PROCESS_BUFFER_DELAY_S = 0.01
@@ -248,11 +246,3 @@ class TbotsTestRunner:
                     break
 
         return params
-
-    @abstractmethod
-    def set_world_state(self, worldstate: protos.WorldState):
-        """Sets the worldstate for the given team
-
-        :param worldstate: the worldstate proto to use
-        """
-        raise NotImplementedError("abstract class method called set_world_state")

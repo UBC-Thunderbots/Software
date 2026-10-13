@@ -1,20 +1,19 @@
 import time
 
 import pytest
+from software.gameplay_tests.field_test_runner import FieldTestRunner
+from software.gameplay_tests.simulated_test_runner import SimulatedTestRunner
+from software.gameplay_tests.util import (
+    get_pytest_name,
+    get_pytest_path_name,
+    load_command_line_arguments,
+)
+from software.logger.logger import create_logger
 from software.py_constants import (
     MAX_ROBOT_IDS_PER_SIDE,
     SSL_REFEREE_PORT,
     getRobotMulticastChannel,
 )
-
-from software.gameplay_tests.field_test_runner import FieldTestRunner
-from software.gameplay_tests.simulated_test_runner import SimulatedTestRunner
-from software.gameplay_tests.util import (
-    load_command_line_arguments,
-    get_pytest_name,
-    get_pytest_path_name,
-)
-from software.logger.logger import create_logger
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.simulator import Simulator

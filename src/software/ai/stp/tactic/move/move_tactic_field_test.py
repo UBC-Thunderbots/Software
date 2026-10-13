@@ -1,9 +1,8 @@
 import math
 
+import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-
-from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.duration_validation import DurationValidation
@@ -38,14 +37,14 @@ def test_basic_rotation(angle, gameplay_test_runner):
             ),
         )
 
-        move_tactic = MoveTactic(
+        move_tactic = protos.MoveTactic(
             destination=tbots_cpp.createPointProto(start_position),
-            dribbler_mode=DribblerMode.OFF,
+            dribbler_mode=protos.DribblerMode.OFF,
             final_orientation=tbots_cpp.createAngleProto(target_angle),
-            ball_collision_type=BallCollisionType.AVOID,
-            auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-            max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-            obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+            ball_collision_type=protos.BallCollisionType.AVOID,
+            auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+            max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+            obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
         )
 
         gameplay_test_runner.set_tactics(
@@ -102,14 +101,14 @@ def test_one_robots_square(start_position, end_position, gameplay_test_runner):
             ),
         )
 
-        tactic = MoveTactic(
+        tactic = protos.MoveTactic(
             destination=tbots_cpp.createPointProto(end_position),
-            dribbler_mode=DribblerMode.OFF,
-            final_orientation=Angle(radians=-math.pi / 2),
-            ball_collision_type=BallCollisionType.AVOID,
-            auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
-            max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-            obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+            dribbler_mode=protos.DribblerMode.OFF,
+            final_orientation=protos.Angle(radians=-math.pi / 2),
+            ball_collision_type=protos.BallCollisionType.AVOID,
+            auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=0.0),
+            max_allowed_speed_mode=protos.MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+            obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
         )
 
         gameplay_test_runner.set_tactics(

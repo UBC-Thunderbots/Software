@@ -9,10 +9,10 @@ import os
 import shutil
 from typing import Callable
 
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.gameplay_tests.util import pytest_main
 from google.protobuf.message import Message
+from software.gameplay_tests.util import pytest_main
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.test.replay_corruption_test import (
     create_random_proto,
     create_valid_log_entry,

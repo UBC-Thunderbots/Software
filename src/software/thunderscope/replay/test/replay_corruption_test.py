@@ -21,12 +21,12 @@ import time
 from typing import Callable
 
 import proto.import_all_protos as protos
-from software.thunderscope.constants import ProtoPlayerFlags
-from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import Message
 from software.gameplay_tests.util import pytest_main
 from software.py_constants import REPLAY_METADATA_DELIMITER
-from google.protobuf.message import Message
+from software.thunderscope.constants import ProtoPlayerFlags
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 random.seed(0)
 

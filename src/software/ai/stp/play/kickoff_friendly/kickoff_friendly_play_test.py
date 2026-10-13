@@ -2,12 +2,12 @@ import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_enters_region import BallNeverEntersRegion
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
 from software.gameplay_tests.validation.or_validation import OrValidation
-from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsAlwaysStaysInRegion,
     NumberOfRobotsEventuallyEntersRegion,
@@ -128,7 +128,7 @@ def test_kickoff_friendly_play(gameplay_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=60,
-        gc_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.BLUE)],
+        gc_cmd_with_delay=[(4, protos.Command.Type.NORMAL_START, SslTeam.BLUE)],
     )
 
 

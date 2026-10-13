@@ -1,8 +1,8 @@
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.util import pytest_main
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.robot_speed_threshold import (
     RobotSpeedEventuallyBelowThreshold,
 )
@@ -46,10 +46,10 @@ def test_halt_play(gameplay_test_runner):
         )
 
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+            gc_command=protos.protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.FORCE_START, team=SslTeam.UNKNOWN
+            gc_command=protos.protos.Command.Type.FORCE_START, team=SslTeam.UNKNOWN
         )
 
     gameplay_test_runner.run_test(
@@ -57,8 +57,8 @@ def test_halt_play(gameplay_test_runner):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[RobotSpeedEventuallyBelowThreshold(1e-3)]],
         gc_cmd_with_delay=[
-            (3, Command.Type.HALT, Team.BLUE),
-            (3, Command.Type.HALT, Team.YELLOW),
+            (3, protos.Command.Type.HALT, SslTeam.BLUE),
+            (3, protos.Command.Type.HALT, SslTeam.YELLOW),
         ],
         test_timeout_s=10,
     )

@@ -2,6 +2,7 @@ import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
     BallEventuallyKickedInDirection,
 )
@@ -17,7 +18,6 @@ from software.gameplay_tests.validation.robot_at_orientation import (
 from software.gameplay_tests.validation.robot_at_position import (
     RobotEventuallyAtPosition,
 )
-from software.gameplay_tests.util import pytest_main
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 

@@ -1,8 +1,8 @@
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.util import pytest_main
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_enters_region import BallNeverEntersRegion
 from software.gameplay_tests.validation.or_validation import OrValidation
 from software.gameplay_tests.validation.robot_enters_region import (
@@ -45,10 +45,10 @@ def test_kickoff_enemy_play(gameplay_test_runner):
         )
 
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+            gc_command=protos.protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
         gameplay_test_runner.send_gamecontroller_command(
-            gc_command=protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
+            gc_command=protos.protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
         )
         gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.KickoffEnemyPlay,
@@ -128,7 +128,7 @@ def test_kickoff_enemy_play(gameplay_test_runner):
         eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        gc_cmd_with_delay=[(4, Command.Type.NORMAL_START, Team.YELLOW)],
+        gc_cmd_with_delay=[(4, protos.Command.Type.NORMAL_START, SslTeam.YELLOW)],
     )
 
 

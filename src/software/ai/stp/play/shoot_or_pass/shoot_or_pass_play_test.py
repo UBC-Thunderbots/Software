@@ -3,10 +3,10 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.friendly_team_scored import (
     FriendlyTeamEventuallyScored,
 )
-from software.gameplay_tests.util import pytest_main
 
 
 @pytest.mark.skip(

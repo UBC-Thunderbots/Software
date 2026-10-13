@@ -2,15 +2,14 @@ import queue
 import time
 from typing import override
 
+import proto.import_all_protos as protos
+from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
+from software.gameplay_tests.validation import validation
+from software.logger.logger import create_logger
 from software.py_constants import (
     DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK,
     MILLISECONDS_PER_SECOND,
 )
-
-from proto.import_all_protos import *
-from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
-from software.gameplay_tests.validation import validation
-from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 logger = create_logger(__name__)
@@ -54,12 +53,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.ci_mode = ci_mode
 
     @override
-    def set_world_state(self, worldstate: WorldState):
+    def set_world_state(self, worldstate: protos.WorldState):
         """Sets the simulation worldstate
 
         :param worldstate: proto containing the desired worldstate
         """
-        self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
+        self.simulator_proto_unix_io.send_proto(protos.WorldState, worldstate)
 
     @override
     def _pre_run_setup(self, setup: (lambda: None)):
@@ -67,9 +66,11 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         :param setup: Function that sets up the world state
         """
-        world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+        world_state_received_buffer = ThreadSafeBuffer(
+            1, protos.WorldStateReceivedTrigger
+        )
         self.simulator_proto_unix_io.register_observer(
-            WorldStateReceivedTrigger, world_state_received_buffer
+            protos.WorldStateReceivedTrigger, world_state_received_buffer
         )
 
         while True:
@@ -110,8 +111,10 @@ class SimulatedTestRunner(TbotsTestRunner):
                     # remove command from the list
                     gc_cmd_with_delay.remove((delay, cmd, team))
 
-            tick = SimulatorTick(milliseconds=TICK_DURATION_S * MILLISECONDS_PER_SECOND)
-            self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+            tick = protos.SimulatorTick(
+                milliseconds=TICK_DURATION_S * MILLISECONDS_PER_SECOND
+            )
+            self.simulator_proto_unix_io.send_proto(protos.SimulatorTick, tick)
             time_elapsed_s += TICK_DURATION_S
 
             while True:
@@ -138,10 +141,10 @@ class SimulatedTestRunner(TbotsTestRunner):
                     robot_status = self.robot_status_buffer.get(block=False)
 
                     self.blue_full_system_proto_unix_io.send_proto(
-                        SSL_WrapperPacket, ssl_wrapper
+                        protos.SSL_WrapperPacket, ssl_wrapper
                     )
                     self.blue_full_system_proto_unix_io.send_proto(
-                        RobotStatus, robot_status
+                        protos.RobotStatus, robot_status
                     )
 
             # get the time difference after we get the primitive (after any blocking that happened)
@@ -173,17 +176,17 @@ class SimulatedTestRunner(TbotsTestRunner):
             # for visualization and logging for replays.
             if self.is_yellow_friendly:
                 self.yellow_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, eventually_validation_proto_set
+                    protos.ValidationProtoSet, eventually_validation_proto_set
                 )
                 self.yellow_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, always_validation_proto_set
+                    protos.ValidationProtoSet, always_validation_proto_set
                 )
             else:
                 self.blue_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, eventually_validation_proto_set
+                    protos.ValidationProtoSet, eventually_validation_proto_set
                 )
                 self.blue_full_system_proto_unix_io.send_proto(
-                    ValidationProtoSet, always_validation_proto_set
+                    protos.ValidationProtoSet, always_validation_proto_set
                 )
 
             if any(len(seq) > 0 for seq in always_validation_sequence_set):

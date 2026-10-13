@@ -3,13 +3,13 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_enters_region import (
     BallEventuallyEntersRegion,
 )
 from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyExitsRegion,
 )
-from software.gameplay_tests.util import pytest_main
 from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 
 

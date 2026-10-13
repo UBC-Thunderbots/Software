@@ -1,6 +1,5 @@
+import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-
-from proto.import_all_protos import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_kicked_in_direction import (
@@ -25,10 +24,10 @@ def test_pivot_kick(gameplay_test_runner):
         )
         gameplay_test_runner.set_tactics(
             blue_tactics={
-                robot_id: PivotKickTactic(
+                robot_id: protos.PivotKickTactic(
                     kick_origin=tbots_cpp.createPointProto(ball_location),
                     kick_direction=tbots_cpp.createAngleProto(angle_to_kick_at),
-                    auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
+                    auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=5.0),
                 )
             }
         )

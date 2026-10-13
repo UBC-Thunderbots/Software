@@ -2,6 +2,7 @@ import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsAlwaysOnGround,
     BallIsEventuallyOffGround,
@@ -17,7 +18,6 @@ from software.gameplay_tests.validation.robot_enters_region import (
     RobotEventuallyEntersRegion,
     RobotNeverEntersRegion,
 )
-from software.gameplay_tests.util import pytest_main
 
 
 def test_not_bumping_ball_towards_net(gameplay_test_runner):
