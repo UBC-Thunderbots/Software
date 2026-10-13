@@ -42,6 +42,7 @@ cc_library(
     target_compatible_with = ["@platforms//os:linux"],
     deps = [
         "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/geom:angular_acceleration",
         "//software/geom:angular_velocity",
