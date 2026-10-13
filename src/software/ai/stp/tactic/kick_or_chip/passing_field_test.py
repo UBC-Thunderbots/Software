@@ -43,13 +43,13 @@ def test_passing(gameplay_test_runner):
         # We use KickTactic since AttackerTactic shoots towards the goal instead if open
         # KickTactic just does the kick we want
         blue_tactics = {
-            passer_robot_id: protos.KickTactic(
-                kick_origin=protos.Point(
+            passer_robot_id: protos.KickOrChipTactic(
+                kick_or_chip_origin=protos.Point(
                     x_meters=pass_to_test.passerPoint().x(),
                     y_meters=pass_to_test.passerPoint().y(),
                 ),
-                kick_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
-                kick_speed_meters_per_second=pass_to_test.speed(),
+                kick_or_chip_direction=protos.Angle(radians=kick_vec.orientation().toRadians()),
+                auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=pass_to_test.speed()),
             )
         }
 
