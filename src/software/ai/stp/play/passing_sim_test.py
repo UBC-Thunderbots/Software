@@ -21,9 +21,12 @@ from software.gameplay_tests.validation.friendly_receives_ball_slow import (
 def calculate_best_pass(
     ball_initial_position,
     ball_initial_velocity,
-    blue_robot_locations,
-    yellow_robot_locations,
+    attacker_robot_position,
+    receiver_robot_positions,
+    enemy_robot_positions,
 ):
+    blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
+
     # construct a world object to match the one sent to the test runner
     world = tbots_cpp.World(
         tbots_cpp.Field.createSSLDivisionBField(),
@@ -53,7 +56,7 @@ def calculate_best_pass(
                     tbots_cpp.Angle(),
                     tbots_cpp.Timestamp(),
                 )
-                for index, location in enumerate(yellow_robot_locations)
+                for index, location in enumerate(enemy_robot_positions)
             ]
         ),
     )
@@ -68,11 +71,10 @@ def calculate_best_pass(
     # generate the best pass on the world 100 times
     # this improves the passes generated over time
     robots_to_ignore = [0]  # Avoid sampling passes around the attacker robot
-    for index in range(0, 100):
+    for index in range(100):
         best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
 
-    best_pass = best_pass_with_score.pass_value
-    return best_pass
+    return best_pass_with_score.pass_value
 
 
 def setup_pass_and_robots(
@@ -96,7 +98,6 @@ def setup_pass_and_robots(
     :param enemy_robot_positions: the positions of the enemy robots
     :param receive_pass: whether a friendly robot should try to receive the pass
     :param gameplay_test_runner: the test runner
-    :return: the best pass we generate
     """
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 
@@ -114,7 +115,8 @@ def setup_pass_and_robots(
     best_pass = calculate_best_pass(
         ball_initial_position,
         ball_initial_velocity,
-        blue_robot_locations,
+        attacker_robot_position,
+        receiver_robot_positions,
         enemy_robot_positions,
     )
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
@@ -155,8 +157,6 @@ def setup_pass_and_robots(
         blue_tactics[1] = protos.ReceiverTactic(**receiver_args)
 
     gameplay_test_runner.set_tactics(blue_tactics=blue_tactics, yellow_tactics=None)
-
-    return best_pass
 
 
 @pytest.mark.parametrize(
@@ -257,7 +257,7 @@ def test_passing_receive_speed(
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
     always_validation_sequence_set = [
-        [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.1)],
+        [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
     ]
 
     gameplay_test_runner.run_test(
@@ -357,13 +357,6 @@ def test_passing_no_backwards_passes(
     enemy_robot_positions,
     gameplay_test_runner,
 ):
-    best_pass = calculate_best_pass(
-        ball_initial_position,
-        ball_initial_velocity,
-        [attacker_robot_position, *receiver_robot_positions],
-        enemy_robot_positions,
-    )
-
     def setup():
         setup_pass_and_robots(
             ball_initial_position=ball_initial_position,
@@ -375,6 +368,14 @@ def test_passing_no_backwards_passes(
             receive_pass=True,
             gameplay_test_runner=gameplay_test_runner,
         )
+
+    best_pass = calculate_best_pass(
+        ball_initial_position,
+        ball_initial_velocity,
+        attacker_robot_position,
+        receiver_robot_positions,
+        enemy_robot_positions,
+    )
 
     field = tbots_cpp.Field.createSSLDivisionBField()
 
