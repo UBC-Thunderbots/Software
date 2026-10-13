@@ -6,6 +6,7 @@ from typing import Sequence
 import pyqtgraph
 import qdarktheme
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
+from software.thunderscope.common.rerun_test_widget import RerunTestWidget
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_communication import RobotCommunication
@@ -492,7 +493,7 @@ def configure_field_test_view(
 
 def configure_open_loop_field_test_view(
     proto_unix_io: ProtoUnixIO,
-) -> TScopeConfig:
+) -> (TScopeConfig, RerunTestWidget):
     """Constructs the Thunderscope Config for open-loop field tests, which run
     without FullSystem or vision. There is no field view; only robot status,
     logs and estop state are shown.
@@ -501,7 +502,7 @@ def configure_open_loop_field_test_view(
     publish MotorControl on every refresh and would override the test's commands.
 
     :param proto_unix_io: the proto unix io the robots communicate over
-    :return: the Thunderscope Config for this view
+    :return: the Thunderscope Config and RerunTestWidget for this view
     """
     proto_unix_io_map = {
         ProtoUnixIOTypes.SIM: ProtoUnixIO(),
@@ -511,6 +512,8 @@ def configure_open_loop_field_test_view(
 
     # Must be called before widgets are initialized below
     initialize_application()
+
+    rerun_test_widget = RerunTestWidget()
 
     tabs = [
         TScopeTab(
@@ -531,11 +534,20 @@ def configure_open_loop_field_test_view(
                 # Only NONE is offered: the test owns the robot control modes
                 configure_robot_view(proto_unix_io, [IndividualRobotMode.NONE]),
                 configure_estop(proto_unix_io),
+                TScopeWidget(
+                    name="Rerun Test",
+                    widget=rerun_test_widget,
+                    anchor="Estop",
+                    position=WidgetPosition.BELOW,
+                ),
             ],
         )
     ]
 
-    return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
+    return (
+        TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs),
+        rerun_test_widget,
+    )
 
 
 def configure_replay_view(

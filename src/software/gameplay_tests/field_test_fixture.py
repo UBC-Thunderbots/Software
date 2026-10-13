@@ -273,17 +273,25 @@ class OpenLoopFieldTestRunner:
     to be validated by eye or from the recorded statuses.
     """
 
-    def __init__(self, thunderscope, proto_unix_io, robot_communication):
+    def __init__(
+        self, thunderscope, rerun_test_widget, proto_unix_io, robot_communication
+    ):
         """Initialize the OpenLoopFieldTestRunner
 
         :param thunderscope: The Thunderscope to use
+        :param rerun_test_widget: The RerunTestWidget used to rerun the test
         :param proto_unix_io: The proto unix io the robots communicate over
         :param robot_communication: The robot communication instance
         """
         self.thunderscope = thunderscope
+        self.rerun_test_widget = rerun_test_widget
         self.proto_unix_io = proto_unix_io
         self.robot_communication = robot_communication
         self.last_exception = None
+
+        self.test_fn = None
+        self.test_thread = None
+        self.rerun_test_widget.rerun_requested.connect(self.__start_test_thread)
 
         self.robot_status_buffer = ThreadSafeBuffer(
             ROBOT_STATUS_BUFFER_SIZE, protos.RobotStatus
@@ -404,29 +412,45 @@ class OpenLoopFieldTestRunner:
     def run(self, test_fn):
         """Run test_fn in a background thread while Thunderscope runs on the
         main thread. Blocks until the Thunderscope window is closed. The
-        controlled robots are stopped once test_fn finishes or fails.
+        controlled robots are stopped once test_fn finishes or fails, and it
+        can be rerun from the Rerun Test button.
+
+        The test fails if any run of test_fn failed.
 
         :param test_fn: function that takes no arguments and runs the test
         """
+        self.test_fn = test_fn
+        self.__start_test_thread()
+        self.thunderscope.show()
+        self.test_thread.join()
+
+        if self.last_exception:
+            pytest.fail(str(self.last_exception))
+
+    def __start_test_thread(self):
+        """Run test_fn in a new background thread, unless a run is in progress"""
+        if self.test_thread is not None and self.test_thread.is_alive():
+            logger.warning("Test is already running, not rerunning it")
+            return
 
         def __runner():
             try:
-                test_fn()
+                self.test_fn()
             except Exception as e:
                 self.last_exception = e
                 raise
             finally:
                 self.send_velocity()
                 self.set_controlled_robots([])
-                logger.info("Test finished, close Thunderscope to exit")
+                self.rerun_test_widget.test_running = False
+                logger.info(
+                    "Test finished, press Rerun Test to run it again "
+                    "or close Thunderscope to exit"
+                )
 
-        test_thread = threading.Thread(target=__runner, daemon=True)
-        test_thread.start()
-        self.thunderscope.show()
-        test_thread.join()
-
-        if self.last_exception:
-            pytest.fail(str(self.last_exception))
+        self.rerun_test_widget.test_running = True
+        self.test_thread = threading.Thread(target=__runner, daemon=True)
+        self.test_thread.start()
 
     def __drain_robot_statuses(self):
         """Empty the RobotStatus buffer
@@ -762,10 +786,10 @@ def open_loop_field_test_runner():
             estop_baudrate=args.estop_baudrate,
         ) as robot_communication,
     ):
-        tscope = Thunderscope(
-            configure_open_loop_field_test_view(proto_unix_io),
-            layout_path=None,
+        tscope_config, rerun_test_widget = configure_open_loop_field_test_view(
+            proto_unix_io
         )
+        tscope = Thunderscope(tscope_config, layout_path=None)
 
         if estop_mode == EstopMode.KEYBOARD_ESTOP:
             tscope.keyboard_estop_shortcut.activated.connect(
@@ -774,6 +798,7 @@ def open_loop_field_test_runner():
 
         runner = OpenLoopFieldTestRunner(
             thunderscope=tscope,
+            rerun_test_widget=rerun_test_widget,
             proto_unix_io=proto_unix_io,
             robot_communication=robot_communication,
         )

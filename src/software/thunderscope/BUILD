@@ -142,6 +142,7 @@ py_library(
         ":proto_unix_io",
         ":thunderscope_types",
         ":widget_names_to_setup",
+        "//software/thunderscope/common:rerun_test_widget",
         requirement("pyqtdarktheme-fork"),
     ],
 )

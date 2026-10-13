@@ -70,16 +70,16 @@ def run_segments(open_loop_field_test_runner, segments):
 
 
 @pytest.mark.parametrize("speed_m_per_s,side_length_m", [
-    # (0.5, 1.5),
-    (1.00, 1.5),
+    (0.5, 0.7),
+    # (1.00, 1.5),
     # (1.0, 1.0),
 ])
 def test_open_loop_square(open_loop_field_test_runner, speed_m_per_s, side_length_m):
     duration_s = side_length_m / speed_m_per_s
     segments = [
-        # (speed_m_per_s, 0, 0, duration_s),
+        (speed_m_per_s, 0, 0, duration_s),
         (0, speed_m_per_s, 0, duration_s),
-        # (-speed_m_per_s, 0, 0, duration_s),
+        (-speed_m_per_s, 0, 0, duration_s),
         (0, -speed_m_per_s, 0, duration_s),
     ]
 
