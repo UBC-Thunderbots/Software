@@ -1,6 +1,8 @@
 # Qt libs must be preloaded before any Qt binding is imported, so the imports
 # below deliberately come after preload_bundled_qt_libs(). This is necessary
 # for the Qt libs used in validation geometries.
+# TODO: Place this in a more appropriate place that would also consistently
+#       load before any Qt libs. Perhaps could be fixed by bazel changes.
 # ruff: noqa: E402
 
 from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
