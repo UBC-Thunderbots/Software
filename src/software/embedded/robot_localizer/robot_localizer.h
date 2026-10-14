@@ -3,30 +3,26 @@
 #include <Eigen/Dense>
 #include <deque>
 #include <optional>
+#include <variant>
 
 #include "proto/primitive.pb.h"
-#include "proto/robot_status_msg.pb.h"
+#include "software/embedded/robot_localizer/robot_localizer_constants.h"
 #include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
+#include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
 #include "software/time/duration.h"
 #include "software/util/make_enum/make_enum.hpp"
 #include "software/world/robot_state.h"
 
-MAKE_ENUM(StateIndex, X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY,
-          ANGULAR_VELOCITY);
-
-MAKE_ENUM(MeasurementIndex, VISION_X_POSITION, VISION_Y_POSITION, VISION_ORIENTATION,
-          MOTOR_X_VELOCITY, MOTOR_Y_VELOCITY, MOTOR_ANGULAR_VELOCITY,
-          IMU_ANGULAR_VELOCITY);
-
-MAKE_ENUM(ControlIndex, X_ACCELERATION, Y_ACCELERATION);
-
 /**
- * Estimates robot orientation, angular velocity, and angular acceleration
- * using a Kalman filter.
+ * Estimates robot position, orientation, velocity, and angular velocity using an
+ * extended Kalman filter.
+ *
+ * The process model is nonlinear because velocity is estimated in the robot's local
+ * frame (see StateIndex) while position is in world space, so propagating position
+ * requires rotating local velocity by the current orientation estimate.
  *
  * The filter keeps a history of recent predict/update operations. When delayed
  * vision data arrives, the localizer rewinds to the matching historical state,
@@ -45,6 +41,8 @@ class RobotLocalizer
 
     struct MotorData
     {
+        // Local-frame velocity, as reported directly by the motor sensors (see
+        // velocity_conversion_util.h)
         Vector velocity;
         AngularVelocity angular_velocity;
     };
@@ -54,12 +52,6 @@ class RobotLocalizer
         AngularVelocity angular_velocity;
     };
 
-    struct RobotLocalizerConfig
-    {
-        double process_noise_variance;
-        double vision_noise_variance;
-        double motor_sensor_noise_variance;
-    };
 
     /**
      * Creates a new robot localizer.
@@ -68,15 +60,16 @@ class RobotLocalizer
      *
      * @param config Configuration for the localizer variances.
      */
-    explicit RobotLocalizer(const RobotLocalizerConfig& config);
+    explicit RobotLocalizer();
 
     /**
      * Runs one prediction step over the given elapsed time.
      *
-     * @param linear_acceleration The current linear acceleration of the robot
+     * @param target_velocity The global-frame linear velocity the robot is currently
+     * being commanded to achieve
      * @param delta_time The elapsed time since the previous step
      */
-    void step(const Vector& linear_acceleration, const Duration& delta_time);
+    void predict(const Vector& target_velocity, const Duration& delta_time);
 
     /**
      * Update the robot's position and orientation from data reported by vision.
@@ -110,9 +103,20 @@ class RobotLocalizer
     /**
      * Gets the estimated velocity of the robot in world space.
      *
+     * The filter estimates velocity in the robot's local frame (see StateIndex), so
+     * this converts it to world space using the current orientation estimate.
+     *
      * @return the estimated velocity of the robot in world space
      */
-    Vector getVelocity() const;
+    Vector getGlobalVelocity() const;
+
+    /**
+     * Gets the estimated velocity of the robot in its own local frame (see StateIndex
+     * and velocity_conversion_util.h), i.e. the filter's raw velocity state.
+     *
+     * @return the estimated velocity of the robot in its local frame
+     */
+    Vector getLocalVelocity() const;
 
     /**
      * Gets the estimated orientation of the robot in world space.
@@ -144,43 +148,66 @@ class RobotLocalizer
      */
     void updateFilterWithVision(const Point& position, const Angle& orientation);
 
-    static constexpr size_t STATE_SIZE       = reflective_enum::size<StateIndex>();
-    static constexpr size_t MEASUREMENT_SIZE = reflective_enum::size<MeasurementIndex>();
-    static constexpr size_t CONTROL_SIZE     = reflective_enum::size<ControlIndex>();
+    /**
+     * Computes the process model function, its Jacobian, the process covariance, and
+     * the control model for the given elapsed time, and writes them into the filter.
+     * Does not run the predict step itself.
+     *
+     * The control model also depends on the filter's current orientation estimate
+     * (used to rotate the global-frame control input into the local frame that
+     * velocity is estimated in), so this must be called with the filter's state
+     * estimate set to what it was immediately before the predict step being
+     * (re)computed.
+     *
+     * @param delta_time_seconds The elapsed time to generate the prediction
+     * matrices for
+     */
+    void updateFilterPredictionMatrices(double delta_time_seconds);
+
+    /**
+     * Writes the measurement model for the given data source into the filter.
+     *
+     * @param source Which sensor's measurement model to generate. Must not be
+     * FilterStepType::PREDICT.
+     */
+    void updateFilterMeasurementModel(FilterStepType source);
+
+
+    /**
+     * A predict step. process_model/process_covariance/control_model are recomputed
+     * from the elapsed time during replay instead of being stored (see
+     * updateFilterPredictionMatrices).
+     */
+    struct PredictStep
+    {
+        Eigen::Vector<double, CONTROL_SIZE> control_input;
+    };
+
+    /**
+     * An update step. The measurement model is regenerated from type during replay
+     * (see updateFilterMeasurementModel). type must not be FilterStepType::PREDICT.
+     */
+    struct UpdateStep
+    {
+        FilterStepType type;
+        Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
+    };
 
     /**
      * Snapshot of a Kalman filter predict/update step needed for rollback/replay.
      */
     struct FilterStep
     {
-        struct Predict
-        {
-            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_model;
-            Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> process_covariance;
-            Eigen::Matrix<double, STATE_SIZE, CONTROL_SIZE> control_model;
-            Eigen::Vector<double, CONTROL_SIZE> control_input;
-        };
+        std::variant<PredictStep, UpdateStep> step;
 
-        struct Update
-        {
-            Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> measurement_model;
-            Eigen::Vector<double, MEASUREMENT_SIZE> measurement;
-        };
-
-        std::optional<Predict> prediction;
-        std::optional<Update> update;
-
+        // Post operation state
         Eigen::Vector<double, STATE_SIZE> state_estimate;
         Eigen::Matrix<double, STATE_SIZE, STATE_SIZE> state_covariance;
 
         double time_seconds;
     };
 
-    LinearKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
-
-    // Process noise variance used in prediction
-    double process_linear_acceleration_noise_variance_;
-    double process_angular_acceleration_noise_variance_;
+    ExtendedKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE> filter_;
 
     // History is ordered newest-first (front is the most recent step)
     std::deque<FilterStep> history;

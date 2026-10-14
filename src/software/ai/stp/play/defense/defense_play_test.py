@@ -3,9 +3,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_enters_region import (
     BallNeverEntersRegion,
 )
@@ -36,11 +34,11 @@ from software.gameplay_tests.validation.friendly_has_ball_possession import (
         )
     ],
 )
-def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
-    def setup(*args):
+def test_defense_play_ball_steal(gameplay_test_runner, blue_bots, yellow_bots):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0.93, 0)
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -49,32 +47,29 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.DefensePlay, yellow_play=protos.PlayName.HaltPlay
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
-        inv_always_validation_sequence_set=[
+        always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
-        inv_eventually_validation_sequence_set=[
+        eventually_validation_sequence_set=[
             [FriendlyEventuallyHasBallPossession(tolerance=0.2)]
         ],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=20,
     )
 
@@ -101,11 +96,11 @@ def test_defense_play_ball_steal(simulated_test_runner, blue_bots, yellow_bots):
         )
     ],
 )
-def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
-    def setup(*args):
+def test_defense_play(gameplay_test_runner, blue_bots, yellow_bots):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(0.9, 2.85)
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -114,33 +109,30 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.DefensePlay,
             yellow_play=protos.PlayName.ShootOrPassPlay,
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
-        inv_always_validation_sequence_set=[
+        always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
-        inv_eventually_validation_sequence_set=[
+        eventually_validation_sequence_set=[
             [FriendlyEventuallyHasBallPossession(tolerance=0.1)]
         ],
-        ag_always_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=30,
     )
 
