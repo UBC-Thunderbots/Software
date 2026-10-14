@@ -21,7 +21,7 @@ runs:
     - name: Run setup_software.sh
       shell: bash
       run: |
-        "${GITHUB_WORKSPACE}"/environment_setup/setup_minimal.sh
+        sudo "${GITHUB_WORKSPACE}"/environment_setup/setup_minimal.sh
 
     - name: Cache Bazel disk cache
       uses: actions/cache@v4
