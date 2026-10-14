@@ -9,6 +9,7 @@ preload_bundled_qt_libs()
 
 import argparse
 import glob
+import math
 import os
 import queue
 import threading
@@ -16,13 +17,17 @@ import time
 from typing import override
 
 import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 import pytest
+from software.gameplay_tests.plotjuggler_sender import PlotJugglerSender
 from software.gameplay_tests.tbots_test_runner import TbotsTestRunner
 from software.gameplay_tests.validation import validation
 from software.logger.logger import create_logger
 from software.py_constants import (
     MAX_ROBOT_IDS_PER_SIDE,
     SSL_REFEREE_PORT,
+    SSL_VISION_ADDRESS,
+    SSL_VISION_PORT,
     getRobotMulticastChannel,
 )
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -51,6 +56,8 @@ ROBOT_STATUS_BUFFER_SIZE = 1000
 # Time to let RobotCommunication flush the queued stop primitives before teardown
 STOP_FLUSH_DELAY_S = 0.5
 MOTOR_CONTROL_RESEND_PERIOD_S = 0.05
+SSL_WRAPPER_BUFFER_SIZE = 5
+VISION_POSE_TIMEOUT_S = 2.0
 
 
 class FieldTestRunner(TbotsTestRunner):
@@ -274,7 +281,13 @@ class OpenLoopFieldTestRunner:
     """
 
     def __init__(
-        self, thunderscope, rerun_test_widget, proto_unix_io, robot_communication
+        self,
+        thunderscope,
+        rerun_test_widget,
+        proto_unix_io,
+        robot_communication,
+        friendly_colour_yellow=False,
+        interface=None,
     ):
         """Initialize the OpenLoopFieldTestRunner
 
@@ -282,8 +295,21 @@ class OpenLoopFieldTestRunner:
         :param rerun_test_widget: The RerunTestWidget used to rerun the test
         :param proto_unix_io: The proto unix io the robots communicate over
         :param robot_communication: The robot communication instance
+        :param friendly_colour_yellow: True if the friendly team is yellow, else blue
+        :param interface: The network interface used to send data to PlotJuggler
         """
         self.thunderscope = thunderscope
+        self.friendly_colour_yellow = friendly_colour_yellow
+        self.plotjuggler_sender = PlotJugglerSender(interface)
+        self.ssl_wrapper_buffer = ThreadSafeBuffer(
+            SSL_WRAPPER_BUFFER_SIZE, protos.SSL_WrapperPacket
+        )
+        proto_unix_io.register_observer(
+            protos.SSL_WrapperPacket, self.ssl_wrapper_buffer
+        )
+        self.tracked_robot_id = None
+        self.initial_pose = None
+        self.expected_position = (0.0, 0.0)
         self.rerun_test_widget = rerun_test_widget
         self.proto_unix_io = proto_unix_io
         self.robot_communication = robot_communication
@@ -329,6 +355,74 @@ class OpenLoopFieldTestRunner:
         logger.info(
             "\x1b[32m" + "Estop is in PLAY state. Proceeding with test." + "\x1b[0m"
         )
+
+    def get_vision_pose(self, robot_id):
+        """Get the latest pose of a friendly robot from SSL vision
+
+        :param robot_id: the robot id to look for
+        :return: (x_m, y_m, orientation_rad) or None if vision has not seen the robot
+        """
+        wrapper = self.ssl_wrapper_buffer.get(block=False, return_cached=True)
+        if wrapper is None or not wrapper.HasField("detection"):
+            return None
+        robots = (
+            wrapper.detection.robots_yellow
+            if self.friendly_colour_yellow
+            else wrapper.detection.robots_blue
+        )
+        for robot in robots:
+            if robot.robot_id == robot_id:
+                return robot.x / 1000.0, robot.y / 1000.0, robot.orientation
+        return None
+
+    def start_path_tracking(self, robot_id):
+        """Record the robot's current vision pose as the start of the expected
+        path. From now on drive() sends the vision position and the position the
+        robot should be at, given the commanded velocities, to PlotJuggler.
+
+        :param robot_id: the robot to track
+        """
+        self.tracked_robot_id = robot_id
+        self.initial_pose = None
+        deadline = time.time() + VISION_POSE_TIMEOUT_S
+        while self.initial_pose is None and time.time() < deadline:
+            self.initial_pose = self.get_vision_pose(robot_id)
+            time.sleep(0.05)
+        if self.initial_pose is None:
+            logger.warning(f"no vision pose for robot {robot_id}, not tracking path")
+            return
+        self.expected_position = self.initial_pose[:2]
+        logger.info(f"tracking path from initial pose {self.initial_pose}")
+
+    def __send_path_tracking(self, x_m_per_s, y_m_per_s, dt):
+        """Advance the expected position by one step and send it, with the
+        current vision position, to PlotJuggler
+
+        :param x_m_per_s: commanded local-frame forward velocity
+        :param y_m_per_s: commanded local-frame leftward velocity
+        :param dt: seconds the command has been applied for
+        """
+        if self.initial_pose is None:
+            return
+        # The square is open-loop and never rotates, so the local-frame command
+        # maps to the global frame through the initial orientation
+        theta = self.initial_pose[2]
+        self.expected_position = (
+            self.expected_position[0]
+            + (x_m_per_s * math.cos(theta) - y_m_per_s * math.sin(theta)) * dt,
+            self.expected_position[1]
+            + (x_m_per_s * math.sin(theta) + y_m_per_s * math.cos(theta)) * dt,
+        )
+        values = {
+            "open_loop/expected_x": self.expected_position[0],
+            "open_loop/expected_y": self.expected_position[1],
+        }
+        vision_pose = self.get_vision_pose(self.tracked_robot_id)
+        if vision_pose is not None:
+            values["open_loop/vision_x"] = vision_pose[0]
+            values["open_loop/vision_y"] = vision_pose[1]
+            values["open_loop/vision_orientation"] = vision_pose[2]
+        self.plotjuggler_sender.send(values)
 
     def set_controlled_robots(self, robot_ids):
         """Choose which robots receive the open-loop commands. All controlled
@@ -390,12 +484,16 @@ class OpenLoopFieldTestRunner:
         robot_statuses = []
         # Resend periodically like the diagnostics widget does, since
         # RobotCommunication's MotorControl buffer drops protos when full
-        end_time = time.time() + duration_s
+        last_time = time.time()
+        end_time = last_time + duration_s
         while time.time() < end_time:
             self.send_velocity(
                 x_m_per_s, y_m_per_s, angular_velocity_rad_per_s, dribbler_speed_rpm
             )
             time.sleep(MOTOR_CONTROL_RESEND_PERIOD_S)
+            now = time.time()
+            self.__send_path_tracking(x_m_per_s, y_m_per_s, now - last_time)
+            last_time = now
             robot_statuses += self.__drain_robot_statuses()
         return robot_statuses
 
@@ -786,6 +884,19 @@ def open_loop_field_test_runner():
             estop_baudrate=args.estop_baudrate,
         ) as robot_communication,
     ):
+        # Only vision is needed for plotting the tracked path, not FullSystem
+        ssl_wrapper_listener = None
+        if args.interface:
+            ssl_wrapper_listener = tbots_cpp.SSLWrapperPacketProtoListener(
+                SSL_VISION_ADDRESS,
+                SSL_VISION_PORT,
+                args.interface,
+                lambda data: proto_unix_io.send_proto(protos.SSL_WrapperPacket, data),
+                True,
+            )
+        else:
+            logger.warning("no --interface given, not listening to SSL vision")
+
         tscope_config, rerun_test_widget = configure_open_loop_field_test_view(
             proto_unix_io
         )
@@ -801,6 +912,8 @@ def open_loop_field_test_runner():
             rerun_test_widget=rerun_test_widget,
             proto_unix_io=proto_unix_io,
             robot_communication=robot_communication,
+            friendly_colour_yellow=args.run_yellow,
+            interface=args.interface,
         )
 
         yield runner

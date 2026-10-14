@@ -88,6 +88,7 @@ def test_open_loop_square(open_loop_field_test_runner, speed_m_per_s, side_lengt
         logger.info(f"Running test on robot {robot_id}")
         open_loop_field_test_runner.set_controlled_robots([robot_id])
         open_loop_field_test_runner.wait_for_estop_play()
+        open_loop_field_test_runner.start_path_tracking(robot_id)
         run_segments(open_loop_field_test_runner, segments)
 
     open_loop_field_test_runner.run(execute_test)

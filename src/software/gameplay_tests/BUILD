@@ -58,15 +58,27 @@ py_library(
 )
 
 py_library(
+    name = "plotjuggler_sender",
+    srcs = [
+        "plotjuggler_sender.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+)
+
+py_library(
     name = "field_test_fixture",
     srcs = [
         "field_test_fixture.py",
     ],
     data = [
         "//software:py_constants.so",
+        "//software:python_bindings.so",
     ],
     deps = [
         "//proto:import_all_protos",
+        "//software/gameplay_tests:plotjuggler_sender",
         "//software/gameplay_tests:tbots_test_runner",
         "//software/gameplay_tests/validation:validations",
         "//software/logger:py_logger",
