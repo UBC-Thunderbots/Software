@@ -6,6 +6,7 @@ from typing import Sequence
 import pyqtgraph
 import qdarktheme
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
+from software.thunderscope.common.rerun_test_widget import RerunTestWidget
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_communication import RobotCommunication
@@ -488,6 +489,65 @@ def configure_field_test_view(
         ]
 
     return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
+
+
+def configure_open_loop_field_test_view(
+    proto_unix_io: ProtoUnixIO,
+) -> (TScopeConfig, RerunTestWidget):
+    """Constructs the Thunderscope Config for open-loop field tests, which run
+    without FullSystem or vision. There is no field view; only robot status,
+    logs and estop state are shown.
+
+    The diagnostics drive/chicker widgets are deliberately left out since they
+    publish MotorControl on every refresh and would override the test's commands.
+
+    :param proto_unix_io: the proto unix io the robots communicate over
+    :return: the Thunderscope Config and RerunTestWidget for this view
+    """
+    proto_unix_io_map = {
+        ProtoUnixIOTypes.SIM: ProtoUnixIO(),
+        ProtoUnixIOTypes.CURRENT: proto_unix_io,
+        ProtoUnixIOTypes.DIAGNOSTICS: proto_unix_io,
+    }
+
+    # Must be called before widgets are initialized below
+    initialize_application()
+
+    rerun_test_widget = RerunTestWidget()
+
+    tabs = [
+        TScopeTab(
+            name="Open Loop Field Test",
+            widgets=[
+                TScopeWidget(
+                    name="Logs",
+                    widget=setup_log_widget(proto_unix_io=proto_unix_io),
+                ),
+                TScopeWidget(
+                    name="Error Log",
+                    widget=setup_robot_error_log_view_widget(
+                        proto_unix_io=proto_unix_io
+                    ),
+                    position=WidgetPosition.BELOW,
+                    anchor="Logs",
+                ),
+                # Only NONE is offered: the test owns the robot control modes
+                configure_robot_view(proto_unix_io, [IndividualRobotMode.NONE]),
+                configure_estop(proto_unix_io),
+                TScopeWidget(
+                    name="Rerun Test",
+                    widget=rerun_test_widget,
+                    anchor="Estop",
+                    position=WidgetPosition.BELOW,
+                ),
+            ],
+        )
+    ]
+
+    return (
+        TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs),
+        rerun_test_widget,
+    )
 
 
 def configure_replay_view(

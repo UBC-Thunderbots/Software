@@ -20,6 +20,11 @@ py_library(
 )
 
 py_library(
+    name = "rerun_test_widget",
+    srcs = ["rerun_test_widget.py"],
+)
+
+py_library(
     name = "common_widgets",
     srcs = ["common_widgets.py"],
 )

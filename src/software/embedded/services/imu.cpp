@@ -7,7 +7,9 @@
 
 #include <Tracy.hpp>
 #include <climits>  // For SHRT_MAX
+#include <map>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
@@ -171,6 +173,42 @@ void ImuService::poll(TbotsProto::RobotStatus& robot_status)
         robot_status.mutable_imu_status()
             ->mutable_linear_acceleration()
             ->set_y_component_meters(linear_acceleration->y());
+    }
+
+    sendImuDataToPlotJuggler(angular_velocity, angular_acceleration,
+                             imu_linear_acceleration, linear_acceleration);
+}
+
+void ImuService::sendImuDataToPlotJuggler(
+    const std::optional<AngularVelocity>& angular_velocity,
+    const std::optional<AngularAcceleration>& angular_acceleration,
+    const std::optional<Eigen::Vector2d>& imu_linear_acceleration,
+    const std::optional<Eigen::Vector2d>& linear_acceleration) const
+{
+    std::map<std::string, double> values;
+
+    if (angular_velocity.has_value())
+    {
+        values["imu/angular_velocity"] = angular_velocity->toRadians();
+    }
+    if (angular_acceleration.has_value())
+    {
+        values["imu/angular_acceleration"] = angular_acceleration->toRadians();
+    }
+    if (imu_linear_acceleration.has_value())
+    {
+        values["imu/raw_linear_acceleration_x"] = imu_linear_acceleration->x();
+        values["imu/raw_linear_acceleration_y"] = imu_linear_acceleration->y();
+    }
+    if (linear_acceleration.has_value())
+    {
+        values["imu/linear_acceleration_x"] = linear_acceleration->x();
+        values["imu/linear_acceleration_y"] = linear_acceleration->y();
+    }
+
+    if (!values.empty())
+    {
+        LOG(PLOTJUGGLER) << *createPlotJugglerValue(values);
     }
 }
 

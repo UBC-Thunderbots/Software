@@ -76,6 +76,21 @@ class ImuService
      */
     Eigen::Vector2d calibrate_imu();
 
+    /**
+     * Sends the IMU readings from a poll to PlotJuggler. Readings that weren't
+     * available this poll are left out.
+     *
+     * @param angular_velocity angular velocity of the robot
+     * @param angular_acceleration angular acceleration of the robot
+     * @param imu_linear_acceleration linear acceleration measured at the IMU
+     * @param linear_acceleration linear acceleration of the robot center of mass
+     */
+    void sendImuDataToPlotJuggler(
+        const std::optional<AngularVelocity>& angular_velocity,
+        const std::optional<AngularAcceleration>& angular_acceleration,
+        const std::optional<Eigen::Vector2d>& imu_linear_acceleration,
+        const std::optional<Eigen::Vector2d>& linear_acceleration) const;
+
 
     bool initialized_ = false;
 

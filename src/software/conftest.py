@@ -1,5 +1,8 @@
 import pytest  # noqa: F401
-from software.gameplay_tests.field_test_fixture import field_test_runner  # noqa: F401
+from software.gameplay_tests.field_test_fixture import (  # noqa: F401
+    field_test_runner,
+    open_loop_field_test_runner,
+)
 from software.gameplay_tests.simulated_test_fixture import (
     simulated_test_runner,  # noqa: F401
 )
