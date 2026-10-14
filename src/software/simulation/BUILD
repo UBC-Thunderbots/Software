@@ -1,5 +1,7 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -39,5 +41,17 @@ cc_test(
         "//software/physics:euclidean_to_wheel",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "simulator_ball_test",
+    srcs = [
+        "simulator_ball_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
     ],
 )

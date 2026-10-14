@@ -46,3 +46,15 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+py_test(
+    name = "passing_field_test",
+    srcs = [
+        "passing_field_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
