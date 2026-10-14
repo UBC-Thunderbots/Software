@@ -455,14 +455,14 @@ class InteractiveCli:
                     "Which tests?",
                     choices=[
                         questionary.Choice(
-                            title="Specific test",
-                            value="one",
-                            description="Search for a test to run",
-                        ),
-                        questionary.Choice(
                             title="All tests",
                             value="all",
                             description="Run the entire test suite",
+                        ),
+                        questionary.Choice(
+                            title="Specific test",
+                            value="one",
+                            description="Search for a test to run",
                         ),
                     ],
                     style=InteractiveCli.INTERACTIVE_STYLE,
