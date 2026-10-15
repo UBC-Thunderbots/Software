@@ -5,10 +5,7 @@ import pytest
 import software.python_bindings as tbots
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import (
-    SimulatedTestRunner,
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.avoid_collisions import (
     RobotsDoNotCollide,
 )
@@ -140,7 +137,6 @@ def create_zig_zag_path_test_params(
         ],
         [],
         20,
-        False,
     )
 
 
@@ -170,7 +166,7 @@ def hrvo_setup(
     friendly_robots_final_orientations: list[tbots.Angle],
     enemy_robots_positions: list[tbots.Point],
     enemy_robots_destinations: list[tbots.Point],
-    simulated_test_runner: SimulatedTestRunner,
+    gameplay_test_runner,
 ):
     """Setup for the hrvo tests
 
@@ -179,7 +175,7 @@ def hrvo_setup(
     :param friendly_robots_final_orientations: final orientations of friendly robots
     :param enemy_robots_positions: starting positions of enemy robots
     :param enemy_robots_destinations: destinations of enemy robots
-    :param simulated_test_runner: the current test runner being used
+    :param gameplay_test_runner: the current test runner being used
     """
     desired_orientation = tbots.Angle.fromRadians(0)
 
@@ -187,7 +183,7 @@ def hrvo_setup(
 
     ball_initial_vel = tbots.Point(0, 0)
 
-    simulated_test_runner.set_world_state(
+    gameplay_test_runner.set_world_state(
         create_world_state(
             yellow_robot_locations=enemy_robots_positions,
             blue_robot_locations=friendly_robots_positions,
@@ -196,13 +192,13 @@ def hrvo_setup(
         )
     )
 
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=protos.Command.Type.STOP, team=SslTeam.BLUE
     )
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=protos.Command.Type.STOP, team=SslTeam.YELLOW
     )
-    simulated_test_runner.send_gamecontroller_command(
+    gameplay_test_runner.send_gamecontroller_command(
         gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
     )
 
@@ -228,14 +224,14 @@ def hrvo_setup(
             tbots.Angle.fromRadians(0),
         )
 
-    simulated_test_runner.set_tactics(
+    gameplay_test_runner.set_tactics(
         blue_tactics=blue_tactics, yellow_tactics=yellow_tactics
     )
 
 
 @pytest.mark.parametrize(
     "friendly_robot_positions,friendly_robot_destinations,friendly_robots_final_orientations,"
-    + "enemy_robots_positions,enemy_robots_destinations,timeout_s,run_till_end",
+    + "enemy_robots_positions,enemy_robots_destinations,timeout_s",
     [
         # robot moving straight with no obstacles
         (
@@ -245,7 +241,6 @@ def hrvo_setup(
             [],
             [],
             10,
-            False,
         ),
         # robot moving straight with no obstacles while turning from 0 to 180 degrees
         (
@@ -255,7 +250,6 @@ def hrvo_setup(
             [],
             [],
             10,
-            False,
         ),
         # robot moving straight with a moving enemy robot behind it
         (
@@ -265,7 +259,6 @@ def hrvo_setup(
             [tbots.Point(-2.5, 0)],
             [tbots.Point(-2.1, 0)],
             10,
-            False,
         ),
         # robot moving straight with a moving enemy robot to its side
         (
@@ -275,7 +268,6 @@ def hrvo_setup(
             [tbots.Point(-1, -0.8)],
             [tbots.Point(1, 0)],
             10,
-            False,
         ),
         # robot moving straight with a moving enemy robot moving straight towards it
         (
@@ -285,7 +277,6 @@ def hrvo_setup(
             [tbots.Point(2.8, 0)],
             [tbots.Point(2.5, 0)],
             10,
-            False,
         ),
         # robot moving with a stationary friendly robot in front of it
         (
@@ -295,7 +286,6 @@ def hrvo_setup(
             [],
             [],
             12,
-            False,
         ),
         # robot moving with a stationary enemy robot in front of it
         (
@@ -305,7 +295,6 @@ def hrvo_setup(
             [tbots.Point(1, 0)],
             [],
             12,
-            False,
         ),
         # robot moving straight with a moving friendly robot moving straight towards it
         (
@@ -315,7 +304,6 @@ def hrvo_setup(
             [],
             [],
             10,
-            False,
         ),
         # robot moving straight with a moving friendly robot moving straight towards it
         # while both are turning from 0 to 180 degrees
@@ -326,7 +314,6 @@ def hrvo_setup(
             [],
             [],
             10,
-            False,
         ),
         # robot moving with a 3 enemy robot wall in front of it
         (
@@ -340,7 +327,6 @@ def hrvo_setup(
             ],
             [],
             10,
-            False,
         ),
         # robot moving with various stationary enemy robots in front of it
         # walls generated by range(start_x, start_x + step * num_robots, step)
@@ -351,7 +337,6 @@ def hrvo_setup(
             [tbots.Point(float(x_meters) / 10, 0) for x_meters in range(20, 32, 2)],
             [],
             25,
-            True,
         ),
         # robot moving in a local minima (enemy robots in a curve around it)
         (
@@ -369,7 +354,6 @@ def hrvo_setup(
             ],
             [],
             25,
-            False,
         ),
         # robot moving in a local minima (enemy robots in a curve around it) with an opening in the middle
         (
@@ -387,7 +371,6 @@ def hrvo_setup(
             ],
             [],
             10,
-            False,
         ),
         # robot moving in a zig zag path around enemy robots
         create_zig_zag_path_test_params(-2, 0.3, 3, 5),
@@ -399,7 +382,6 @@ def hrvo_setup(
             [],
             [],
             15,
-            False,
         ),
         # friendly robots in a circle moving along each diameter
         # while turning from 0 to 180 degrees
@@ -410,7 +392,6 @@ def hrvo_setup(
             [],
             [],
             20,
-            False,
         ),
         # half enemy half friendly robots in a circle moving along each diameter
         (
@@ -450,7 +431,6 @@ def hrvo_setup(
                 if index % 2 == 1
             ],
             10,
-            False,
         ),
     ],
     ids=[
@@ -474,41 +454,34 @@ def hrvo_setup(
     ],
 )
 def test_robot_movement(
-    simulated_test_runner: SimulatedTestRunner,
+    gameplay_test_runner,
     friendly_robot_positions: list[tbots.Point],
     friendly_robot_destinations: list[tbots.Point],
     friendly_robots_final_orientations: list[tbots.Angle],
     enemy_robots_positions: list[tbots.Point],
     enemy_robots_destinations: list[tbots.Point],
     timeout_s: int,
-    run_till_end: bool,
 ):
     # Always Validation
     always_validation_sequence_set = [[RobotsDoNotCollide()]]
 
     # Eventually Validation
-    eventually_validation_sequence_set = (
-        [[]]
-        if run_till_end
-        else get_reached_destination_validation(friendly_robot_destinations)
+    eventually_validation_sequence_set = get_reached_destination_validation(
+        friendly_robot_destinations
     )
 
-    simulated_test_runner.run_test(
-        setup=lambda param: hrvo_setup(
+    gameplay_test_runner.run_test(
+        setup=lambda: hrvo_setup(
             friendly_robot_positions,
             friendly_robot_destinations,
             friendly_robots_final_orientations,
             enemy_robots_positions,
             enemy_robots_destinations,
-            simulated_test_runner,
+            gameplay_test_runner,
         ),
-        params=[0],
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=timeout_s,
-        run_till_end=run_till_end,
     )
 
 

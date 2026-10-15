@@ -35,8 +35,12 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
 
    private:
     // TODO(#3737): tune constants
-    PidController<double> x_pid_{0.2, 0.0, 0.0, 0.0};
-    PidController<double> y_pid_{0.2, 0.0, 0.0, 0.0};
+    PidController<double> x_pid_{0.1, 0.0, 0.0, 0.0};
+    PidController<double> y_pid_{0.1, 0.0, 0.0, 0.0};
 
     static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
+
+    // Time constant the PID effort decays with since the trajectory was created,
+    // since the position estimate drifts from the last vision fix over time
+    static constexpr double PID_DECAY_TIME_CONSTANT_S = 1.0;
 };

@@ -1,5 +1,7 @@
 #include "software/embedded/motion_control/orientation_controller.h"
 
+#include <cmath>
+
 AngularVelocity OrientationController::step(
     const Angle& orientation, const BangBangTrajectory1DAngular& target_trajectory,
     Duration elapsed_time, Duration delta_time)
@@ -7,8 +9,10 @@ AngularVelocity OrientationController::step(
     // feedforward trajectory angular velocity with small pid control effort
     const Angle error_angular =
         (target_trajectory.getPosition(elapsed_time.toSeconds()) - orientation).clamp();
+    const double pid_decay =
+        std::exp(-elapsed_time.toSeconds() / PID_DECAY_TIME_CONSTANT_S);
     const AngularVelocity pid_effort_angular = AngularVelocity::fromRadians(
-        w_pid_.step(error_angular.toRadians(), delta_time.toSeconds()));
+        w_pid_.step(error_angular.toRadians(), delta_time.toSeconds()) * pid_decay);
 
     AngularVelocity angular_velocity =
         target_trajectory.getVelocity(elapsed_time.toSeconds()) + pid_effort_angular;

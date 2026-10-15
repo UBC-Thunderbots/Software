@@ -2,9 +2,7 @@ import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_is_off_ground import (
     BallIsEventuallyOffGround,
 )
@@ -58,13 +56,13 @@ def test_kick_or_chip(
     ball_offset_from_robot,
     angle_to_kick_or_chip_at,
     auto_chip_or_kick,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     robot_position = tbots_cpp.Point(0, 0)
     ball_position = robot_position + ball_offset_from_robot
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -76,7 +74,7 @@ def test_kick_or_chip(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: protos.KickOrChipTactic(
                     kick_or_chip_origin=tbots_cpp.createPointProto(ball_position),
@@ -102,10 +100,9 @@ def test_kick_or_chip(
             ]
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
     )
 
 

@@ -3,9 +3,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.robot_at_orientation import (
     RobotEventuallyAtOrientation,
 )
@@ -94,13 +92,13 @@ from software.py_constants import ROBOT_MAX_RADIUS_METERS
 def test_penalty_kick_enemy_play_setup(
     friendly_robot_positions,
     enemy_distance_behind_ball,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = field.enemyPenaltyMark()
     enemy_penalty_x = ball_initial_pos.x()
 
-    def setup(*args):
+    def setup():
         # Enemy robots behind the penalty mark
         yellow_bots = [
             tbots_cpp.Point(enemy_penalty_x + 0.3, 0),  # kicker robot
@@ -123,7 +121,7 @@ def test_penalty_kick_enemy_play_setup(
             ),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=friendly_robot_positions,
                 yellow_robot_locations=yellow_bots,
@@ -132,14 +130,14 @@ def test_penalty_kick_enemy_play_setup(
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.HALT, team=SslTeam.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.PENALTY, team=SslTeam.YELLOW
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.PenaltyKickEnemyPlay,
             yellow_play=protos.PlayName.HaltPlay,
         )
@@ -168,10 +166,9 @@ def test_penalty_kick_enemy_play_setup(
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=20,
     )
 

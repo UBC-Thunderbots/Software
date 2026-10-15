@@ -10,7 +10,7 @@ import shutil
 from typing import Callable
 
 from google.protobuf.message import Message
-from software.gameplay_tests.simulated_test_fixture import pytest_main
+from software.gameplay_tests.util import pytest_main
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.test.replay_corruption_test import (

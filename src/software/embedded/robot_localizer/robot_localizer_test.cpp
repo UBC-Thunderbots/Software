@@ -1,4 +1,4 @@
-#include "software/embedded/robot_localizer.h"
+#include "robot_localizer.h"
 
 #include <gtest/gtest.h>
 
@@ -7,16 +7,11 @@
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/time/duration.h"
+#include "software/world/robot.h"
 
 namespace
 {
 // Mirror the values thunderloop constructs the localizer with (DivB constants).
-RobotLocalizer::RobotLocalizerConfig makeConfig()
-{
-    return RobotLocalizer::RobotLocalizerConfig{/*process_noise_variance=*/1.0,
-                                                /*vision_noise_variance=*/0.01 * 0.01,
-                                                /*motor_sensor_noise_variance=*/0.5};
-}
 
 constexpr double LOOP_HZ = 300.0;
 constexpr double DT      = 1.0 / LOOP_HZ;
@@ -27,7 +22,7 @@ constexpr double DT      = 1.0 / LOOP_HZ;
 // provided (isolates whether the periodic vision fix corrupts the velocity estimate).
 RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S / 2)
 {
-    RobotLocalizer localizer(makeConfig());
+    RobotLocalizer localizer = RobotLocalizer();
 
     const Vector true_velocity(1.0, 0.0);
     const Angle true_orientation = Angle::zero();

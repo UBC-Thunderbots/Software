@@ -1,5 +1,7 @@
 #include "software/embedded/motion_control/position_controller.h"
 
+#include <cmath>
+
 #include "software/geom/algorithms/distance.h"
 
 Vector PositionController::step(const Point& position,
@@ -9,8 +11,12 @@ Vector PositionController::step(const Point& position,
     // feedforward trajectory velocity with small pid control effort
     const Vector error =
         target_trajectory.getPosition(elapsed_time.toSeconds()) - position;
-    const Vector control_effort{x_pid_.step(error.x(), delta_time.toSeconds()),
-                                y_pid_.step(error.y(), delta_time.toSeconds())};
+    const double pid_decay =
+        std::exp(-elapsed_time.toSeconds() / PID_DECAY_TIME_CONSTANT_S);
+    const Vector control_effort =
+        Vector{x_pid_.step(error.x(), delta_time.toSeconds()),
+               y_pid_.step(error.y(), delta_time.toSeconds())} *
+        pid_decay;
     double distance_to_destination =
         distance(position, target_trajectory.getDestination());
 

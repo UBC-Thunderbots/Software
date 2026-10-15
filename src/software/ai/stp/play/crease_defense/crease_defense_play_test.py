@@ -2,9 +2,7 @@ import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.delay_validation import DelayValidation
 from software.gameplay_tests.validation.robot_enters_region import (
     NumberOfRobotsEventuallyEntersRegion,
@@ -14,12 +12,12 @@ from software.gameplay_tests.validation.robot_speed_threshold import (
 )
 
 
-def test_crease_defense_play(simulated_test_runner):
+def test_crease_defense_play(gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
     goalie_position = tbots_cpp.Point(-4.5, 0)
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     goalie_position,
@@ -42,12 +40,12 @@ def test_crease_defense_play(simulated_test_runner):
             ),
         )
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.CreaseDefensePlay,
             yellow_play=protos.PlayName.HaltPlay,
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
@@ -70,10 +68,9 @@ def test_crease_defense_play(simulated_test_runner):
         ]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=10,
     )
 

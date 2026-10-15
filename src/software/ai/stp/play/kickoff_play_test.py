@@ -17,9 +17,7 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_enters_region import (
     BallEventuallyExitsRegion,
     BallNeverEntersRegion,
@@ -35,10 +33,10 @@ NORMAL_START_DELAY_S = 4.0
 
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
-def test_kickoff_play(simulated_test_runner, is_friendly_test):
+def test_kickoff_play(gameplay_test_runner, is_friendly_test):
     ball_initial_pos = tbots_cpp.Point(0, 0)
 
-    def setup(*args):
+    def setup():
         blue_bots = [
             tbots_cpp.Point(-3, 2.5),
             tbots_cpp.Point(-3, 1.5),
@@ -61,7 +59,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             .negXPosYCorner(),
         ]
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
@@ -70,24 +68,24 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             ),
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
         if is_friendly_test:
-            simulated_test_runner.send_gamecontroller_command(
+            gameplay_test_runner.send_gamecontroller_command(
                 gc_command=protos.Command.Type.KICKOFF, team=SslTeam.BLUE
             )
             blue_play = protos.PlayName.KickoffFriendlyPlay
             yellow_play = protos.PlayName.KickoffEnemyPlay
         else:
-            simulated_test_runner.send_gamecontroller_command(
+            gameplay_test_runner.send_gamecontroller_command(
                 gc_command=protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
             )
             blue_play = protos.PlayName.KickoffEnemyPlay
             yellow_play = protos.PlayName.KickoffFriendlyPlay
 
-        simulated_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
+        gameplay_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
 
     # Always Validation
     always_validation_sequence_set = [[]]
@@ -148,11 +146,11 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             )
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ci_cmd_with_delay=[
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
+        gc_cmd_with_delay=[
             (NORMAL_START_DELAY_S, protos.Command.Type.NORMAL_START, SslTeam.BLUE),
         ],
         test_timeout_s=10,

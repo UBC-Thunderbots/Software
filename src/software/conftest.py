@@ -1,10 +1,7 @@
 import pytest  # noqa: F401
-from software.gameplay_tests.field_test_fixture import (  # noqa: F401
-    field_test_runner,
+from software.gameplay_tests.fixture import gameplay_test_runner  # noqa: F401
+from software.gameplay_tests.open_loop_field_test_runner import (  # noqa: F401
     open_loop_field_test_runner,
-)
-from software.gameplay_tests.simulated_test_fixture import (
-    simulated_test_runner,  # noqa: F401
 )
 
 # Pytest requires that all tests fixtures shared across a package be defined

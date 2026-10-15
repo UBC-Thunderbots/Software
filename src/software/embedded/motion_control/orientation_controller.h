@@ -37,7 +37,11 @@ class OrientationController
 
    private:
     // TODO(#3737): tune constants
-    PidController<double> w_pid_{0.4, 0.0, 0.0, 0.0};
+    PidController<double> w_pid_{0.15, 0.0, 0.0, 0.0};
 
     static constexpr double ANGULAR_DESTINATION_THRESHOLD_DEGREES = 5;
+
+    // Time constant the PID effort decays with since the trajectory was created,
+    // since the orientation estimate drifts from the last vision fix over time
+    static constexpr double PID_DECAY_TIME_CONSTANT_S = 1.0;
 };

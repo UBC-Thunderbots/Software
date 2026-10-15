@@ -2,9 +2,7 @@ import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_moves_in_direction import (
     BallAlwaysMovesForward,
 )
@@ -49,16 +47,14 @@ from software.gameplay_tests.validation.friendly_team_scored import (
 @pytest.mark.skip(
     "Disabling this test because of poor dribbling controls, does not consistently score goal. TODO (#2232)"
 )
-def test_penalty_kick(
-    enemy_robot_location, enemy_robot_velocity, simulated_test_runner
-):
+def test_penalty_kick(enemy_robot_location, enemy_robot_velocity, gameplay_test_runner):
     field = tbots_cpp.Field.createSSLDivisionBField()
     ball_initial_pos = field.friendlyPenaltyMark()
 
-    def setup(*args):
+    def setup():
         shooter_position = ball_initial_pos - tbots_cpp.Vector(0.1, 0)
 
-        simulated_test_runner.set_world_state(
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[shooter_position],
                 yellow_robot_locations=[enemy_robot_location],
@@ -67,7 +63,7 @@ def test_penalty_kick(
             ),
         )
 
-        simulated_test_runner.set_tactics(blue_tactics={0: protos.PenaltyKickTactic()})
+        gameplay_test_runner.set_tactics(blue_tactics={0: protos.PenaltyKickTactic()})
 
     eventually_validation_sequence_set = [
         [
@@ -80,10 +76,10 @@ def test_penalty_kick(
         [BallAlwaysMovesForward(ball_initial_pos), NeverExcessivelyDribbles()]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
     )
 

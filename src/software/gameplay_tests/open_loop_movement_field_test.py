@@ -1,9 +1,7 @@
 import math
 
 import pytest
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.logger.logger import create_logger
 
 logger = create_logger(__name__)
