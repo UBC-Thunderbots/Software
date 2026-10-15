@@ -42,7 +42,7 @@ chmod +x /opt/tbots/bin/gamecontroller
 
 # Install TIGERS AutoReferee
 wget -O /opt/tbots/autoReferee.zip https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip
-unzip /opt/tbots/autoReferee.zip -d /opt/tbots/autoReferee
+unzip /opt/tbots/autoReferee.zip -d /opt/tbots/
 rm /opt/tbots/autoReferee.zip
 
 echo "Setup successful!"
