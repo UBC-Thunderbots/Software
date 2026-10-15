@@ -15,6 +15,10 @@ void Esp32Hal::initializeCharger()
     pinMode(CHRG_DONE, INPUT);
     pinMode(CHRG, OUTPUT);
     digitalWrite(CHRG, LOW);
+
+    charge_toggle_timer_ = timerBegin(CAPACITOR_CHARGE_TIMER, 80, true);
+    if (charge_toggle_timer_ != nullptr)
+        timerAttachInterrupt(charge_toggle_timer_, &Esp32Hal::chargeToggleTimerISR, true);
 }
 
 void Esp32Hal::setCapacitorCharging(bool enabled)
@@ -33,4 +37,9 @@ float Esp32Hal::getCapacitorVoltage()
 {
     return analogRead(HV_SENSE) / ADC_RESOLUTION * ADC_REFERENCE_VOLTAGE *
            CAPACITOR_VOLTAGE_DIVIDER;
+}
+
+void IRAM_ATTR Esp32Hal::chargeToggleTimerISR()
+{
+    instance_->recordTimerExpiration(PowerTimer::CapacitorChargeToggle);
 }

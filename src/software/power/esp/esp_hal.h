@@ -47,6 +47,7 @@ class Esp32Hal final : public PowerHAL
     static void IRAM_ATTR cooldownTimerISR();
     static void IRAM_ATTR chargeToggleTimerISR();
     void IRAM_ATTR recordTimerExpiration(PowerTimer timer);
+    static uint8_t IRAM_ATTR timerEventMask(PowerTimer timer);
     static int timerIndex(PowerTimer timer);
     hw_timer_t* timerFor(PowerTimer timer) const;
     void initializeChicker();
@@ -59,7 +60,6 @@ class Esp32Hal final : public PowerHAL
     hw_timer_t* charge_toggle_timer_ = nullptr;
     CallbackSlot callbacks_[3]{};
     volatile uint8_t pending_events_ = 0;
-    volatile bool pulse_active_      = false;
     portMUX_TYPE timer_mux_          = portMUX_INITIALIZER_UNLOCKED;
     LTC4151 monitor_;
 
