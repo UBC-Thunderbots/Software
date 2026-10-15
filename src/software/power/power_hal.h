@@ -2,14 +2,14 @@
 
 #include <cstdint>
 
-/** The physical chicker output to drive. */
+/** Chicker output to drive. */
 enum class ChickerOutput : uint8_t
 {
     Kicker,
     Chipper,
 };
 
-/** Timers whose expiration is reported to the power state machine. */
+/** One-shot timers exposed to power logic. */
 enum class PowerTimer : uint8_t
 {
     ChickerPulse,
@@ -18,92 +18,65 @@ enum class PowerTimer : uint8_t
 };
 
 /**
- * Timer callbacks are dispatched by serviceTimers() in the main-loop context,
- * not from a hardware timer ISR. The context is supplied by the caller.
+ * Invoked once by dispatchTimerCallbacks(), never from an ISR.
+ * Callback/context must remain valid until delivery, cancellation, or replacement.
  */
 using PowerTimerCallback = void (*)(void* context, PowerTimer timer);
 
 /**
- * Low-level interface to power-board hardware.
- *
- * Business rules (such as cooldown policy, charge sequencing, and dribbler RPM
- * ramping) belong in the power logic/state machine, not in this interface.
+ * Power-board hardware interface; business rules belong in power logic.
+ * ESP32 implementations use hardware timers with ISR-safe deadline handling;
+ * simulations may expire timers using simulated time. Neither runs logic in an ISR.
  */
 class PowerHAL
 {
    public:
     virtual ~PowerHAL() = default;
 
-    /**
-     * Interface for Arduino's millis() method
-     */
+    /** Monotonic microseconds, wrapping at UINT32_MAX. */
     virtual uint32_t micros() const = 0;
 
     // Chicker
     /**
-     * Starts a timed pulse on the selected output.
-     *
-     * The implementation drives the output high and guarantees it is driven low
-     * at the hardware timer deadline. The callback is deferred until
-     * serviceTimers() runs outside interrupt context.
-     *
-     * @return true if the pulse was started, false if the hardware could not
-     *         start it (for example, because another pulse is active).
+     * Drives the output high, then low at the timer deadline without loop service.
+     * Queues ChickerPulse for callback dispatch after expiration.
+     * Returns false if busy or unable to start; no callback is queued on failure.
      */
     virtual bool startChickerPulse(ChickerOutput output, uint32_t pulse_width_us,
                                    PowerTimerCallback callback, void* context) = 0;
-    /** Forces both chicker outputs low and cancels an active pulse. */
+    /** Forces both outputs low and cancels the pulse and any pending callback. */
     virtual void stopChickerPulse() = 0;
 
     /**
-     * Starts a one-shot timer other than the chicker pulse timer.
-     * Use ChickerCooldown or CapacitorChargeToggle here; ChickerPulse is managed
-     * by startChickerPulse(). The callback and context must remain valid until
-     * the timer expires or is canceled. Callbacks are dispatched by
-     * serviceTimers(), not in an ISR.
+     * Starts ChickerCooldown or CapacitorChargeToggle; replaces any active timer
+     * or pending callback for that ID. ChickerPulse uses startChickerPulse().
      */
     virtual void startOneShotTimer(PowerTimer timer, uint32_t duration_us,
                                    PowerTimerCallback callback, void* context) = 0;
-    virtual void cancelTimer(PowerTimer timer)                                 = 0;
-    /** Dispatches pending timer callbacks from the main-loop context. */
-    virtual void serviceTimers() = 0;
+    /** Cancels the timer and pending callback; ChickerPulse also forces outputs low. */
+    virtual void cancelTimer(PowerTimer timer) = 0;
+    /** Called from the main loop to deliver callbacks, not to advance timers. */
+    virtual void dispatchTimerCallbacks() = 0;
 
     // Chicker break beam
-    /**
-     * @return true if the break beam is tripped, false otherwise
-     */
+    /** True when the break beam is tripped. */
     virtual bool getBreakBeamTripped() = 0;
 
     // Dribbler
-    /**
-     * Applies the requested PWM duty cycle to the dribbler output.
-     * RPM limits and ramping are handled by the business logic.
-     *
-     * @param duty_cycle PWM duty cycle from 0 (off) to 255 (full output)
-     */
+    /** PWM duty cycle: 0 (off) to 255 (full output)*/
     virtual void setDribblerPwm(uint8_t duty_cycle) = 0;
 
     // Charger
-    /**
-     * Sets the capacitor charger enable output.
-     *
-     * @param enabled true to enable charging, false to disable it
-     */
+    /** Sets the charger enable output. */
     virtual void setCapacitorCharging(bool enabled) = 0;
-    /** @return true when the charger hardware reports charging is complete */
+    /** True when hardware reports charging complete. */
     virtual bool isCapacitorChargeDone() = 0;
-    /**
-     * @return the capacitor voltage in volts
-     */
+    /** Capacitor voltage in volts. */
     virtual float getCapacitorVoltage() = 0;
 
     // Power monitor
-    /**
-     * @return the battery voltage in volts
-     */
+    /** Battery voltage in volts. */
     virtual float getBatteryVoltage() = 0;
-    /**
-     * @return the current draw in amps
-     */
+    /** Current draw in amps. */
     virtual float getCurrentDrawAmp() = 0;
 };
