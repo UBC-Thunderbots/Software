@@ -16,44 +16,52 @@
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
 
-robot::Specs ErForceSimulator::createRobotSpecs(const robot_constants::RobotConstants &robot_constants) {
-  
-  robot::Specs specs;
-  robotSetDefault(&specs);
+robot::Specs ErForceSimulator::createRobotSpecs(
+    const robot_constants::RobotConstants& robot_constants)
+{
+    robot::Specs specs;
+    robotSetDefault(&specs);
 
-  const float radius = robot_constants.robot_radius_m;
-  const float angle = 2 * asin(robot_constants.front_of_robot_width_meters / (2 * radius));
-  const float dribbler_width = robot_constants.dribbler_width_meters;
+    const float radius = robot_constants.robot_radius_m;
+    const float angle =
+        2 * asin(robot_constants.front_of_robot_width_meters / (2 * radius));
+    const float dribbler_width = robot_constants.dribbler_width_meters;
 
-  const float v_max = robot_constants.robot_max_speed_m_per_s;
-  const float omega_max = robot_constants.robot_max_ang_speed_rad_per_s;
+    const float v_max     = robot_constants.robot_max_speed_m_per_s;
+    const float omega_max = robot_constants.robot_max_ang_speed_rad_per_s;
 
-  specs.set_radius(radius);
-  specs.set_angle(angle); 
-  specs.set_dribbler_width(dribbler_width);
-  specs.set_v_max(v_max);
-  specs.set_omega_max(omega_max);
+    specs.set_radius(radius);
+    specs.set_angle(angle);
+    specs.set_dribbler_width(dribbler_width);
+    specs.set_v_max(v_max);
+    specs.set_omega_max(omega_max);
 
-  auto* acceleration = specs.mutable_acceleration();
-  acceleration->set_a_speedup_f_max(robot_constants.robot_max_acceleration_m_per_s_2);
-  acceleration->set_a_speedup_s_max(robot_constants.robot_max_acceleration_m_per_s_2);
-  acceleration->set_a_speedup_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
-  acceleration->set_a_brake_f_max(robot_constants.robot_max_deceleration_m_per_s_2);
-  acceleration->set_a_brake_s_max(robot_constants.robot_max_deceleration_m_per_s_2);
-  acceleration->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    auto* acceleration = specs.mutable_acceleration();
+    acceleration->set_a_speedup_f_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_s_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    acceleration->set_a_brake_f_max(robot_constants.robot_max_deceleration_m_per_s_2);
+    acceleration->set_a_brake_s_max(robot_constants.robot_max_deceleration_m_per_s_2);
+    acceleration->set_a_brake_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
 
-  auto* strategy = specs.mutable_strategy();
-  strategy->set_a_speedup_f_max(robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
-  strategy->set_a_speedup_s_max(robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
-  strategy->set_a_speedup_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
-  strategy->set_a_brake_f_max(robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
-  strategy->set_a_brake_s_max(robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
-  strategy->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    auto* strategy = specs.mutable_strategy();
+    strategy->set_a_speedup_f_max(
+        robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
+    strategy->set_a_speedup_s_max(
+        robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
+    strategy->set_a_speedup_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    strategy->set_a_brake_f_max(
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    strategy->set_a_brake_s_max(
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    strategy->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
 
 
-  return specs;
+    return specs;
 }
-
 
 
 
