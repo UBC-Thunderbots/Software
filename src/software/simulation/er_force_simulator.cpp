@@ -4,6 +4,7 @@
 #include <google/protobuf/text_format.h>
 
 #include <iostream>
+#include <cmath>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
@@ -108,9 +109,6 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
-    // start with default robots, take ER-Force specs.
-    robot::Specs ERForce;
-    robotSetDefault(&ERForce);
     Team friendly_team = Team();
     Team enemy_team    = Team();
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -241,7 +239,7 @@ void ErForceSimulator::setRobots(
 {
     auto simulator_setup_command = std::make_unique<amun::Command>();
 
-    const robot::Specs ERForce = createRobotSpecs(robot_constants);
+    const robot::Specs robot_specs = createRobotSpecs(robot_constants);
 
     // Initialize Team Robots at the bottom of the field
     ::robot::Team* team;
@@ -257,7 +255,7 @@ void ErForceSimulator::setRobots(
     for (auto& [id, robot_state] : robots)
     {
         auto* robot = team->add_robot();
-        robot->CopyFrom(ERForce);
+        robot->CopyFrom(robot_specs);
         robot->set_id(id);
     }
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
