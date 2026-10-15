@@ -59,20 +59,23 @@ class LoggerSingleton
      * @param proto_logger The proto logger to log VISUALIZE protos
      * @param reduce_repetition Whether logs should be merged whenever possible to reduce
      * spam
+     * @param plotjuggler_interface The network interface to send PlotJuggler packets on
      */
-    static void initializeLogger(const std::string& runtime_dir,
-                                 const std::shared_ptr<ProtoLogger>& proto_logger,
-                                 const bool reduce_repetition   = true,
-                                 const LEVELS minimum_log_level = DEBUG)
+    static void initializeLogger(
+        const std::string& runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger,
+        const bool reduce_repetition             = true,
+        const LEVELS minimum_log_level           = DEBUG,
+        const std::string& plotjuggler_interface = LOOPBACK_INTERFACE)
     {
         static LoggerSingleton s(runtime_dir, proto_logger, reduce_repetition,
-                                 minimum_log_level);
+                                 minimum_log_level, plotjuggler_interface);
     }
 
    private:
     LoggerSingleton(const std::string& runtime_dir,
                     const std::shared_ptr<ProtoLogger>& proto_logger,
-                    const bool reduce_repetition, const LEVELS minimum_log_level)
+                    const bool reduce_repetition, const LEVELS minimum_log_level,
+                    const std::string& plotjuggler_interface)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -120,8 +123,9 @@ class LoggerSingleton
                                &ProtobufSink::sendProtobuf);
 
         // Sink for PlotJuggler plotting
-        auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),
-                                                     &PlotJugglerSink::sendToPlotJuggler);
+        auto plotjuggler_handle =
+            logWorker->addSink(std::make_unique<PlotJugglerSink>(plotjuggler_interface),
+                               &PlotJugglerSink::sendToPlotJuggler);
 
         g3::log_levels::setHighest(minimum_log_level);
 

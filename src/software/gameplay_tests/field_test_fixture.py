@@ -288,6 +288,7 @@ class OpenLoopFieldTestRunner:
         robot_communication,
         friendly_colour_yellow=False,
         interface=None,
+        vision_robot_id=None,
     ):
         """Initialize the OpenLoopFieldTestRunner
 
@@ -297,9 +298,12 @@ class OpenLoopFieldTestRunner:
         :param robot_communication: The robot communication instance
         :param friendly_colour_yellow: True if the friendly team is yellow, else blue
         :param interface: The network interface used to send data to PlotJuggler
+        :param vision_robot_id: The id vision sees the tracked robot as, if it
+            differs from the robot's own id. None to use the robot's id
         """
         self.thunderscope = thunderscope
         self.friendly_colour_yellow = friendly_colour_yellow
+        self.vision_robot_id = vision_robot_id
         self.plotjuggler_sender = PlotJugglerSender(interface)
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
             SSL_WRAPPER_BUFFER_SIZE, protos.SSL_WrapperPacket
@@ -382,14 +386,19 @@ class OpenLoopFieldTestRunner:
 
         :param robot_id: the robot to track
         """
-        self.tracked_robot_id = robot_id
+        # Vision may see the robot under a different id than it reports itself as
+        self.tracked_robot_id = (
+            robot_id if self.vision_robot_id is None else self.vision_robot_id
+        )
         self.initial_pose = None
         deadline = time.time() + VISION_POSE_TIMEOUT_S
         while self.initial_pose is None and time.time() < deadline:
-            self.initial_pose = self.get_vision_pose(robot_id)
+            self.initial_pose = self.get_vision_pose(self.tracked_robot_id)
             time.sleep(0.05)
         if self.initial_pose is None:
-            logger.warning(f"no vision pose for robot {robot_id}, not tracking path")
+            logger.warning(
+                f"no vision pose for robot {self.tracked_robot_id}, not tracking path"
+            )
             return
         self.expected_position = self.initial_pose[:2]
         logger.info(f"tracking path from initial pose {self.initial_pose}")
@@ -670,6 +679,22 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
+        "--vision_interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to listen for SSL vision on, defaults to --interface",
+    )
+
+    parser.add_argument(
+        "--vision_robot_id",
+        action="store",
+        type=int,
+        default=None,
+        help="The id vision sees the tested robot as, if it differs from the robot's id",
+    )
+
+    parser.add_argument(
         "--channel",
         action="store",
         type=int,
@@ -886,16 +911,19 @@ def open_loop_field_test_runner():
     ):
         # Only vision is needed for plotting the tracked path, not FullSystem
         ssl_wrapper_listener = None
-        if args.interface:
+        vision_interface = args.vision_interface or args.interface
+        if vision_interface:
             ssl_wrapper_listener = tbots_cpp.SSLWrapperPacketProtoListener(
                 SSL_VISION_ADDRESS,
                 SSL_VISION_PORT,
-                args.interface,
+                vision_interface,
                 lambda data: proto_unix_io.send_proto(protos.SSL_WrapperPacket, data),
                 True,
             )
         else:
-            logger.warning("no --interface given, not listening to SSL vision")
+            logger.warning(
+                "no --vision_interface or --interface given, not listening to SSL vision"
+            )
 
         tscope_config, rerun_test_widget = configure_open_loop_field_test_view(
             proto_unix_io
@@ -914,6 +942,7 @@ def open_loop_field_test_runner():
             robot_communication=robot_communication,
             friendly_colour_yellow=args.run_yellow,
             interface=args.interface,
+            vision_robot_id=args.vision_robot_id,
         )
 
         yield runner

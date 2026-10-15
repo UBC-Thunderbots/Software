@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
@@ -229,6 +230,44 @@ bool SensorFusion::shouldTrustRobotStatus()
 
 
 
+namespace
+{
+/**
+ * Sends the raw vision detections and filtered state of the friendly robots to
+ * PlotJuggler
+ *
+ * @param detections The friendly robot detections from one vision frame
+ * @param friendly_team The filtered friendly team
+ */
+void sendFriendlyRobotsToPlotJuggler(const std::vector<RobotDetection>& detections,
+                                     const Team& friendly_team)
+{
+    std::map<std::string, double> values;
+    for (const RobotDetection& detection : detections)
+    {
+        const std::string prefix = "robot_" + std::to_string(detection.id) + "/vision/";
+        values[prefix + "x"]           = detection.position.x();
+        values[prefix + "y"]           = detection.position.y();
+        values[prefix + "orientation"] = detection.orientation.toRadians();
+    }
+    for (const Robot& robot : friendly_team.getAllRobots())
+    {
+        const std::string prefix =
+            "robot_" + std::to_string(robot.id()) + "/sensor_fusion/";
+        values[prefix + "x"]                = robot.position().x();
+        values[prefix + "y"]                = robot.position().y();
+        values[prefix + "orientation"]      = robot.orientation().toRadians();
+        values[prefix + "v_x"]              = robot.velocity().x();
+        values[prefix + "v_y"]              = robot.velocity().y();
+        values[prefix + "angular_velocity"] = robot.angularVelocity().toRadians();
+    }
+    if (!values.empty())
+    {
+        LOG(PLOTJUGGLER) << *createPlotJugglerValue(values);
+    }
+}
+}  // namespace
+
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection_frame)
 {
     double min_valid_x              = sensor_fusion_config.min_valid_x();
@@ -275,6 +314,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame& ssl_detection
         friendly_team = createFriendlyTeam(blue_team, capture_timestamp);
         enemy_team    = createEnemyTeam(yellow_team, capture_timestamp);
     }
+    sendFriendlyRobotsToPlotJuggler(friendly_team_is_yellow ? yellow_team : blue_team,
+                                    friendly_team);
 
     ball_in_dribbler_timeout--;
     if (ball_in_dribbler_timeout <= 0)

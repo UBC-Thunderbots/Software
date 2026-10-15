@@ -83,6 +83,7 @@ int main(int argc, char** argv)
         bool friendly_colour_yellow = false;
         bool ci                     = false;
         std::string log_level       = "DEBUG";
+        std::string interface       = LOOPBACK_INTERFACE;
     };
 
     CommandLineArgs args;
@@ -102,6 +103,9 @@ int main(int argc, char** argv)
     desc.add_options()(
         "log_level", boost::program_options::value<std::string>(&args.log_level),
         "The minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)");
+    desc.add_options()(
+        "interface", boost::program_options::value<std::string>(&args.interface),
+        "The network interface to send PlotJuggler packets on");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -152,7 +156,7 @@ int main(int argc, char** argv)
         proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
                                                      args.friendly_colour_yellow);
         LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger, true,
-                                          *minimum_log_level);
+                                          *minimum_log_level, args.interface);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
         // Override friendly color

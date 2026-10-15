@@ -219,7 +219,9 @@ void Thunderloop::runLoop()
                                   delta_time);
         updateRobotLocalizer(robot_status_);
 
-        primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
+        const RobotState robot_state = robot_localizer_->getRobotState();
+        primitive_executor_->updateRobotState(robot_state);
+        sendRobotStateToPlotJuggler(robot_state);
 
         imu_service_->poll(robot_status_);
 
@@ -266,6 +268,21 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
         robot_localizer_->update(
             RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
     }
+}
+
+void Thunderloop::sendRobotStateToPlotJuggler(const RobotState& robot_state) const
+{
+    const std::string prefix =
+        "robot_" + std::to_string(robot_status_.robot_id()) + "/localizer/";
+
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {prefix + "x", robot_state.position().x()},
+        {prefix + "y", robot_state.position().y()},
+        {prefix + "orientation", robot_state.orientation().toRadians()},
+        {prefix + "v_x", robot_state.velocity().x()},
+        {prefix + "v_y", robot_state.velocity().y()},
+        {prefix + "angular_velocity", robot_state.angularVelocity().toRadians()},
+    });
 }
 
 void Thunderloop::updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status)

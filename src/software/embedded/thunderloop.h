@@ -66,6 +66,13 @@ class Thunderloop
      */
     void updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status);
 
+    /**
+     * Sends the robot localizer's state estimate (global frame) to PlotJuggler.
+     *
+     * @param robot_state The robot localizer's state estimate
+     */
+    void sendRobotStateToPlotJuggler(const RobotState& robot_state) const;
+
     std::unique_ptr<TomlConfigClient> toml_config_client_;
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;

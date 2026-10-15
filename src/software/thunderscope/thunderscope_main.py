@@ -363,6 +363,7 @@ if __name__ == "__main__":
                     should_restart_on_crash=True,
                     run_sudo=args.sudo,
                     log_level=args.log_level,
+                    interface=args.interface,
                 ) as full_system:
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 

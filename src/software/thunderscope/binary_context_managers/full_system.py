@@ -47,6 +47,7 @@ class FullSystem:
         run_sudo: bool = False,
         running_in_realtime: bool = True,
         log_level: LogLevels = LogLevels.DEBUG,
+        interface: str = None,
     ) -> None:
         """Run FullSystem
 
@@ -58,6 +59,7 @@ class FullSystem:
         :param run_sudo: true if we should run full system under sudo
         :param running_in_realtime: True if we are running fullsystem in realtime, else False
         :param log_level: Minimum g3log level that will be printed (DEBUG|INFO|WARNING|FATAL)
+        :param interface: The network interface to send PlotJuggler packets on, or None for loopback
         """
         self.path_to_binary = path_to_binary
         self.full_system_runtime_dir = full_system_runtime_dir
@@ -75,6 +77,7 @@ class FullSystem:
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
         self.log_level = log_level
+        self.interface = interface
         self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
     def discover_supported_flags(self, path_to_binary: str) -> set[str]:
@@ -121,6 +124,8 @@ class FullSystem:
             cmd_parts.append("--ci")
         if "log_level" in supported_flags:
             cmd_parts.append("--log_level={}".format(self.log_level.value))
+        if self.interface and "interface" in supported_flags:
+            cmd_parts.append("--interface={}".format(self.interface))
 
         # Log supported flags info based on importance level
         if supported_flags:
