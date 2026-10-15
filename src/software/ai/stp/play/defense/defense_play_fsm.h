@@ -71,7 +71,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      *
      * @param num_shadowers the number of shadow enemy tactics to set
      */
-    void setUpShadowers(int num_shadowers);
+    void setUpShadowers(unsigned int num_shadowers);
 
     /**
      * Helper function to return the next tactics

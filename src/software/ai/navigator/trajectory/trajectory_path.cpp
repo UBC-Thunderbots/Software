@@ -19,7 +19,8 @@ void TrajectoryPath::append(double connection_time_sec, const Point& destination
         {
             // Delete all trajectory nodes after the node that is at the
             // connection_time_sec
-            traj_path.erase(traj_path.begin() + i + 1, traj_path.end());
+            traj_path.erase(traj_path.begin() + static_cast<std::ptrdiff_t>(i + 1),
+                            traj_path.end());
 
             // To have a smooth and continuous trajectory path, we want the start
             // position and velocity of the newly generated trajectory to be
