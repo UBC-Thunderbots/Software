@@ -174,6 +174,17 @@ class ErForceSimulator
         gameController::Team side);
 
     /**
+     * Creates the ER Force robot specs from our Thunderbots robot constants.
+     * It it used to configure the ER Force simulator to match our robots.
+     * Fields with no equvalent in RobotConstants maintain ERForce defaults.
+     *
+     * @param robot_constants The robot constants to build specs from
+     * @return the robot specs
+     */
+    static robot::Specs createRobotSpecs(
+        const robot_constants::RobotConstants& robot_constants);
+
+    /**
      * Update Simulator Robot and get the latest robot control
      *
      * @param robot_primitive_executor_map Map of robot IDs to the robot's primitive
