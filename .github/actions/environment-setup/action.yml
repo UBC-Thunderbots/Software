@@ -22,7 +22,7 @@ runs:
       shell: bash
       run: |
         sudo "${GITHUB_WORKSPACE}"/environment_setup/setup_minimal.sh
-        sudo apt-get install xvfb libxcb-cursor0
+        sudo "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
     - name: Cache Bazel disk cache
       uses: actions/cache@v4
