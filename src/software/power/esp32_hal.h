@@ -54,8 +54,8 @@ class Esp32Hal final : public PowerHAL
     void initializeDribbler();
     void initializePowerMonitor();
 
-    hw_timer_t* pulse_timer_        = nullptr;
-    hw_timer_t* cooldown_timer_     = nullptr;
+    hw_timer_t* pulse_timer_         = nullptr;
+    hw_timer_t* cooldown_timer_      = nullptr;
     hw_timer_t* charge_toggle_timer_ = nullptr;
     CallbackSlot callbacks_[3]{};
     volatile uint8_t pending_events_ = 0;
