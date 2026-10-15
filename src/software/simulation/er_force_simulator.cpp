@@ -18,8 +18,8 @@
 
 robot::Specs ErForceSimulator::createRobotSpecs(const robot_constants::RobotConstants &robot_constants) {
   
-  robot::Specs ERForce;
-  robotSetDefault(&ERForce);
+  robot::Specs specs;
+  robotSetDefault(&specs);
 
   const float radius = robot_constants.robot_radius_m;
   const float angle = 2 * asin(robot_constants.front_of_robot_width_meters / (2 * radius));
@@ -28,13 +28,13 @@ robot::Specs ErForceSimulator::createRobotSpecs(const robot_constants::RobotCons
   const float v_max = robot_constants.robot_max_speed_m_per_s;
   const float omega_max = robot_constants.robot_max_ang_speed_rad_per_s;
 
-  ERForce.set_radius(radius);
-  ERForce.set_angle(angle); 
-  ERForce.set_dribbler_width(dribbler_width);
-  ERForce.set_v_max(v_max);
-  ERForce.set_omega_max(omega_max);
+  specs.set_radius(radius);
+  specs.set_angle(angle); 
+  specs.set_dribbler_width(dribbler_width);
+  specs.set_v_max(v_max);
+  specs.set_omega_max(omega_max);
 
-  auto* acceleration = ERForce.mutable_acceleration();
+  auto* acceleration = specs.mutable_acceleration();
   acceleration->set_a_speedup_f_max(robot_constants.robot_max_acceleration_m_per_s_2);
   acceleration->set_a_speedup_s_max(robot_constants.robot_max_acceleration_m_per_s_2);
   acceleration->set_a_speedup_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
@@ -42,7 +42,7 @@ robot::Specs ErForceSimulator::createRobotSpecs(const robot_constants::RobotCons
   acceleration->set_a_brake_s_max(robot_constants.robot_max_deceleration_m_per_s_2);
   acceleration->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
 
-  auto* strategy = ERForce.mutable_strategy();
+  auto* strategy = specs.mutable_strategy();
   strategy->set_a_speedup_f_max(robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
   strategy->set_a_speedup_s_max(robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
   strategy->set_a_speedup_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
@@ -51,7 +51,7 @@ robot::Specs ErForceSimulator::createRobotSpecs(const robot_constants::RobotCons
   strategy->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
 
 
-  return ERForce;
+  return specs;
 }
 
 
