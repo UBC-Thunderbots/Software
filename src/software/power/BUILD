@@ -26,20 +26,6 @@ config_setting(
 # more information can be found here: https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
 
 platformio_library(
-    name = "chicker",
-    src = "chicker.cpp",
-    hdr = "chicker.h",
-    deps = [":pins"],
-)
-
-platformio_library(
-    name = "dribbler",
-    src = "dribbler.cpp",
-    hdr = "dribbler.h",
-    deps = [":pins"],
-)
-
-platformio_library(
     name = "geneva",
     src = "geneva.cpp",
     hdr = "geneva.h",
@@ -50,20 +36,32 @@ platformio_library(
 )
 
 platformio_library(
-    name = "charger",
-    src = "charger.cpp",
-    hdr = "charger.h",
-    deps = [":pins"],
+    name = "power_hal",
+    hdr = "power_hal.h",
 )
 
 platformio_library(
-    name = "power_monitor",
-    src = "power_monitor.cpp",
-    hdr = "power_monitor.h",
+    name = "esp32_hal",
+    src = "esp32_hal.cpp",
+    add_srcs = [
+        "charger.cpp",
+        "chicker.cpp",
+        "dribbler.cpp",
+        "power_monitor.cpp",
+    ],
+    hdr = "esp32_hal.h",
     deps = [
         ":pins",
+        ":power_hal",
         "@LTC4151//:LTC4151_platformio",
     ],
+)
+
+platformio_library(
+    name = "power_controller",
+    src = "power_controller.cpp",
+    hdr = "power_controller.h",
+    deps = [":power_hal"],
 )
 
 platformio_library(
@@ -71,10 +69,7 @@ platformio_library(
     src = "control_executor.cpp",
     hdr = "control_executor.h",
     deps = [
-        ":charger",
-        ":chicker",
-        ":geneva",
-        ":pins",
+        ":power_controller",
         "//proto:tbots_nanopb_proto",
     ],
 )
@@ -97,13 +92,12 @@ platformio_project(
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
     deps = [
-        ":charger",
-        ":chicker",
         ":control_executor",
-        ":dribbler",
+        ":esp32_hal",
         ":geneva",
         ":pins",
-        ":power_monitor",
+        ":power_controller",
+        ":power_hal",
         "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
         "//shared/uart_framing:uart_framing_platformio",

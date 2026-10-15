@@ -1,22 +1,27 @@
-#include "power_monitor.h"
-
 #include <Wire.h>
 
-PowerMonitor::PowerMonitor()
+#include "esp32_hal.h"
+#include "pins.h"
+
+namespace
+{
+constexpr double CURRENT_SENSE_RESISTANCE_OHMS = 0.002;
+}  // namespace
+
+void Esp32Hal::initializePowerMonitor()
 {
     // See https://github.com/espressif/arduino-esp32/issues/6616
-    Wire.begin(13, 14);
-
-    monitor = std::make_shared<LTC4151>();
-    monitor->init(LTC4151::L, LTC4151::L);
+    Wire.begin(PM_SDA, PM_SCL);
+    monitor_.init(LTC4151::L, LTC4151::L);
 }
 
-float PowerMonitor::getBatteryVoltage()
+float Esp32Hal::getBatteryVoltage()
 {
-    return static_cast<float>(monitor->getInputVoltage());
+    return static_cast<float>(monitor_.getInputVoltage());
 }
 
-float PowerMonitor::getCurrentDrawAmp()
+float Esp32Hal::getCurrentDrawAmp()
 {
-    return static_cast<float>(monitor->getLoadCurrent(RESISTANCE_OHMS) / 1000.0);
+    return static_cast<float>(monitor_.getLoadCurrent(CURRENT_SENSE_RESISTANCE_OHMS) /
+                              1000.0);
 }

@@ -18,7 +18,7 @@ enum class PowerTimer : uint8_t
 };
 
 /**
- * Invoked once by dispatchTimerCallbacks(), never from an ISR.
+ * Non-null; invoked once by dispatchTimerCallbacks(), never from an ISR.
  * Callback/context must remain valid until delivery, cancellation, or replacement.
  */
 using PowerTimerCallback = void (*)(void* context, PowerTimer timer);
@@ -48,10 +48,10 @@ class PowerHAL
     virtual void stopChickerPulse() = 0;
 
     /**
-     * Starts ChickerCooldown or CapacitorChargeToggle; replaces any active timer
-     * or pending callback for that ID. ChickerPulse uses startChickerPulse().
+     * Starts/replaces ChickerCooldown or CapacitorChargeToggle. ChickerPulse uses
+     * startChickerPulse(). Returns false if the timer cannot be armed.
      */
-    virtual void startOneShotTimer(PowerTimer timer, uint32_t duration_us,
+    virtual bool startOneShotTimer(PowerTimer timer, uint32_t duration_us,
                                    PowerTimerCallback callback, void* context) = 0;
     /** Cancels the timer and pending callback; ChickerPulse also forces outputs low. */
     virtual void cancelTimer(PowerTimer timer) = 0;

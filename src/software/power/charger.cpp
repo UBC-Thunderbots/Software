@@ -1,50 +1,36 @@
-#include "charger.h"
+#include "esp32_hal.h"
+#include "pins.h"
 
-bool Charger::is_charging              = false;
-unsigned long Charger::charge_start_ms = 0;
+namespace
+{
+constexpr float ADC_RESOLUTION            = 4096.0F;
+constexpr float ADC_REFERENCE_VOLTAGE     = 3.3F;
+constexpr float CAPACITOR_VOLTAGE_DIVIDER = 1003.0F / 13.0F;
+constexpr float CHARGE_DONE_THRESHOLD_V   = 0.5F;
+}  // namespace
 
-Charger::Charger()
+void Esp32Hal::initializeCharger()
 {
     pinMode(HV_SENSE, INPUT);
     pinMode(CHRG_DONE, INPUT);
     pinMode(CHRG, OUTPUT);
+    digitalWrite(CHRG, LOW);
 }
 
-void Charger::setCapacitorPin(bool pin_state)
+void Esp32Hal::setCapacitorCharging(bool enabled)
 {
-    digitalWrite(CHRG, pin_state);
-    if (pin_state)
-    {
-        charge_start_ms = millis();
-        is_charging     = true;
-    }
-    else
-    {
-        is_charging = false;
-    }
+    digitalWrite(CHRG, enabled ? HIGH : LOW);
 }
 
-float Charger::getCapacitorVoltage()
+bool Esp32Hal::isCapacitorChargeDone()
 {
-    return analogRead(HV_SENSE) / RESOLUTION * SCALE_VOLTAGE * VOLTAGE_DIVIDER;
+    const float done_pin_voltage =
+        analogRead(CHRG_DONE) / ADC_RESOLUTION * ADC_REFERENCE_VOLTAGE;
+    return done_pin_voltage <= CHARGE_DONE_THRESHOLD_V;
 }
 
-bool Charger::isDonePinLow()
+float Esp32Hal::getCapacitorVoltage()
 {
-    return analogRead(CHRG_DONE) / RESOLUTION * SCALE_VOLTAGE <=
-           DONE_PIN_THRESHOLD_VOLTAGE;
-}
-
-void Charger::update()
-{
-    if (!is_charging || isDonePinLow())
-    {
-        return;
-    }
-
-    if (millis() - charge_start_ms >= MAX_CHARGE_DURATION_MILLISECONDS)
-    {
-        // Charged too long without DONE asserting -> fault: force-discharge and stop.
-        setCapacitorPin(LOW);
-    }
+    return analogRead(HV_SENSE) / ADC_RESOLUTION * ADC_REFERENCE_VOLTAGE *
+           CAPACITOR_VOLTAGE_DIVIDER;
 }
