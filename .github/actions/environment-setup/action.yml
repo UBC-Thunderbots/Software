@@ -22,7 +22,12 @@ runs:
       shell: bash
       run: |
         sudo "${GITHUB_WORKSPACE}"/environment_setup/setup_minimal.sh
-        sudo "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+    - name: Install GUI dependencies for Linux runner
+      shell: bash
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get install xvfb python3-pyqt6 # specifically for runner
 
     - name: Cache Bazel disk cache
       uses: actions/cache@v4
