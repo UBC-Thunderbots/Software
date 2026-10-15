@@ -6,6 +6,10 @@
 
 class TestType
 {
+   public:
+    virtual ~TestType() = default;
+
+   private:
     virtual void foo() = 0;
 };
 

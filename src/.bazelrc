@@ -71,7 +71,7 @@ common --enable_platform_specific_config
 build --incompatible_remove_legacy_whole_archive=False
 
 # Escalate Warnings to fail Compile for Thunderbots code
-# build:linux --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
+build --per_file_copt=proto/.*,proto/message_translation/.*,proto/primitive/.*,software/.*,shared/.*,-external/.*@-Wall,-Wextra,-Wno-unused-parameter,-Wno-deprecated,-Werror,-Wno-deprecated-declarations
 build --per_file_copt=software/.*,shared/.*,-external/.*@-Wconversion
 
 build --cxxopt="-DG3_DYNAMIC_LOGGING"
