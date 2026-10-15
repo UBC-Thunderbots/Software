@@ -138,6 +138,19 @@ jobs:
          cd src
          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
 
+  gui-test:
+    needs: check-and-clear-cache
+    if: needs.check-and-clear-cache.outputs.should_run == 'true'
+    name: Test GUI runs
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/environment-setup
+
+      - name: Simulated gameplay test run
+        run: |
+          cd src
+          bazel test --copt=-O3 //software/ai/stp/tactic/move:move_tactic_test
 
   simulated-gameplay-tests:
     needs: check-and-clear-cache
