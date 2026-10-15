@@ -24,10 +24,6 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
-    linkopts = select({
-        "@platforms//os:linux": ["-lstdc++fs"],
-        "//conditions:default": [],
-    }),
     deps = [
         ":coloured_cout_sink",
         ":compat_flags",
