@@ -1,6 +1,6 @@
 #include <Wire.h>
 
-#include "esp32_hal.h"
+#include "esp_hal.h"
 #include "pins.h"
 
 namespace

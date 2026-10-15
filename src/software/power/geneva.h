@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "pins.h"
 #include "proto/geneva_slot.nanopb.h"
 
 /**

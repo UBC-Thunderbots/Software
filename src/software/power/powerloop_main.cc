@@ -1,7 +1,7 @@
 #ifdef PLATFORMIO_BUILD
 #include "constants_platformio.h"
 #include "control_executor.h"
-#include "esp32_hal.h"
+#include "esp_hal.h"
 #include "geneva.h"
 #include "power_controller.h"
 #include "power_frame_msg_platformio.h"
@@ -14,7 +14,7 @@
 #include "shared/constants.h"
 #include "shared/uart_framing/uart_framing.hpp"
 #include "software/power/control_executor.h"
-#include "software/power/esp32_hal.h"
+#include "software/power/esp/esp_hal.h"
 #include "software/power/geneva.h"
 #include "software/power/power_controller.h"
 #endif

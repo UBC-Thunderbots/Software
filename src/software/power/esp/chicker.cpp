@@ -1,4 +1,4 @@
-#include "esp32_hal.h"
+#include "esp_hal.h"
 #include "pins.h"
 
 void Esp32Hal::initializeChicker()

@@ -30,7 +30,6 @@ platformio_library(
     src = "geneva.cpp",
     hdr = "geneva.h",
     deps = [
-        ":pins",
         "//proto:tbots_nanopb_proto",
     ],
 )
@@ -41,15 +40,15 @@ platformio_library(
 )
 
 platformio_library(
-    name = "esp32_hal",
-    src = "esp32_hal.cpp",
+    name = "esp_hal",
+    src = "esp/esp_hal.cpp",
     add_srcs = [
-        "charger.cpp",
-        "chicker.cpp",
-        "dribbler.cpp",
-        "power_monitor.cpp",
+        "esp/charger.cpp",
+        "esp/chicker.cpp",
+        "esp/dribbler.cpp",
+        "esp/power_monitor.cpp",
     ],
-    hdr = "esp32_hal.h",
+    hdr = "esp/esp_hal.h",
     deps = [
         ":pins",
         ":power_hal",
@@ -76,7 +75,7 @@ platformio_library(
 
 platformio_library(
     name = "pins",
-    hdr = "pins.h",
+    hdr = "esp/pins.h",
 )
 
 platformio_project(
@@ -93,7 +92,7 @@ platformio_project(
     platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
     deps = [
         ":control_executor",
-        ":esp32_hal",
+        ":esp_hal",
         ":geneva",
         ":pins",
         ":power_controller",
