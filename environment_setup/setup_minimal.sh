@@ -14,7 +14,21 @@
 # Exit immediately after failed command
 set -euo pipefail
 
-OS="$(uname -s)"
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+
+case "$ARCH" in
+     x86_64|amd64)
+          ARCH="amd64"
+          ;;
+     aarch64|arm64)
+          ARCH="arm64"
+          ;;
+     *)
+          echo "Unsupported architecture: $ARCH" >&2
+          exit 1
+          ;;
+esac
 
 # Create our tbots directory
 mkdir -p /opt/tbots/bin
@@ -23,21 +37,11 @@ chown -R $SUDO_USER /opt/tbots
 echo 'export PATH="/opt/tbots/bin:$PATH"' > /opt/tbots/bin/activate
 
 # Install bazelisk
-if [ "$OS" = "Darwin" ]; then
-     wget -O /opt/tbots/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-darwin-arm64
-elif [ "$OS" = "Linux" ]; then
-     wget -O /opt/tbots/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-linux-amd64
-fi
+wget -O /opt/tbots/bin/bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-${OS}-${ARCH}"
 chmod +x /opt/tbots/bin/bazel
 
 # Install SSL gamecontroller
-if [ "$OS" = "Darwin" ]; then
-     wget -O /opt/tbots/bin/gamecontroller \
-          https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_darwin_arm64
-elif [ "$OS" = "Linux" ]; then
-     wget -O /opt/tbots/bin/gamecontroller \
-          https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_linux_amd64
-fi
+wget -O /opt/tbots/bin/gamecontroller "https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_${OS}_${ARCH}"
 chmod +x /opt/tbots/bin/gamecontroller
 
 # Install TIGERS AutoReferee
