@@ -38,6 +38,9 @@ build --crosstool_top=//toolchains/cc:toolchain
 common --features=external_include_paths
 common --features=generated_include_paths
 
+# Output cross-compiled builds in separate directory
+build --experimental_platform_in_output_dir
+
 ################# Build Optimizations #################
 
 # Use a local directory as a remote cache. This shares artifacts when switching

@@ -85,7 +85,8 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       loop_hz_(loop_hz)
 {
-    const RobotId robot_id = std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY));
+    const RobotId robot_id =
+        static_cast<RobotId>(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY)));
     const int channel_id =
         std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY));
     const std::string network_interface =
@@ -196,7 +197,7 @@ void Thunderloop::runLoop()
         const auto iter_start_time      = std::chrono::steady_clock::now();
         const auto time_since_prev_iter = iter_start_time - prev_iter_start_time;
         const Duration delta_time       = Duration::fromSeconds(
-                  std::chrono::duration<double>(time_since_prev_iter).count());
+            std::chrono::duration<double>(time_since_prev_iter).count());
 
         FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
