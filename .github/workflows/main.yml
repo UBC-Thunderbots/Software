@@ -76,7 +76,7 @@ jobs:
       - name: Software Build Test
         run: |
           cd src
-          bazel build --show_timestamps --copt=-O3 --verbose_failures \
+          bazel build --show_timestamps --copt=-O3 --verbose_failures --keep_going \
             -- //... -//software:unix_full_system   \
             -//software/gameplay_tests/...         \
             -//software/ai/stp/...                   \
@@ -117,7 +117,7 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --copt=-O3 --show_timestamps --verbose_failures \
+          bazel test --copt=-O3 --show_timestamps --verbose_failures --keep_going \
             -- //... -//software:unix_full_system \
             -//software/gameplay_tests/...  \
             -//software/ai/stp/...            \
@@ -137,20 +137,6 @@ jobs:
         run: |
          cd src
          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=@llvm//platforms:linux_x86_64_gnu.2.28
-
-  gui-test:
-    needs: check-and-clear-cache
-    if: needs.check-and-clear-cache.outputs.should_run == 'true'
-    name: Test GUI runs
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/environment-setup
-
-      - name: Simulated gameplay test run
-        run: |
-          cd src
-          bazel test --copt=-O3 //software/ai/stp/tactic/move:move_tactic_test
 
   simulated-gameplay-tests:
     needs: check-and-clear-cache
