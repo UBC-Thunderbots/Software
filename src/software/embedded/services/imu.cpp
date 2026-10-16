@@ -13,7 +13,7 @@
 
 // these functions taken from
 // https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/lib/smbus.c
-static __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size,
+static __s32 i2c_smbus_access(int file, __u8 read_write, __u8 command, __u32 size,
                               union i2c_smbus_data* data)
 {
     struct i2c_smbus_ioctl_data args;
