@@ -4,6 +4,7 @@
 from software.gameplay_tests.util import load_command_line_arguments
 
 import math
+import os
 import queue
 import threading
 import time
@@ -11,6 +12,7 @@ import time
 import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
+from software.gameplay_tests.csv_logger import CsvLogger
 from software.gameplay_tests.plotjuggler_sender import PlotJugglerSender
 from software.logger.logger import create_logger
 from software.py_constants import (
@@ -39,6 +41,20 @@ STOP_FLUSH_DELAY_S = 0.5
 MOTOR_CONTROL_RESEND_PERIOD_S = 0.05
 SSL_WRAPPER_BUFFER_SIZE = 5
 VISION_POSE_TIMEOUT_S = 2.0
+CSV_DIRECTORY = os.path.expanduser("~/Documents/open_loop_robot_testing")
+# Prefix of the values sent to PlotJuggler, dropped from the CSV column names
+PATH_TRACKING_PREFIX = "open_loop/"
+PATH_TRACKING_FIELDS = [
+    "expected_x",
+    "expected_y",
+    "expected_orientation",
+    "expected_speed",
+    "vision_x",
+    "vision_y",
+    "vision_orientation",
+    "vision_speed",
+    "vision_w",
+]
 
 ROBOT_CONSTANTS = tbots_cpp.createRobotConstants()
 # Direction each wheel drives in, in the robot's local frame, matching the
@@ -114,6 +130,7 @@ class OpenLoopFieldTestRunner:
         friendly_colour_yellow=False,
         interface=None,
         vision_robot_id=None,
+        csv_name=None,
     ):
         """Initialize the OpenLoopFieldTestRunner
 
@@ -125,11 +142,20 @@ class OpenLoopFieldTestRunner:
         :param interface: The network interface used to send data to PlotJuggler
         :param vision_robot_id: The id vision sees the tracked robot as, if it
             differs from the robot's own id. None to use the robot's id
+        :param csv_name: The name of the CSV file in CSV_DIRECTORY to also log the
+            values sent to PlotJuggler to. None to not log to a CSV
         """
         self.thunderscope = thunderscope
         self.friendly_colour_yellow = friendly_colour_yellow
         self.vision_robot_id = vision_robot_id
         self.plotjuggler_sender = PlotJugglerSender(interface)
+        self.csv_logger = None
+        if csv_name:
+            if not csv_name.endswith(".csv"):
+                csv_name += ".csv"
+            csv_path = os.path.join(CSV_DIRECTORY, csv_name)
+            self.csv_logger = CsvLogger(csv_path, PATH_TRACKING_FIELDS)
+            logger.info(f"logging path tracking to {csv_path}")
         self.ssl_wrapper_buffer = ThreadSafeBuffer(
             SSL_WRAPPER_BUFFER_SIZE, protos.SSL_WrapperPacket
         )
@@ -258,6 +284,8 @@ class OpenLoopFieldTestRunner:
         self.expected_position = self.initial_pose[:2]
         self.expected_local_velocity = (0.0, 0.0)
         logger.info(f"tracking path from initial pose {self.initial_pose}")
+        if self.csv_logger is not None:
+            self.csv_logger.start_run()
 
     def __send_path_tracking(self, x_m_per_s, y_m_per_s, dt):
         """Advance the expected position by one step and send it, with the
@@ -318,6 +346,13 @@ class OpenLoopFieldTestRunner:
             self.prev_vision_sample = vision_sample
 
         self.plotjuggler_sender.send(values)
+        if self.csv_logger is not None:
+            self.csv_logger.log(
+                {
+                    name.removeprefix(PATH_TRACKING_PREFIX): value
+                    for name, value in values.items()
+                }
+            )
 
     def set_controlled_robots(self, robot_ids):
         """Choose which robots receive the open-loop commands. All controlled
@@ -524,6 +559,7 @@ def open_loop_field_test_runner():
             friendly_colour_yellow=args.run_yellow,
             interface=args.interface,
             vision_robot_id=args.vision_robot_id,
+            csv_name=args.csv_name,
         )
 
         yield runner
@@ -531,3 +567,5 @@ def open_loop_field_test_runner():
         # Make sure no robot is left driving on its last command
         runner.set_controlled_robots([])
         time.sleep(STOP_FLUSH_DELAY_S)
+        if runner.csv_logger is not None:
+            runner.csv_logger.close()

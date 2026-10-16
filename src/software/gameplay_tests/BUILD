@@ -103,6 +103,13 @@ py_library(
 )
 
 py_library(
+    name = "csv_logger",
+    srcs = [
+        "csv_logger.py",
+    ],
+)
+
+py_library(
     name = "plotjuggler_sender",
     srcs = [
         "plotjuggler_sender.py",
@@ -122,6 +129,7 @@ py_library(
         "//software:python_bindings.so",
     ],
     deps = [
+        ":csv_logger",
         ":plotjuggler_sender",
         ":util",
         "//proto:import_all_protos",

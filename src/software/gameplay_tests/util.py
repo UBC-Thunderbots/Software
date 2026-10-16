@@ -182,6 +182,15 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         + "angles increase CCW (open loop angle field test only)",
     )
     field_group.add_argument(
+        "--csv_name",
+        action="store",
+        type=str,
+        default=None,
+        help="Name of a CSV file in ~/Documents/open_loop_robot_testing to also log "
+        + "the values sent to PlotJuggler to, appended to if it exists "
+        + "(open loop field tests only)",
+    )
+    field_group.add_argument(
         "--channel",
         action="store",
         type=int,
