@@ -84,6 +84,7 @@ class OpenLoopFieldTestRunner:
         )
         self.tracked_robot_id = None
         self.initial_pose = None
+        self.prev_vision_sample = None
         self.expected_position = (0.0, 0.0)
         self.rerun_test_widget = rerun_test_widget
         self.proto_unix_io = proto_unix_io
@@ -137,17 +138,41 @@ class OpenLoopFieldTestRunner:
         :param robot_id: the robot id to look for
         :return: (x_m, y_m, orientation_rad) or None if vision has not seen the robot
         """
-        wrapper = self.ssl_wrapper_buffer.get(block=False, return_cached=True)
-        if wrapper is None or not wrapper.HasField("detection"):
+        vision_sample = self.__get_vision_sample(robot_id)
+        return None if vision_sample is None else vision_sample[1:]
+
+    def __get_vision_sample(self, robot_id):
+        """Get the latest pose of a friendly robot from SSL vision, with the
+        time the frame was captured
+
+        :param robot_id: the robot id to look for
+        :return: (t_capture_s, x_m, y_m, orientation_rad) or None if vision has
+            not seen the robot
+        """
+        # The buffer drops new packets once it's full, so drain it to get the
+        # newest detection instead of one queued up from a while ago
+        detection = None
+        while True:
+            wrapper = self.ssl_wrapper_buffer.get(block=False, return_cached=False)
+            if wrapper is None:
+                break
+            if wrapper.HasField("detection"):
+                detection = wrapper.detection
+        if detection is None:
             return None
         robots = (
-            wrapper.detection.robots_yellow
+            detection.robots_yellow
             if self.friendly_colour_yellow
-            else wrapper.detection.robots_blue
+            else detection.robots_blue
         )
         for robot in robots:
             if robot.robot_id == robot_id:
-                return robot.x / 1000.0, robot.y / 1000.0, robot.orientation
+                return (
+                    detection.t_capture,
+                    robot.x / 1000.0,
+                    robot.y / 1000.0,
+                    robot.orientation,
+                )
         return None
 
     def start_path_tracking(self, robot_id):
@@ -162,46 +187,92 @@ class OpenLoopFieldTestRunner:
             robot_id if self.vision_robot_id is None else self.vision_robot_id
         )
         self.initial_pose = None
+        self.prev_vision_sample = None
         deadline = time.time() + VISION_POSE_TIMEOUT_S
         while self.initial_pose is None and time.time() < deadline:
             self.initial_pose = self.get_vision_pose(self.tracked_robot_id)
             time.sleep(0.05)
         if self.initial_pose is None:
+            # Still send the expected path so it can be plotted, just from the
+            # origin instead of where the robot actually started
             logger.warning(
-                f"no vision pose for robot {self.tracked_robot_id}, not tracking path"
+                f"no vision pose for robot {self.tracked_robot_id}, "
+                "sending the expected path from the origin"
             )
-            return
+            self.initial_pose = (0.0, 0.0, 0.0)
         self.expected_position = self.initial_pose[:2]
         logger.info(f"tracking path from initial pose {self.initial_pose}")
 
-    def __send_path_tracking(self, x_m_per_s, y_m_per_s, dt):
+    def __send_path_tracking(
+        self, x_m_per_s, y_m_per_s, angular_velocity_rad_per_s, dt, robot_status
+    ):
         """Advance the expected position by one step and send it, with the
-        current vision position, to PlotJuggler
+        current vision position, to PlotJuggler. Also sends the expected and
+        vision-measured global velocities, and the commanded and robot-reported
+        local velocities.
 
         :param x_m_per_s: commanded local-frame forward velocity
         :param y_m_per_s: commanded local-frame leftward velocity
+        :param angular_velocity_rad_per_s: commanded angular velocity
         :param dt: seconds the command has been applied for
+        :param robot_status: the latest RobotStatus from the tracked robot, or None
         """
         if self.initial_pose is None:
             return
         # The square is open-loop and never rotates, so the local-frame command
         # maps to the global frame through the initial orientation
         theta = self.initial_pose[2]
+        expected_v_x = x_m_per_s * math.cos(theta) - y_m_per_s * math.sin(theta)
+        expected_v_y = x_m_per_s * math.sin(theta) + y_m_per_s * math.cos(theta)
         self.expected_position = (
-            self.expected_position[0]
-            + (x_m_per_s * math.cos(theta) - y_m_per_s * math.sin(theta)) * dt,
-            self.expected_position[1]
-            + (x_m_per_s * math.sin(theta) + y_m_per_s * math.cos(theta)) * dt,
+            self.expected_position[0] + expected_v_x * dt,
+            self.expected_position[1] + expected_v_y * dt,
         )
         values = {
             "open_loop/expected_x": self.expected_position[0],
             "open_loop/expected_y": self.expected_position[1],
+            "open_loop/expected_orientation": theta,
+            "open_loop/expected_v_x": expected_v_x,
+            "open_loop/expected_v_y": expected_v_y,
+            "open_loop/commanded_local_v_x": x_m_per_s,
+            "open_loop/commanded_local_v_y": y_m_per_s,
+            "open_loop/commanded_w": angular_velocity_rad_per_s,
         }
-        vision_pose = self.get_vision_pose(self.tracked_robot_id)
-        if vision_pose is not None:
-            values["open_loop/vision_x"] = vision_pose[0]
-            values["open_loop/vision_y"] = vision_pose[1]
-            values["open_loop/vision_orientation"] = vision_pose[2]
+
+        vision_sample = self.__get_vision_sample(self.tracked_robot_id)
+        if vision_sample is not None:
+            t_capture, x, y, orientation = vision_sample
+            values["open_loop/vision_x"] = x
+            values["open_loop/vision_y"] = y
+            values["open_loop/vision_orientation"] = orientation
+            # Differentiate over vision's capture times, since the frames don't
+            # line up with this loop's period
+            if self.prev_vision_sample is not None:
+                prev_t_capture, prev_x, prev_y, prev_orientation = (
+                    self.prev_vision_sample
+                )
+                vision_dt = t_capture - prev_t_capture
+                if vision_dt > 0:
+                    d_orientation = math.remainder(
+                        orientation - prev_orientation, 2 * math.pi
+                    )
+                    values["open_loop/vision_v_x"] = (x - prev_x) / vision_dt
+                    values["open_loop/vision_v_y"] = (y - prev_y) / vision_dt
+                    values["open_loop/vision_w"] = d_orientation / vision_dt
+            self.prev_vision_sample = vision_sample
+
+        if robot_status is not None:
+            motor_status = robot_status.motor_status
+            values["open_loop/robot_local_v_x"] = (
+                motor_status.local_velocity.x_component_meters
+            )
+            values["open_loop/robot_local_v_y"] = (
+                motor_status.local_velocity.y_component_meters
+            )
+            values["open_loop/robot_w"] = (
+                motor_status.angular_velocity.radians_per_second
+            )
+
         self.plotjuggler_sender.send(values)
 
     def set_controlled_robots(self, robot_ids):
@@ -272,9 +343,16 @@ class OpenLoopFieldTestRunner:
             )
             time.sleep(MOTOR_CONTROL_RESEND_PERIOD_S)
             now = time.time()
-            self.__send_path_tracking(x_m_per_s, y_m_per_s, now - last_time)
+            new_robot_statuses = self.__drain_robot_statuses()
+            robot_statuses += new_robot_statuses
+            self.__send_path_tracking(
+                x_m_per_s,
+                y_m_per_s,
+                angular_velocity_rad_per_s,
+                now - last_time,
+                new_robot_statuses[-1] if new_robot_statuses else None,
+            )
             last_time = now
-            robot_statuses += self.__drain_robot_statuses()
         return robot_statuses
 
     def stop(self, settle_time_s=1.0):
