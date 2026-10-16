@@ -174,6 +174,14 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         + "robot's id (open loop field tests only)",
     )
     field_group.add_argument(
+        "--angle_deg",
+        action="store",
+        type=float,
+        default=0.0,
+        help="The local-frame heading to drive at in degrees, 0 is forward and "
+        + "angles increase CCW (open loop angle field test only)",
+    )
+    field_group.add_argument(
         "--channel",
         action="store",
         type=int,

@@ -137,12 +137,35 @@ py_library(
     ],
 )
 
-py_test(
-    name = "open_loop_movement_field_test",
+py_library(
+    name = "open_loop_field_test_helpers",
     srcs = [
-        "open_loop_movement_field_test.py",
+        "open_loop_field_test_helpers.py",
     ],
     deps = [
+        "//software/logger:py_logger",
+    ],
+)
+
+py_test(
+    name = "open_loop_field_square_test",
+    srcs = [
+        "open_loop_field_square_test.py",
+    ],
+    deps = [
+        ":open_loop_field_test_helpers",
+        "//software:conftest",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
+    name = "open_loop_field_angle_test",
+    srcs = [
+        "open_loop_field_angle_test.py",
+    ],
+    deps = [
+        ":open_loop_field_test_helpers",
         "//software:conftest",
         requirement("pytest"),
     ],
