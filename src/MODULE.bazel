@@ -85,6 +85,17 @@ pip.parse(
     requirements_lock = "//starlark/nanopb:requirements_lock.txt",
 )
 use_repo(pip, "nanopb_deps")
+pip.parse(
+    hub_name = "platformio_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//starlark/platformio:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
+)
+use_repo(pip, "platformio_deps")
 
 ##############################################
 # Configure Dependencies
@@ -169,7 +180,10 @@ archive_override(
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
 archive_override(
     module_name = "platformio_rules",
-    patches = ["//starlark/patches/platformio_rules:add_py_binary_load.patch"],
+    patches = [
+        "//starlark/patches/platformio_rules:add_py_binary_load.patch",
+        "//starlark/patches/platformio_rules:use_hermetic_platformio.patch",
+    ],
     sha256 = "a80357230e27b8b57b8deffaa82684d3ee88b2284e4a767a9d8a692e9034e125",
     strip_prefix = "platformio_rules-3cd18c7c7bb2482fe3cbb58898245dd675421234",
     url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",

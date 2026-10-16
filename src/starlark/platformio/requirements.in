@@ -1,0 +1,7 @@
+# PlatformIO is used by the @platformio_rules build actions to compile the
+# Arduino firmware (e.g. //software/estop:main, //software/power:...).
+#
+# It is intentionally NOT installed into the host virtualenv (/opt/tbotspython).
+# Instead it is provided hermetically through rules_python so that the build
+# does not depend on the developer's PATH or a /usr/local/bin symlink.
+platformio==6.1.18

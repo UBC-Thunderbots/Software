@@ -1,0 +1,80 @@
+Make platformio_project able to build and upload with a Bazel-provided
+PlatformIO binary.
+
+Upstream, the build and upload actions resolve `platformio` from a hard-coded
+PATH (`/bin:/usr/bin:/usr/local/bin:/usr/sbin:/sbin`), which forces the tool to
+be installed out-of-band on the host (e.g. a symlink in /usr/local/bin pointing
+at a virtualenv). This adds an optional `platformio` attribute; when set, the
+build action invokes that executable instead, and the generated `bazel run`
+upload script invokes it from the runfiles tree. This allows a hermetic,
+Bazel-managed PlatformIO (see //starlark/platformio:platformio).
+
+--- platformio/platformio.bzl
++++ platformio/platformio.bzl
+@@ -256,16 +256,24 @@
++  if ctx.attr.platformio:
++    build_command = "%s run -s -d %s" % (ctx.executable.platformio.path, project_dir)
++    platformio_tools = [ctx.executable.platformio]
++  else:
++    build_command = _BUILD_COMMAND.format(project_dir=project_dir)
++    platformio_tools = []
++
+   commands = []
+   for zip_file in transitive_zip_files.to_list():
+     commands.append(_UNZIP_COMMAND.format(
+         project_dir=project_dir, zip_filename=zip_file.path))
+-  commands.append(_BUILD_COMMAND.format(project_dir=project_dir))
++  commands.append(build_command)
+ 
+   # The PlatformIO build system needs the project configuration file, the main
+   # file and all the transitive dependancies.
+   inputs=[output_files.platformio_ini, output_files.main_cpp]
+   for zip_file in transitive_zip_files.to_list():
+     inputs.append(zip_file)
+   ctx.actions.run_shell(
+       inputs=inputs,
+       outputs=[output_files.firmware_elf],
++      tools=platformio_tools,
+       command="\n".join(commands),
+       env={
+@@ -306,6 +306,10 @@
+   commands = [_SHELL_HEADER]
+   for zip_file in transitive_zip_files.to_list():
+     commands.append(_UNZIP_COMMAND.format(
+         project_dir=project_dir, zip_filename=zip_file.short_path))
+-  commands.append(_UPLOAD_COMMAND.format(project_dir=project_dir))
++  if ctx.attr.platformio:
++    commands.append("%s run -s -d %s -t upload" % (
++        ctx.executable.platformio.short_path, project_dir))
++  else:
++    commands.append(_UPLOAD_COMMAND.format(project_dir=project_dir))
+   ctx.actions.write(
+@@ -350,4 +350,7 @@
+      ]).to_list()
+-  return DefaultInfo(
+-    default_runfiles=ctx.runfiles(files=default_info_files)
+-  )
++  runfiles = ctx.runfiles(files=default_info_files)
++  if ctx.attr.platformio:
++    runfiles = runfiles.merge(ctx.attr.platformio[DefaultInfo].default_runfiles)
++  return DefaultInfo(
++    default_runfiles=runfiles
++  )
+@@ -549,9 +549,17 @@
+     "src": attr.label(
+       allow_single_file=[".cc"],
+       mandatory=True,
+       doc = """
+ A string, the name of the C++ source file, the main file for
+ the project that contains the Arduino setup() and loop() functions. This is mandatory.
+ """,
+     ),
++    "platformio": attr.label(
++      executable=True,
++      cfg="exec",
++      doc = """
++An optional executable that provides PlatformIO. When set, the build action
++invokes this binary instead of resolving `platformio` from the host PATH.
++""",
++    ),
+     "board": attr.string(
