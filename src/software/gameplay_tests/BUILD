@@ -83,6 +83,7 @@ py_library(
         "//software/logger:py_logger",
         "//software/thunderscope",
         "//software/thunderscope:estop_helpers",
+        "//software/thunderscope:robot_communication",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",

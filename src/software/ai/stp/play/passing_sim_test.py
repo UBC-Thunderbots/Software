@@ -56,7 +56,7 @@ def calculate_best_pass(
                     tbots_cpp.Angle(),
                     tbots_cpp.Timestamp(),
                 )
-                for index, location in enumerate(yellow_robot_locations)
+                for index, location in enumerate(enemy_robot_positions)
             ]
         ),
     )
