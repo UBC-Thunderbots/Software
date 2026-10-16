@@ -1,46 +1,32 @@
 #include "software/networking/udp/threaded_udp_sender.h"
 
-ThreadedUdpSender::ThreadedUdpSender(const std::string& ip_address,
+ThreadedUdpSender::ThreadedUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
+                                     const std::string& ip_address,
                                      const unsigned short port,
                                      const std::string& interface, bool multicast)
-    : io_service(),
-      udp_sender(io_service, ip_address, port, interface, multicast),
-      io_service_thread([this]() { io_service.run(); })
+    : io_context_(std::move(io_context)),
+      udp_sender_(io_context_->getIoContext(), ip_address, port, interface, multicast)
 {
-}
-
-ThreadedUdpSender::~ThreadedUdpSender()
-{
-    // Stop the io_service. This is safe to call from another thread.
-    // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
-    // This MUST be done before attempting to join the thread because otherwise the
-    // io_service will not stop and the thread will not join
-    io_service.stop();
-
-    // Join the io_service_thread so that we wait for it to exit before destructing the
-    // thread object. If we do not wait for the thread to finish executing, it will call
-    // `std::terminate` when we deallocate the thread object and kill our whole program
-    io_service_thread.join();
 }
 
 std::string ThreadedUdpSender::getInterface() const
 {
-    return udp_sender.getInterface();
+    return udp_sender_.getInterface();
 }
 
 std::string ThreadedUdpSender::getIpAddress() const
 {
-    return udp_sender.getIpAddress();
+    return udp_sender_.getIpAddress();
 }
 
 void ThreadedUdpSender::sendString(const std::string& message, bool async)
 {
     if (async)
     {
-        udp_sender.sendStringAsync(message);
+        udp_sender_.sendStringAsync(message);
     }
     else
     {
-        udp_sender.sendString(message);
+        udp_sender_.sendString(message);
     }
 }

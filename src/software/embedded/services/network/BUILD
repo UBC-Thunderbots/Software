@@ -12,6 +12,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/logger:network_logger",
+        "//software/networking/udp:threaded_io_context",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
         "//software/time:duration",

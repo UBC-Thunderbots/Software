@@ -1,8 +1,11 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <memory>
 #include <string>
+#include <utility>
 
+#include "software/networking/udp/threaded_io_context.h"
 #include "software/networking/udp/udp_sender.h"
 
 class ThreadedUdpSender
@@ -15,6 +18,7 @@ class ThreadedUdpSender
      * @throws TbotsNetworkException if the multicast group could not be joined if the
      * multicast option is requested
      *
+     * @param io_context The shared service used to process asynchronous send operations
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
@@ -23,13 +27,17 @@ class ThreadedUdpSender
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ThreadedUdpSender(const std::string& ip_address, unsigned short port,
+    ThreadedUdpSender(std::shared_ptr<ThreadedIoContext> io_context,
+                      const std::string& ip_address, unsigned short port,
                       const std::string& interface, bool multicast);
 
     /**
-     * Destructor will stop the io_service thread
+     * Destructor releases this sender's ownership of the shared io_context.
+     *
+     * The shared ThreadedIoContext owns the io_context thread and is responsible
+     * for stopping and joining it after all UDP objects release their ownership.
      */
-    ~ThreadedUdpSender();
+    ~ThreadedUdpSender() = default;
 
     /**
      * Get the interface that this sender is sending on.
@@ -56,13 +64,9 @@ class ThreadedUdpSender
     void sendString(const std::string& message, bool async = false);
 
    private:
-    // The io_service that will be used to service all network requests
-    boost::asio::io_service io_service;
+    // Keeps the shared service alive while the UDP socket exists.
+    std::shared_ptr<ThreadedIoContext> io_context_;
 
     // The UdpSender that will be used to send data over the network
-    UdpSender udp_sender;
-
-    // The thread running the io_service in the background. This thread will run for the
-    // entire lifetime of the class
-    std::thread io_service_thread;
+    UdpSender udp_sender_;
 };

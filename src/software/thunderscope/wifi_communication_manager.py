@@ -69,6 +69,7 @@ class WifiCommunicationManager:
         self.fullsystem_ip_broadcaster: tuple[
             Lock, tbots_cpp.FullsystemIpBroadcast | None, protos.IpNotification
         ] = (Lock(), None, protos.IpNotification())
+        self.io_context = tbots_cpp.ThreadedIoContext()
 
         ## ProtoUnixIO ##
         self.current_proto_unix_io = current_proto_unix_io
@@ -152,6 +153,7 @@ class WifiCommunicationManager:
             ):
                 try:
                     primitive_sender = tbots_cpp.PrimitiveProtoUdpSender(
+                        self.io_context,
                         ip_address,
                         PRIMITIVE_PORT,
                         self.current_network_config.robot_communication_interface,
@@ -238,6 +240,7 @@ class WifiCommunicationManager:
         if change_referee_interface:
             try:
                 self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
+                    self.io_context,
                     SSL_REFEREE_ADDRESS,
                     self.referee_port,
                     referee_interface,
@@ -252,6 +255,7 @@ class WifiCommunicationManager:
         if change_vision_interface:
             try:
                 self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
+                    self.io_context,
                     SSL_VISION_ADDRESS,
                     SSL_VISION_PORT,
                     vision_interface,
@@ -288,13 +292,14 @@ class WifiCommunicationManager:
         if self.receive_robot_status is None:
             self.receive_robot_status = setup_network_resource(
                 lambda: tbots_cpp.RobotStatusProtoListener(
-                    ROBOT_STATUS_PORT, self.__receive_robot_status
+                    self.io_context, ROBOT_STATUS_PORT, self.__receive_robot_status
                 )
             )
 
         if self.receive_robot_log is None:
             self.receive_robot_log = setup_network_resource(
                 lambda: tbots_cpp.RobotLogProtoListener(
+                    self.io_context,
                     ROBOT_LOGS_PORT,
                     lambda data: self.__forward_to_proto_unix_io(protos.RobotLog, data),
                 )
@@ -314,6 +319,7 @@ class WifiCommunicationManager:
         # The following listeners and senders use multicast and are binded to a specific interface
         self.receive_robot_crash = setup_network_resource(
             lambda: tbots_cpp.RobotCrashProtoListener(
+                self.io_context,
                 self.multicast_channel,
                 ROBOT_CRASH_PORT,
                 robot_communication_interface,
@@ -324,6 +330,7 @@ class WifiCommunicationManager:
 
         self.robot_ip_listener = setup_network_resource(
             lambda: tbots_cpp.RobotIpNotificationProtoListener(
+                self.io_context,
                 self.multicast_channel,
                 ROBOT_TO_FULL_SYSTEM_IP_NOTIFICATION_PORT,
                 robot_communication_interface,
@@ -334,6 +341,7 @@ class WifiCommunicationManager:
 
         fullsystem_ip_broadcaster = setup_network_resource(
             lambda: tbots_cpp.FullsystemIpBroadcastProtoUdpSender(
+                self.io_context,
                 self.multicast_channel,
                 FULL_SYSTEM_TO_ROBOT_IP_NOTIFICATION_PORT,
                 robot_communication_interface,
