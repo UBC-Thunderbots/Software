@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
@@ -6,8 +7,12 @@ package(default_visibility = ["//visibility:public"])
 compile_pip_requirements(
     name = "requirements",
     src = "requirements.in",
-    requirements_darwin = "requirements_lock.darwin.txt",
     requirements_txt = "requirements_lock.txt",
+)
+
+py_library(
+    name = "qt_dependency_bootstrap",
+    srcs = ["qt_dependency_bootstrap.py"],
 )
 
 py_binary(
@@ -17,6 +22,7 @@ py_binary(
         ":config",
         ":constants",
         ":estop_helpers",
+        ":qt_dependency_bootstrap",
         ":thunderscope",
         ":util",
         "//software/gameplay_tests:test_mode",
@@ -55,6 +61,8 @@ py_library(
         requirement("numpy"),
         requirement("pyqtdarktheme-fork"),
         requirement("pyqtgraph"),
+        requirement("PyQt6-Qt6"),
+        requirement("pyqt6"),
     ],
 )
 
@@ -163,6 +171,8 @@ py_library(
     srcs = ["constants.py"],
     deps = [
         requirement("protobuf"),
+        requirement("pyopengl"),
+        requirement("pyqtgraph"),
     ],
 )
 

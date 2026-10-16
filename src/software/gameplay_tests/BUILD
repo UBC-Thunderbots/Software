@@ -1,4 +1,5 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(default_visibility = ["//visibility:public"])
@@ -46,6 +47,9 @@ py_library(
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/thunderscope",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         requirement("pytest"),
     ],
 )
@@ -92,24 +96,7 @@ py_library(
         "util.py",
     ],
     deps = [
-        requirement("pytest"),
-    ],
-)
-
-py_library(
-    name = "test_mode",
-    srcs = [
-        "test_mode.py",
-    ],
-    deps = [
-        ":fixture",
-        ":util",
-        "//proto:import_all_protos",
-        "//software/logger:py_logger",
-        "//software/thunderscope",
-        "//software/thunderscope:config",
-        "//software/thunderscope:test_runner_widget",
-        "//software/thunderscope:thunderscope_types",
+        "//software/thunderscope:qt_dependency_bootstrap",
         requirement("pytest"),
     ],
 )

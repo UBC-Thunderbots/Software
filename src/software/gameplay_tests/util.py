@@ -1,3 +1,14 @@
+# Qt libs must be preloaded before any Qt binding is imported, so the imports
+# below deliberately come after preload_bundled_qt_libs(). This is necessary
+# for the Qt libs used in validation geometries.
+# TODO: Place this in a more appropriate place that would also consistently
+#       load before any Qt libs. Perhaps could be fixed by bazel changes.
+# ruff: noqa: E402
+
+from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+
+preload_bundled_qt_libs()
+
 import argparse
 import ast
 import logging
@@ -105,7 +116,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
         help="Debug yellow full_system",
     )
     general_group.add_argument(
-        "--verbose",
+        "--show_gamecontroller_logs",
         action="store_true",
         default=False,
         help="Show gamecontroller logs",
@@ -200,7 +211,6 @@ def pytest_main(file):
             ["-svv", "-W ignore::DeprecationWarning", "-k", args.test_filter, file]
         )
     )
-
 
 def _file_has_gameplay_test(path: str) -> bool:
     """Returns whether a Python file defines a test using gameplay_test_runner.

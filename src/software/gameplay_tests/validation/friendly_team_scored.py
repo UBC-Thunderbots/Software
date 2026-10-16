@@ -1,12 +1,12 @@
-import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+from typing import override
 
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-from typing import override
 
 
 class FriendlyTeamScored(Validation):
@@ -16,7 +16,7 @@ class FriendlyTeamScored(Validation):
         self.region = tbots_cpp.Field.createSSLDivisionBField().enemyGoal()
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the ball enters the provided regions
 
         :param world: The world msg to validate
@@ -26,12 +26,12 @@ class FriendlyTeamScored(Validation):
         if tbots_cpp.contains(
             self.region, tbots_cpp.createPoint(world.ball.current_state.global_position)
         ):
-            return ValidationStatus.PASSING
+            return protos.ValidationStatus.PASSING
 
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
         :param world: The world msg to create v alidation geometry from

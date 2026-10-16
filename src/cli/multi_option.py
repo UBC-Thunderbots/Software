@@ -1,10 +1,10 @@
 from typing import Any
+
 import click
 import typer
 import typer.core
 import typer.main
 from typer.models import OptionInfo
-
 
 # ======= Patch to support nargs functionality in typer =======
 # nargs usage is considered bad practice in typer and many CLIs,

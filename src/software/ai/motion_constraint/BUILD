@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -6,7 +9,7 @@ cc_library(
     hdrs = ["motion_constraint_visitor.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/ai/hl/stp/tactic:all_tactics",
+        "//software/ai/stp/tactic:all_tactics",
         "//software/world:game_state",
     ],
 )

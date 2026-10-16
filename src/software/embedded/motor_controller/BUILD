@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -9,28 +12,17 @@ cc_library(
 )
 
 cc_library(
-    name = "motor_board",
-    hdrs = ["motor_board.h"],
-    deps = [
-        "//software/util/make_enum",
-    ],
-)
-
-cc_library(
     name = "motor_controller",
     srcs = [
         "stspin_motor_controller.cpp",
-        "tmc_motor_controller.cpp",
     ],
     hdrs = [
         "motor_controller.h",
         "stspin_motor_controller.h",
-        "tmc_motor_controller.h",
     ],
     # Uses Linux kernel headers (linux/spi/spidev.h); robot-only.
     target_compatible_with = ["@platforms//os:linux"],
     deps = [
-        ":motor_board",
         ":motor_fault_indicator",
         ":motor_index",
         ":stspin_types",
@@ -40,7 +32,6 @@ cc_library(
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "@cppcrc",
-        "@trinamic",
     ],
 )
 
@@ -49,7 +40,6 @@ cc_library(
     srcs = ["motor_fault_indicator.cpp"],
     hdrs = ["motor_fault_indicator.h"],
     deps = [
-        ":motor_board",
         "//proto:tbots_cc_proto",
     ],
 )

@@ -1,16 +1,16 @@
 from typing import Callable, override
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.Qt.QtWidgets import *
-from proto.import_all_protos import *
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import (
-    CameraView,
-    THUNDERSCOPE_HELP_TEXT,
-    SIMULATION_SPEEDS,
-)
-from software.thunderscope.common.common_widgets import ToggleableButton
-from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+
+import proto.import_all_protos as protos
 import qtawesome as qta
+from pyqtgraph.Qt import QtGui, QtWidgets
+from software.thunderscope.common.common_widgets import ToggleableButton
+from software.thunderscope.constants import (
+    SIMULATION_SPEEDS,
+    THUNDERSCOPE_HELP_TEXT,
+    CameraView,
+)
+from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLFieldToolbar(GLToolbar):
@@ -22,11 +22,11 @@ class GLFieldToolbar(GLToolbar):
 
     def __init__(
         self,
-        parent: QWidget,
+        parent: QtWidgets.QWidget,
         on_camera_view_change: Callable[[CameraView], None],
         on_measure_mode: Callable[[], None],
-        layers_menu: QMenu,
-        toolbars_menu: QMenu,
+        layers_menu: QtWidgets.QMenu,
+        toolbars_menu: QtWidgets.QMenu,
         sandbox_mode: bool = False,
         replay_mode: bool = False,
         on_add_bookmark=Callable[[], None],
@@ -54,19 +54,19 @@ class GLFieldToolbar(GLToolbar):
         super(GLFieldToolbar, self).__init__(parent=parent)
 
         # Setup Layers button for toggling visibility of layers
-        self.layers_button = QPushButton()
+        self.layers_button = QtWidgets.QPushButton()
         self.layers_button.setText("Layers")
         self.layers_button.setStyleSheet(self.get_button_style())
         self.layers_button.setMenu(layers_menu)
 
         # Set up View button for setting the camera position to standard views
-        self.camera_view_button = QPushButton()
+        self.camera_view_button = QtWidgets.QPushButton()
         self.camera_view_button.setToolTip("View")
         self.camera_view_button.setIcon(
             qta.icon("msc.device-camera-video", color=self.BUTTON_ICON_COLOR)
         )
         self.camera_view_button.setStyleSheet(self.get_button_style())
-        self.camera_view_menu = QMenu()
+        self.camera_view_menu = QtWidgets.QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
         self.camera_view_actions = [
             QtGui.QAction("[1] Orthographic Top Down"),
@@ -90,7 +90,7 @@ class GLFieldToolbar(GLToolbar):
             self.camera_view_menu.addAction(camera_view_action)
 
         # Setup Measure button for enabling/disabling measure mode
-        self.measure_button = QPushButton()
+        self.measure_button = QtWidgets.QPushButton()
         self.measure_button.setToolTip("Measure")
         self.measure_button.setIcon(
             qta.icon("ph.ruler-light", color=self.BUTTON_ICON_COLOR)
@@ -100,35 +100,35 @@ class GLFieldToolbar(GLToolbar):
         self.measure_button.clicked.connect(lambda: on_measure_mode())
 
         # Setup Help button
-        self.help_button = QPushButton()
+        self.help_button = QtWidgets.QPushButton()
         self.help_button.setToolTip("Help")
         self.help_button.setIcon(
             qta.icon("mdi.help-circle", color=self.BUTTON_ICON_COLOR)
         )
         self.help_button.setStyleSheet(self.get_button_style())
         self.help_button.clicked.connect(
-            lambda: QMessageBox.information(
+            lambda: QtWidgets.QMessageBox.information(
                 self.window(), "Help", THUNDERSCOPE_HELP_TEXT
             )
         )
 
         # Setup pause button
-        self.pause_button = QPushButton()
+        self.pause_button = QtWidgets.QPushButton()
         self.pause_button.setStyleSheet(self.get_button_style())
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
-        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, protos.SimulationState)
 
         # Setup Toolbars button for toggling visibility of toolbars
-        self.toolbars_button = QPushButton()
+        self.toolbars_button = QtWidgets.QPushButton()
         self.toolbars_button.setText("Toolbars")
-        self.toolbars_menu = QMenu()
+        self.toolbars_menu = QtWidgets.QMenu()
         self.toolbars_menu_checkboxes = {}
         self.toolbars_button.setMenu(toolbars_menu)
         self.toolbars_button.setStyleSheet(self.get_button_style())
 
         if not replay_mode:
-            self.bookmark_button = QPushButton()
+            self.bookmark_button = QtWidgets.QPushButton()
             self.bookmark_button.setIcon(
                 qta.icon(("fa6.bookmark"), color=self.BUTTON_ICON_COLOR)
             )
@@ -137,8 +137,8 @@ class GLFieldToolbar(GLToolbar):
             self.bookmark_button.clicked.connect(on_add_bookmark)
 
         # Setup simulation speed button and menu
-        self.sim_speed_menu = QMenu()
-        self.sim_speed_button = QPushButton()
+        self.sim_speed_menu = QtWidgets.QMenu()
+        self.sim_speed_button = QtWidgets.QPushButton()
         self.sim_speed_button.setText("Speed: 1.00x")
         self.sim_speed_button.setStyleSheet(self.get_button_style())
         self.sim_speed_button.setMenu(self.sim_speed_menu)
@@ -172,7 +172,7 @@ class GLFieldToolbar(GLToolbar):
             )
             self.redo_button.setStyleSheet(self.get_button_style(False))
 
-            self.reset_button = QPushButton()
+            self.reset_button = QtWidgets.QPushButton()
             self.reset_button.setToolTip("Reset")
             self.reset_button.setIcon(
                 qta.icon(

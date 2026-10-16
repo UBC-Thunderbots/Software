@@ -1,9 +1,9 @@
-from pyqtgraph.Qt.QtCore import *
-from pyqtgraph.Qt.QtWidgets import *
-from software.py_constants import *
-from proto.import_all_protos import *
 from enum import Enum
-import software.thunderscope.common.common_widgets as common_widgets
+
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtWidgets
+from software.py_constants import CHICKER_TIMEOUT
+from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -21,7 +21,7 @@ class ChickerCommandMode(Enum):
     AUTOCHIP_PULSE_WIDTH = 8
 
 
-class ChickerWidget(QWidget):
+class ChickerWidget(QtWidgets.QWidget):
     """This widget provides an interface to send PowerControl messages for
     kicking and chipping actions to the robot. It has sliders for adjusting
     the kick power and chip distance, as well as buttons for sending single
@@ -47,7 +47,7 @@ class ChickerWidget(QWidget):
 
         self.kick_chip_locked = False
 
-        chicker_widget_vbox_layout = QVBoxLayout()
+        chicker_widget_vbox_layout = QtWidgets.QVBoxLayout()
         self.setLayout(chicker_widget_vbox_layout)
 
         (
@@ -111,13 +111,13 @@ class ChickerWidget(QWidget):
             lambda new_value: self.chipper_pulse_width_label.setText(str(new_value))
         )
 
-        kick_chip_sliders_hbox_layout = QHBoxLayout()
+        kick_chip_sliders_hbox_layout = QtWidgets.QHBoxLayout()
         kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
         kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
         kick_chip_sliders_hbox_layout.addLayout(self.kicker_pulse_width_slider_layout)
         kick_chip_sliders_hbox_layout.addLayout(self.chipper_pulse_width_slider_layout)
 
-        kick_chip_sliders_box = QGroupBox()
+        kick_chip_sliders_box = QtWidgets.QGroupBox()
         kick_chip_sliders_box.setLayout(kick_chip_sliders_hbox_layout)
         kick_chip_sliders_box.setTitle("Kick Power, Chip Distance, and Pulse Widths")
 
@@ -135,7 +135,7 @@ class ChickerWidget(QWidget):
         self.chip_button = self.kick_chip_buttons[1]
 
         # Initializing auto kick & chip buttons
-        self.radio_buttons_group = QButtonGroup()
+        self.radio_buttons_group = QtWidgets.QButtonGroup()
         (
             self.auto_kick_chip_buttons_box,
             self.auto_kick_chip_buttons,
@@ -153,7 +153,7 @@ class ChickerWidget(QWidget):
             self.__update_kick_chip_buttons_accessibility
         )
 
-        self.power_mode_buttons_group = QButtonGroup()
+        self.power_mode_buttons_group = QtWidgets.QButtonGroup()
         (
             self.power_mode_buttons_box,
             self.power_mode_buttons,
@@ -238,7 +238,7 @@ class ChickerWidget(QWidget):
                 self.kick_chip_locked = False
                 self.__update_kick_chip_buttons_accessibility()
 
-            QTimer.singleShot(int(CHICKER_TIMEOUT), unlock_kick_chip)
+            QtCore.QTimer.singleShot(int(CHICKER_TIMEOUT), unlock_kick_chip)
 
     def send_command(self, command: ChickerCommandMode) -> None:
         """Send a [auto]kick or [auto]chip primitive with the currently set
@@ -253,7 +253,7 @@ class ChickerWidget(QWidget):
         chip_pulse_width = self.chipper_pulse_width_slider.value()
 
         # Send kick, chip, autokick, or autochip primitive
-        power_control = PowerControl()
+        power_control = protos.PowerControl()
         power_control.geneva_slot = 3
 
         if command == ChickerCommandMode.KICK:
@@ -277,7 +277,7 @@ class ChickerWidget(QWidget):
                 chip_pulse_width
             )
 
-        self.proto_unix_io.send_proto(PowerControl, power_control)
+        self.proto_unix_io.send_proto(protos.PowerControl, power_control)
 
         if (
             command == ChickerCommandMode.KICK
@@ -289,9 +289,9 @@ class ChickerWidget(QWidget):
             # spamming of kick/chip commands. This is because if no new messages are received in the
             # buffer, the last sent message will be repeatedly resent to the robot, which we don't
             # want for kick/chip.
-            power_control = PowerControl()
+            power_control = protos.PowerControl()
             power_control.geneva_slot = 3
-            self.proto_unix_io.send_proto(PowerControl, power_control, True)
+            self.proto_unix_io.send_proto(protos.PowerControl, power_control, True)
 
     def enable(self) -> None:
         """Enable all sliders and buttons in the ChickerWidget"""

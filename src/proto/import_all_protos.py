@@ -1,5 +1,6 @@
 import importlib
 import pkgutil
+
 import proto
 
 
@@ -44,5 +45,5 @@ def import_all_classes(package, input_globals):
 # Import all the protobuf classes that are generated into the proto library
 import_all_classes(proto, globals())
 
-# Now add the following line to get access to all protobufs
-# from proto.import_all_protos import *
+# Now add the following line to get access to all protobufs through a single module
+# import proto.import_all_protos as protos

@@ -1,18 +1,13 @@
-from pyqtgraph.opengl import *
-
 import math
-
-from proto.tbots_software_msgs_pb2 import PrimitiveSet
-from proto.visualization_pb2 import PathVisualization
-
-from software.thunderscope.constants import Colors, DepthValues
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
-from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
-
-from software.thunderscope.gl.helpers.observable_list import ObservableList
 from typing import override
+
+import proto.import_all_protos as protos
+from software.thunderscope.constants import Colors, DepthValues
+from software.thunderscope.gl.graphics.gl_line_strip import GLLineStrip
+from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLPathLayer(GLLayer):
@@ -28,9 +23,9 @@ class GLPathLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, protos.PrimitiveSet)
         self.path_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, PathVisualization
+            buffer_size, protos.PathVisualization
         )
 
         self.destination_graphics = ObservableList(self._graphics_changed)

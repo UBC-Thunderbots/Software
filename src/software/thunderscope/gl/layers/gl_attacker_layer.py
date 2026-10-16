@@ -1,22 +1,20 @@
 import math
 import time
+from typing import override
 
+import proto.import_all_protos as protos
+import pyqtgraph.opengl as gl
 from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-
-from proto.visualization_pb2 import AttackerVisualization
-
 from software.thunderscope.constants import (
+    THUNDERSCOPE_UI_FONT_NAME,
     Colors,
     DepthValues,
-    THUNDERSCOPE_UI_FONT_NAME,
 )
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from typing import override
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class GLAttackerLayer(GLLayer):
@@ -35,7 +33,9 @@ class GLAttackerLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.attacker_vis_buffer = ThreadSafeBuffer(buffer_size, AttackerVisualization)
+        self.attacker_vis_buffer = ThreadSafeBuffer(
+            buffer_size, protos.AttackerVisualization
+        )
 
         self.pass_graphics = ObservableList(self._graphics_changed)
         self.shot_graphics = ObservableList(self._graphics_changed)
@@ -102,7 +102,7 @@ class GLAttackerLayer(GLLayer):
             )
             self.shot_open_angle_graphics.resize(
                 1,
-                lambda: GLTextItem(
+                lambda: gl.GLTextItem(
                     font=QtGui.QFont(THUNDERSCOPE_UI_FONT_NAME, 8),
                     color=Colors.SHOT_VISUALIZATION_COLOR,
                 ),

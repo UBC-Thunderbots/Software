@@ -1,11 +1,8 @@
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 #include <gtest/gtest.h>
 
-#include <exception>
-#include <iostream>
-
-#include "software/util/generic_factory/generic_factory.h"
+#include <stdexcept>
 
 class TestConfig
 {
@@ -19,7 +16,7 @@ class TestGeneric
 class TestGenericA : public TestGeneric
 {
    public:
-    TestGenericA(const TestConfig config);
+    explicit TestGenericA(const TestConfig config);
 };
 
 TestGenericA::TestGenericA(const TestConfig config) {}
@@ -27,7 +24,7 @@ TestGenericA::TestGenericA(const TestConfig config) {}
 class TestGenericB : public TestGeneric
 {
    public:
-    TestGenericB(const TestConfig config);
+    explicit TestGenericB(const TestConfig config);
 };
 
 TestGenericB::TestGenericB(const TestConfig config) {}

@@ -1,15 +1,14 @@
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import *
-from software.py_constants import *
-from software.thunderscope.util import color_from_gradient
 from typing import override
 
+from pyqtgraph.Qt import QtCore, QtWidgets
+from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.util import color_from_gradient
 
-class FloatSlider(QSlider):
+
+class FloatSlider(QtWidgets.QSlider):
     """This class extends QSlider to offer support to float values instead of just ints"""
 
-    floatValueChanged = pyqtSignal(float)
+    floatValueChanged = QtCore.pyqtSignal(float)
 
     def __init__(self, decimals: int = 1, *args, **kwargs):
         """Creates a FloatSlider with the given number of decimal places
@@ -60,7 +59,7 @@ class FloatSlider(QSlider):
         super(FloatSlider, self).setValue(int(value * self.decimals))
 
 
-class ColorQLabel(QLabel):
+class ColorQLabel(QtWidgets.QLabel):
     """A QLabel that changes color based on the float value it holds
     Can provide a custom min and max value
     The label starts off with no color and becomes more Red as the value increases up till the max value
@@ -108,12 +107,12 @@ class ColorQLabel(QLabel):
         self.setStyleSheet(f"background: rgba(255, 0, 0, {percent})")
 
 
-class ColorProgressBar(QProgressBar):
+class ColorProgressBar(QtWidgets.QProgressBar):
     """This class extends QProgressBar to support floats instead of ints
     Also changes progress bar color based on percentage filled
     """
 
-    floatValueChanged = pyqtSignal(float)
+    floatValueChanged = QtCore.pyqtSignal(float)
 
     def __init__(self, min_val: float, max_val: float, decimals: int = 2):
         """Creates a ColorProgressBar with the specified min, max and decimals
@@ -132,7 +131,7 @@ class ColorProgressBar(QProgressBar):
         )
 
         super(ColorProgressBar, self).setStyleSheet(
-            "QProgressBar::chunk" "{" "background: grey" "color: black" "}"
+            "QProgressBar::chunk{background: greycolor: black}"
         )
 
         self.valueChanged.connect(self.emitFloatValueChanged)
@@ -198,7 +197,7 @@ class ColorProgressBar(QProgressBar):
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
 
-class ToggleableButton(QPushButton):
+class ToggleableButton(QtWidgets.QPushButton):
     """A QPushButton which can be enabled or disabled
     Indicates with cursor if it is enabled or disabled
     """
@@ -240,15 +239,15 @@ def create_buttons(text: list):
             QGroupBox object - add this to the widget
             list of QPushButton objects - use this to perform tasks on the buttons
     """
-    group_box = QGroupBox()
+    group_box = QtWidgets.QGroupBox()
     num_buttons = len(text)
     buttons = []
 
     for i in range(num_buttons):
-        button = QPushButton(text[i])
+        button = QtWidgets.QPushButton(text[i])
         buttons.append(button)
 
-    hbox = QHBoxLayout()
+    hbox = QtWidgets.QHBoxLayout()
 
     for button in buttons:
         hbox.addWidget(button)
@@ -267,17 +266,17 @@ def create_radio(text: list, radio_group):
                 QGroupBox object - add this to the widget
                 list of QRadioButton object - use this to perform tasks on the buttons
     """
-    group_box = QGroupBox()
+    group_box = QtWidgets.QGroupBox()
     num_buttons = len(text)
     radios = []
 
     for i in range(num_buttons):
-        radio = QRadioButton(text[i])
+        radio = QtWidgets.QRadioButton(text[i])
         # this is so that the button is properly visible in black background
         radio_group.addButton(radio)
         radios.append(radio)
 
-    hbox = QHBoxLayout()
+    hbox = QtWidgets.QHBoxLayout()
 
     for radio in radios:
         hbox.addWidget(radio)
@@ -304,16 +303,16 @@ def create_slider_abs(slider, text, min_val, max_val, tick_spacing):
     """
     slider.setMinimum(min_val)
     slider.setMaximum(max_val)
-    slider.setTickPosition(QSlider.TickPosition.NoTicks)
+    slider.setTickPosition(QtWidgets.QSlider.TickPosition.NoTicks)
     slider.setTickInterval(tick_spacing)
 
-    vbox = QVBoxLayout()
+    vbox = QtWidgets.QVBoxLayout()
 
     if text:
-        slider_label = QLabel(str(text))
+        slider_label = QtWidgets.QLabel(str(text))
         vbox.addWidget(slider_label)
 
-    value_label = QLabel(str(slider.value()))
+    value_label = QtWidgets.QLabel(str(slider.value()))
     vbox.addWidget(value_label)
     vbox.addWidget(slider)
 
@@ -332,7 +331,7 @@ def create_slider(text, min_val, max_val, tick_spacing):
             QSlider object - use this to perform tasks on the button
             displays value of slider, update this when value is changed
     """
-    slider = QSlider(Qt.Orientation.Horizontal)
+    slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
 
     return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
 
@@ -350,7 +349,7 @@ def create_float_slider(text, decimals, min_val, max_val, tick_spacing):
             QSlider object - use this to perform tasks on the button
             displays value of slider, update this when value is changed
     """
-    slider = FloatSlider(decimals, Qt.Orientation.Horizontal)
+    slider = FloatSlider(decimals, QtCore.Qt.Orientation.Horizontal)
 
     return create_slider_abs(slider, text, min_val, max_val, tick_spacing)
 
@@ -372,7 +371,7 @@ def set_table_data(
 
         for m, item in enumerate(data[key]):
             str_item = str(item)
-            newitem = QTableWidgetItem(str_item)
+            newitem = QtWidgets.QTableWidgetItem(str_item)
             newitem.setSizeHint(
                 QtCore.QSize(
                     max(
@@ -488,8 +487,8 @@ def display_tooltip(event, tooltip_text):
     :param tooltip_text: the text to display in the tooltip
     """
     if str(event.type()) == "Type.Enter":
-        QToolTip.showText(
-            QPoint(
+        QtWidgets.QToolTip.showText(
+            QtCore.QPoint(
                 int(event.globalPosition().x()),
                 int(event.globalPosition().y()),
             ),
@@ -497,4 +496,4 @@ def display_tooltip(event, tooltip_text):
             msecShowTime=int(20 * MILLISECONDS_PER_SECOND),
         )
     elif str(event.type()) == "Type.Leave":
-        QToolTip.hideText()
+        QtWidgets.QToolTip.hideText()

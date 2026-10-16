@@ -164,7 +164,8 @@ def simulated_session(args, runtime_subpath):
             should_restart_on_crash=False,
             running_in_realtime=args.enable_thunderscope and not args.ci_mode,
         ) as yellow_fs,
-        Gamecontroller(suppress_logs=(not args.verbose)) as gamecontroller,
+        Gamecontroller(suppress_logs=(not args.verbose),
+                       parallelized=True) as gamecontroller,
     ):
         blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
         yellow_fs.setup_proto_unix_io(yellow_full_system_proto_unix_io)

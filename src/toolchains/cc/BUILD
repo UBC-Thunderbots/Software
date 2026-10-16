@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_toolchain", "cc_toolchain_suite")
 load(
     ":cc_toolchain_config.bzl",
     "cc_toolchain_config_fullsystem",
@@ -69,6 +70,35 @@ platform(
     ],
 )
 
+# The toolchain filegroups below are only needed on the host OS they were built for.
+# Selecting on the host platform keeps Bazel from fetching the other platforms' toolchains.
+
+config_setting(
+    name = "is_linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+config_setting(
+    name = "is_linux_x86_64",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+config_setting(
+    name = "is_linux_aarch64",
+    constraint_values = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+)
+
+config_setting(
+    name = "is_macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
 # This represents a mapping of CPU -> Compiler To Use
 cc_toolchain_suite(
     name = "toolchain",
@@ -92,9 +122,10 @@ filegroup(
 
 filegroup(
     name = "k8_aarch64_linux_everything",
-    srcs = [
-        "@k8_aarch64_linux_gcc//:everything",
-    ] + glob(["wrapper/k8_aarch64_linux_*"]),
+    srcs = glob(["wrapper/k8_aarch64_linux_*"]) + select({
+        ":is_linux": ["@k8_aarch64_linux_gcc//:everything"],
+        "//conditions:default": [],
+    }),
 )
 
 filegroup(
@@ -106,22 +137,30 @@ filegroup(
     name = "linux_k8_gcc_all",
     srcs = [
         ":linux_gcc_wrapper",
-        "@linux_k8_gcc//:includes",
-        "@linux_k8_gcc//:libs",
-        "@linux_k8_gcc//:runtime_libs",
-        "@linux_k8_gcc//:static_libs",
-    ],
+    ] + select({
+        ":is_linux_x86_64": [
+            "@linux_k8_gcc//:includes",
+            "@linux_k8_gcc//:libs",
+            "@linux_k8_gcc//:runtime_libs",
+            "@linux_k8_gcc//:static_libs",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 filegroup(
     name = "linux_aarch64_gcc_all",
     srcs = [
         ":linux_gcc_wrapper",
-        "@linux_aarch64_gcc//:includes",
-        "@linux_aarch64_gcc//:libs",
-        "@linux_aarch64_gcc//:runtime_libs",
-        "@linux_aarch64_gcc//:static_libs",
-    ],
+    ] + select({
+        ":is_linux_aarch64": [
+            "@linux_aarch64_gcc//:includes",
+            "@linux_aarch64_gcc//:libs",
+            "@linux_aarch64_gcc//:runtime_libs",
+            "@linux_aarch64_gcc//:static_libs",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 filegroup(
@@ -161,10 +200,16 @@ cc_toolchain(
     as_files = ":linux_k8_gcc_all",
     compiler_files = ":linux_k8_gcc_all",
     dwp_files = ":linux_k8_gcc_all",
-    dynamic_runtime_lib = "@linux_k8_gcc//:runtime_libs",
+    dynamic_runtime_lib = select({
+        ":is_linux_x86_64": "@linux_k8_gcc//:runtime_libs",
+        "//conditions:default": ":empty",
+    }),
     linker_files = ":linux_k8_gcc_all",
     objcopy_files = ":linux_k8_gcc_all",
-    static_runtime_lib = "@linux_k8_gcc//:static_libs",
+    static_runtime_lib = select({
+        ":is_linux_x86_64": "@linux_k8_gcc//:static_libs",
+        "//conditions:default": ":empty",
+    }),
     strip_files = ":linux_k8_gcc_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
@@ -182,10 +227,16 @@ cc_toolchain(
     as_files = ":linux_aarch64_gcc_all",
     compiler_files = ":linux_aarch64_gcc_all",
     dwp_files = ":linux_aarch64_gcc_all",
-    dynamic_runtime_lib = "@linux_aarch64_gcc//:runtime_libs",
+    dynamic_runtime_lib = select({
+        ":is_linux_aarch64": "@linux_aarch64_gcc//:runtime_libs",
+        "//conditions:default": ":empty",
+    }),
     linker_files = ":linux_aarch64_gcc_all",
     objcopy_files = ":linux_aarch64_gcc_all",
-    static_runtime_lib = "@linux_aarch64_gcc//:static_libs",
+    static_runtime_lib = select({
+        ":is_linux_aarch64": "@linux_aarch64_gcc//:static_libs",
+        "//conditions:default": ":empty",
+    }),
     strip_files = ":linux_aarch64_gcc_all",
     supports_param_files = True,
     toolchain_config = ":linux_aarch64_gcc",
@@ -251,7 +302,11 @@ cc_toolchain_config_k8_aarch64_linux(
         "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/sysroot/usr/include/",
         "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include/",
         "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include-fixed",
+        "/opt/tbotspython/cross_compile_headers/include/",
     ] + make_builtin_include_directories(),
+    host_unfiltered_compile_flags = [
+        "-I/opt/tbotspython/cross_compile_headers/include",
+    ],
     tool_paths = {
         "ar": "wrapper/k8_aarch64_linux_ar",
         "cpp": "wrapper/k8_aarch64_linux_cpp",
@@ -309,8 +364,10 @@ filegroup(
     name = "macos_robot_everything",
     srcs = [
         "wrapper/macos_robot_gcc",
-        "@macos_robot_gcc//:everything",
-    ],
+    ] + select({
+        ":is_macos": ["@macos_robot_gcc//:everything"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_toolchain(
@@ -332,7 +389,7 @@ cc_toolchain(
 toolchain(
     name = "cc_toolchain_for_macos_robot",
     exec_compatible_with = [
-        "@platforms//os:osx",
+        "@platforms//os:macos",
         "@platforms//cpu:aarch64",
     ],
     target_compatible_with = [

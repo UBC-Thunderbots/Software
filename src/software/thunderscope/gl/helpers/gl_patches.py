@@ -1,8 +1,7 @@
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-from pyqtgraph.opengl.GLViewWidget import GLViewMixin
-from pyqtgraph.opengl.shaders import ShaderProgram
-from pyqtgraph.Qt import QtGui
 from typing import Callable
+
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
 
 
 def GLGraphicsItem_setParentItem_patched(self, parent: GLGraphicsItem) -> None:
@@ -87,9 +86,3 @@ def ShaderProgram_program_patched(original: Callable) -> Callable:
         return original(self)
 
     return patched
-
-
-GLGraphicsItem.setParentItem = GLGraphicsItem_setParentItem_patched
-GLViewMixin.addItem = GLViewMixin_addItem_patched
-GLViewMixin.removeItem = GLViewMixin_removeItem_patched
-ShaderProgram.program = ShaderProgram_program_patched(ShaderProgram.program)

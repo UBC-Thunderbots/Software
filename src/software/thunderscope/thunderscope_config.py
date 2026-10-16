@@ -5,7 +5,6 @@ from typing import Sequence
 
 import pyqtgraph
 import qdarktheme
-
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
