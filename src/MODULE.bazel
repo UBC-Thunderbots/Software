@@ -251,25 +251,28 @@ http_archive(
     url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
 )
 
+bazel_dep(name = "toolchains_arm_gnu")
+archive_override(
+    module_name = "toolchains_arm_gnu",
+    # The upstream toolchain templates load `HOST_CONSTRAINTS` from
+    # `@local_config_platform`, which was removed in Bazel 9. Patch them to use
+    # the supported `@platforms//host` replacement instead.
+    patches = ["//starlark/patches/toolchains_arm_gnu:use_platforms_host_constraints.patch"],
+    sha256 = "40a97f3c09e31383b8204288c08989213de2863b561cf4d8f61e45060ef22854",
+    strip_prefix = "toolchains_arm_gnu-6895733b87d3a75a40056b12c3d6628bc6945011",
+    url = "https://github.com/hexdae/toolchains_arm_gnu/archive/6895733b87d3a75a40056b12c3d6628bc6945011.tar.gz",
+)
+
 ##############################################
 # Register our Toolchains
 ##############################################
 register_toolchains("@llvm//toolchain:all")
-# register_toolchains("//toolchains/python:py_toolchain")
-#
-# register_toolchains(
-#     "//toolchains/python:k8_aarch64_linux_py_cc_toolchain",
-#     "//toolchains/python:py_cc_toolchain_host_x86_64",
-#     "//toolchains/python:py_cc_toolchain_host_aarch64",
-# )
-#
-# register_toolchains(
-#     "//toolchains/cc:cc_toolchain_for_macos_robot",
-#     "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
-#     "//toolchains/cc:cc_toolchain_for_k8",
-#     "//toolchains/cc:cc_toolchain_for_aarch64",
-#     "//toolchains/cc:cc_toolchain_for_stm32",
-# )
+
+arm_toolchain = use_extension("@toolchains_arm_gnu//:extensions.bzl", "arm_toolchain")
+arm_toolchain.arm_none_eabi()
+use_repo(arm_toolchain, "arm_none_eabi")
+
+register_toolchains("//toolchains/stm:motor_board_toolchain")
 
 ##############################################
 # New local repos for our toolchains/compilers

@@ -41,6 +41,9 @@ common --features=generated_include_paths
 # Output cross-compiled builds in separate directory
 build --experimental_platform_in_output_dir
 
+# Auto select toolchain based on platform constraints
+build --incompatible_enable_cc_toolchain_resolution
+
 ################# Build Optimizations #################
 
 # Use a local directory as a remote cache. This shares artifacts when switching
