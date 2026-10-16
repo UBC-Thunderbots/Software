@@ -40,15 +40,9 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
      */
     void reset() override;
 
-    /** @brief Return the PID for the x-axis. */
-    PidController<double> getXPid() const {
-        return x_pid_;
-    }
+    PidController<double> getXPid() const;
 
-    /** @brief Return the PID for the y-axis. */
-    PidController<double> getYPid() const {
-        return y_pid_;
-    }
+    PidController<double> getYPid() const;
 
    private:
     // TODO(#3737): tune constants
