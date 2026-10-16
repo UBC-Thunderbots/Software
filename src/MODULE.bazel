@@ -279,54 +279,12 @@ register_toolchains("//toolchains/stm:motor_board_toolchain")
 ##############################################
 new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
-new_local_repository(
-    name = "linux_k8_gcc",
-    build_file = "@//extlibs:linux_k8_gcc.bzl",
-    path = "/",
-)
-
-new_local_repository(
-    name = "linux_aarch64_gcc",
-    build_file = "@//extlibs:linux_aarch64_gcc.bzl",
-    path = "/",
-)
-
 # libclang-dev is installed into the system through setup_software.sh
 new_local_repository(
     name = "libclang",
     build_file = "@//extlibs:libclang.bzl",
     path = "/usr/lib/llvm-6.0/",
 )
-
-# new_local_repository(
-#     name = "k8_aarch64_linux_gcc",
-#     build_file = "@//extlibs:k8_aarch64_linux_gcc.bzl",
-#     path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
-# )
-#
-# new_local_repository(
-#     name = "macos_robot_gcc",
-#     build_file = "@//extlibs:macos_robot_gcc.bzl",
-#     path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
-# )
-#
-# new_local_repository(
-#     name = "motor_board_gcc",
-#     build_file = "@//extlibs:motor_board_gcc.bzl",
-#     path = "/opt/tbotspython/arm-none-eabi-gcc/",
-# )
-#
-# new_local_repository(
-#     name = "py_cc_toolchain_host",
-#     build_file = "@//extlibs:py_cc_toolchain.bzl",
-#     path = "/opt/tbotspython/py_headers/include/python3.12/",
-# )
-#
-# new_local_repository(
-#     name = "py_cc_toolchain_for_k8_aarch64_linux",
-#     build_file = "@//extlibs:py_cc_toolchain.bzl",
-#     path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
-# )
 
 ##############################################
 # Workarounds and Fixes Below (hacks)
