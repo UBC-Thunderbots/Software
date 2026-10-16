@@ -310,6 +310,8 @@ PYBIND11_MODULE(python_bindings, m)
                        &robot_constants::RobotConstants::wheel_radius_meters)
         .def_readwrite("robot_max_speed_m_per_s",
                        &robot_constants::RobotConstants::robot_max_speed_m_per_s)
+        .def_readwrite("motor_max_acceleration_m_per_s_2",
+                       &robot_constants::RobotConstants::motor_max_acceleration_m_per_s_2)
         .def_readwrite("robot_max_ang_speed_rad_per_s",
                        &robot_constants::RobotConstants::robot_max_ang_speed_rad_per_s);
     m.def("createRobotConstants", &robot_constants::createRobotConstants);

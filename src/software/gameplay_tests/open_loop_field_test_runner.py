@@ -40,6 +40,60 @@ MOTOR_CONTROL_RESEND_PERIOD_S = 0.05
 SSL_WRAPPER_BUFFER_SIZE = 5
 VISION_POSE_TIMEOUT_S = 2.0
 
+ROBOT_CONSTANTS = tbots_cpp.createRobotConstants()
+# Direction each wheel drives in, in the robot's local frame, matching the
+# wheel angles in EuclideanToWheel (front right, front left, back left, back right)
+_FRONT_WHEEL_ANGLE_RAD = math.radians(ROBOT_CONSTANTS.front_wheel_angle_deg)
+_BACK_WHEEL_ANGLE_RAD = math.radians(ROBOT_CONSTANTS.back_wheel_angle_deg)
+WHEEL_DIRECTION_ANGLES_RAD = [
+    -(math.pi - _FRONT_WHEEL_ANGLE_RAD),
+    -_FRONT_WHEEL_ANGLE_RAD,
+    _BACK_WHEEL_ANGLE_RAD,
+    math.pi - _BACK_WHEEL_ANGLE_RAD,
+]
+
+
+def max_wheel_speed(local_velocity):
+    """Get the fastest any wheel spins for a local-frame velocity with no rotation
+
+    :param local_velocity: (x_m_per_s, y_m_per_s) in the robot's local frame
+    :return: the largest absolute wheel speed in m/s
+    """
+    return max(
+        abs(math.cos(b) * local_velocity[0] + math.sin(b) * local_velocity[1])
+        for b in WHEEL_DIRECTION_ANGLES_RAD
+    )
+
+
+def ramp_local_velocity(current, target, dt):
+    """Step a local-frame velocity towards a target the way the robot does, so
+    the expected path accelerates like the robot is told to.
+
+    Mirrors EuclideanToWheel::rampWheelVelocity for motion without rotation: the
+    change in velocity is scaled down so no wheel accelerates faster than
+    motor_max_acceleration_m_per_s_2, and then so no wheel spins faster than
+    robot_max_speed_m_per_s.
+
+    :param current: (x_m_per_s, y_m_per_s) the velocity last step
+    :param target: (x_m_per_s, y_m_per_s) the commanded velocity
+    :param dt: seconds since the last step
+    :return: (x_m_per_s, y_m_per_s) the velocity this step
+    """
+    delta = (target[0] - current[0], target[1] - current[1])
+    max_wheel_delta = max_wheel_speed(delta)
+    allowed_wheel_delta = ROBOT_CONSTANTS.motor_max_acceleration_m_per_s_2 * dt
+    if max_wheel_delta > allowed_wheel_delta:
+        scale = allowed_wheel_delta / max_wheel_delta
+        velocity = (current[0] + delta[0] * scale, current[1] + delta[1] * scale)
+    else:
+        velocity = target
+
+    wheel_speed = max_wheel_speed(velocity)
+    if wheel_speed > ROBOT_CONSTANTS.robot_max_speed_m_per_s:
+        scale = ROBOT_CONSTANTS.robot_max_speed_m_per_s / wheel_speed
+        velocity = (velocity[0] * scale, velocity[1] * scale)
+    return velocity
+
 
 class OpenLoopFieldTestRunner:
     """Run a field test that drives robots open-loop, without FullSystem or vision.
@@ -86,6 +140,7 @@ class OpenLoopFieldTestRunner:
         self.initial_pose = None
         self.prev_vision_sample = None
         self.expected_position = (0.0, 0.0)
+        self.expected_local_velocity = (0.0, 0.0)
         self.rerun_test_widget = rerun_test_widget
         self.proto_unix_io = proto_unix_io
         self.robot_communication = robot_communication
@@ -201,42 +256,42 @@ class OpenLoopFieldTestRunner:
             )
             self.initial_pose = (0.0, 0.0, 0.0)
         self.expected_position = self.initial_pose[:2]
+        self.expected_local_velocity = (0.0, 0.0)
         logger.info(f"tracking path from initial pose {self.initial_pose}")
 
-    def __send_path_tracking(
-        self, x_m_per_s, y_m_per_s, angular_velocity_rad_per_s, dt, robot_status
-    ):
+    def __send_path_tracking(self, x_m_per_s, y_m_per_s, dt):
         """Advance the expected position by one step and send it, with the
         current vision position, to PlotJuggler. Also sends the expected and
-        vision-measured global velocities, and the commanded and robot-reported
-        local velocities.
+        vision-measured speeds.
 
         :param x_m_per_s: commanded local-frame forward velocity
         :param y_m_per_s: commanded local-frame leftward velocity
-        :param angular_velocity_rad_per_s: commanded angular velocity
         :param dt: seconds the command has been applied for
-        :param robot_status: the latest RobotStatus from the tracked robot, or None
         """
         if self.initial_pose is None:
             return
-        # The square is open-loop and never rotates, so the local-frame command
-        # maps to the global frame through the initial orientation
+        prev_local_velocity = self.expected_local_velocity
+        self.expected_local_velocity = ramp_local_velocity(
+            prev_local_velocity, (x_m_per_s, y_m_per_s), dt
+        )
+        # Integrate the average over the step, since the velocity ramps linearly
+        local_v_x = (prev_local_velocity[0] + self.expected_local_velocity[0]) / 2
+        local_v_y = (prev_local_velocity[1] + self.expected_local_velocity[1]) / 2
+
+        # The tests never rotate, so the local-frame velocity maps to the global
+        # frame through the initial orientation
         theta = self.initial_pose[2]
-        expected_v_x = x_m_per_s * math.cos(theta) - y_m_per_s * math.sin(theta)
-        expected_v_y = x_m_per_s * math.sin(theta) + y_m_per_s * math.cos(theta)
         self.expected_position = (
-            self.expected_position[0] + expected_v_x * dt,
-            self.expected_position[1] + expected_v_y * dt,
+            self.expected_position[0]
+            + (local_v_x * math.cos(theta) - local_v_y * math.sin(theta)) * dt,
+            self.expected_position[1]
+            + (local_v_x * math.sin(theta) + local_v_y * math.cos(theta)) * dt,
         )
         values = {
             "open_loop/expected_x": self.expected_position[0],
             "open_loop/expected_y": self.expected_position[1],
             "open_loop/expected_orientation": theta,
-            "open_loop/expected_v_x": expected_v_x,
-            "open_loop/expected_v_y": expected_v_y,
-            "open_loop/commanded_local_v_x": x_m_per_s,
-            "open_loop/commanded_local_v_y": y_m_per_s,
-            "open_loop/commanded_w": angular_velocity_rad_per_s,
+            "open_loop/expected_speed": math.hypot(*self.expected_local_velocity),
         }
 
         vision_sample = self.__get_vision_sample(self.tracked_robot_id)
@@ -256,22 +311,11 @@ class OpenLoopFieldTestRunner:
                     d_orientation = math.remainder(
                         orientation - prev_orientation, 2 * math.pi
                     )
-                    values["open_loop/vision_v_x"] = (x - prev_x) / vision_dt
-                    values["open_loop/vision_v_y"] = (y - prev_y) / vision_dt
+                    values["open_loop/vision_speed"] = (
+                        math.hypot(x - prev_x, y - prev_y) / vision_dt
+                    )
                     values["open_loop/vision_w"] = d_orientation / vision_dt
             self.prev_vision_sample = vision_sample
-
-        if robot_status is not None:
-            motor_status = robot_status.motor_status
-            values["open_loop/robot_local_v_x"] = (
-                motor_status.local_velocity.x_component_meters
-            )
-            values["open_loop/robot_local_v_y"] = (
-                motor_status.local_velocity.y_component_meters
-            )
-            values["open_loop/robot_w"] = (
-                motor_status.angular_velocity.radians_per_second
-            )
 
         self.plotjuggler_sender.send(values)
 
@@ -343,16 +387,9 @@ class OpenLoopFieldTestRunner:
             )
             time.sleep(MOTOR_CONTROL_RESEND_PERIOD_S)
             now = time.time()
-            new_robot_statuses = self.__drain_robot_statuses()
-            robot_statuses += new_robot_statuses
-            self.__send_path_tracking(
-                x_m_per_s,
-                y_m_per_s,
-                angular_velocity_rad_per_s,
-                now - last_time,
-                new_robot_statuses[-1] if new_robot_statuses else None,
-            )
+            self.__send_path_tracking(x_m_per_s, y_m_per_s, now - last_time)
             last_time = now
+            robot_statuses += self.__drain_robot_statuses()
         return robot_statuses
 
     def stop(self, settle_time_s=1.0):
