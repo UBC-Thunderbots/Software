@@ -82,7 +82,6 @@ class RobotCommunication:
         for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_control_mode_map[robot_id] = IndividualRobotMode.NONE
 
-        # TODO: (#3174): move estop state management out of robot_communication
         self.estop_mode = estop_mode
         self.estop_path = estop_path
         self.estop_baudrate = estop_baudrate
