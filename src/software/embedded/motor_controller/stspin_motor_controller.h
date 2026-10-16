@@ -33,7 +33,6 @@ class StSpinMotorController : public MotorController
     void immediatelyDisable() override;
 
    private:
-    // TODO: #3750 Use a template function instead of std::variant.
     using OutgoingMessage =
         std::variant<NoOpMessage, SetResponseTypeMessage, SetTargetSpeedMessage,
                      SetTargetTorqueMessage, SetPidTorqueKpKiMessage,

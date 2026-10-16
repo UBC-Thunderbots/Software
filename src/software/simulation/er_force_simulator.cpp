@@ -3,6 +3,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
 
+#include <cmath>
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
@@ -10,11 +11,62 @@
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
+
+robot::Specs ErForceSimulator::createRobotSpecs(
+    const robot_constants::RobotConstants& robot_constants)
+{
+    robot::Specs specs;
+    robotSetDefault(&specs);
+
+    const float radius = robot_constants.robot_radius_m;
+    const float angle =
+        2 * std::asin(robot_constants.front_of_robot_width_meters / (2 * radius));
+    const float dribbler_width = robot_constants.dribbler_width_meters;
+
+    const float v_max     = robot_constants.robot_max_speed_m_per_s;
+    const float omega_max = robot_constants.robot_max_ang_speed_rad_per_s;
+
+    specs.set_radius(radius);
+    specs.set_angle(angle);
+    specs.set_dribbler_width(dribbler_width);
+    specs.set_v_max(v_max);
+    specs.set_omega_max(omega_max);
+
+    auto* acceleration = specs.mutable_acceleration();
+    acceleration->set_a_speedup_f_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_s_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    acceleration->set_a_brake_f_max(robot_constants.robot_max_deceleration_m_per_s_2);
+    acceleration->set_a_brake_s_max(robot_constants.robot_max_deceleration_m_per_s_2);
+    acceleration->set_a_brake_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+
+    auto* strategy = specs.mutable_strategy();
+    strategy->set_a_speedup_f_max(
+        robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
+    strategy->set_a_speedup_s_max(
+        robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
+    strategy->set_a_speedup_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    strategy->set_a_brake_f_max(
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    strategy->set_a_brake_s_max(
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    strategy->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+
+
+    return specs;
+}
+
+
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
@@ -59,9 +111,6 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
-    // start with default robots, take ER-Force specs.
-    robot::Specs ERForce;
-    robotSetDefault(&ERForce);
     Team friendly_team = Team();
     Team enemy_team    = Team();
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -120,7 +169,7 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismCo
     realism_config->set_vision_delay(35000000);
     realism_config->set_vision_processing_time(10000000);
     realism_config->set_missing_ball_detections(0.02f);
-    realism_config->set_simulate_dribbling(true);
+    realism_config->set_simulate_dribbling(false);
     return realism_config;
 }
 
@@ -192,8 +241,7 @@ void ErForceSimulator::setRobots(
 {
     auto simulator_setup_command = std::make_unique<amun::Command>();
 
-    robot::Specs ERForce;
-    robotSetDefault(&ERForce);
+    const robot::Specs robot_specs = createRobotSpecs(robot_constants);
 
     // Initialize Team Robots at the bottom of the field
     ::robot::Team* team;
@@ -209,7 +257,7 @@ void ErForceSimulator::setRobots(
     for (auto& [id, robot_state] : robots)
     {
         auto* robot = team->add_robot();
-        robot->CopyFrom(ERForce);
+        robot->CopyFrom(robot_specs);
         robot->set_id(id);
     }
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);

@@ -8,7 +8,6 @@
 #include "software/physics/euclidean_to_wheel.h"
 #include "software/world/field.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_types.h"
 #include "software/world/world.h"
 
 
@@ -172,6 +171,17 @@ class ErForceSimulator
     static std::map<RobotId, RobotState> getRobotIdToRobotStateMap(
         const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots,
         gameController::Team side);
+
+    /**
+     * Creates the ER Force robot specs from our Thunderbots robot constants.
+     * It it used to configure the ER Force simulator to match our robots.
+     * Fields with no equivalent in RobotConstants maintain ERForce defaults.
+     *
+     * @param robot_constants The robot constants to build specs from
+     * @return the robot specs
+     */
+    static robot::Specs createRobotSpecs(
+        const robot_constants::RobotConstants& robot_constants);
 
     /**
      * Update Simulator Robot and get the latest robot control

@@ -56,11 +56,12 @@ class Ai final
     void overridePlayFromProto(TbotsProto::Play play_proto);
 
     /**
-     * Update the AiConfig proto
+     * Mark the shared AI config as updated.
      *
-     * @param ai_config The new AiConfig proto
+     * Only used so we can adjust to changes in the control config's play override, other
+     * config fields just get read on demand from the shared config.
      */
-    void updateAiConfig();
+    void markAiConfigUpdated();
 
    private:
     void checkAiConfig();
