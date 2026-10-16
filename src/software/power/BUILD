@@ -40,16 +40,6 @@ platformio_library(
 )
 
 platformio_library(
-    name = "geneva",
-    src = "geneva.cpp",
-    hdr = "geneva.h",
-    deps = [
-        ":pins",
-        "//proto:tbots_nanopb_proto",
-    ],
-)
-
-platformio_library(
     name = "charger",
     src = "charger.cpp",
     hdr = "charger.h",
@@ -73,7 +63,6 @@ platformio_library(
     deps = [
         ":charger",
         ":chicker",
-        ":geneva",
         ":pins",
         "//proto:tbots_nanopb_proto",
     ],
@@ -101,7 +90,6 @@ platformio_project(
         ":chicker",
         ":control_executor",
         ":dribbler",
-        ":geneva",
         ":pins",
         ":power_monitor",
         "//proto:tbots_nanopb_proto",
