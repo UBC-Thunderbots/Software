@@ -2,7 +2,7 @@
 
 Point::Point() : x_(0.0), y_(0.0) {}
 
-Point::Point(double x, double y) : x_(x), y_(y) {}
+Point::Point(const double x, const double y) : x_(x), y_(y) {}
 
 Point::Point(const Point& p) : x_(p.x()), y_(p.y()) {}
 

@@ -68,6 +68,22 @@ class PidController
         last_error_ = std::nullopt;
     }
 
+    T getProportionalGain() {
+        return k_p_;
+    }
+
+    T getIntegralGain() {
+        return k_i_;
+    }
+
+    T getDerivativeGain() {
+        return k_i_;
+    }
+
+    T getMaxIntegral() {
+        return max_integral_;
+    }
+
    private:
     T k_p_;
     T k_i_;
