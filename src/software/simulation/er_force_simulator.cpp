@@ -25,7 +25,7 @@ robot::Specs ErForceSimulator::createRobotSpecs(
 
     const float radius = robot_constants.robot_radius_m;
     const float angle =
-        2 * asin(robot_constants.front_of_robot_width_meters / (2 * radius));
+        2 * std::asin(robot_constants.front_of_robot_width_meters / (2 * radius));
     const float dribbler_width = robot_constants.dribbler_width_meters;
 
     const float v_max     = robot_constants.robot_max_speed_m_per_s;
