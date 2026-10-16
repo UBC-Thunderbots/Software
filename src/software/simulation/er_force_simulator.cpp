@@ -3,8 +3,8 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
