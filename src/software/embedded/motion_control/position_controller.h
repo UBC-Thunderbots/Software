@@ -20,10 +20,17 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
      * Given a position and target trajectory, returns a target global velocity to
      * minimize error between the two.
      *
+     * @details The @ref elapsed_time is used with the @ref target_trajectory to determine
+     * where the position should be, which is compared against the actual position @ref
+     * position.
+     *
      * @param position The actual position.
      * @param target_trajectory The target 2D trajectory path.
      * @param elapsed_time The elapsed time since the trajectory was created.
      * @param delta_time The time passed since last time step.
+     * 
+     * @note @ref elapsed_time and @ref delta_time expect positive @ref Duration
+     * values.
      */
     Vector step(const Point& position, const TrajectoryPath& target_trajectory,
                 Duration elapsed_time, Duration delta_time) override;
@@ -32,6 +39,10 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
      * Resets the state of this position controller.
      */
     void reset() override;
+
+    PidController<double> getXPid() const;
+
+    PidController<double> getYPid() const;
 
    private:
     // TODO(#3737): tune constants
