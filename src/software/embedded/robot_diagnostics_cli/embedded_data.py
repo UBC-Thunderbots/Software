@@ -136,7 +136,6 @@ class EmbeddedData:
     def get_zero_power_control_primitive(self) -> protos.Primitive:
         """Creates a PowerControl primitive with zeroed/default base values"""
         power_control_primitive = protos.PowerControl()
-
         return power_control_primitive
 
     def get_zero_motor_control_primitive(self) -> protos.Primitive:

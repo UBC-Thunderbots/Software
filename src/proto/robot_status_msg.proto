@@ -3,7 +3,6 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/tbots_timestamp_msg.proto";
-
 import "proto/geometry.proto";
 
 message RobotStatus
@@ -141,7 +140,7 @@ message PowerStatus
     float capacitor_voltage = 2;
     // voltage on the robot’s capacitor, in volts.
     float current_draw = 3;
-
+    reserved 4;
     uint32 sequence_num    = 5;
     bool breakbeam_tripped = 6;
 }

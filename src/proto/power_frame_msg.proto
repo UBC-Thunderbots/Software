@@ -4,7 +4,6 @@ package TbotsProto;
 
 import "proto/robot_status_msg.proto";
 
-
 // This is used on the robots. Similar proto in primitive.proto but with m_per_s instead
 // of pulse width
 message PowerPulseControl
@@ -27,7 +26,7 @@ message PowerPulseControl
             AutoChipOrKick auto_chip_or_kick = 3;
         }
     }
-
+    reserved 2;
     ChickerControl chicker = 1;
 }
 

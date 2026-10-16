@@ -4,7 +4,6 @@ package TbotsProto;
 
 import "google/protobuf/descriptor.proto";
 import "proto/geometry.proto";
-
 import "proto/tbots_timestamp_msg.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -98,7 +97,7 @@ message PowerControl
             float chip_pulse_width           = 5;
         };
     }
-
+    reserved 2;
     ChickerControl chicker = 1;
 }
 

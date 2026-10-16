@@ -111,7 +111,6 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
     TbotsProto_PowerStatus status = {.battery_voltage   = battery_voltage,
                                      .capacitor_voltage = capacitor_voltage,
                                      .current_draw      = current_draw,
-
                                      .sequence_num      = sequence_num,
                                      .breakbeam_tripped = breakbeam_tripped};
     return status;
@@ -236,9 +235,6 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         default:
             break;
     }
-
-
-
     return nanopb_control;
 }
 
