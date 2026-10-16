@@ -101,7 +101,7 @@ class UartFramingTest : public ::testing::Test
 
     TbotsProto_PowerPulseControl test_message;
 
-    const uint16_t TEST_MESSAGE_CRC = 60410;
+    const uint16_t TEST_MESSAGE_CRC = 53610;
 };
 
 bool operator==(const TbotsProto_PowerPulseControl& lhs,
