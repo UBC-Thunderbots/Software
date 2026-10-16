@@ -29,6 +29,14 @@ build --test_env=QT_QPA_PLATFORM
 build --action_env=PYTHON_BIN_PATH=/opt/tbotspython/bin/python3.12
 build --action_env=PYTHON_LIB_PATH=/opt/tbotspython/lib/python3.12
 
+# The hermetic rules_python toolchain creates the interpreter symlink in a
+# py_binary's venv with `declare_symlink()` using a path relative to the
+# runfiles tree. rules_pkg cannot package those symlinks (it follows them and
+# fails on the dangling target), which breaks the `*_tar` python CLI packages.
+# Have rules_python recreate the venv at runtime instead of creating symlinks.
+# See https://github.com/bazel-contrib/rules_python/issues/2489
+build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
+
 # Automatically set the CPU environment based on the `--cpu` flag as per our
 # defined CPU environments
 build --auto_cpu_environment_group=//toolchains/cc:cpus
