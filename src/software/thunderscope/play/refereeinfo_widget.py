@@ -44,6 +44,10 @@ class RefereeInfoWidget(QtWidgets.QWidget):
 
         Works even if the field is unset or an empty list, so both
         teams always have a value for every row.
+
+        :param team_info: the TeamInfo proto for one team
+        :param field_name: the name of the field to format
+        :return: the value as a string, or "-" if the field has no value
         """
         value = getattr(team_info, field_name)
         field = team_info.DESCRIPTOR.fields_by_name[field_name]
