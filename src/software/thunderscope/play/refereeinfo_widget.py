@@ -38,6 +38,25 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         # Team info table data, indexed by [field_name]["blue" | "yellow"]
         self.team_info = defaultdict(dict)
 
+    @staticmethod   
+    def _format_field(team_info, field_name: str) -> str:
+        """Return a display string for one TeamInfo field.
+
+        Works even if the field is unset or an empty list, so both
+        teams always have a value for every row.
+        """
+        value = getattr(team_info, field_name)
+        field = team_info.DESCRIPTOR.fields_by_name[field_name]
+
+        if field.is_repeated:
+            if field_name == "yellow_card_times":
+                return ", ".join(f"{t / 1_000_000:.1f}s" for t in value) or "-"
+            return ", ".join(str(v) for v in value) or "-"
+
+        return str(value) if team_info.HasField(field_name) else "-"
+
+        
+
     def refresh(self) -> None:
         """Update the referee info widget with new referee information"""
         referee = self.referee_buffer.get(block=False, return_cached=False)
@@ -56,17 +75,16 @@ class RefereeInfoWidget(QtWidgets.QWidget):
             + f"Blue Team on Positive Half: {referee.blue_team_on_positive_half}\n"
         )
 
-        for field_descriptor, field_val in referee.blue.ListFields():
-            self.team_info[field_descriptor.name]["blue"] = field_val
+        # Use every TeamInfo field (not just populated ones) so both teams
+        # always have a value for each row
+        field_names = [f.name for f in protos.Referee.TeamInfo.DESCRIPTOR.fields]
 
-        for field_descriptor, field_val in referee.yellow.ListFields():
-            self.team_info[field_descriptor.name]["yellow"] = field_val
-
+        self.referee_table.setRowCount(len(field_names))
         set_table_data(
             {
-                "Team Info": self.team_info.keys(),
-                "Blue": [val["blue"] for val in self.team_info.values()],
-                "Yellow": [val["yellow"] for val in self.team_info.values()],
+                "Team Info": field_names,
+                "Blue": [self._format_field(referee.blue, f) for f in field_names],
+                "Yellow": [self._format_field(referee.yellow, f) for f in field_names],
             },
             self.referee_table,
             RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
