@@ -89,13 +89,13 @@ int main(int argc, char** argv)
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_A, robot_constants::createRobotConstants(),
-                realism_config);
+                realism_config, args.enable_realism);
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
                 TbotsProto::FieldType::DIV_B, robot_constants::createRobotConstants(),
-                realism_config);
+                realism_config, args.enable_realism);
         }
 
         std::mutex simulator_mutex;

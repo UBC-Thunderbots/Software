@@ -70,14 +70,16 @@ robot::Specs ErForceSimulator::createRobotSpecs(
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce>& realism_config)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config,
+                                   const bool enable_realism)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt)
+      yellow_robot_with_ball(std::nullopt),
+      enable_realism(enable_realism)
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -318,7 +320,7 @@ void ErForceSimulator::setRobots(
     simulated_robots.clear();
     for (auto& [id, robot_state] : robots)
     {
-        simulated_robots.try_emplace(id, id, robot_constants);
+        simulated_robots.try_emplace(id, id, robot_constants, enable_realism);
     }
 
     bool& robots_moved =
