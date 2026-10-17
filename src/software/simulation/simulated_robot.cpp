@@ -4,6 +4,8 @@ SimulatedRobot::SimulatedRobot(const RobotId robot_id,
                                const robot_constants::RobotConstants& robot_constants)
     : motor_service_(std::make_unique<SimulatedMotorService>(
           robot_constants, SimulatedMotorService::NoiseConfig(), robot_id)),
+      imu_service_(std::make_unique<SimulatedImuService>(
+          SimulatedImuService::NoiseConfig(), robot_id)),
       primitive_executor_(std::make_unique<PrimitiveExecutor>(robot_constants, robot_id))
 {
 }
@@ -21,6 +23,14 @@ TbotsProto::DirectControlPrimitive SimulatedRobot::tick(const RobotState& true_s
     const TbotsProto::DirectControlPrimitive direct_control_primitive =
         primitive_executor_->stepPrimitive(robot_status_, time_step);
 
+    imu_service_->poll(true_state, robot_status_, time_step);
+
     return motor_service_->poll(direct_control_primitive, true_state, robot_status_,
                                 time_step);
+}
+
+void SimulatedRobot::reset()
+{
+    imu_service_->reset();
+    robot_status_.Clear();
 }
