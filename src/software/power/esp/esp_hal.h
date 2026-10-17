@@ -5,15 +5,15 @@
 
 #include "power_hal.h"
 
-/** ESP32 Arduino implementation*/
-class Esp32Hal final : public PowerHAL
+/** ESP Arduino implementation*/
+class EspHal final : public PowerHAL
 {
    public:
-    Esp32Hal();
-    ~Esp32Hal() override;
+    EspHal();
+    ~EspHal() override;
 
-    Esp32Hal(const Esp32Hal&)            = delete;
-    Esp32Hal& operator=(const Esp32Hal&) = delete;
+    EspHal(const EspHal&)            = delete;
+    EspHal& operator=(const EspHal&) = delete;
 
     uint32_t micros() const override;
     bool startChickerPulse(ChickerOutput output, uint32_t pulse_width_us,
@@ -63,5 +63,5 @@ class Esp32Hal final : public PowerHAL
     portMUX_TYPE timer_mux_          = portMUX_INITIALIZER_UNLOCKED;
     LTC4151 monitor_;
 
-    static Esp32Hal* volatile instance_;
+    static EspHal* volatile instance_;
 };

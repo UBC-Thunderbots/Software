@@ -2,9 +2,9 @@
 
 #include <cstdlib>
 
-Esp32Hal* volatile Esp32Hal::instance_ = nullptr;
+EspHal* volatile EspHal::instance_ = nullptr;
 
-Esp32Hal::Esp32Hal()
+EspHal::EspHal()
 {
     if (instance_ != nullptr)
         abort();
@@ -21,7 +21,7 @@ Esp32Hal::Esp32Hal()
         abort();
 }
 
-Esp32Hal::~Esp32Hal()
+EspHal::~EspHal()
 {
     stopChickerPulse();
     cancelTimer(PowerTimer::ChickerCooldown);
@@ -35,13 +35,13 @@ Esp32Hal::~Esp32Hal()
         instance_ = nullptr;
 }
 
-uint32_t Esp32Hal::micros() const
+uint32_t EspHal::micros() const
 {
     return ::micros();
 }
 
-bool Esp32Hal::startOneShotTimer(PowerTimer timer, uint32_t duration_us,
-                                 PowerTimerCallback callback, void* context)
+bool EspHal::startOneShotTimer(PowerTimer timer, uint32_t duration_us,
+                               PowerTimerCallback callback, void* context)
 {
     if (callback == nullptr ||
         (timer != PowerTimer::ChickerCooldown &&
@@ -62,7 +62,7 @@ bool Esp32Hal::startOneShotTimer(PowerTimer timer, uint32_t duration_us,
     return true;
 }
 
-void Esp32Hal::cancelTimer(PowerTimer timer)
+void EspHal::cancelTimer(PowerTimer timer)
 {
     if (timer == PowerTimer::ChickerPulse)
     {
@@ -86,7 +86,7 @@ void Esp32Hal::cancelTimer(PowerTimer timer)
     portEXIT_CRITICAL(&timer_mux_);
 }
 
-void Esp32Hal::dispatchTimerCallbacks()
+void EspHal::dispatchTimerCallbacks()
 {
     for (int index = 0; index < 3; ++index)
     {
@@ -108,7 +108,7 @@ void Esp32Hal::dispatchTimerCallbacks()
     }
 }
 
-void IRAM_ATTR Esp32Hal::recordTimerExpiration(PowerTimer timer)
+void IRAM_ATTR EspHal::recordTimerExpiration(PowerTimer timer)
 {
     portENTER_CRITICAL_ISR(&timer_mux_);
     pending_events_ |= timerEventMask(timer);

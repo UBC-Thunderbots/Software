@@ -1,7 +1,7 @@
 #include "esp_hal.h"
 #include "pins.h"
 
-void Esp32Hal::initializeChicker()
+void EspHal::initializeChicker()
 {
     pinMode(CHIPPER_PIN, OUTPUT);
     pinMode(KICKER_PIN, OUTPUT);
@@ -11,20 +11,20 @@ void Esp32Hal::initializeChicker()
 
     pulse_timer_ = timerBegin(CHICKER_PULSE_TIMER, 80, true);
     if (pulse_timer_ != nullptr)
-        timerAttachInterrupt(pulse_timer_, &Esp32Hal::pulseTimerISR, true);
+        timerAttachInterrupt(pulse_timer_, &EspHal::pulseTimerISR, true);
 
     cooldown_timer_ = timerBegin(CHICKER_COOLDOWN_TIMER, 80, true);
     if (cooldown_timer_ != nullptr)
-        timerAttachInterrupt(cooldown_timer_, &Esp32Hal::cooldownTimerISR, true);
+        timerAttachInterrupt(cooldown_timer_, &EspHal::cooldownTimerISR, true);
 }
 
-bool Esp32Hal::getBreakBeamTripped()
+bool EspHal::getBreakBeamTripped()
 {
     return digitalRead(BREAK_BEAM_PIN) == LOW;
 }
 
-bool Esp32Hal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us,
-                                 PowerTimerCallback callback, void* context)
+bool EspHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us,
+                               PowerTimerCallback callback, void* context)
 {
     if (callback == nullptr || pulse_width_us == 0 ||
         (output != ChickerOutput::Kicker && output != ChickerOutput::Chipper))
@@ -53,7 +53,7 @@ bool Esp32Hal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us,
     return true;
 }
 
-void Esp32Hal::stopChickerPulse()
+void EspHal::stopChickerPulse()
 {
     timerAlarmDisable(pulse_timer_);
 
@@ -66,7 +66,7 @@ void Esp32Hal::stopChickerPulse()
     digitalWrite(CHIPPER_PIN, LOW);
 }
 
-void IRAM_ATTR Esp32Hal::pulseTimerISR()
+void IRAM_ATTR EspHal::pulseTimerISR()
 {
     digitalWrite(KICKER_PIN, LOW);
     digitalWrite(CHIPPER_PIN, LOW);

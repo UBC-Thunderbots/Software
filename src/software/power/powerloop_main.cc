@@ -39,7 +39,7 @@ bool receiving;
 
 uint32_t sequence_num;
 
-std::shared_ptr<Esp32Hal> power_hal;
+std::shared_ptr<EspHal> power_hal;
 std::shared_ptr<Geneva> geneva;
 std::shared_ptr<PowerController> power_controller;
 std::shared_ptr<ControlExecutor> executor;
@@ -49,7 +49,7 @@ void setup()
     Serial.begin(460800, SERIAL_8N1);
     receiving        = false;
     sequence_num     = 0;
-    power_hal        = std::make_shared<Esp32Hal>();
+    power_hal        = std::make_shared<EspHal>();
     geneva           = std::make_shared<Geneva>();
     power_controller = std::make_shared<PowerController>(*power_hal);
     executor         = std::make_shared<ControlExecutor>(*power_controller);
