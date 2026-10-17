@@ -20,9 +20,12 @@ class SimulatedRobot
      *
      * @param robot_id The ID of the robot
      * @param robot_constants The robot constants
+     * @param enable_realism Whether to add sensor noise and execute primitives on the
+     * robot localizer's estimate instead of the true state
      */
     SimulatedRobot(RobotId robot_id,
-                   const robot_constants::RobotConstants& robot_constants);
+                   const robot_constants::RobotConstants& robot_constants,
+                   bool enable_realism);
 
     /**
      * Starts executing a new primitive.
