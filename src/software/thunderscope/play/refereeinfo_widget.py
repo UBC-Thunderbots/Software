@@ -38,7 +38,7 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         # Team info table data, indexed by [field_name]["blue" | "yellow"]
         self.team_info = defaultdict(dict)
 
-    @staticmethod   
+    @staticmethod
     def _format_field(team_info, field_name: str) -> str:
         """Return a display string for one TeamInfo field.
 
@@ -58,8 +58,6 @@ class RefereeInfoWidget(QtWidgets.QWidget):
             return ", ".join(str(v) for v in value) or "-"
 
         return str(value) if team_info.HasField(field_name) else "-"
-
-        
 
     def refresh(self) -> None:
         """Update the referee info widget with new referee information"""
