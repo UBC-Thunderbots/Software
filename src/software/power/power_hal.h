@@ -2,14 +2,12 @@
 
 #include <cstdint>
 
-/** Chicker output to drive. */
 enum class ChickerOutput : uint8_t
 {
     Kicker,
     Chipper,
 };
 
-/** One-shot timers exposed to power logic. */
 enum class PowerTimer : uint8_t
 {
     ChickerPulse,
@@ -17,66 +15,56 @@ enum class PowerTimer : uint8_t
     CapacitorChargeToggle,
 };
 
-/**
- * Invoked once by dispatchTimerCallbacks(), never from an ISR.
- * Callback/context must remain valid until delivery, cancellation, or replacement.
- */
+/** Called once when a timer expires; context must remain valid until delivery or
+ * cancellation. */
 using PowerTimerCallback = void (*)(void* context, PowerTimer timer);
 
-/**
- * Power-board hardware interface; business rules belong in power logic.
- * ESP32 implementations use hardware timers with ISR-safe deadline handling;
- * simulations may expire timers using simulated time. Neither runs logic in an ISR.
- */
+/** Interface to power hardware. */
 class PowerHAL
 {
    public:
     virtual ~PowerHAL() = default;
 
-    /** Monotonic microseconds, wrapping at UINT32_MAX. */
+    /** Returns monotonic time in microseconds, wrapping modulo 2^32. */
     virtual uint32_t micros() const = 0;
 
-    // Chicker
     /**
-     * Drives the output high, then low at the timer deadline without loop service.
-     * Queues ChickerPulse for callback dispatch after expiration.
-     * Returns false if busy or unable to start; no callback is queued on failure.
+     * Generates a pulse of pulse_width_us on the selected output and queues its callback
+     * for delivery on completion. Returns false if the pulse cannot be started; no
+     * callback is delivered on failure.
      */
     virtual bool startChickerPulse(ChickerOutput output, uint32_t pulse_width_us,
                                    PowerTimerCallback callback, void* context) = 0;
-    /** Forces both outputs low and cancels the pulse and any pending callback. */
+    /** Stops the active pulse, makes its output inactive, and cancels its callback. */
     virtual void stopChickerPulse() = 0;
 
     /**
-     * Starts ChickerCooldown or CapacitorChargeToggle; replaces any active timer
-     * or pending callback for that ID. ChickerPulse uses startChickerPulse().
+     * Starts or replaces the timer and callback for the given timer ID.
+     * ChickerPulse is started with startChickerPulse().
      */
     virtual void startOneShotTimer(PowerTimer timer, uint32_t duration_us,
                                    PowerTimerCallback callback, void* context) = 0;
-    /** Cancels the timer and pending callback; ChickerPulse also forces outputs low. */
+    /** Cancels the timer and its callback; cancelling ChickerPulse also stops its pulse.
+     */
     virtual void cancelTimer(PowerTimer timer) = 0;
-    /** Called from the main loop to deliver callbacks, not to advance timers. */
+    /** Delivers callbacks for timers that have expired. */
     virtual void dispatchTimerCallbacks() = 0;
 
-    // Chicker break beam
-    /** True when the break beam is tripped. */
+    /** Returns whether the break beam is tripped. */
     virtual bool getBreakBeamTripped() = 0;
 
-    // Dribbler
-    /** PWM duty cycle: 0 (off) to 255 (full output)*/
+    /** Sets the dribbler output duty cycle, from 0 (off) to 255 (full output). */
     virtual void setDribblerPwm(uint8_t duty_cycle) = 0;
 
-    // Charger
-    /** Sets the charger enable output. */
+    /** Enables or disables capacitor charging. */
     virtual void setCapacitorCharging(bool enabled) = 0;
-    /** True when hardware reports charging complete. */
+    /** Returns whether capacitor charging is complete. */
     virtual bool isCapacitorChargeDone() = 0;
-    /** Capacitor voltage in volts. */
+    /** Returns capacitor voltage in volts. */
     virtual float getCapacitorVoltage() = 0;
 
-    // Power monitor
-    /** Battery voltage in volts. */
+    /** Returns battery voltage in volts. */
     virtual float getBatteryVoltage() = 0;
-    /** Current draw in amps. */
+    /** Returns current draw in amps. */
     virtual float getCurrentDrawAmp() = 0;
 };
