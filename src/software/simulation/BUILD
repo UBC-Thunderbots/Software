@@ -40,6 +40,28 @@ cc_test(
 )
 
 cc_library(
+    name = "simulated_imu",
+    srcs = ["simulated_imu.cpp"],
+    hdrs = ["simulated_imu.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/geom:angular_velocity",
+        "//software/geom:vector",
+        "//software/time:duration",
+        "//software/world:robot_state",
+    ],
+)
+
+cc_test(
+    name = "simulated_imu_test",
+    srcs = ["simulated_imu_test.cpp"],
+    deps = [
+        ":simulated_imu",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
     name = "simulated_motor",
     srcs = ["simulated_motor.cpp"],
     hdrs = ["simulated_motor.h"],
@@ -67,6 +89,7 @@ cc_library(
     srcs = ["simulated_robot.cpp"],
     hdrs = ["simulated_robot.h"],
     deps = [
+        ":simulated_imu",
         ":simulated_motor",
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",

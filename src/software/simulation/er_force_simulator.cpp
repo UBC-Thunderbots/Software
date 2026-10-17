@@ -323,6 +323,10 @@ void ErForceSimulator::setRobots(
     {
         simulated_robots->try_emplace(id, id, robot_constants);
     }
+
+    bool& robots_moved =
+        (side == gameController::Team::BLUE) ? blue_robots_moved : yellow_robots_moved;
+    robots_moved = true;
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
@@ -456,7 +460,29 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     er_force_sim->stepSimulation(time_step.toSeconds());
 
+    // After the physics step, since that is when ER-Force applies moves
+    resetMovedRobots(gameController::Team::BLUE);
+    resetMovedRobots(gameController::Team::YELLOW);
+
     frame_number++;
+}
+
+void ErForceSimulator::resetMovedRobots(gameController::Team side)
+{
+    auto& simulated_robots = (side == gameController::Team::BLUE)
+                                 ? blue_simulated_robots
+                                 : yellow_simulated_robots;
+    bool& robots_moved =
+        (side == gameController::Team::BLUE) ? blue_robots_moved : yellow_robots_moved;
+
+    if (robots_moved)
+    {
+        for (auto& [robot_id, simulated_robot] : simulated_robots)
+        {
+            simulated_robot.reset();
+        }
+        robots_moved = false;
+    }
 }
 
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
