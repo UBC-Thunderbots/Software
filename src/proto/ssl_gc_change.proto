@@ -138,6 +138,7 @@ message Change
         optional Division division = 1;
         // the team that does/did the first kick off
         optional Team first_kickoff_team = 2;
+        // DELETE?
         reserved 3;  // auto_continue moved to gcState
         // The match type
         optional MatchType match_type = 4;
