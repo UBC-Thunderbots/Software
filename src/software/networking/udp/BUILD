@@ -160,3 +160,23 @@ cc_test(
         "@protobuf//:wrappers_cc_proto",
     ],
 )
+
+cc_library(
+    name = "threaded_proto_udp_bidirectional",
+    hdrs = ["threaded_proto_udp_bidirectional.hpp"],
+    deps = [
+        ":proto_udp_bidirectional",
+        "@boost//:asio",
+    ],
+)
+
+cc_test(
+    name = "threaded_proto_udp_bidirectional_test",
+    srcs = ["threaded_proto_udp_bidirectional_test.cpp"],
+    deps = [
+        ":threaded_proto_udp_bidirectional",
+        "//shared/test_util:tbots_gtest_main",
+        "@boost//:asio",
+        "@protobuf//:wrappers_cc_proto",
+    ],
+)
