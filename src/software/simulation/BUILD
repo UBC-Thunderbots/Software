@@ -19,6 +19,7 @@ cc_library(
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
+        "//proto:ssl_simulation_cc_proto",
         "//shared:constants",
         "//software/embedded:primitive_executor",
         "//software/embedded/robot_localizer",
