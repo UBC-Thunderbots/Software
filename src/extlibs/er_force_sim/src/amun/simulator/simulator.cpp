@@ -402,7 +402,6 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
 
 world::SimulatorState Simulator::getSimulatorState()
 {
-    const std::size_t numCameras = m_data->reportedCameraSetup.size();
     world::SimulatorState simState;
 
     m_data->ball->writeBallState(*simState.mutable_ball());
