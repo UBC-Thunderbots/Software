@@ -15,6 +15,7 @@ cc_library(
     ],
     deps = [
         "//extlibs/er_force_sim/src/amun/simulator",
+        "//proto:ssl_simulation_cc_proto",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
