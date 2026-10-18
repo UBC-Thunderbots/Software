@@ -7,7 +7,7 @@ module(
 ##############################################################
 # Import Dependencies available in the Bazel Central Registry
 ##############################################################
-bazel_dep(name = "googletest", version = "1.16.0.bcr.2")
+bazel_dep(name = "googletest", version = "1.18.0.bcr.1")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
@@ -308,13 +308,6 @@ new_local_repository(
 # transitive dependencies that haven't been updated.
 cc_compat = use_extension("@rules_cc//cc:extensions.bzl", "compatibility_proxy")
 use_repo(cc_compat, "cc_compatibility_proxy")
-
-# googletest 1.16.0.bcr.2 needs compat proxy registration for Bazel 9.
-single_version_override(
-    module_name = "googletest",
-    patches = ["//starlark/patches/googletest:add_compat_proxy.patch"],
-    version = "1.16.0.bcr.2",
-)
 
 # pybind11_protobuf needs Bazel 9 compat and protobuf 35 API fixes.
 single_version_override(
