@@ -1,6 +1,7 @@
 load("@ansible_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("//toolchains/cc:transitions.bzl", "cross_compiled_filegroup")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,6 +9,21 @@ compile_pip_requirements(
     name = "requirements",
     src = ":requirements.in",
     requirements_txt = ":requirements_lock.txt",
+)
+
+cross_compiled_filegroup(
+    name = "robot_binaries",
+    deps = [
+        "//software/embedded:thunderloop_main",
+        "//software/embedded:hash_thunderloop_binary.sh",
+        "//software/embedded:setup_openocd_deps",
+        "//software/embedded:setup_robot_software_deps",
+        "//software/embedded/linux_configs/pi:pi_files",
+        "//software/embedded/linux_configs/systemd:systemd_files",
+        "//software/embedded/motor_controller:stspin_motor_controller_test",
+        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
+        "//software/power:powerloop_tar",
+    ],
 )
 
 py_binary(
@@ -18,15 +34,7 @@ py_binary(
     data = [
         ":playbooks",
         ":tasks",
-        "//software/embedded:hash_thunderloop_binary.sh",
-        "//software/embedded:setup_openocd_deps",
-        "//software/embedded:setup_robot_software_deps",
-        "//software/embedded:thunderloop_main",
-        "//software/embedded/linux_configs/pi:pi_files",
-        "//software/embedded/linux_configs/systemd:systemd_files",
-        "//software/embedded/motor_controller:stspin_motor_controller_test",
-        "//software/embedded/robot_diagnostics_cli:robot_diagnostics_cli_tar",
-        "//software/power:powerloop_tar",
+        ":robot_binaries",
     ],
     deps = [
         requirement("ansible"),
