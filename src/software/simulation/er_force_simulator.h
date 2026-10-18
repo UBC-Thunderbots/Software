@@ -2,6 +2,7 @@
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/ssl_simulation_robot_feedback.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/embedded/primitive_executor.h"
@@ -27,11 +28,18 @@ class ErForceSimulator
      * @param field_type The field type
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
+     * @param ramping enable ramping
+     * @param blue_direct_ssl blue controls directly via ssl messages instead of
+     * primitives
+     * @param yellow_direct_ssl yellow controls directly via ssl messages instead of
+     * primitives
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const robot_constants::RobotConstants& robot_constants,
                               std::unique_ptr<RealismConfigErForce>& realism_config,
-                              const bool ramping = true);
+                              const bool ramping           = true,
+                              const bool blue_direct_ssl   = false,
+                              const bool yellow_direct_ssl = false);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -81,6 +89,18 @@ class ErForceSimulator
                                     std::unique_ptr<TbotsProto::World> world_msg);
     void setBlueRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
                                   std::unique_ptr<TbotsProto::World> world_msg);
+
+    /**
+     * Applies SSL robot commands directly when the corresponding direct_ssl flag is
+     * enabled.
+     *
+     * @param command Commands for this team
+     * @return Feedback for accepted robot commands and any command errors
+     */
+    SSLSimulationProto::RobotControlResponse sendYellowSSLControl(
+        const SSLSimulationProto::RobotControl& command);
+    SSLSimulationProto::RobotControlResponse sendBlueSSLControl(
+        const SSLSimulationProto::RobotControl& command);
 
     /**
      * Advances the simulation by the given time step.
@@ -142,6 +162,14 @@ class ErForceSimulator
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
    private:
+    SSLSimulationProto::RobotControlResponse sendSSLControl(
+        const SSLSimulationProto::RobotControl& command, bool is_blue);
+
+    // Returns accepted commands and appends validation errors to the response.
+    SSLSimulationProto::RobotControl validateSSLControl(
+        const SSLSimulationProto::RobotControl& command, bool is_blue,
+        SSLSimulationProto::RobotControlResponse& response) const;
+
     // Grants the ramping unit test access to the private getRampedVelocityPrimitive()
     friend class ErForceSimulatorRampingTest;
 
@@ -231,6 +259,8 @@ class ErForceSimulator
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool ramping;
+    bool blue_direct_ssl;
+    bool yellow_direct_ssl;
 
     struct LocalVelocity
     {

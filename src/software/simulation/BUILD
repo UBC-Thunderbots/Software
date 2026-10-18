@@ -17,6 +17,7 @@ cc_library(
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
+        "//proto:ssl_simulation_cc_proto",
         "//software/embedded:primitive_executor",
         "//software/physics:euclidean_to_wheel",
         "//software/physics:velocity_conversion_util",
