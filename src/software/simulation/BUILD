@@ -22,6 +22,7 @@ cc_library(
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
+        "//proto:ssl_simulation_cc_proto",
         "//shared:constants",
         "//software/physics:velocity_conversion_util",
         "//software/world",
