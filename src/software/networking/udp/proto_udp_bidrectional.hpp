@@ -130,8 +130,10 @@ void ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::handleDataReception(
     const boost::asio::ip::udp::endpoint& sender_endpoint)
 {
     auto packet_data = ReceiveProtoT();
-    std::ignore =
-        packet_data.ParseFromArray(buffer, static_cast<int>(num_bytes_received));
+    if (!packet_data.ParseFromArray(buffer, static_cast<int>(num_bytes_received)))
+    {
+        return;
+    }
     receive_callback(packet_data, sender_endpoint);
 }
 
