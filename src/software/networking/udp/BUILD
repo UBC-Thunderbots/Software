@@ -128,3 +128,13 @@ cc_library(
         "@boost//:asio",
     ],
 )
+
+cc_test(
+    name = "udp_listener_test",
+    srcs = ["udp_listener_test.cpp"],
+    deps = [
+        ":udp_listener",
+        "//shared/test_util:tbots_gtest_main",
+        "@boost//:asio",
+    ],
+)

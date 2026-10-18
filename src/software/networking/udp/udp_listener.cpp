@@ -131,7 +131,8 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
     if (!error)
     {
         // Call the receive callback with the received data
-        receive_callback_(raw_received_data_.data(), num_bytes_received);
+        receive_callback_(raw_received_data_.data(), num_bytes_received,
+                          sender_endpoint_);
     }
     else
     {
