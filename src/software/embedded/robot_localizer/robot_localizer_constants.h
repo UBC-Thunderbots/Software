@@ -35,29 +35,45 @@ static constexpr double PROCESS_MODEL_INITIAL_VARIANCE = 1;
 static constexpr double PROCESS_LINEAR_VELOCITY_NOISE_VARIANCE      = 1;
 static constexpr double PROCESS_ANGULAR_ACCELERATION_NOISE_VARIANCE = 1;
 
-static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE>
-    VISION_MEASUREMENT_MODEL = []
+// Measurement models (H). Rows: MeasurementIndex, columns: StateIndex
+// (X_POSITION, Y_POSITION, ORIENTATION, X_VELOCITY, Y_VELOCITY, ANGULAR_VELOCITY)
+// clang-format off
+static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> VISION_MEASUREMENT_MODEL = []
 {
     Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> m;
-    m << 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+    m << 1, 0, 0, 0, 0, 0,  // VISION_X_POSITION
+         0, 1, 0, 0, 0, 0,  // VISION_Y_POSITION
+         0, 0, 1, 0, 0, 0,  // VISION_ORIENTATION
+         0, 0, 0, 0, 0, 0,  // MOTOR_X_VELOCITY
+         0, 0, 0, 0, 0, 0,  // MOTOR_Y_VELOCITY
+         0, 0, 0, 0, 0, 0,  // MOTOR_ANGULAR_VELOCITY
+         0, 0, 0, 0, 0, 0;  // IMU_ANGULAR_VELOCITY
     return m;
 }();
 
-static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> MOTOR_MEASUREMENT_MODEL =
-    []
+static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> MOTOR_MEASUREMENT_MODEL = []
 {
     Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> m;
-    m << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-        0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0;
+    m << 0, 0, 0, 0, 0, 0,  // VISION_X_POSITION
+         0, 0, 0, 0, 0, 0,  // VISION_Y_POSITION
+         0, 0, 0, 0, 0, 0,  // VISION_ORIENTATION
+         0, 0, 0, 1, 0, 0,  // MOTOR_X_VELOCITY
+         0, 0, 0, 0, 1, 0,  // MOTOR_Y_VELOCITY
+         0, 0, 0, 0, 0, 1,  // MOTOR_ANGULAR_VELOCITY
+         0, 0, 0, 0, 0, 0;  // IMU_ANGULAR_VELOCITY
     return m;
 }();
 
-static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> IMU_MEASUREMENT_MODEL =
-    []
+static const Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> IMU_MEASUREMENT_MODEL = []
 {
     Eigen::Matrix<double, MEASUREMENT_SIZE, STATE_SIZE> m;
-    m << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1;
+    m << 0, 0, 0, 0, 0, 0,  // VISION_X_POSITION
+         0, 0, 0, 0, 0, 0,  // VISION_Y_POSITION
+         0, 0, 0, 0, 0, 0,  // VISION_ORIENTATION
+         0, 0, 0, 0, 0, 0,  // MOTOR_X_VELOCITY
+         0, 0, 0, 0, 0, 0,  // MOTOR_Y_VELOCITY
+         0, 0, 0, 0, 0, 0,  // MOTOR_ANGULAR_VELOCITY
+         0, 0, 0, 0, 0, 1;  // IMU_ANGULAR_VELOCITY
     return m;
 }();
+// clang-format on
