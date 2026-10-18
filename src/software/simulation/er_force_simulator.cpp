@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <set>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
@@ -70,7 +71,9 @@ robot::Specs ErForceSimulator::createRobotSpecs(
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce>& realism_config)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config,
+                                   const bool blue_direct_ssl,
+                                   const bool yellow_direct_ssl)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -79,7 +82,9 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
       enable_robot_localizer(realism_config->enable_robot_localizer()),
-      robot_sensor_noise(realism_config->robot_sensor_noise())
+      robot_sensor_noise(realism_config->robot_sensor_noise()),
+      blue_direct_ssl(blue_direct_ssl),
+      yellow_direct_ssl(yellow_direct_ssl)
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -299,6 +304,11 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    if (yellow_direct_ssl)
+    {
+        return;
+    }
+
     auto sim_state         = getSimulatorState();
     const auto& sim_robots = sim_state.yellow_robots();
     const auto robot_map =
@@ -319,6 +329,11 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    if (blue_direct_ssl)
+    {
+        return;
+    }
+
     auto sim_state         = getSimulatorState();
     const auto& sim_robots = sim_state.blue_robots();
     const auto robot_map =
@@ -333,6 +348,99 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
                               robot_map.at(robot_id));
         }
     }
+}
+
+SSLSimulationProto::RobotControlResponse ErForceSimulator::sendYellowSSLControl(
+    const SSLSimulationProto::RobotControl& command)
+{
+    return sendSSLControl(command, false);
+}
+
+SSLSimulationProto::RobotControlResponse ErForceSimulator::sendBlueSSLControl(
+    const SSLSimulationProto::RobotControl& command)
+{
+    return sendSSLControl(command, true);
+}
+
+SSLSimulationProto::RobotControlResponse ErForceSimulator::sendSSLControl(
+    const SSLSimulationProto::RobotControl& command, bool is_blue)
+{
+    SSLSimulationProto::RobotControlResponse response;
+    const auto accepted = validateSSLControl(command, is_blue, response);
+    const auto radio_responses =
+        is_blue ? er_force_sim->acceptBlueRobotControlCommand(accepted)
+                : er_force_sim->acceptYellowRobotControlCommand(accepted);
+    for (const auto& radio : radio_responses)
+    {
+        auto* feedback = response.add_feedback();
+        feedback->set_id(radio.id());
+        if (radio.has_ball_detected())
+        {
+            feedback->set_dribbler_ball_contact(radio.ball_detected());
+        }
+    }
+    return response;
+}
+
+SSLSimulationProto::RobotControl ErForceSimulator::validateSSLControl(
+    const SSLSimulationProto::RobotControl& command, bool is_blue,
+    SSLSimulationProto::RobotControlResponse& response) const
+{
+    auto add_error = [&](const std::string& code, const std::string& message)
+    {
+        auto* error = response.add_errors();
+        error->set_code(code);
+        error->set_message(message);
+    };
+    if (!(is_blue ? blue_direct_ssl : yellow_direct_ssl))
+    {
+        add_error("TEAM_NOT_SSL_CONTROLLED",
+                  "This team is controlled by Thunderbots primitives");
+        return {};
+    }
+    if (!command.IsInitialized())
+    {
+        add_error("INVALID_COMMAND", "Missing required protobuf fields");
+        return {};
+    }
+
+    const auto& robots = is_blue ? blue_simulated_robots : yellow_simulated_robots;
+    SSLSimulationProto::RobotControl accepted;
+    std::set<RobotId> seen;
+    // Filter unknown IDs first: the vendor stops processing a batch at its first unknown
+    // ID.
+    for (const auto& robot : command.robot_commands())
+    {
+        if (!robots.contains(robot.id()))
+        {
+            add_error("UNKNOWN_ROBOT",
+                      "Robot " + std::to_string(robot.id()) + " is not on this team");
+            continue;
+        }
+        if (!seen.insert(robot.id()).second)
+        {
+            add_error("DUPLICATE_ROBOT",
+                      "Multiple commands for robot " + std::to_string(robot.id()));
+            continue;
+        }
+        if (robot.has_move_command() && !robot.move_command().has_local_velocity())
+        {
+            add_error("UNSUPPORTED_MOVE_COMMAND",
+                      "ER-Force currently supports local velocity commands");
+            continue;
+        }
+        const auto& velocity = robot.move_command().local_velocity();
+        if (!std::isfinite(velocity.forward()) || !std::isfinite(velocity.left()) ||
+            !std::isfinite(velocity.angular()) || !std::isfinite(robot.kick_speed()) ||
+            !std::isfinite(robot.kick_angle()) ||
+            !std::isfinite(robot.dribbler_speed()) || robot.kick_speed() < 0)
+        {
+            add_error("INVALID_COMMAND", "Robot command contains invalid numeric values");
+            continue;
+        }
+        *accepted.add_robot_commands() = robot;
+    }
+    return accepted;
 }
 
 void ErForceSimulator::setRobotPrimitive(
@@ -392,18 +500,20 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
     current_time = current_time + time_step;
 
-    SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_simulated_robots, *yellow_team_world_msg, time_step,
-                              gameController::Team::YELLOW);
-
-    SSLSimulationProto::RobotControl blue_robot_control =
-        updateSimulatorRobots(blue_simulated_robots, *blue_team_world_msg, time_step,
-                              gameController::Team::BLUE);
-
-    auto yellow_radio_responses =
-        er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
-    auto blue_radio_responses =
-        er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
+    std::vector<robot::RadioResponse> yellow_radio_responses;
+    std::vector<robot::RadioResponse> blue_radio_responses;
+    if (!yellow_direct_ssl)
+    {
+        yellow_radio_responses = er_force_sim->acceptYellowRobotControlCommand(
+            updateSimulatorRobots(yellow_simulated_robots, *yellow_team_world_msg,
+                                  time_step, gameController::Team::YELLOW));
+    }
+    if (!blue_direct_ssl)
+    {
+        blue_radio_responses = er_force_sim->acceptBlueRobotControlCommand(
+            updateSimulatorRobots(blue_simulated_robots, *blue_team_world_msg, time_step,
+                                  gameController::Team::BLUE));
+    }
 
     blue_robot_with_ball.reset();
     yellow_robot_with_ball.reset();
