@@ -138,3 +138,25 @@ cc_test(
         "@boost//:asio",
     ],
 )
+
+cc_library(
+    name = "proto_udp_bidirectional",
+    hdrs = [
+        "proto_udp_bidrectional.hpp",
+    ],
+    deps = [
+        ":proto_udp_listener",
+        "@boost//:asio",
+    ],
+)
+
+cc_test(
+    name = "proto_udp_bidirectional_test",
+    srcs = ["proto_udp_bidirectional_test.cpp"],
+    deps = [
+        ":proto_udp_bidirectional",
+        "//shared/test_util:tbots_gtest_main",
+        "@boost//:asio",
+        "@protobuf//:wrappers_cc_proto",
+    ],
+)
