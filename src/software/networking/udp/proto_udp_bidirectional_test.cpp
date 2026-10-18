@@ -19,8 +19,12 @@ TEST(ProtoUdpBidirectionalTest, receives_a_request_and_replies)
         reservation.close();
 
         std::unique_ptr<ProtoUdpBidirectional<Message, Message>> server;
-        auto echo = [&](Message& message, const Udp::endpoint& sender)
-        { server->sendTo(message, sender); };
+        int callbacks = 0;
+        auto echo     = [&](Message& message, const Udp::endpoint& sender)
+        {
+            ++callbacks;
+            server->sendTo(message, sender);
+        };
         if (all_interfaces)
             server =
                 std::make_unique<ProtoUdpBidirectional<Message, Message>>(io, port, echo);
@@ -29,6 +33,8 @@ TEST(ProtoUdpBidirectionalTest, receives_a_request_and_replies)
                 io, "127.0.0.1", port, "", echo, false);
 
         Udp::socket client(io, Udp::endpoint(loopback, 0));
+        client.send_to(boost::asio::buffer(std::string(1, '\xff')),
+                       Udp::endpoint(loopback, port));
         Message request;
         request.set_value(std::string("hello\0udp", 9));
         client.send_to(boost::asio::buffer(request.SerializeAsString()),
@@ -51,5 +57,6 @@ TEST(ProtoUdpBidirectionalTest, receives_a_request_and_replies)
                                   });
         io.run_for(std::chrono::seconds(1));
         EXPECT_TRUE(received);
+        EXPECT_EQ(callbacks, 1);
     }
 }
