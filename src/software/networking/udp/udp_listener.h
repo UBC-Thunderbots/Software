@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <string>
 
 typedef std::function<void(const char*, const size_t&,
                            const boost::asio::ip::udp::endpoint&)>
@@ -50,6 +51,15 @@ class UdpListener
      * Destructor.
      */
     virtual ~UdpListener();
+
+    /**
+     * Sends a datagram through the listening socket. Blocks until the send completes.
+     *
+     * @param message The bytes to send
+     * @param destination The recipient's address and port
+     */
+    void sendTo(const std::string& message,
+                const boost::asio::ip::udp::endpoint& destination);
 
     /**
      * Cleans up all associated networking resources with this listener.
