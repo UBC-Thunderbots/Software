@@ -1,3 +1,0 @@
-#!/bin/bash --norc
-
-exec /opt/tbotspython/aarch64-tbots-linux-gnu/bin/aarch64-tbots-linux-gnu-strip "$@"

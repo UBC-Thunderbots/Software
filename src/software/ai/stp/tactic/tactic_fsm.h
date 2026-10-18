@@ -69,4 +69,4 @@ class TacticFSM
 };
 
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }
+    [](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

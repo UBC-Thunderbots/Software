@@ -13,6 +13,8 @@ MAKE_ENUM(GpioDirection, INPUT, OUTPUT);
 class Gpio
 {
    public:
+    virtual ~Gpio() = default;
+
     /**
      * Set the value to the provided state
      *

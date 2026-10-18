@@ -14,7 +14,6 @@ bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "rules_cc", version = "0.2.19")
 bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
-bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
 bazel_dep(name = "rules_python", version = "2.2.0")
 bazel_dep(name = "eigen", version = "5.0.1.bcr.2")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.7")
@@ -25,29 +24,31 @@ bazel_dep(name = "yaml-cpp", version = "0.8.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
 bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
 bazel_dep(name = "bazel_lib", version = "3.1.0")
+bazel_dep(name = "llvm", version = "0.8.21")
 
 ##############################################
 # Load PIP packages and our Requirements
 ##############################################
+PYTHON_VERSION = "3.12"
+
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.defaults(python_version = "3.12")
-python.toolchain(
-    is_default = True,
-    python_version = "3.12",
-)
+python.toolchain(python_version = PYTHON_VERSION)
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "thunderscope_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/thunderscope:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
 )
 use_repo(pip, "thunderscope_deps")
 pip.parse(
     hub_name = "ansible_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/embedded/ansible:requirements_lock.txt",
     target_platforms = [
         "linux_x86_64",
@@ -58,15 +59,18 @@ pip.parse(
 use_repo(pip, "ansible_deps")
 pip.parse(
     hub_name = "gameplay_tests_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/gameplay_tests:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
 )
 use_repo(pip, "gameplay_tests_deps")
 pip.parse(
     hub_name = "robot_diagnostics_cli_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//software/embedded/robot_diagnostics_cli:requirements_lock.txt",
     target_platforms = [
         "linux_x86_64",
@@ -77,11 +81,21 @@ pip.parse(
 use_repo(pip, "robot_diagnostics_cli_deps")
 pip.parse(
     hub_name = "nanopb_deps",
-    python_interpreter = "/opt/tbotspython/bin/python",
-    python_version = "3.12",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//starlark/nanopb:requirements_lock.txt",
 )
 use_repo(pip, "nanopb_deps")
+pip.parse(
+    hub_name = "platformio_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//starlark/platformio:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
+)
+use_repo(pip, "platformio_deps")
 
 ##############################################
 # Configure Dependencies
@@ -114,9 +128,9 @@ http_archive(
 http_archive(
     name = "g3log",
     build_file = "@//extlibs:g3log.bzl",
-    sha256 = "2177e6dfd86fa7465c44c8ef5c3b6ab98ffc94e1130355d6982f7d886cb7bec9",
-    strip_prefix = "g3log-2.4",
-    url = "https://github.com/KjellKod/g3log/archive/refs/tags/2.4.zip",
+    sha256 = "65cb6e56e7757221fd4f3f6e97a47834cacf45288010f8fa2b192272eaa63637",
+    strip_prefix = "g3log-2.6.1",
+    urls = ["https://github.com/KjellKod/g3log/archive/refs/tags/2.6.1.tar.gz"],
 )
 
 http_archive(
@@ -166,7 +180,10 @@ archive_override(
 bazel_dep(name = "platformio_rules", repo_name = "platformio_rules")
 archive_override(
     module_name = "platformio_rules",
-    patches = ["//starlark/patches/platformio_rules:add_py_binary_load.patch"],
+    patches = [
+        "//starlark/patches/platformio_rules:add_py_binary_load.patch",
+        "//starlark/patches/platformio_rules:use_hermetic_platformio.patch",
+    ],
     sha256 = "a80357230e27b8b57b8deffaa82684d3ee88b2284e4a767a9d8a692e9034e125",
     strip_prefix = "platformio_rules-3cd18c7c7bb2482fe3cbb58898245dd675421234",
     url = "https://github.com/mum4k/platformio_rules/archive/3cd18c7c7bb2482fe3cbb58898245dd675421234.tar.gz",
@@ -248,77 +265,39 @@ http_archive(
     url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
 )
 
+bazel_dep(name = "toolchains_arm_gnu")
+archive_override(
+    module_name = "toolchains_arm_gnu",
+    # The upstream toolchain templates load `HOST_CONSTRAINTS` from
+    # `@local_config_platform`, which was removed in Bazel 9. Patch them to use
+    # the supported `@platforms//host` replacement instead.
+    patches = ["//starlark/patches/toolchains_arm_gnu:use_platforms_host_constraints.patch"],
+    sha256 = "40a97f3c09e31383b8204288c08989213de2863b561cf4d8f61e45060ef22854",
+    strip_prefix = "toolchains_arm_gnu-6895733b87d3a75a40056b12c3d6628bc6945011",
+    url = "https://github.com/hexdae/toolchains_arm_gnu/archive/6895733b87d3a75a40056b12c3d6628bc6945011.tar.gz",
+)
+
 ##############################################
 # Register our Toolchains
 ##############################################
-register_toolchains("//toolchains/python:py_toolchain")
+register_toolchains("@llvm//toolchain:all")
 
-register_toolchains(
-    "//toolchains/python:k8_aarch64_linux_py_cc_toolchain",
-    "//toolchains/python:py_cc_toolchain_host_x86_64",
-    "//toolchains/python:py_cc_toolchain_host_aarch64",
-)
+arm_toolchain = use_extension("@toolchains_arm_gnu//:extensions.bzl", "arm_toolchain")
+arm_toolchain.arm_none_eabi()
+use_repo(arm_toolchain, "arm_none_eabi")
 
-register_toolchains(
-    "//toolchains/cc:cc_toolchain_for_macos_robot",
-    "//toolchains/cc:cc_toolchain_for_k8_aarch64_linux",
-    "//toolchains/cc:cc_toolchain_for_k8",
-    "//toolchains/cc:cc_toolchain_for_aarch64",
-    "//toolchains/cc:cc_toolchain_for_stm32",
-)
+register_toolchains("//toolchains/stm:motor_board_toolchain")
 
 ##############################################
 # New local repos for our toolchains/compilers
 ##############################################
 new_local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "new_local_repository")
 
-new_local_repository(
-    name = "linux_k8_gcc",
-    build_file = "@//extlibs:linux_k8_gcc.bzl",
-    path = "/",
-)
-
-new_local_repository(
-    name = "linux_aarch64_gcc",
-    build_file = "@//extlibs:linux_aarch64_gcc.bzl",
-    path = "/",
-)
-
 # libclang-dev is installed into the system through setup_software.sh
 new_local_repository(
     name = "libclang",
     build_file = "@//extlibs:libclang.bzl",
     path = "/usr/lib/llvm-6.0/",
-)
-
-new_local_repository(
-    name = "k8_aarch64_linux_gcc",
-    build_file = "@//extlibs:k8_aarch64_linux_gcc.bzl",
-    path = "/opt/tbotspython/aarch64-tbots-linux-gnu/",
-)
-
-new_local_repository(
-    name = "macos_robot_gcc",
-    build_file = "@//extlibs:macos_robot_gcc.bzl",
-    path = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain/",
-)
-
-new_local_repository(
-    name = "motor_board_gcc",
-    build_file = "@//extlibs:motor_board_gcc.bzl",
-    path = "/opt/tbotspython/arm-none-eabi-gcc/",
-)
-
-new_local_repository(
-    name = "py_cc_toolchain_host",
-    build_file = "@//extlibs:py_cc_toolchain.bzl",
-    path = "/opt/tbotspython/py_headers/include/python3.12/",
-)
-
-new_local_repository(
-    name = "py_cc_toolchain_for_k8_aarch64_linux",
-    build_file = "@//extlibs:py_cc_toolchain.bzl",
-    path = "/opt/tbotspython/cross_compile_headers/include/python3.12/",
 )
 
 ##############################################

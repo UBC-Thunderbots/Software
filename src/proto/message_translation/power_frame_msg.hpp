@@ -59,7 +59,7 @@ std::vector<uint8_t> serializeToVector(const T& data)
         throw std::runtime_error("Unexpected type as argument");
     }
 
-    std::vector<uint8_t> buffer(size);
+    std::vector<uint8_t> buffer(static_cast<size_t>(size));
     pb_ostream_t stream =
         pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
     if (!pb_encode(&stream, fields, &data))
@@ -171,7 +171,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.chip_pulse_width = chip_pulse_width;
+            nanopb_control.chicker.chicker_command.chip_pulse_width =
+                static_cast<uint32_t>(chip_pulse_width);
             break;
         case TbotsProto::PowerControl::ChickerControl::kKickPulseWidth:
             nanopb_control.chicker.which_chicker_command =
@@ -206,7 +207,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autochip_pulse_width = chip_pulse_width;
+                        .auto_chip_or_kick.autochip_pulse_width =
+                        static_cast<uint32_t>(chip_pulse_width);
                     break;
                 case TbotsProto::AutoChipOrKick::kAutokickPulseWidth:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick

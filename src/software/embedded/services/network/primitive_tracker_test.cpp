@@ -26,7 +26,7 @@ TEST(PrimitiveTrackerTest, no_loss_rate)
     PrimitiveTracker tracker;
     for (int i = 0; i <= 5; i++)
     {
-        tracker.track(makePrimitive(i));
+        tracker.track(makePrimitive(static_cast<uint64_t>(i)));
         EXPECT_EQ(0, tracker.getPrimitiveLossRate());
     }
 }

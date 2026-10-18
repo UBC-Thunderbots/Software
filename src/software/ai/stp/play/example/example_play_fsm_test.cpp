@@ -14,7 +14,7 @@ TEST(ExamplePlayFSMTest, test_transitions)
 
     EXPECT_TRUE(fsm.is(boost::sml::state<ExamplePlayFSM::MoveState>));
 
-    int num_tactics = 6;
+    unsigned int num_tactics = 6;
 
     fsm.process_event(ExamplePlayFSM::Update(
         ExamplePlayFSM::ControlParams{},

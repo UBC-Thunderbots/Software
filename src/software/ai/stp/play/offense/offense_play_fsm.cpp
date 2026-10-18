@@ -46,8 +46,8 @@ void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
     setTactics(event, 0, event.common.num_tactics);
 }
 
-void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
-                                int num_defenders)
+void OffensePlayFSM::setTactics(const Update& event, unsigned int num_shoot_or_pass,
+                                unsigned int num_defenders)
 {
     PriorityTacticVector tactics_to_return;
 

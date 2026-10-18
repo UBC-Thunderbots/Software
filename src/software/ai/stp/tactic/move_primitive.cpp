@@ -125,7 +125,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     if (!traj_path.has_value())
     {
-        return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
+        return std::make_pair(std::nullopt, createStopPrimitiveProto());
     }
 
     estimated_cost = traj_path->getTotalTime();
