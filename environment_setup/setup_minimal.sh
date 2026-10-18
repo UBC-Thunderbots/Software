@@ -6,7 +6,7 @@
 # Installs everything into /opt/tbots/, to undo this install script, just run:
 #    sudo rm -rf /opt/tbots/
 #
-# Requirements: wget
+# Requirements: wget, unzip
 #
 # NOTE: Currently WIP, only partial support for macOS (ARM64) and Ubuntu (AMD64)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
