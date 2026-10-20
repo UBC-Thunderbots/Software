@@ -170,11 +170,11 @@ TEST_F(RobotNavigationObstacleFactoryTest, stadium_enemy_robot_obstacle)
     try
     {
         auto circle_obstacle = dynamic_cast<GeomObstacle<Stadium>&>(*obstacle);
-        TestUtil::equalWithinTolerance(
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(
             Stadium(origin,
                     origin + velocity * config.dynamic_enemy_robot_obstacle_horizon_sec(),
                     ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
-            circle_obstacle.getGeom());
+            circle_obstacle.getGeom()));
     }
     catch (std::bad_cast&)
     {
@@ -197,10 +197,10 @@ TEST_F(RobotNavigationObstacleFactoryTest, enemy_robot_obstacle_slow)
     try
     {
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(
             Circle(origin,
                    ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
-            circle_obstacle.getGeom());
+            circle_obstacle.getGeom()));
     }
     catch (std::bad_cast&)
     {
@@ -227,10 +227,10 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_robot_obstacle)
     try
     {
         auto circle_obstacle = dynamic_cast<TrajectoryObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(
             Circle(origin,
                    ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
-            circle_obstacle.getGeom());
+            circle_obstacle.getGeom()));
 
         EXPECT_TRUE(obstacle->contains(origin, 0.0));
         EXPECT_FALSE(obstacle->contains(end, 0.0));
@@ -260,14 +260,14 @@ TEST_F(RobotNavigationObstacleFactoryTest, const_velocity_enemy_robot_obstacle)
     try
     {
         auto circle_obstacle = dynamic_cast<ConstVelocityObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(
             Circle(origin,
                    ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
-            circle_obstacle.getGeom());
+            circle_obstacle.getGeom()));
 
         // Verify that the obstacle has moved forward 0.3 seconds into the future
-        TestUtil::equalWithinTolerance(obstacle->distance(Point(1.3, 1.0), 0.3), 0.0,
-                                       0.001);
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(
+            obstacle->distance(Point(1.3, 1.0), 0.3), 0.0, 0.001));
     }
     catch (std::bad_cast&)
     {
@@ -294,10 +294,10 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_obstacle)
     try
     {
         auto circle_obstacle = dynamic_cast<TrajectoryObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(
             Circle(origin,
                    ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
-            circle_obstacle.getGeom());
+            circle_obstacle.getGeom()));
 
         // Verify that the obstacle does move in the future
         EXPECT_FALSE(
