@@ -96,7 +96,7 @@ platformio_project(
     }),
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
-    platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+    platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
     deps = [
         ":charger",
         ":chicker",
