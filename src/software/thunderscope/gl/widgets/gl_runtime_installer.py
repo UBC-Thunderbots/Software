@@ -6,8 +6,8 @@ from pyqtgraph.Qt.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from software.thunderscope.binary_context_managers.runtime_manager import (
-    runtime_manager_instance,
+from software.thunderscope.binary_context_managers.runtime_service import (
+    runtime_service_instance,
 )
 
 
@@ -22,7 +22,7 @@ class GLRuntimeInstallerDialog(QDialog):
         """
         super().__init__(parent)
 
-        runtimes = runtime_manager_instance.fetch_remote_runtimes()
+        runtimes = runtime_service_instance.fetch_remote_runtimes()
 
         self.setWindowTitle("Install runtimes")
         self.setModal(True)
@@ -50,6 +50,6 @@ class GLRuntimeInstallerDialog(QDialog):
         selected_runtimes = [item.text() for item in selected_items]
 
         for runtime in selected_runtimes:
-            runtime_manager_instance.install_runtime(runtime)
+            runtime_service_instance.install_runtime(runtime)
 
         self.close()

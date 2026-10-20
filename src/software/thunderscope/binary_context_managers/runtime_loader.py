@@ -3,7 +3,7 @@ import os
 import tomllib
 from tomllib import TOMLDecodeError
 
-from software.thunderscope.constants import RuntimeManagerConstants
+from software.thunderscope.constants import RuntimeServiceConstants
 
 
 class RuntimeConfig:
@@ -22,13 +22,13 @@ class RuntimeConfig:
             blue_runtime
             if blue_runtime
             and self._is_valid_runtime_path(self._get_runtime_path(blue_runtime))
-            else RuntimeManagerConstants.DEFAULT_BINARY_NAME
+            else RuntimeServiceConstants.DEFAULT_BINARY_NAME
         )
         self.yellow_runtime = (
             yellow_runtime
             if yellow_runtime
             and self._is_valid_runtime_path(self._get_runtime_path(yellow_runtime))
-            else RuntimeManagerConstants.DEFAULT_BINARY_NAME
+            else RuntimeServiceConstants.DEFAULT_BINARY_NAME
         )
 
     def get_blue_runtime_path(self) -> str:
@@ -50,14 +50,14 @@ class RuntimeConfig:
         :return: the absolute path of the binary as a string, or the relative path of our FullSystem
         """
         file_path = os.path.join(
-            RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
+            RuntimeServiceConstants.EXTERNAL_RUNTIMES_PATH, selected_runtime
         )
         # Default to local FullSystem if it is selected or the selected binary isn't a valid runtime
         if (
-            selected_runtime == RuntimeManagerConstants.DEFAULT_BINARY_NAME
+            selected_runtime == RuntimeServiceConstants.DEFAULT_BINARY_NAME
             or not self._is_valid_runtime_path(file_path)
         ):
-            return RuntimeManagerConstants.DEFAULT_BINARY_PATH
+            return RuntimeServiceConstants.DEFAULT_BINARY_PATH
         # Remove leading and trailing white space and return
         return file_path.strip()
 
@@ -77,15 +77,15 @@ class RuntimeLoader:
         Creates the external runtimes directory in our local disk if it does not exist yet.
         :return: A list of installed runtime names
         """
-        runtime_list = [RuntimeManagerConstants.DEFAULT_BINARY_NAME]
+        runtime_list = [RuntimeServiceConstants.DEFAULT_BINARY_NAME]
 
-        if not os.path.isdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
-            os.mkdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
+        if not os.path.isdir(RuntimeServiceConstants.EXTERNAL_RUNTIMES_PATH):
+            os.mkdir(RuntimeServiceConstants.EXTERNAL_RUNTIMES_PATH)
 
         # Check for all executable files in the directory, and add its name to the list
-        for file_name in os.listdir(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH):
+        for file_name in os.listdir(RuntimeServiceConstants.EXTERNAL_RUNTIMES_PATH):
             file_path = os.path.join(
-                RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH, file_name
+                RuntimeServiceConstants.EXTERNAL_RUNTIMES_PATH, file_name
             )
             if os.access(file_path, os.X_OK):
                 runtime_list.append(file_name)
@@ -99,12 +99,12 @@ class RuntimeLoader:
         """
         # Format as TOML
         selected_runtimes = (
-            f'{RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY} = "{blue_runtime}"\n'
-            f'{RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_runtime}"'
+            f'{RuntimeServiceConstants.RUNTIME_CONFIG_BLUE_KEY} = "{blue_runtime}"\n'
+            f'{RuntimeServiceConstants.RUNTIME_CONFIG_YELLOW_KEY} = "{yellow_runtime}"'
         )
 
         # create a new config file if it doesn't exist, and write in the format above to it
-        with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "w") as file:
+        with open(RuntimeServiceConstants.RUNTIME_CONFIG_PATH, "w") as file:
             file.write(selected_runtimes)
 
     def fetch_runtime_config(self) -> RuntimeConfig:
@@ -113,28 +113,28 @@ class RuntimeLoader:
         """
         # Create empty config file if doesn't exist yet
         os.makedirs(
-            os.path.dirname(RuntimeManagerConstants.RUNTIME_CONFIG_PATH), exist_ok=True
+            os.path.dirname(RuntimeServiceConstants.RUNTIME_CONFIG_PATH), exist_ok=True
         )
-        open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "a").close()
+        open(RuntimeServiceConstants.RUNTIME_CONFIG_PATH, "a").close()
 
         try:
-            with open(RuntimeManagerConstants.RUNTIME_CONFIG_PATH, "rb") as file:
+            with open(RuntimeServiceConstants.RUNTIME_CONFIG_PATH, "rb") as file:
                 selected_runtime_dict = tomllib.load(file)
 
                 # Get the persisted runtimes
                 config = RuntimeConfig(
                     selected_runtime_dict.get(
-                        RuntimeManagerConstants.RUNTIME_CONFIG_BLUE_KEY
+                        RuntimeServiceConstants.RUNTIME_CONFIG_BLUE_KEY
                     ),
                     selected_runtime_dict.get(
-                        RuntimeManagerConstants.RUNTIME_CONFIG_YELLOW_KEY
+                        RuntimeServiceConstants.RUNTIME_CONFIG_YELLOW_KEY
                     ),
                 )
 
                 return config
         except TOMLDecodeError:
             logging.warning(
-                f"Failed to read TOML file at: {RuntimeManagerConstants.RUNTIME_CONFIG_PATH}"
+                f"Failed to read TOML file at: {RuntimeServiceConstants.RUNTIME_CONFIG_PATH}"
             )
 
         return RuntimeConfig()

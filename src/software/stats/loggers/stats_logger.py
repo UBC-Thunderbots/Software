@@ -12,7 +12,7 @@ from software.stats.trackers import (
     ShotTracker,
     TrackerBuilder,
 )
-from software.thunderscope.constants import RuntimeManagerConstants
+from software.thunderscope.constants import RuntimeServiceConstants
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -41,8 +41,8 @@ class StatsLogger:
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.events_file_path = os.path.join(
-            RuntimeManagerConstants.RUNTIME_EVENTS_DIRECTORY_PATH,
-            RuntimeManagerConstants.RUNTIME_EVENTS_FILE
+            RuntimeServiceConstants.RUNTIME_EVENTS_DIRECTORY_PATH,
+            RuntimeServiceConstants.RUNTIME_EVENTS_FILE
             if out_file_name is None
             else out_file_name,
         )
