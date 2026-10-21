@@ -10,17 +10,14 @@ Add an existing tag to a new task if that task *must* run for that tag group, ev
 ### All Tags
 - dependencies : setting up dependencies for the Pi
 - configure_pi : config tasks for Pi
-- set_hostname :
-- update_hostname :
-- add_user_robot_to_dialout :
-- check_internet :
-- setup_wifi_interface :
+- update_hostname : updates the Pi's hostname
+- add_user_robot_to_dialout : adds the robot user to the dialout group
+- check_internet : checks that the Pi has internet access
+- setup_wifi_interface : sets up the Pi's wifi interface
 - rtt : for computer-robot RTT statistics
-- reboot : 
-- shutdown : 
+- reboot : reboots the Pi
+- shutdown : shuts down the Pi
 - always : Ansible special tag; runs unless explicitly skipped.
 - never : Ansible special tag; task will not run unless specifically requested.
-
-
 
 
