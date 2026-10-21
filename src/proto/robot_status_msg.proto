@@ -57,11 +57,8 @@ message DribblerStatus
     // The current speed of the dribbler in RPM
     float dribbler_rpm = 1;
 
-    // DELETE geneva
-    reserved 2;
-
-    repeated MotorFault motor_faults = 3;
-    bool enabled                     = 4;
+    repeated MotorFault motor_faults = 2;
+    bool enabled                     = 3;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -121,8 +118,6 @@ message MotorStatus
 /* Data about the network connection with the robots, including network-derived values */
 message NetworkStatus
 {
-    // DELETE
-    reserved 4;
 
     // Indicates the time elapsed since the last vision packet was received in ms
     double ms_since_last_vision_received = 1;
@@ -142,10 +137,8 @@ message PowerStatus
     float capacitor_voltage = 2;
     // voltage on the robot’s capacitor, in volts.
     float current_draw = 3;
-    // DELETE
-    reserved 4;
-    uint32 sequence_num    = 5;
-    bool breakbeam_tripped = 6;
+    uint32 sequence_num    = 4;
+    bool breakbeam_tripped = 5;
 }
 
 message ImuStatus

@@ -35,11 +35,10 @@ message Specs
     optional float dribbler_width         = 12;
     optional LimitParameters acceleration = 13;
     optional LimitParameters strategy     = 16;
-    // deprecated = 14; DELETE?
+    // deprecated = 14;
     optional float ir_param        = 15;
     optional float shoot_radius    = 17;
     optional float dribbler_height = 18;
-    // DELETE?
     reserved 20;
 };
 
