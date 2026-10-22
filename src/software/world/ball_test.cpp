@@ -58,7 +58,7 @@ TEST_F(BallTest, construct_with_initial_state)
 TEST_F(BallTest, construct_with_protobuf)
 {
     Ball original_ball(Point(1.0, 1.0), Vector(2.0, 2.0), Timestamp::fromSeconds(3.0));
-    std::unique_ptr<TbotsProto::Ball> ball_proto = createBall(original_ball);
+    std::unique_ptr<TbotsProto::Ball> ball_proto = createBallProto(original_ball);
     Ball proto_converted_ball(*ball_proto);
 
     EXPECT_EQ(original_ball, proto_converted_ball);
