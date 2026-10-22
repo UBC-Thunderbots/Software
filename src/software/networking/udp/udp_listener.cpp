@@ -92,6 +92,12 @@ void UdpListener::setupMulticast(const boost::asio::ip::address& ip_address,
 
 UdpListener::~UdpListener() {}
 
+void UdpListener::sendTo(const std::string& message,
+                         const boost::asio::ip::udp::endpoint& destination)
+{
+    socket_.send_to(boost::asio::buffer(message), destination);
+}
+
 void UdpListener::close()
 {
     running_ = false;
@@ -131,7 +137,8 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
     if (!error)
     {
         // Call the receive callback with the received data
-        receive_callback_(raw_received_data_.data(), num_bytes_received);
+        receive_callback_(raw_received_data_.data(), num_bytes_received,
+                          sender_endpoint_);
     }
     else
     {
