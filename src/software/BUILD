@@ -41,7 +41,11 @@ cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
     deps = [
+        "//proto:ssl_cc_proto",
+        "//proto:ssl_simulation_cc_proto",
         "//software:constants",
+        "//software/networking/udp:threaded_proto_udp_bidirectional",
+        "//software/networking/udp:threaded_proto_udp_sender",
         "//software/networking/unix:threaded_proto_unix_listener",
         "//software/networking/unix:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
