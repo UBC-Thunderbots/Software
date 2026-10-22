@@ -101,6 +101,11 @@ void ThreadedObserver<T>::onValueReceived(T val)
 template <typename T>
 void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 {
+    // Lock the mutex for the first iteration of the loop. The lock/unlock cycle
+    // within the loop ensures we always hold the mutex when checking
+    // `in_destructor` at the bottom of the loop, and release it while we wait
+    // for new values
+    in_destructor_mutex.lock();
     do
     {
         in_destructor_mutex.unlock();
@@ -115,6 +120,7 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 
         in_destructor_mutex.lock();
     } while (!in_destructor);
+    in_destructor_mutex.unlock();
 }
 
 

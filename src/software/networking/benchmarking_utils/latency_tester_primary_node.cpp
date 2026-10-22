@@ -34,10 +34,11 @@ void LatencyTesterPrimaryNode::initialize(
 
     std::string charset =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    send_buffer_.resize(message_size);
+    send_buffer_.resize(static_cast<size_t>(message_size));
     for (int i = 0; i < message_size; i++)
     {
-        send_buffer_[i] = charset[rand() % charset.size()];
+        send_buffer_[static_cast<size_t>(i)] =
+            charset[static_cast<size_t>(rand()) % charset.size()];
     }
 }
 

@@ -33,7 +33,6 @@ cc_test(
     deps = [
         ":pass_defender_tactic",
         "//software/test_util",
-        "@googletest//:gtest_main",
     ],
 )
 

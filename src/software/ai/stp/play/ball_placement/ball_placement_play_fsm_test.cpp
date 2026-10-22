@@ -8,7 +8,7 @@
 
 TEST(BallPlacementPlayFSMTest, test_transitions)
 {
-    int num_tactics = 5;
+    unsigned int num_tactics = 5;
 
     std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
     // ball starts within the field lines
@@ -37,7 +37,7 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
 
 TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
 {
-    int num_tactics = 5;
+    unsigned int num_tactics = 5;
 
     // default field type is DIV_B
     std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();

@@ -5,9 +5,9 @@
 #       load before any Qt libs. Perhaps could be fixed by bazel changes.
 # ruff: noqa: E402
 
-from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+from software.thunderscope.qt_dependency_bootstrap import prepare
 
-preload_bundled_qt_libs()
+prepare()
 
 import argparse
 import os
