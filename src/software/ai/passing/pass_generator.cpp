@@ -36,7 +36,7 @@ PassWithRating PassGenerator::getBestPass(const World& world,
         {
             for (const Point& receiving_position : receiving_positions)
             {
-                debug_shapes.push_back(*createDebugShape(
+                debug_shapes.push_back(*createDebugShapeProto(
                     Stadium(world.friendlyTeam().getRobotById(robot_id)->position(),
                             receiving_position, 0.02),
                     std::to_string(debug_shapes.size()) + "pg"));
@@ -44,10 +44,10 @@ PassWithRating PassGenerator::getBestPass(const World& world,
         }
         std::stringstream stream;
         stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-        debug_shapes.push_back(
-            *createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
-                              std::to_string(debug_shapes.size()) + "pg", stream.str()));
-        LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
+        debug_shapes.push_back(*createDebugShapeProto(
+            Circle(best_pass.pass.receiverPoint(), 0.05),
+            std::to_string(debug_shapes.size()) + "pg", stream.str()));
+        LOG(VISUALIZE) << *createDebugShapesProto(debug_shapes);
     }
 
     // Generate sample passes across the field for cost visualization

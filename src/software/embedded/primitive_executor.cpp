@@ -232,7 +232,7 @@ void PrimitiveExecutor::sendLinearMotionToPlotJuggler(
 {
     const std::string robot_prefix = "robot_" + std::to_string(robot_id_);
 
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue(
+    LOG(PLOTJUGGLER) << *createPlotJugglerValueProto(
         {{robot_prefix + "/x", robot_state_.position().x()},
          {robot_prefix + "/y", robot_state_.position().y()},
          {robot_prefix + "/v_x", robot_state_.velocity().x()},
