@@ -3,7 +3,7 @@
   become: true
   become_method: ansible.builtin.sudo
   tags:
-    - set_hostname
+    - update_hostname
   when: new_hostname is defined
   block:
     - name: Set hostname
