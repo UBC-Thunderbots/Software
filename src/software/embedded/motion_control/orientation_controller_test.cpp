@@ -18,34 +18,34 @@ TEST(OrientationControllerTest, BasicTest)
 
 // !!!
 
-class TestOrientationControllerStep : public testing::TestWithParam<std::tuple<const int>>
-{
-};
+// class TestOrientationControllerStep : public testing::TestWithParam<std::tuple<const int>>
+// {
+// };
 
-TEST_P(TestOrientationControllerStep, TestOrientationControllerStep) {
-    // !!!
-}
+// TEST_P(TestOrientationControllerStep, TestOrientationControllerStep) {
+//     // !!!
+// }
 
-INSTANTIATE_TEST_SUITE_P(TestTrivial, TestOrientationControllerStep, 
-    testing::Values(
-        std::tuple{
-            // !!!
-        }
-    )
-);
+// INSTANTIATE_TEST_SUITE_P(TestTrivial, TestOrientationControllerStep, 
+//     testing::Values(
+//         std::tuple{
+//             // !!!
+//         }
+//     )
+// );
 
-INSTANTIATE_TEST_SUITE_P(TestNormal, TestOrientationControllerStep, 
-    testing::Values(
-        std::tuple{
-            // !!!
-        }
-    )
-);
+// INSTANTIATE_TEST_SUITE_P(TestNormal, TestOrientationControllerStep, 
+//     testing::Values(
+//         std::tuple{
+//             // !!!
+//         }
+//     )
+// );
 
-INSTANTIATE_TEST_SUITE_P(TestEdgeCase, TestOrientationControllerStep, 
-    testing::Values(
-        std::tuple{
-            // !!!
-        }
-    )
-);
+// INSTANTIATE_TEST_SUITE_P(TestEdgeCase, TestOrientationControllerStep, 
+//     testing::Values(
+//         std::tuple{
+//             // !!!
+//         }
+//     )
+// );
