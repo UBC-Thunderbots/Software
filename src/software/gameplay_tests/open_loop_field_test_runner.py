@@ -41,7 +41,7 @@ STOP_FLUSH_DELAY_S = 0.5
 MOTOR_CONTROL_RESEND_PERIOD_S = 0.05
 SSL_WRAPPER_BUFFER_SIZE = 5
 VISION_POSE_TIMEOUT_S = 2.0
-CSV_DIRECTORY = os.path.expanduser("~/Documents/open_loop_robot_testing")
+CSV_DIRECTORY = os.path.expanduser("~/Documents/open_loop_robot_testing_oct_22")
 # Prefix of the values sent to PlotJuggler, dropped from the CSV column names
 PATH_TRACKING_PREFIX = "open_loop/"
 PATH_TRACKING_FIELDS = [
