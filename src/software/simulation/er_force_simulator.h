@@ -190,9 +190,26 @@ class ErForceSimulator
         const TbotsProto::World& world_msg, const Duration& time_step,
         gameController::Team side);
 
+    /**
+     * Resets a team's simulated robots if they were moved before the physics step that
+     * just ran.
+     *
+     * ER-Force applies a move at the start of the next physics step. Until then it
+     * reports the robots where it created them, at rest, so the robots are only reset
+     * once that step has run.
+     *
+     * @param side Which team's robots to reset
+     */
+    void resetMovedRobots(gameController::Team side);
+
     // Map of Robot id to the simulated robot running its firmware
     std::unordered_map<RobotId, SimulatedRobot> yellow_simulated_robots;
     std::unordered_map<RobotId, SimulatedRobot> blue_simulated_robots;
+
+    // Whether each team's robots were moved since the last physics step
+    bool yellow_robots_moved = false;
+    bool blue_robots_moved   = false;
+
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
