@@ -43,6 +43,7 @@
 #include "software/geom/vector.h"
 #include "software/math/math_functions.h"
 #include "software/networking/tbots_network_exception.h"
+#include "software/networking/udp/threaded_io_context.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/uart/boost_uart_communication.h"
@@ -70,7 +71,8 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<const std::string&, unsigned short, const std::string&, bool>())
+        .def(py::init<std::shared_ptr<ThreadedIoContext>, const std::string&,
+                      unsigned short, const std::string&, bool>())
         .def("get_interface", &Class::getInterface)
         .def("get_ip_address", &Class::getIpAddress)
         .def("send_proto", &Class::sendProto, py::arg("message"),
@@ -88,12 +90,47 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
 {
     using Class              = ThreadedProtoUdpListener<T>;
     std::string pyclass_name = name + "ProtoListener";
+
+    // Release the GIL while close waits for callbacks that may need it.
+    auto deleter = [](Class* self)
+    {
+        {
+            py::gil_scoped_release release;
+            self->close();
+        }
+        delete self;
+    };
+
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<const std::string&, unsigned short, const std::string&,
-                      const std::function<void(T)>&, bool>())
-        .def(py::init<unsigned short, const std::function<void(T)>&>())
-        .def("close", &Class::close);
+        .def(py::init(
+                 [deleter](std::shared_ptr<ThreadedIoContext> io_context,
+                           const std::string& ip_address, unsigned short port,
+                           const std::string& interface,
+                           const std::function<void(T)>& receive_callback, bool multicast)
+                 {
+                     return std::shared_ptr<Class>(
+                         new Class(io_context, ip_address, port, interface,
+                                   receive_callback, multicast),
+                         deleter);
+                 }),
+             py::arg("io_context"), py::arg("ip_address"), py::arg("port"),
+             py::arg("interface"), py::arg("receive_callback"), py::arg("multicast"))
+        .def(py::init(
+                 [deleter](std::shared_ptr<ThreadedIoContext> io_context,
+                           unsigned short port,
+                           const std::function<void(T)>& receive_callback)
+                 {
+                     return std::shared_ptr<Class>(
+                         new Class(io_context, port, receive_callback), deleter);
+                 }),
+             py::arg("io_context"), py::arg("port"), py::arg("receive_callback"))
+        .def("close",
+             [](Class& self)
+             {
+                 py::gil_scoped_release release;
+                 self.close();
+             });
 }
 
 template <typename T>
@@ -429,6 +466,10 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
+    py::class_<ThreadedIoContext, std::shared_ptr<ThreadedIoContext>>(m,
+                                                                      "ThreadedIoContext")
+        .def(py::init<>());
+
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

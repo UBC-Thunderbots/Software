@@ -67,6 +67,7 @@ class Thunderloop
     void updateRobotLocalizer(const TbotsProto::RobotStatus& robot_status);
 
     std::unique_ptr<TomlConfigClient> toml_config_client_;
+    std::shared_ptr<ThreadedIoContext> io_context_;
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
     std::unique_ptr<PowerService> power_service_;

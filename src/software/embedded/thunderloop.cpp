@@ -71,8 +71,9 @@ extern "C" void tbotsExit(const int signal_num)
     crash_msg.set_exit_signal(g3::signalToStr(signal_num));
     *(crash_msg.mutable_status()) = *crash_context.robot_status;
 
-    auto sender = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(crash_context.channel_id)),
+    auto io_context = std::make_shared<ThreadedIoContext>();
+    auto sender     = ThreadedProtoUdpSender<TbotsProto::RobotCrash>(
+        io_context, std::string(ROBOT_MULTICAST_CHANNELS.at(crash_context.channel_id)),
         ROBOT_CRASH_PORT, crash_context.network_interface, true);
     sender.sendProto(crash_msg);
     std::cerr << "Broadcasting robot crash msg";
@@ -83,6 +84,7 @@ extern "C" void tbotsExit(const int signal_num)
 Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
                          const bool enable_log_merging, const int loop_hz)
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
+      io_context_(std::make_shared<ThreadedIoContext>()),
       loop_hz_(loop_hz)
 {
     const RobotId robot_id = std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY));
@@ -121,7 +123,7 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
         .interface = network_interface,
     };
 
-    network_service_ = std::make_unique<NetworkService>(network_config);
+    network_service_ = std::make_unique<NetworkService>(network_config, io_context_);
     LOG(INFO) << "THUNDERLOOP: Network Service initialized!";
 
 #ifndef DISABLE_POWER_SERVICE

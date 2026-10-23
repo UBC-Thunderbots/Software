@@ -5,8 +5,9 @@
 #include "shared/constants.h"
 
 PlotJugglerSink::PlotJugglerSink(const std::string& interface)
-    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, interface,
-                 false)
+    : io_context_(std::make_shared<ThreadedIoContext>()),
+      udp_sender_(io_context_, PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT,
+                  interface, false)
 {
 }
 
@@ -14,7 +15,7 @@ void PlotJugglerSink::sendToPlotJuggler(g3::LogMessageMover log_entry)
 {
     if (log_entry.get()._level.value == PLOTJUGGLER.value)
     {
-        udp_sender.sendString(log_entry.get().message());
+        udp_sender_.sendString(log_entry.get().message());
     }
 }
 

@@ -6,6 +6,7 @@
 #include "proto/visualization.pb.h"
 #include "shared/constants.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/networking/udp/threaded_io_context.h"
 #include "software/networking/udp/threaded_udp_sender.h"
 
 
@@ -37,7 +38,8 @@ class PlotJugglerSink
     // Any error that occurs during the creation of the UDP sender will be stored here
     std::optional<std::string> error;
 
-    ThreadedUdpSender udp_sender;
+    std::shared_ptr<ThreadedIoContext> io_context_;
+    ThreadedUdpSender udp_sender_;
 };
 
 /*
