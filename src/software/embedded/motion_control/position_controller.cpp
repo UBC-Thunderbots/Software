@@ -30,3 +30,11 @@ void PositionController::reset()
     x_pid_.reset();
     y_pid_.reset();
 }
+
+const PidController<double>& PositionController::getXPid() const {
+    return x_pid_;
+}
+
+const PidController<double>& PositionController::getYPid() const {
+    return y_pid_;
+}
