@@ -3,6 +3,9 @@ from __future__ import annotations
 import logging
 import os
 import queue
+import re
+import shutil
+import tempfile
 import threading
 import time
 from subprocess import Popen
@@ -50,6 +53,7 @@ class TigersAutoref:
         buffer_size: int = 5,
         suppress_logs: bool = True,
         show_gui: bool = False,
+        div_a: bool = False,
     ) -> None:
         """Constructor
 
@@ -60,10 +64,12 @@ class TigersAutoref:
         :param buffer_size:     buffer size for the SSL wrapper and referee packets
         :param suppress_logs:   true silences logs from the Autoref binary, otherwise shows them (its very verbose)
         :param show_gui:        true shows the Tigers' autoref GUI, false runs it in headless mode
+        :param div_a:           true runs the autoref with Division A rules and geometry
         """
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
+        self.autoref_runtime_dir = None
         self.ci_mode = ci_mode
         self.end_autoref = threading.Event()
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, protos.SSL_WrapperPacket)
@@ -72,6 +78,7 @@ class TigersAutoref:
         self.suppress_logs = suppress_logs
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
+        self.division = protos.Division.DIV_A if div_a else protos.Division.DIV_B
         self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
@@ -114,7 +121,11 @@ class TigersAutoref:
         ci_input = protos.AutoRefCiInput()
         ci_input.detection.append(ssl_wrapper.detection)
 
-        field = tbots_cpp.Field.createSSLDivisionBField()
+        field = (
+            tbots_cpp.Field.createSSLDivisionAField()
+            if self.division == protos.Division.DIV_A
+            else tbots_cpp.Field.createSSLDivisionBField()
+        )
         ci_input.geometry.CopyFrom(tbots_cpp.createGeometryData(field, 0.3))
 
         self.ci_socket.send(ci_input)
@@ -218,28 +229,50 @@ class TigersAutoref:
         env = os.environ.copy()
         env["JAVA_HOME"] = self.AUTOREF_JAVA_HOME
 
-        autoref_cmd = "bin/autoReferee"
-        kill_cmd_if_running([autoref_cmd])
-        autoref_cmd += " -a"
+        self.autoref_runtime_dir = tempfile.TemporaryDirectory(prefix="tbots-autoref-")
+        shutil.copytree(
+            os.path.join(self.AUTOREF_DIR, "config"),
+            os.path.join(self.autoref_runtime_dir.name, "config"),
+        )
+
+        moduli_config_path = os.path.join(
+            self.autoref_runtime_dir.name, "config", "moduli", "moduli-ci.xml"
+        )
+        with open(moduli_config_path, encoding="utf-8") as moduli_config_file:
+            moduli_config = moduli_config_file.read()
+
+        geometry = "DIV_A" if self.division == protos.Division.DIV_A else "DIV_B"
+        moduli_config = re.sub(
+            r"(<geometry>)[^<]+(</geometry>)",
+            rf"\g<1>{geometry}\g<2>",
+            moduli_config,
+            count=1,
+        )
+        with open(moduli_config_path, "w", encoding="utf-8") as moduli_config_file:
+            moduli_config_file.write(moduli_config)
+
+        autoref_cmd = os.path.join(self.AUTOREF_DIR, "bin", "autoReferee")
+        kill_cmd_if_running(["bin/autoReferee"])
+        autoref_args = [autoref_cmd, "-a"]
 
         if not self.show_gui:
-            autoref_cmd += " -hl"
+            autoref_args.append("-hl")
 
         if self.ci_mode:
-            autoref_cmd += " --ci"
+            autoref_args.append("--ci")
 
         if self.suppress_logs:
             with open(os.devnull, "w") as fp:
                 self.tigers_autoref_proc = Popen(
-                    autoref_cmd.split(" "),
+                    autoref_args,
                     stdout=fp,
                     stderr=fp,
                     env=env,
-                    cwd=self.AUTOREF_DIR,
+                    cwd=self.autoref_runtime_dir.name,
                 )
         else:
             self.tigers_autoref_proc = Popen(
-                autoref_cmd.split(" "), env=env, cwd=self.AUTOREF_DIR
+                autoref_args, env=env, cwd=self.autoref_runtime_dir.name
             )
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
@@ -261,5 +294,8 @@ class TigersAutoref:
 
             self.auto_ref_proc_thread.join()
         self.auto_ref_wrapper_thread.join()
+
+        if self.autoref_runtime_dir:
+            self.autoref_runtime_dir.cleanup()
 
         logging.info("[TigersAutoref] Process exited")
