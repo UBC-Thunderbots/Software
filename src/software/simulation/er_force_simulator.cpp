@@ -70,17 +70,14 @@ robot::Specs ErForceSimulator::createRobotSpecs(
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
-      euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
-      yellow_robot_with_ball(std::nullopt),
-      ramping(ramping)
+      yellow_robot_with_ball(std::nullopt)
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -315,29 +312,13 @@ void ErForceSimulator::setRobots(
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
-    if (side == gameController::Team::BLUE)
-    {
-        blue_primitive_executor_map.clear();
-    }
-    else
-    {
-        yellow_primitive_executor_map.clear();
-    }
-
+    auto& simulated_robots = (side == gameController::Team::BLUE)
+                                 ? blue_simulated_robots
+                                 : yellow_simulated_robots;
+    simulated_robots.clear();
     for (auto& [id, robot_state] : robots)
     {
-        if (side == gameController::Team::BLUE)
-        {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants, id);
-            blue_primitive_executor_map.insert({id, robot_primitive_executor});
-        }
-        else
-        {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants, id);
-            yellow_primitive_executor_map.insert({id, robot_primitive_executor});
-        }
+        simulated_robots.try_emplace(id, id, robot_constants);
     }
 }
 
@@ -355,7 +336,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     {
         if (robot_map.contains(robot_id))
         {
-            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
+            setRobotPrimitive(robot_id, primitive_set_msg, yellow_simulated_robots,
                               robot_map.at(robot_id));
         }
     }
@@ -375,7 +356,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     {
         if (robot_map.contains(robot_id))
         {
-            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
+            setRobotPrimitive(robot_id, primitive_set_msg, blue_simulated_robots,
                               robot_map.at(robot_id));
         }
     }
@@ -383,30 +364,24 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 
 void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
-    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-        robot_primitive_executor_map,
+    std::unordered_map<RobotId, SimulatedRobot>& simulated_robots,
     const RobotState& robot_state)
 {
-    auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);
+    auto simulated_robot_iter = simulated_robots.find(id);
 
-    if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
+    if (simulated_robot_iter != simulated_robots.end())
     {
-        auto primitive_executor = robot_primitive_executor_iter->second;
-        TbotsProto::RobotStatus robot_status;
-        primitive_executor->updateRobotState(robot_state);
-        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id),
-                                            robot_status);
+        simulated_robot_iter->second.setPrimitive(
+            primitive_set_msg.robot_primitives().at(id), robot_state);
     }
     else
     {
-        LOG(WARNING) << "Primitive Executor for robot with ID " << id << " not found"
-                     << std::endl;
+        LOG(WARNING) << "Simulated robot with ID " << id << " not found" << std::endl;
     }
 }
 
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
-    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-        robot_primitive_executor_map,
+    std::unordered_map<RobotId, SimulatedRobot>& simulated_robots,
     const TbotsProto::World& world_msg, const Duration& time_step,
     gameController::Team side)
 {
@@ -418,101 +393,24 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                                  : sim_state.yellow_robots();
     const auto robot_map   = getRobotIdToRobotStateMap(sim_robots, side);
 
-    for (auto& [robot_id, primitive_executor] : robot_primitive_executor_map)
+    for (auto& [robot_id, simulated_robot] : simulated_robots)
     {
-        std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control;
+        const auto robot_state_it = robot_map.find(robot_id);
+        const RobotState true_state =
+            (robot_state_it != robot_map.end())
+                ? robot_state_it->second
+                : RobotState(Point(), Vector(), Angle::zero(), AngularVelocity::zero());
 
-        TbotsProto::RobotStatus robot_status;
-        if (ramping)
-        {
-            auto direct_control_no_ramp =
-                primitive_executor->stepPrimitive(robot_status, time_step);
-
-            auto* prev_ramp_velocities = &yellow_prev_ramp_velocities;
-            if (side == gameController::Team::BLUE)
-            {
-                prev_ramp_velocities = &blue_prev_ramp_velocities;
-            }
-            auto prev_it = prev_ramp_velocities->find(robot_id);
-            if (prev_it == prev_ramp_velocities->end())
-            {
-                LocalVelocity seed{Vector(0, 0), AngularVelocity::zero()};
-                auto robot_state_it = robot_map.find(robot_id);
-                if (robot_state_it != robot_map.end())
-                {
-                    seed = LocalVelocity{robot_state_it->second.localVelocity(),
-                                         robot_state_it->second.angularVelocity()};
-                }
-                prev_it = prev_ramp_velocities->insert({robot_id, seed}).first;
-            }
-
-            direct_control = getRampedVelocityPrimitive(
-                prev_it->second.linear, prev_it->second.angular, direct_control_no_ramp,
-                time_step);
-
-            // Persist the ramped command as the setpoint to ramp from next tick.
-            const auto& ramped =
-                direct_control->motor_control().direct_velocity_control();
-            prev_it->second =
-                LocalVelocity{Vector(ramped.velocity().x_component_meters(),
-                                     ramped.velocity().y_component_meters()),
-                              AngularVelocity::fromRadians(
-                                  ramped.angular_velocity().radians_per_second())};
-        }
-        else
-        {
-            direct_control = std::make_unique<TbotsProto::DirectControlPrimitive>(
-                primitive_executor->stepPrimitive(robot_status, time_step));
-        }
+        const TbotsProto::DirectControlPrimitive direct_control =
+            simulated_robot.tick(true_state, time_step);
 
         auto command = *getRobotCommandFromDirectControl(
-            robot_id, std::move(direct_control), robot_constants);
+            robot_id,
+            std::make_unique<TbotsProto::DirectControlPrimitive>(direct_control),
+            robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;
-}
-
-std::unique_ptr<TbotsProto::DirectControlPrimitive>
-ErForceSimulator::getRampedVelocityPrimitive(
-    const Vector current_local_velocity,
-    const AngularVelocity current_local_angular_velocity,
-    TbotsProto::DirectControlPrimitive& target_velocity_primitive, Duration time_to_ramp)
-{
-    TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
-        target_velocity_primitive.motor_control().direct_velocity_control();
-
-    // getting the target wheel velocity
-    EuclideanSpace_t target_euclidean_velocity = {
-        direct_velocity.velocity().x_component_meters(),
-        direct_velocity.velocity().y_component_meters(),
-        direct_velocity.angular_velocity().radians_per_second()};
-
-    WheelSpace_t target_wheel_velocity =
-        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-
-    // getting the current wheel velocity
-    EuclideanSpace_t current_euclidean_velocity = {
-        current_local_velocity.x(), current_local_velocity.y(),
-        current_local_angular_velocity.toRadians()};
-
-    WheelSpace_t current_wheel_velocity =
-        euclidean_to_four_wheel.getWheelVelocity(current_euclidean_velocity);
-
-    WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_wheel_velocity, time_to_ramp.toSeconds());
-
-    EuclideanSpace_t ramped_euclidean =
-        euclidean_to_four_wheel.getEuclideanVelocity(ramped_four_wheel);
-
-    auto mutable_direct_velocity = target_velocity_primitive.mutable_motor_control()
-                                       ->mutable_direct_velocity_control();
-    *(mutable_direct_velocity->mutable_velocity()) =
-        *createVectorProto({ramped_euclidean[0], ramped_euclidean[1]});
-    *(mutable_direct_velocity->mutable_angular_velocity()) =
-        *createAngularVelocityProto(AngularVelocity::fromRadians(ramped_euclidean[2]));
-
-    return std::make_unique<TbotsProto::DirectControlPrimitive>(
-        target_velocity_primitive);
 }
 
 void ErForceSimulator::stepSimulation(const Duration& time_step)
@@ -520,12 +418,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,
-                              time_step, gameController::Team::YELLOW);
+        updateSimulatorRobots(yellow_simulated_robots, *yellow_team_world_msg, time_step,
+                              gameController::Team::YELLOW);
 
     SSLSimulationProto::RobotControl blue_robot_control =
-        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg,
-                              time_step, gameController::Team::BLUE);
+        updateSimulatorRobots(blue_simulated_robots, *blue_team_world_msg, time_step,
+                              gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);

@@ -14,16 +14,15 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
+        ":simulated_robot",
         "//extlibs/er_force_sim/src/amun/simulator",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
         "//shared:constants",
-        "//software/embedded:primitive_executor",
         "//software/embedded/robot_localizer",
         "//software/embedded/services:imu",
-        "//software/physics:euclidean_to_wheel",
         "//software/physics:velocity_conversion_util",
         "//software/world",
         "//software/world:field",
@@ -36,11 +35,47 @@ cc_test(
     deps = [
         ":er_force_simulator",
         "//proto/message_translation:er_force_world",
-        "//proto/primitive:primitive_msg_factory",
         "//shared/test_util:tbots_gtest_main",
-        "//software/physics:euclidean_to_wheel",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "simulated_motor",
+    srcs = ["simulated_motor.cpp"],
+    hdrs = ["simulated_motor.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:robot_constants",
+        "//software/physics:euclidean_to_wheel",
+        "//software/time:duration",
+        "//software/world:robot_state",
+    ],
+)
+
+cc_test(
+    name = "simulated_motor_test",
+    srcs = ["simulated_motor_test.cpp"],
+    deps = [
+        ":simulated_motor",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
+    name = "simulated_robot",
+    srcs = ["simulated_robot.cpp"],
+    hdrs = ["simulated_robot.h"],
+    deps = [
+        ":simulated_motor",
+        "//proto:tbots_cc_proto",
+        "//shared:robot_constants",
+        "//software/embedded:primitive_executor",
+        "//software/embedded/robot_localizer",
+        "//software/time:duration",
+        "//software/world:robot_state",
     ],
 )
 
