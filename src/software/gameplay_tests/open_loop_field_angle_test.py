@@ -11,7 +11,7 @@ from software.gameplay_tests.util import load_command_line_arguments, pytest_mai
 
 
 @pytest.mark.parametrize("speed_m_per_s,duration_s", [
-    (0.5, 2),
+    (0.8, 2),
 ])
 def test_open_loop_angle(open_loop_field_test_runner, speed_m_per_s, duration_s):
     angle_deg = load_command_line_arguments().angle_deg
