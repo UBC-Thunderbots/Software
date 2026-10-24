@@ -12,7 +12,7 @@ TEST(GameStateTest, test_get_name_of_referee_command)
             RefereeCommand state = static_cast<RefereeCommand>(i);
             std::ostringstream ss;
             ss << state;
-            ss.str();
+            std::ignore = ss.str();
         }
         catch (std::invalid_argument&)
         {

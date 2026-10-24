@@ -143,7 +143,8 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
         {
             auto optimized_receiving_pos_array = optimizer_.maximize(
                 objective_function, {receiving_position.x(), receiving_position.y()},
-                passing_config_.number_of_gradient_descent_steps_per_iter());
+                static_cast<unsigned int>(
+                    passing_config_.number_of_gradient_descent_steps_per_iter()));
 
             // get a pass with the new appropriate speed using the optimized destination
             Pass optimized_pass = Pass::fromDestReceiveSpeed(

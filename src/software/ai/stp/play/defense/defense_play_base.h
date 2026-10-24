@@ -39,14 +39,14 @@ class DefensePlayFSMBase : public PlayFSM<DefensePlayFSMBase>
      *
      * @param num_crease_defenders the number of crease defender tactics to set
      */
-    void setUpCreaseDefenders(int num_crease_defenders);
+    void setUpCreaseDefenders(unsigned int num_crease_defenders);
 
     /**
      * Helper function to set up pass defender tactic vector members
      *
      * @param num_pass_defenders the number of pass defender tactics to set
      */
-    void setUpPassDefenders(int num_pass_defenders);
+    void setUpPassDefenders(unsigned int num_pass_defenders);
 
     /**
      * Helper function to set up alignments for the crease defense robots and control
