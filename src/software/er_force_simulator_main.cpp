@@ -1,4 +1,7 @@
+#include <google/protobuf/text_format.h>
+
 #include <boost/program_options.hpp>
+#include <fstream>
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
@@ -196,6 +199,9 @@ int main(int argc, char** argv)
                         input, std::make_unique<TbotsProto::World>(blue_vision));
                 });
 
+        std::ofstream out{"/tmp/avah/log/sim.text"};
+        out.close();
+
         // Simulator Tick Input
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
             runtime_dir + SIMULATION_TICK_PATH,
@@ -225,6 +231,20 @@ int main(int argc, char** argv)
                 for (const auto& packet : er_force_sim->getYellowRobotStatuses())
                 {
                     yellow_robot_status_output.sendProto(packet);
+                }
+
+                std::string text;
+                if (google::protobuf::TextFormat::PrintToString(
+                        er_force_sim->getSimulatorState(), &text))
+                {
+                    static int i{0};
+                    std::ofstream out{args.runtime_dir + "/avah_sim.log", std::ios::app};
+                    out << i++ << ": " << text << "\n";
+                    out.close();
+                }
+                else
+                {
+                    LOG(FATAL) << "COULDNT LOG PROTO";
                 }
 
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());

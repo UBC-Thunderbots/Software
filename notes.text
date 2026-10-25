@@ -9,8 +9,8 @@ attaches to fullsystems:
 
 ---
 
-./tbots.py run thunderscope --blue_log  /tmp/tbots_1039a8db/blue/test/test_two_ai_ball_placemen/proto_2026_10_25_08_03_06/
-: ./tbots.py run thunderscope --blue_log  /tmp/tbots_8c9c1a48/blue/test/test_two_ai_ball_placemen/proto_2026_10_25_08_03_57/
+bazel run //software/thunderscope:thunderscope_main -- --blue_log  /tmp/tbots_1039a8db/blue/test/test_two_ai_ball_placemen/proto_2026_10_25_08_03_06/
+bazel run //software/thunderscope:thunderscope_main -- --blue_log  /tmp/tbots_8c9c1a48/blue/test/test_two_ai_ball_placemen/proto_2026_10_25_08_03_57/
 
 time_sent {                                            time_sent {
   epoch_timestamp_seconds: 1792915393.9894431            epoch_timestamp_seconds: 1792915445.02269
@@ -648,7 +648,7 @@ sequence_number: 517                                    sequence_number: 511    
 
 ---
 
-Looking at the below logs, it seems like tactic tests SHOULD be completely deterministic.
+Looking at the below logs, it seems like tactic tests SHOULD be completely deterministic. BUT it isnt...
 
 time_sent {                                                time_sent {                                             time_sent {
   epoch_timestamp_seconds: 1792914355.599211                 epoch_timestamp_seconds: 1792914376.352993              epoch_timestamp_seconds: 1792914774.0883269

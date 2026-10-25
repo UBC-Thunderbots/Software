@@ -1,6 +1,7 @@
 import sys
 import time
 import threading
+import argparse
 
 import software.python_bindings as tbots_cpp
 
@@ -28,6 +29,15 @@ def low_level():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--runtime_dir", type=str)
+
+    args = parser.parse_args()
+
+    if not args.runtime_dir:
+        parser.print_help()
+        sys.exit(1)
+
     received_buf = ThreadSafeBuffer(
         buffer_size=20, protobuf_type=protos.WorldStateReceivedTrigger
     )
@@ -37,34 +47,35 @@ if __name__ == "__main__":
 
     puio = ProtoUnixIO()
     puio.attach_unix_receiver(
-        "/tmp/avah/", "world_state_received_trigger", protos.WorldStateReceivedTrigger
+        args.runtime_dir,
+        "/world_state_received_trigger",
+        protos.WorldStateReceivedTrigger,
     )
     puio.register_observer(protos.WorldStateReceivedTrigger, received_buf)
 
-    puio.attach_unix_receiver("/tmp/avah/", "simulator_state", er_force.SimulatorState)
+    puio.attach_unix_receiver(
+        args.runtime_dir, "/simulator_state", er_force.SimulatorState
+    )
     puio.register_observer(er_force.SimulatorState, sim_state_buf)
 
-    puio.attach_unix_sender("/tmp/avah/", "world_state", protos.WorldState)
-    puio.attach_unix_sender("/tmp/avah/", "simulation_tick", protos.SimulatorTick)
+    puio.attach_unix_sender(args.runtime_dir, "/world_state", protos.WorldState)
+    puio.attach_unix_sender(args.runtime_dir, "/simulation_tick", protos.SimulatorTick)
 
     init_world_state = create_world_state(
         yellow_robot_locations=[],
-        blue_robot_locations=[],
+        blue_robot_locations=[tbots_cpp.Point(0, 0)],
         ball_location=tbots_cpp.Point(1, 0),
         ball_velocity=tbots_cpp.Vector(-1, 0),
     )
 
     puio.send_proto(protos.WorldState, init_world_state)
 
-    # if not received_buf.get(return_cached=False):
-    #     sys.exit(1)
+    if not received_buf.get(block=True, return_cached=False):
+        sys.exit(1)
 
-    time.sleep(0.1)
-    puio.send_proto(protos.SimulatorTick, protos.SimulatorTick(milliseconds=10))
-    time.sleep(0.1)
-    puio.send_proto(protos.SimulatorTick, protos.SimulatorTick(milliseconds=10))
-    time.sleep(0.1)
-    puio.send_proto(protos.SimulatorTick, protos.SimulatorTick(milliseconds=10))
+    for _ in range(100):
+        puio.send_proto(protos.SimulatorTick, protos.SimulatorTick(milliseconds=10))
+        time.sleep(0.001)
 
     time.sleep(1)
 
