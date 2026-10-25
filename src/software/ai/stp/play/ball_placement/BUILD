@@ -49,6 +49,18 @@ py_test(
     ],
 )
 
+py_test(
+    name = "ball_placement_play_minimal_test",
+    srcs = [
+        "ball_placement_play_minimal_test.py",
+    ],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)
+
 cc_test(
     name = "ball_placement_play_fsm_test",
     srcs = ["ball_placement_play_fsm_test.cpp"],

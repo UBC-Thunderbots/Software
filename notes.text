@@ -1,0 +1,869 @@
+send to simulator:
+simulation tick
+world state
+
+simulator returns:
+world state received
+
+attaches to fullsystems:
+
+---
+
+./tbots.py run thunderscope --blue_log  /tmp/tbots_1039a8db/blue/test/test_two_ai_ball_placemen/proto_2026_10_25_08_03_06/
+: ./tbots.py run thunderscope --blue_log  /tmp/tbots_8c9c1a48/blue/test/test_two_ai_ball_placemen/proto_2026_10_25_08_03_57/
+
+time_sent {                                            time_sent {
+  epoch_timestamp_seconds: 1792915393.9894431            epoch_timestamp_seconds: 1792915445.02269
+}                                                      }
+field {                                                field {
+  field_x_length: 9                                      field_x_length: 9
+  field_y_length: 6                                      field_y_length: 6
+  defense_x_length: 1                                    defense_x_length: 1
+  defense_y_length: 2                                    defense_y_length: 2
+  goal_x_length: 0.18                                    goal_x_length: 0.18
+  goal_y_length: 1                                       goal_y_length: 1
+  boundary_buffer_size: 0.3                              boundary_buffer_size: 0.3
+  center_circle_radius: 0.5                              center_circle_radius: 0.5
+}                                                      }
+friendly_team {                                        friendly_team {
+  team_robots {                                          team_robots {
+    id: 0                                                  id: 0
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: -4.21141552734375                            x_meters: -4.21059765625
+        y_meters: 0.093765785217285152                         y_meters: 0.091709335327148436
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: 0.29240617156028748                           radians: 0.29831725358963013
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.022031250881206485              x_component_meters: -0.00049804689491671022
+        y_component_meters: 0.07949615796499393                y_component_meters: 0.00040832521164538781
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: -0.53311767326404591               radians_per_second: 0.010412335812305383
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 1                                                  id: 1
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 0.18364385986328124                          x_meters: 0.24720411682128907
+        y_meters: 1.5446115722656251                           y_meters: 1.5598957519531251
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -2.9141466617584229                           radians: -2.9163210391998291
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00021514893438771883            x_component_meters: -0.71176486001349371
+        y_component_meters: -0.00033691407597855451            y_component_meters: -0.17355469444216984
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 0                                  radians_per_second: 0.0010013580722807855
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 2                                                  id: 2
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: -3.2252595214843751                          x_meters: -3.2253879394531251
+        y_meters: -0.50000424194335935                         y_meters: -0.50001144409179688
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -0.00669200299307704                          radians: -0.0073413746431469917
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: 0.00068847659004602933             x_component_meters: 0.00048339845682778991
+        y_component_meters: -4.7607423775668433e-05            y_component_meters: 7.3242190444601711e-06
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: -7.99074800982993e-06              radians_per_second: -0.00075850638801001023
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 3                                                  id: 3
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: -3.2341491699218752                          x_meters: -3.23447412109375
+        y_meters: 1.8533950671553612e-05                       y_meters: -2.8265989385545256e-07
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: 0.0040819370187819                            radians: 0.004125633742660284
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: 0.00023437500936943477             x_component_meters: 0.00010253906659579705
+        y_component_meters: 5.443107554483318e-05              y_component_meters: 3.7544676207497284e-06
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 6.90110055394403e-06               radians_per_second: -0.00011108816114364964
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 4                                                  id: 4
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: -3.2341491699218752                          x_meters: -3.2341572265625
+        y_meters: -0.99998394775390631                         y_meters: -0.99999554443359373
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: 0.0040821125730872154                         radians: 0.0044359681196510792
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: 0.00023437500936943477             x_component_meters: 0.00023437500936943477
+        y_component_meters: 5.8593752342358693e-05             y_component_meters: 7.3242190444601711e-06
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 6.90110055394403e-06               radians_per_second: -0.00010656193324996976
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 5                                                  id: 5
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: -3.2338681640625                             x_meters: -3.2338269042968752
+        y_meters: 0.50227813720703129                          y_meters: 0.50227731323242186
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: 0.0095101045444607735                         radians: 0.008972623385488987
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: 8.78906285068767e-05               x_component_meters: 7.324219041795636e-05
+        y_component_meters: 0                                  y_component_meters: -4.9438478543444817e-05
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 8.158386079966222e-06              radians_per_second: -6.3702466651791042e-05
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  goalie_id: 0                                           goalie_id: 0
+}                                                      }
+enemy_team {                                           enemy_team {
+  team_robots {                                          team_robots {
+    id: 0                                                  id: 0
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 0.99740856933593747                          x_meters: 0.99738879394531255
+        y_meters: -0.00028636083006858829                      y_meters: -0.00030397859215736388
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -3.1415374279022217                           radians: -3.1415400505065918
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00044311525210324296            x_component_meters: -0.00043945314257435154
+        y_component_meters: -0.00013791204050487156            y_component_meters: -0.00014219999882152969
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 1.4305115318296937e-05             radians_per_second: 1.4305115318296937e-05
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 1                                                  id: 1
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 0.99678033447265624                          x_meters: 0.99738885498046881
+        y_meters: 2.4996892089843752                           y_meters: 2.4996916503906252
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -3.1415493488311768                           radians: -3.1415400505065918
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00062988283769700932            x_component_meters: -0.00043945314257435154
+        y_component_meters: -0.00010253906659579705            y_component_meters: -0.0001757812570137534
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 0                                  radians_per_second: 1.4305115318296937e-05
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 2                                                  id: 2
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 0.99678033447265624                          x_meters: 0.99738885498046881
+        y_meters: -2.5003107910156253                          y_meters: -2.5003083496093752
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -3.1415493488311768                           radians: -3.1415400505065918
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00062988283769700932            x_component_meters: -0.00043945314257435154
+        y_component_meters: -0.0001025390666224424             y_component_meters: -0.00016113281895147841
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 0                                  radians_per_second: 1.4305115318296937e-05
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 3                                                  id: 3
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 4.49679833984375                             x_meters: 4.4973642578125
+        y_meters: -0.00031262037158012393                      y_meters: -0.00031384730339050295
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -3.1415491104125977                           radians: -3.1415402889251709
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00061523439962807291            x_component_meters: -0.00043945314256102887
+        y_component_meters: -0.00012151480207127356            y_component_meters: -0.00014487505538605301
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 0                                  radians_per_second: 0
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 4                                                  id: 4
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 3.4967878417968752                           x_meters: 3.49736474609375
+        y_meters: -1.000310791015625                           y_meters: -1.0003021850585938
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -3.1415493488311768                           radians: -3.1415402889251709
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00061523439960142756            x_component_meters: -0.00045410158067659453
+        y_component_meters: -0.00011352539516248729            y_component_meters: -0.00012817383325140763
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 0                                  radians_per_second: 0
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  team_robots {                                          team_robots {
+    id: 5                                                  id: 5
+    current_state {                                        current_state {
+      global_position {                                      global_position {
+        x_meters: 3.4967878417968752                           x_meters: 3.49736474609375
+        y_meters: 0.99968927001953123                          y_meters: 0.9996978149414063
+      }                                                      }
+      global_orientation {                                   global_orientation {
+        radians: -3.1415493488311768                           radians: -3.1415402889251709
+      }                                                      }
+      global_velocity {                                      global_velocity {
+        x_component_meters: -0.00061523439960142756            x_component_meters: -0.00045410158067659453
+        y_component_meters: -0.00011352539516914863            y_component_meters: -0.00013183594277363774
+      }                                                      }
+      global_angular_velocity {                              global_angular_velocity {
+        radians_per_second: 0                                  radians_per_second: 0
+      }                                                      }
+    }                                                      }
+    timestamp {                                            timestamp {
+      epoch_timestamp_seconds: 5.016666466000002             epoch_timestamp_seconds: 5.016666466000002
+    }                                                      }
+  }                                                      }
+  goalie_id: 0                                           goalie_id: 0
+}                                                      }
+ball {                                                 ball {
+  current_state {                                        current_state {
+    global_position {                                      global_position {
+      x_meters: 0.056479385958279359                         x_meters: 0.15860084419705217
+      y_meters: 1.5181049740930792                           y_meters: 1.5395913169628292
+    }                                                      }
+    global_velocity {                                      global_velocity {
+      x_component_meters: -0.3449721384692                   x_component_meters: 0
+      y_component_meters: -0.080299633119832986              y_component_meters: 0
+    }                                                      }
+    distance_from_ground: 5.5879354476928711e-09         }
+  }                                                      timestamp {
+  timestamp {                                              epoch_timestamp_seconds: 5.016666466
+    epoch_timestamp_seconds: 5.016666466                 }
+  }                                                    }
+}                                                      game_state {
+game_state {                                             play_state: PLAY_STATE_SETUP
+  play_state: PLAY_STATE_SETUP                           restart_reason: RESTART_REASON_BALL_PLACEMENT
+  restart_reason: RESTART_REASON_BALL_PLACEMENT          command: REFEREE_COMMAND_BALL_PLACEMENT_US
+  command: REFEREE_COMMAND_BALL_PLACEMENT_US             ball_placement_point {
+  ball_placement_point {                                   x_meters: 0
+    x_meters: 0                                            y_meters: 1.5
+    y_meters: 1.5                                        }
+  }                                                    }
+}                                                      sequence_number: 300
+sequence_number: 300                                   dribble_displacement {
+dribble_displacement {                                   start {
+  start {                                                  x_meters: 2
+    x_meters: 2                                            y_meters: 2.0000012207031252
+    y_meters: 2.0000012207031252                         }
+  }                                                      end {
+  end {                                                    x_meters: 0.15860084419705217
+    x_meters: 0.056479385958279359                         y_meters: 1.5395913169628292
+    y_meters: 1.5181049740930792                         }
+  }                                                    }
+}
+
+---
+
+Non-deterministic ball placement tests:
+
+time_sent {                                             time_sent {                                                time_sent {
+  epoch_timestamp_seconds: 1792914659.5546169             epoch_timestamp_seconds: 1792914710.1859219                epoch_timestamp_seconds: 1792914860.152333
+}                                                       }                                                          }
+field {                                                 field {                                                    field {
+  field_x_length: 9                                       field_x_length: 9                                          field_x_length: 9
+  field_y_length: 6                                       field_y_length: 6                                          field_y_length: 6
+  defense_x_length: 1                                     defense_x_length: 1                                        defense_x_length: 1
+  defense_y_length: 2                                     defense_y_length: 2                                        defense_y_length: 2
+  goal_x_length: 0.18                                     goal_x_length: 0.18                                        goal_x_length: 0.18
+  goal_y_length: 1                                        goal_y_length: 1                                           goal_y_length: 1
+  boundary_buffer_size: 0.3                               boundary_buffer_size: 0.3                                  boundary_buffer_size: 0.3
+  center_circle_radius: 0.5                               center_circle_radius: 0.5                                  center_circle_radius: 0.5
+}                                                       }                                                          }
+friendly_team {                                         friendly_team {                                            friendly_team {
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 0                                                   id: 0                                                      id: 0
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: -3.8472080078125                              x_meters: -3.8467155761718752                              x_meters: -3.8460241699218751
+        y_meters: 0.2237031707763672                            y_meters: 0.22409849548339844                              y_meters: 0.22361865234375
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: 0.30755347013473511                            radians: 0.30786743760108948                               radians: 0.3067585825920105
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: 0.00010253906659578065              x_component_meters: 8.7890628506890752e-05                 x_component_meters: 7.324219041796807e-05
+        y_component_meters: -7.9650882091838278e-05             y_component_meters: -6.3171389245156393e-05                y_component_meters: -6.3171389245156393e-05
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0.00024318696041100905              radians_per_second: 0.000368356719446205                   radians_per_second: 0.00039517881066801605
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 1                                                   id: 1                                                      id: 1
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 0.49029397583007811                           x_meters: 0.49352175903320311                              x_meters: 0.49508996582031251
+        y_meters: 1.6078255615234376                            y_meters: 1.60468603515625                                 y_meters: 1.613621337890625
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -2.9114282131195068                            radians: -2.9132828712463379                               radians: -2.914722204208374
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: 0.8374347258799818                  x_component_meters: 0.84504642052065726                    x_component_meters: 0.84832767065190651
+        y_component_meters: 0.17675537816391787                 y_component_meters: 0.16891846378799946                    y_component_meters: 0.18924317163223633
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0.00633716608600453                 radians_per_second: 0.00090122226505285111                 radians_per_second: -0.0041770936729433735
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 2                                                   id: 2                                                      id: 2
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: -3.2248681640625                              x_meters: -3.224966796875                                  x_meters: -3.2251423339843752
+        y_meters: -0.50055902099609373                          y_meters: -0.50053204345703128                             y_meters: -0.50108648681640622
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -0.0098800808191299438                         radians: -0.00995735451579094                              radians: -0.012563030235469341
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.0019189453892485778              x_component_meters: -0.0016552735037018737                 x_component_meters: -0.0013476563039144334
+        y_component_meters: 0.00020141602368265447              y_component_meters: 0.00015930176418372749                 y_component_meters: 0.00028564454268070164
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: -0.0050570817824440069              radians_per_second: -0.0050707722248400896                 radians_per_second: -0.0049613045650410735
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 3                                                   id: 3                                                      id: 3
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: -3.2333835449218751                           x_meters: -3.2333977050781249                              x_meters: -3.23340576171875
+        y_meters: 2.1187791600823403e-05                        y_meters: 3.64474318921566e-05                             y_meters: 2.7163272723555565e-05
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: 0.0040242904797196388                          radians: 0.0039694481529295444                             radians: 0.0040159453637897968
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: 0.00023437500936939731              x_component_meters: 0.00023437500939611758                 x_component_meters: 0.00023437500936947223
+        y_component_meters: 4.9989672514633865e-07              y_component_meters: -3.9227308411921419e-07                y_component_meters: 2.1211803807906947e-07
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: -4.74974532052752e-06               radians_per_second: -3.883615291491391e-06                 radians_per_second: -4.3585898235442942e-06
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 4                                                   id: 4                                                      id: 4
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: -3.2333835449218751                           x_meters: -3.2333972167968752                              x_meters: -3.23460400390625
+        y_meters: -0.999982177734375                            y_meters: -0.99996759033203131                             y_meters: -0.99999566650390626
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: 0.0040248543955385685                          radians: 0.0039701950736343861                             radians: 0.0039463979192078114
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: 0.00023437500936939731              x_component_meters: 0.00023437500936947223                 x_component_meters: 0
+        y_component_meters: 0                                   y_component_meters: 0                                      y_component_meters: 0
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: -4.74974532052752e-06               radians_per_second: -3.9115549698474442e-06                radians_per_second: -0.00022893772444949968
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 5                                                   id: 5                                                      id: 5
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: -3.2335947265625                              x_meters: -3.233611328125                                  x_meters: -3.232720703125
+        y_meters: 0.50204168701171881                           y_meters: 0.50226110839843752                              y_meters: 0.50223422241210935
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: 0.00841542985290289                            radians: 0.0091924052685499191                             radians: -0.0073793684132397175
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: 8.7890628506862644e-05              x_component_meters: 2.9296876177845367e-05                 x_component_meters: 7.3242190444613422e-05
+        y_component_meters: -4.7607423775660823e-05             y_component_meters: -1.8310547604492017e-05                y_component_meters: -8.6059573759098091e-05
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: -0.00011270866248828245             radians_per_second: -0.00013545156067014578                radians_per_second: 6.8144875510413682e-05
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  goalie_id: 0                                            goalie_id: 0                                               goalie_id: 0
+}                                                       }                                                          }
+enemy_team {                                            enemy_team {                                               enemy_team {
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 0                                                   id: 0                                                      id: 0
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 0.99582830810546874                           x_meters: 0.9958961791992188                               x_meters: 0.99587341308593758
+        y_meters: -0.00085107904672622687                       y_meters: -0.000866082489490509                            y_meters: -0.0008630297183990479
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -3.1415467262268066                            radians: -3.1415455341339111                               radians: -3.1415455341339111
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.0004577636901854288              x_component_meters: -0.0004394531425744218                 x_component_meters: -0.00045776369018557517
+        y_component_meters: -0.00011136532275292827             y_component_meters: -0.00012053490167198826                y_component_meters: -0.0001176416920988648
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0                                   radians_per_second: -1.4305115318299224e-05                radians_per_second: 0
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 1                                                   id: 1                                                      id: 1
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 0.99582720947265624                           x_meters: 0.99588958740234379                              x_meters: 0.995865966796875
+        y_meters: 2.49915478515625                              y_meters: 2.49914599609375                                 y_meters: 2.499154052734375
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -3.1415464878082275                            radians: -3.141545295715332                                radians: -3.1415457725524902
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.0004577636901854288              x_component_meters: -0.00045776369018557517                x_component_meters: -0.00045776369018557517
+        y_component_meters: -0.00011718750468469866             y_component_meters: -0.00011718750468473612                y_component_meters: -0.00011718750468473612
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0                                   radians_per_second: 0                                      radians_per_second: 0
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 2                                                   id: 2                                                      id: 2
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 0.99582720947265624                           x_meters: 0.99588958740234379                              x_meters: 0.995865966796875
+        y_meters: -2.5008454589843749                           y_meters: -2.500854248046875                               y_meters: -2.500845947265625
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -3.1415464878082275                            radians: -3.141545295715332                                radians: -3.1415457725524902
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.0004577636901854288              x_component_meters: -0.00045776369018557517                x_component_meters: -0.00045776369018557517
+        y_component_meters: -0.00011718750468469866             y_component_meters: -0.00011718750468473612                y_component_meters: -0.00011718750468473612
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0                                   radians_per_second: 0                                      radians_per_second: 0
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 3                                                   id: 3                                                      id: 3
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 4.495755859375                                x_meters: 4.4958251953125                                  x_meters: 4.49463232421875
+        y_meters: -0.00082599449157714849                       y_meters: -0.00083369916677474975                          y_meters: -0.00053710299730300908
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -3.1415479183197021                            radians: -3.1415467262268066                               radians: -3.1415722370147705
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.00043945314256095861             x_component_meters: -0.00046875001873894446                x_component_meters: -0.00055664064727248058
+        y_component_meters: -0.00010284662658087871             y_component_meters: -0.00011087537255330339                y_component_meters: -6.8807604681051011e-06
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0                                   radians_per_second: -1.4305115318299224e-05                radians_per_second: -1.4305115318299224e-05
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 4                                                   id: 4                                                      id: 4
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 3.4957587890625                               x_meters: 3.4958293457031249                               x_meters: 3.4958017578125
+        y_meters: -1.0008253784179688                           y_meters: -1.0008332519531251                              y_meters: -1.0008268432617187
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -3.1415481567382812                            radians: -3.1415467262268066                               radians: -3.1415472030639648
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.00045410158064987659             x_component_meters: -0.00045410158067666717                x_component_meters: -0.00045410158067666717
+        y_component_meters: -9.1552738042414828e-05             y_component_meters: -0.00011352539517582813                y_component_meters: -0.00011352539516250545
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: -1.430511531829465e-05              radians_per_second: -1.4305115318299224e-05                radians_per_second: 0
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  team_robots {                                           team_robots {                                              team_robots {
+    id: 5                                                   id: 5                                                      id: 5
+    current_state {                                         current_state {                                            current_state {
+      global_position {                                       global_position {                                          global_position {
+        x_meters: 3.49458056640625                              x_meters: 3.4946416015625                                  x_meters: 3.4958017578125
+        y_meters: 0.999468505859375                             y_meters: 0.999468505859375                                y_meters: 0.99917315673828122
+      }                                                       }                                                          }
+      global_orientation {                                    global_orientation {                                       global_orientation {
+        radians: -3.1415727138519287                            radians: -3.1415722370147705                               radians: -3.1415472030639648
+      }                                                       }                                                          }
+      global_velocity {                                       global_velocity {                                          global_velocity {
+        x_component_meters: -0.00061523439962797458             x_component_meters: -0.00061523439962817136                x_component_meters: -0.00045410158067666717
+        y_component_meters: 0                                   y_component_meters: 0                                      y_component_meters: -0.00011352539516916679
+      }                                                       }                                                          }
+      global_angular_velocity {                               global_angular_velocity {                                  global_angular_velocity {
+        radians_per_second: 0                                   radians_per_second: -1.4305115318299224e-05                radians_per_second: 0
+      }                                                       }                                                          }
+    }                                                       }                                                          }
+    timestamp {                                             timestamp {                                                timestamp {
+      epoch_timestamp_seconds: 8.6333329880000047             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+    }                                                       }                                                          }
+  }                                                       }                                                          }
+  goalie_id: 0                                            goalie_id: 0                                               goalie_id: 0
+}                                                       }                                                          }
+ball {                                                  ball {                                                     ball {
+  current_state {                                         current_state {                                            current_state {
+    global_position {                                       global_position {                                          global_position {
+      x_meters: -0.07435371398925783                          x_meters: -0.069624923706054678                            x_meters: -0.0633307762145996
+      y_meters: 1.4889873046875002                            y_meters: 1.4916971435546877                               y_meters: 1.4896506347656253
+    }                                                       }                                                          }
+    global_velocity {                                       global_velocity {                                          global_velocity {
+      x_component_meters: 3.9677291381745437e-16              x_component_meters: 2.0301797126627747e-16                 x_component_meters: 3.528555138822689e-16
+      y_component_meters: -1.5144979167286311e-15             y_component_meters: 1.1988155000219677e-15                 y_component_meters: -2.9744074685971495e-15
+    }                                                       }                                                          }
+    distance_from_ground: 1.1175870895385742e-08            distance_from_ground: 1.1175870895385742e-08               distance_from_ground: 1.1175870895385742e-08
+  }                                                       }                                                          }
+  timestamp {                                             timestamp {                                                timestamp {
+    epoch_timestamp_seconds: 8.6333329880000012             epoch_timestamp_seconds: 8.533332992                       epoch_timestamp_seconds: 8.566666324
+  }                                                       }                                                          }
+}                                                       }                                                          }
+game_state {                                            game_state {                                               game_state {
+  play_state: PLAY_STATE_SETUP                            play_state: PLAY_STATE_SETUP                               play_state: PLAY_STATE_SETUP
+  restart_reason: RESTART_REASON_BALL_PLACEMENT           restart_reason: RESTART_REASON_BALL_PLACEMENT              restart_reason: RESTART_REASON_BALL_PLACEMENT
+  command: REFEREE_COMMAND_BALL_PLACEMENT_US              command: REFEREE_COMMAND_BALL_PLACEMENT_US                 command: REFEREE_COMMAND_BALL_PLACEMENT_US
+  ball_placement_point {                                  ball_placement_point {                                     ball_placement_point {
+    x_meters: 0                                             x_meters: 0                                                x_meters: 0
+    y_meters: 1.5                                           y_meters: 1.5                                              y_meters: 1.5
+  }                                                       }                                                          }
+}                                                       }                                                          }
+sequence_number: 517                                    sequence_number: 511                                       sequence_number: 513
+
+---
+
+Looking at the below logs, it seems like tactic tests SHOULD be completely deterministic.
+
+time_sent {                                                time_sent {                                             time_sent {
+  epoch_timestamp_seconds: 1792914355.599211                 epoch_timestamp_seconds: 1792914376.352993              epoch_timestamp_seconds: 1792914774.0883269
+}                                                          }                                                       }
+field {                                                    field {                                                 field {
+  field_x_length: 9                                          field_x_length: 9                                       field_x_length: 9
+  field_y_length: 6                                          field_y_length: 6                                       field_y_length: 6
+  defense_x_length: 1                                        defense_x_length: 1                                     defense_x_length: 1
+  defense_y_length: 2                                        defense_y_length: 2                                     defense_y_length: 2
+  goal_x_length: 0.18                                        goal_x_length: 0.18                                     goal_x_length: 0.18
+  goal_y_length: 1                                           goal_y_length: 1                                        goal_y_length: 1
+  boundary_buffer_size: 0.3                                  boundary_buffer_size: 0.3                               boundary_buffer_size: 0.3
+  center_circle_radius: 0.5                                  center_circle_radius: 0.5                               center_circle_radius: 0.5
+}                                                          }                                                       }
+friendly_team {                                            friendly_team {                                         friendly_team {
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 0                                                      id: 0                                                   id: 0
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: -2.9972824707031251                              x_meters: -2.9972824707031251                           x_meters: -2.9972824707031251
+        y_meters: 2.50021630859375                                 y_meters: 2.50021630859375                              y_meters: 2.50021630859375
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: 4.072166484547779e-05                             radians: 4.072166484547779e-05                          radians: 4.072166484547779e-05
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: 0.000644531275779337                   x_component_meters: 0.000644531275779337                x_component_meters: 0.000644531275779337
+        y_component_meters: 0.00011718750468472988                 y_component_meters: 0.00011718750468472988              y_component_meters: 0.00011718750468472988
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 4.6427887393220256e-06                 radians_per_second: 4.6427887393220256e-06              radians_per_second: 4.6427887393220256e-06
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 1                                                      id: 1                                                   id: 1
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 2.4954821777343752                               x_meters: 2.4954584960937503                            x_meters: 2.4954326171875
+        y_meters: -1.0977720947265626                              y_meters: -1.0977685546875                              y_meters: -1.0977530517578125
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: 0.014202349819242954                              radians: 0.01417115144431591                            radians: 0.014184440486133099
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: 0.0014208984943323258                  x_component_meters: 0.0014794922466880133               x_component_meters: 0.0015820313132571761
+        y_component_meters: -0.00069580080909056364                y_component_meters: -0.00073974612334400667             y_component_meters: -0.00077636721855298878
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: -0.0017459505004696696                 radians_per_second: -0.0017494708999425321              radians_per_second: -0.0017652847578920573
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  goalie_id: 0                                               goalie_id: 0                                            goalie_id: 0
+}                                                          }                                                       }
+enemy_team {                                               enemy_team {                                            enemy_team {
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 0                                                      id: 0                                                   id: 0
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 0.99729425048828124                              x_meters: 0.99729425048828124                           x_meters: 0.99729425048828124
+        y_meters: -0.00021848094463348388                          y_meters: -0.00021848094463348388                       y_meters: -0.00021848094463348388
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: -3.1415519714355469                               radians: -3.1415519714355469                            radians: -3.1415519714355469
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: -0.00062988283769707643                x_component_meters: -0.00062988283769707643             x_component_meters: -0.00062988283769707643
+        y_component_meters: -0.0001057353658054948                 y_component_meters: -0.0001057353658054948              y_component_meters: -0.0001057353658054948
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 0                                      radians_per_second: 0                                   radians_per_second: 0
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 1                                                      id: 1                                                   id: 1
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 0.99729425048828124                              x_meters: 0.99729425048828124                           x_meters: 0.99729425048828124
+        y_meters: 2.4997824707031251                               y_meters: 2.4997824707031251                            y_meters: 2.4997824707031251
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: -3.1415519714355469                               radians: -3.1415519714355469                            radians: -3.1415519714355469
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: -0.00062988283769707643                x_component_meters: -0.00062988283769707643             x_component_meters: -0.00062988283769707643
+        y_component_meters: -0.00011718750468472988                y_component_meters: -0.00011718750468472988             y_component_meters: -0.00011718750468472988
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 0                                      radians_per_second: 0                                   radians_per_second: 0
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 2                                                      id: 2                                                   id: 2
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 0.99729425048828124                              x_meters: 0.99729425048828124                           x_meters: 0.99729425048828124
+        y_meters: -2.5002175292968749                              y_meters: -2.5002175292968749                           y_meters: -2.5002175292968749
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: -3.1415519714355469                               radians: -3.1415519714355469                            radians: -3.1415519714355469
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: -0.00062988283769707643                x_component_meters: -0.00062988283769707643             x_component_meters: -0.00062988283769707643
+        y_component_meters: -0.00011718750468472988                y_component_meters: -0.00011718750468472988             y_component_meters: -0.00011718750468472988
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 0                                      radians_per_second: 0                                   radians_per_second: 0
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 3                                                      id: 3                                                   id: 3
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 4.497296875                                      x_meters: 4.497296875                                   x_meters: 4.497296875
+        y_meters: -0.00021779921650886535                          y_meters: -0.00021779921650886535                       y_meters: -0.00021779921650886535
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: -3.1415519714355469                               radians: -3.1415519714355469                            radians: -3.1415519714355469
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: -0.00061523439962813851                x_component_meters: -0.00061523439962813851             x_component_meters: -0.00061523439962813851
+        y_component_meters: -0.00010561019604646021                y_component_meters: -0.00010561019604646021             y_component_meters: -0.00010561019604646021
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 0                                      radians_per_second: 0                                   radians_per_second: 0
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 4                                                      id: 4                                                   id: 4
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 3.4972863769531251                               x_meters: 3.4972863769531251                            x_meters: 3.4972863769531251
+        y_meters: -1.0002169799804688                              y_meters: -1.0002169799804688                           y_meters: -1.0002169799804688
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: -3.1415519714355469                               radians: -3.1415519714355469                            radians: -3.1415519714355469
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: -0.00061523439960149316                x_component_meters: -0.00061523439960149316             x_component_meters: -0.00061523439960149316
+        y_component_meters: -0.00011718750468472988                y_component_meters: -0.00011718750468472988             y_component_meters: -0.00011718750468472988
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 0                                      radians_per_second: 0                                   radians_per_second: 0
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  team_robots {                                              team_robots {                                           team_robots {
+    id: 5                                                      id: 5                                                   id: 5
+    current_state {                                            current_state {                                         current_state {
+      global_position {                                          global_position {                                       global_position {
+        x_meters: 3.4972863769531251                               x_meters: 3.4972863769531251                            x_meters: 3.4972863769531251
+        y_meters: 0.99978302001953123                              y_meters: 0.99978302001953123                           y_meters: 0.99978302001953123
+      }                                                          }                                                       }
+      global_orientation {                                       global_orientation {                                    global_orientation {
+        radians: -3.1415519714355469                               radians: -3.1415519714355469                            radians: -3.1415519714355469
+      }                                                          }                                                       }
+      global_velocity {                                          global_velocity {                                       global_velocity {
+        x_component_meters: -0.00061523439960149316                x_component_meters: -0.00061523439960149316             x_component_meters: -0.00061523439960149316
+        y_component_meters: -0.00011718750469139122                y_component_meters: -0.00011718750469139122             y_component_meters: -0.00011718750469139122
+      }                                                          }                                                       }
+      global_angular_velocity {                                  global_angular_velocity {                               global_angular_velocity {
+        radians_per_second: 0                                      radians_per_second: 0                                   radians_per_second: 0
+      }                                                          }                                                       }
+    }                                                          }                                                       }
+    timestamp {                                                timestamp {                                             timestamp {
+      epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+    }                                                          }                                                       }
+  }                                                          }                                                       }
+  goalie_id: 0                                               goalie_id: 0                                            goalie_id: 0
+}                                                          }                                                       }
+ball {                                                     ball {                                                  ball {
+  current_state {                                            current_state {                                         current_state {
+    global_position {                                          global_position {                                       global_position {
+      x_meters: 4.5                                              x_meters: 4.5                                           x_meters: 4.5
+      y_meters: -2.9999987792968752                              y_meters: -2.9999987792968752                           y_meters: -2.9999987792968752
+    }                                                          }                                                       }
+    global_velocity {                                          global_velocity {                                       global_velocity {
+      x_component_meters: 0                                      x_component_meters: 0                                   x_component_meters: 0
+      y_component_meters: 0                                      y_component_meters: 0                                   y_component_meters: 0
+    }                                                          }                                                       }
+    distance_from_ground: 1.1175870895385742e-08               distance_from_ground: 1.1175870895385742e-08            distance_from_ground: 1.1175870895385742e-08
+  }                                                          }                                                       }
+  timestamp {                                                timestamp {                                             timestamp {
+    epoch_timestamp_seconds: 4.1999998320000005                epoch_timestamp_seconds: 4.1999998320000005             epoch_timestamp_seconds: 4.1999998320000005
+  }                                                          }                                                       }
+}                                                          }                                                       }
+game_state {                                               game_state {                                            game_state {
+  play_state: PLAY_STATE_HALT                                play_state: PLAY_STATE_HALT                             play_state: PLAY_STATE_HALT
+  restart_reason: RESTART_REASON_NONE                        restart_reason: RESTART_REASON_NONE                     restart_reason: RESTART_REASON_NONE
+  command: REFEREE_COMMAND_HALT                              command: REFEREE_COMMAND_HALT                           command: REFEREE_COMMAND_HALT
+}                                                          }                                                       }
+sequence_number: 251                                       sequence_number: 251                                    sequence_number: 251

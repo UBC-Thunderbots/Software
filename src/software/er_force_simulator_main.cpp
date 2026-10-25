@@ -135,6 +135,8 @@ int main(int argc, char** argv)
 
         bool has_sent_world_state_trigger = false;
 
+        LOG(INFO) << "Start up";
+
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
@@ -151,6 +153,7 @@ int main(int argc, char** argv)
                     world_state_received_trigger.sendProto(
                         world_state_received_trigger_msg);
                     has_sent_world_state_trigger = true;
+                    LOG(INFO) << "Received world state";
                 }
             });
 
@@ -205,7 +208,9 @@ int main(int argc, char** argv)
                 er_force_sim->stepSimulation(
                     Duration::fromMilliseconds(input.milliseconds()));
 
-                for (const auto packet : er_force_sim->getSSLWrapperPackets())
+                LOG(INFO) << "sim elapsed: " << er_force_sim->getTimestamp();
+
+                for (const auto& packet : er_force_sim->getSSLWrapperPackets())
                 {
                     blue_ssl_wrapper_output.sendProto(packet);
                     yellow_ssl_wrapper_output.sendProto(packet);

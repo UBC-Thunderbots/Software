@@ -203,4 +203,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
 
+        print()
+        print()
+        print(world)
+
         self._stopper()
