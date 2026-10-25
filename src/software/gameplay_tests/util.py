@@ -26,9 +26,11 @@ def get_runtime_dir():
     """
     import uuid
 
-    runtime_dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
-    os.makedirs(runtime_dir, exist_ok=True)
-    return runtime_dir
+    if not hasattr(get_runtime_dir, "dir"):
+        get_runtime_dir.dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
+        os.makedirs(get_runtime_dir.dir, exist_ok=True)
+
+    return get_runtime_dir.dir
 
 
 def get_pytest_name():
