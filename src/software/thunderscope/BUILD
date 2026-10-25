@@ -16,6 +16,24 @@ py_library(
 )
 
 py_binary(
+    name = "avah",
+    srcs = ["avah.py"],
+    deps = [
+        ":proto_unix_io",
+        ":thread_safe_buffer",
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
+        "//proto:import_all_protos",
+        "//proto/message_translation:py_tbots_protobuf",
+        requirement("numpy"),
+    ],
+    data = [
+        "//software:python_bindings.so",
+    ]
+)
+
+py_binary(
     name = "thunderscope_main",
     srcs = ["thunderscope_main.py"],
     deps = [
