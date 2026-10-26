@@ -20,11 +20,24 @@ namespace
 std::string path;
 static int i{0};
 
-void AVAH_LOG(auto x)
+[[maybe_unused]] void AVAH_LOG(auto x)
 {
     std::ofstream out{path, std::ios::app};
     out << i++ << ": " << x << "\n";
     out.close();
+}
+
+[[maybe_unused]] void AVAH_LOG_PROTO(auto x)
+{
+    std::string text;
+    if (google::protobuf::TextFormat::PrintToString(x, &text))
+    {
+        AVAH_LOG(text);
+    }
+    else
+    {
+        LOG(FATAL) << "COULDNT LOG PROTO";
+    }
 }
 
 }  // namespace
@@ -168,6 +181,7 @@ int main(int argc, char** argv)
             runtime_dir + WORLD_STATE_PATH,
             [&](TbotsProto::WorldState input)
             {
+                AVAH_LOG("Received world state");
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
 
@@ -188,6 +202,8 @@ int main(int argc, char** argv)
             runtime_dir + BLUE_WORLD_PATH,
             [&](TbotsProto::World input)
             {
+                AVAH_LOG("Received blue world");
+                // AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
@@ -196,6 +212,8 @@ int main(int argc, char** argv)
             runtime_dir + YELLOW_WORLD_PATH,
             [&](TbotsProto::World input)
             {
+                AVAH_LOG("Received yellow world");
+                // AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
                 yellow_vision = input;
             });
@@ -206,6 +224,8 @@ int main(int argc, char** argv)
                 runtime_dir + YELLOW_PRIMITIVE_SET,
                 [&](TbotsProto::PrimitiveSet input)
                 {
+                    AVAH_LOG("Received yellow primitive set");
+                    // AVAH_LOG_PROTO(input);
                     std::scoped_lock lock(simulator_mutex);
                     er_force_sim->setYellowRobotPrimitiveSet(
                         input, std::make_unique<TbotsProto::World>(yellow_vision));
@@ -216,6 +236,8 @@ int main(int argc, char** argv)
                 runtime_dir + BLUE_PRIMITIVE_SET,
                 [&](TbotsProto::PrimitiveSet input)
                 {
+                    AVAH_LOG("Received blue primitive set");
+                    // AVAH_LOG_PROTO(input);
                     std::scoped_lock lock(simulator_mutex);
                     er_force_sim->setBlueRobotPrimitiveSet(
                         input, std::make_unique<TbotsProto::World>(blue_vision));
@@ -232,6 +254,9 @@ int main(int argc, char** argv)
                 // the robot status msgs
                 er_force_sim->stepSimulation(
                     Duration::fromMilliseconds(input.milliseconds()));
+
+                AVAH_LOG("Received simulator tick");
+                // AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
 
                 LOG(INFO) << "sim elapsed: " << er_force_sim->getTimestamp();
 
@@ -250,17 +275,6 @@ int main(int argc, char** argv)
                 for (const auto packet : er_force_sim->getYellowRobotStatuses())
                 {
                     yellow_robot_status_output.sendProto(packet);
-                }
-
-                std::string text;
-                if (google::protobuf::TextFormat::PrintToString(
-                        er_force_sim->getSimulatorState(), &text))
-                {
-                    AVAH_LOG(text);
-                }
-                else
-                {
-                    LOG(FATAL) << "COULDNT LOG PROTO";
                 }
 
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());
