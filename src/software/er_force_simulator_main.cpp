@@ -14,6 +14,21 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
+namespace
+{
+
+std::string path;
+static int i{0};
+
+void AVAH_LOG(auto x)
+{
+    std::ofstream out{path, std::ios::app};
+    out << i++ << ": " << x << "\n";
+    out.close();
+}
+
+}  // namespace
+
 int main(int argc, char** argv)
 {
     struct CommandLineArgs
@@ -51,6 +66,13 @@ int main(int argc, char** argv)
     {
         std::string runtime_dir = args.runtime_dir;
         LoggerSingleton::initializeLogger(runtime_dir, nullptr);
+
+        path = args.runtime_dir + "/avah_sim.log";
+
+        {
+            std::ofstream out{path};
+            out.close();
+        }
 
         /**
          * Creates a ER force simulator and sets up the appropriate
@@ -199,9 +221,6 @@ int main(int argc, char** argv)
                         input, std::make_unique<TbotsProto::World>(blue_vision));
                 });
 
-        std::ofstream out{"/tmp/avah/log/sim.text"};
-        out.close();
-
         // Simulator Tick Input
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
             runtime_dir + SIMULATION_TICK_PATH,
@@ -237,10 +256,7 @@ int main(int argc, char** argv)
                 if (google::protobuf::TextFormat::PrintToString(
                         er_force_sim->getSimulatorState(), &text))
                 {
-                    static int i{0};
-                    std::ofstream out{args.runtime_dir + "/avah_sim.log", std::ios::app};
-                    out << i++ << ": " << text << "\n";
-                    out.close();
+                    AVAH_LOG(text);
                 }
                 else
                 {
