@@ -89,7 +89,7 @@ int main(int argc, char** argv)
              args.blue_udp_port == args.yellow_udp_port))
         {
             std::cerr
-                << "Enabled UDP control ports must be nonzero and distinct; vision port must be nonzero\n";
+                << "Teams communicating to simulator over UDP must have different, non-zero ports.\n";
             return 1;
         }
         std::string runtime_dir = args.runtime_dir;
@@ -97,9 +97,9 @@ int main(int argc, char** argv)
 
         /**
          * Creates a ER force simulator and sets up the appropriate
-         * communication channels (unix senders/listeners). All inputs (left) and
-         * outputs (right) shown below are over unix sockets. Optional SSL UDP inputs
-         * bypass primitive execution; vision is also published over UDP when enabled.
+         * communication channels (unix senders/listeners or udp sockets). Below
+         * is an example where yellow speaks over unix socket and blue speaks over
+         * UDP (with ssl instead of primitives)
          *
          *
          *                        ┌────────────────────────────┐
@@ -110,8 +110,8 @@ int main(int argc, char** argv)
          *   WorldState           │                            │
          *   ─────────────────────►                            │ SSL_WrapperPacket
          *                        │                            ├───────────────────►
-         *   Blue Primitive Set   │                            │
-         *   ─────────────────────►  ┌──────────────────────┐  │ Blue Robot Status
+         *   Blue Robot Controls  │                            │
+         *   ─────────────────────►  ┌──────────────────────┐  │ Blue Robot Feedback
          *   Yellow Primitive Set │  │                      │  ├───────────────────►
          *                        │  │                      │  │ Yellow Robot Status
          *                        │  │  ER Force Simulator  │  │
