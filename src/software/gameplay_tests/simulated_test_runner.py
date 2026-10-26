@@ -51,6 +51,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.ci_mode = ci_mode
+        self.avah_ack_buffer = ThreadSafeBuffer(
+            buffer_size=10, protobuf_type=protos.AvahAck
+        )
+        self.simulator_proto_unix_io.register_observer(
+            protos.AvahAck, self.avah_ack_buffer
+        )
 
     @override
     def set_world_state(self, worldstate: protos.WorldState):
@@ -119,33 +125,29 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             while True:
                 try:
-                    world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    self.avah_ack_buffer.get(
+                        block=True, timeout=1.0, return_cached=False
                     )
-
-                    # We block until the timeout for the new primitives from AI. if not found still,
-                    # the SSL Wrapper packet is resent in a loop until we actually get a primitive set from AI
-                    # Otherwise, if the AI misses the first SSL Wrapper packet and doesn't start
-                    # the simulated test will continue to tick forward, causes syncing issues with the AI
-                    self.primitive_set_buffer.get(
+                    world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
                     break
                 except queue.Empty:
+                    raise RuntimeError("AVAH ACK NOT RECEIVED")
                     # If we timeout, that means full_system missed the last
                     # wrapper and robot status, lets resend it.
-                    logger.warning("Fullsystem missed last wrapper, resending ...")
+                    # logger.warning("Fullsystem missed last wrapper, resending ...")
 
-                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    robot_status = self.robot_status_buffer.get(block=False)
-
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        protos.SSL_WrapperPacket, ssl_wrapper
-                    )
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        protos.RobotStatus, robot_status
-                    )
+                    # ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
+                    # robot_status = self.robot_status_buffer.get(block=False)
+                    #
+                    # self.blue_full_system_proto_unix_io.send_proto(
+                    #     protos.SSL_WrapperPacket, ssl_wrapper
+                    # )
+                    # self.blue_full_system_proto_unix_io.send_proto(
+                    #     protos.RobotStatus, robot_status
+                    # )
 
             # get the time difference after we get the primitive (after any blocking that happened)
             processing_time = time.time() - processing_start_time
@@ -202,9 +204,5 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         # Check that all eventually validations are eventually valid
         validation.check_validation(eventually_validation_proto_set)
-
-        print()
-        print()
-        print(world)
 
         self._stopper()

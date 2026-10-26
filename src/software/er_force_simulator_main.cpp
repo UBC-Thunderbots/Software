@@ -2,6 +2,7 @@
 
 #include <boost/program_options.hpp>
 #include <fstream>
+#include <queue>
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
@@ -139,8 +140,68 @@ int main(int argc, char** argv)
         std::mutex simulator_mutex;
 
         // World Buffer
-        TbotsProto::World blue_vision;
-        TbotsProto::World yellow_vision;
+        std::queue<TbotsProto::World> blue_visions;
+        std::queue<TbotsProto::World> yellow_visions;
+
+        std::queue<TbotsProto::PrimitiveSet> blue_prims;
+        std::queue<TbotsProto::PrimitiveSet> yellow_prims;
+
+        bool other_fs_received{false};
+
+        auto avah_ack_output =
+            ThreadedProtoUnixSender<TbotsProto::AvahAck>(runtime_dir + "/avah_ack");
+
+        auto avah_send_if_both_blue = [&]()
+        {
+            if (blue_visions.empty() || blue_prims.empty())
+            {
+                return;
+            }
+
+            auto& world = blue_visions.front();
+            auto& prim  = blue_prims.front();
+
+            {
+                er_force_sim->setBlueRobotPrimitiveSet(
+                    prim, std::make_unique<TbotsProto::World>(world));
+            }
+
+            blue_visions.pop();
+            blue_prims.pop();
+
+            if (other_fs_received)
+            {
+                avah_ack_output.sendProto(TbotsProto::AvahAck{});
+                LOG(INFO) << "SENT ACK";
+            }
+            other_fs_received = !other_fs_received;
+        };
+
+        auto avah_send_if_both_yellow = [&]()
+        {
+            if (yellow_visions.empty() || yellow_prims.empty())
+            {
+                return;
+            }
+
+            auto& world = yellow_visions.front();
+            auto& prim  = yellow_prims.front();
+
+            {
+                er_force_sim->setYellowRobotPrimitiveSet(
+                    prim, std::make_unique<TbotsProto::World>(world));
+            }
+
+            yellow_visions.pop();
+            yellow_prims.pop();
+
+            if (other_fs_received)
+            {
+                avah_ack_output.sendProto(TbotsProto::AvahAck{});
+                LOG(INFO) << "SENT ACK";
+            }
+            other_fs_received = !other_fs_received;
+        };
 
         // Outputs
         // SSL Wrapper Output
@@ -181,7 +242,7 @@ int main(int argc, char** argv)
             runtime_dir + WORLD_STATE_PATH,
             [&](TbotsProto::WorldState input)
             {
-                AVAH_LOG("Received world state");
+                // AVAH_LOG("Received world state");
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
 
@@ -202,20 +263,22 @@ int main(int argc, char** argv)
             runtime_dir + BLUE_WORLD_PATH,
             [&](TbotsProto::World input)
             {
-                AVAH_LOG("Received blue world");
+                // AVAH_LOG("Received blue world");
                 // AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
-                blue_vision = input;
+                blue_visions.push(input);
+                avah_send_if_both_blue();
             });
 
         auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
             runtime_dir + YELLOW_WORLD_PATH,
             [&](TbotsProto::World input)
             {
-                AVAH_LOG("Received yellow world");
+                // AVAH_LOG("Received yellow world");
                 // AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
-                yellow_vision = input;
+                yellow_visions.push(input);
+                avah_send_if_both_yellow();
             });
 
         // PrimitiveSet Input: set the primitive set with cached vision
@@ -224,11 +287,11 @@ int main(int argc, char** argv)
                 runtime_dir + YELLOW_PRIMITIVE_SET,
                 [&](TbotsProto::PrimitiveSet input)
                 {
-                    AVAH_LOG("Received yellow primitive set");
+                    // AVAH_LOG("Received yellow primitive set");
                     // AVAH_LOG_PROTO(input);
                     std::scoped_lock lock(simulator_mutex);
-                    er_force_sim->setYellowRobotPrimitiveSet(
-                        input, std::make_unique<TbotsProto::World>(yellow_vision));
+                    yellow_prims.push(input);
+                    avah_send_if_both_yellow();
                 });
 
         auto blue_primitive_set_input =
@@ -236,11 +299,11 @@ int main(int argc, char** argv)
                 runtime_dir + BLUE_PRIMITIVE_SET,
                 [&](TbotsProto::PrimitiveSet input)
                 {
-                    AVAH_LOG("Received blue primitive set");
+                    // AVAH_LOG("Received blue primitive set");
                     // AVAH_LOG_PROTO(input);
                     std::scoped_lock lock(simulator_mutex);
-                    er_force_sim->setBlueRobotPrimitiveSet(
-                        input, std::make_unique<TbotsProto::World>(blue_vision));
+                    blue_prims.push(input);
+                    avah_send_if_both_blue();
                 });
 
         // Simulator Tick Input
@@ -255,8 +318,8 @@ int main(int argc, char** argv)
                 er_force_sim->stepSimulation(
                     Duration::fromMilliseconds(input.milliseconds()));
 
-                AVAH_LOG("Received simulator tick");
-                // AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
+                // AVAH_LOG("Received simulator tick");
+                AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
 
                 LOG(INFO) << "sim elapsed: " << er_force_sim->getTimestamp();
 

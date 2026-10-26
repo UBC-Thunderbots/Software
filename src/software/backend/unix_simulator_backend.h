@@ -37,6 +37,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
 
+    void avah_send_both_if_has();
+
     // ThreadedProtoUnix** to communicate with Thunderscope
     // Inputs
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::VirtualObstacles>>
