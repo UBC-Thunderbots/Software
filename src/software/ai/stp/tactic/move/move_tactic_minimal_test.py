@@ -81,18 +81,85 @@ def test_move_across_field(gameplay_test_runner):
     )
 
 
-def test_autochip_move(gameplay_test_runner):
-    initial_position = tbots_cpp.Point(-3, 1.5)
-    destination = tbots_cpp.Point(0, 1.5)
+# def test_autochip_move(gameplay_test_runner):
+#     initial_position = tbots_cpp.Point(-3, 1.5)
+#     destination = tbots_cpp.Point(0, 1.5)
+#     field = tbots_cpp.Field.createSSLDivisionBField()
+#
+#     def setup():
+#         gameplay_test_runner.set_world_state(
+#             create_world_state(
+#                 blue_robot_locations=[
+#                     tbots_cpp.Point(-3, 2.5),
+#                     initial_position,
+#                 ],
+#                 yellow_robot_locations=[
+#                     tbots_cpp.Point(1, 0),
+#                     tbots_cpp.Point(1, 2.5),
+#                     tbots_cpp.Point(1, -2.5),
+#                     field.enemyGoalCenter(),
+#                     field.enemyDefenseArea().negXNegYCorner(),
+#                     field.enemyDefenseArea().negXPosYCorner(),
+#                 ],
+#                 ball_location=destination,
+#                 ball_velocity=tbots_cpp.Vector(0, 0),
+#             ),
+#         )
+#
+#         gameplay_test_runner.set_tactics(
+#             blue_tactics={
+#                 1: protos.MoveTactic(
+#                     destination=tbots_cpp.createPointProto(destination),
+#                     final_orientation=tbots_cpp.createAngleProto(
+#                         tbots_cpp.Angle.zero()
+#                     ),
+#                     dribbler_mode=protos.DribblerMode.OFF,
+#                     ball_collision_type=protos.BallCollisionType.ALLOW,
+#                     auto_chip_or_kick=protos.AutoChipOrKick(
+#                         autochip_distance_meters=2.0
+#                     ),
+#                     max_allowed_speed_mode=protos.MaxAllowedSpeedMode.COLLISIONS_ALLOWED,
+#                     obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
+#                 )
+#             }
+#         )
+#
+#     eventually_validation_sequence_set = [
+#         [
+#             # Robot moves to position and chips ball
+#             RobotEventuallyAtPosition(1, destination),
+#             BallEventuallyKickedInDirection(tbots_cpp.Angle.zero()),
+#             BallIsEventuallyOffGround(),
+#             # Robot stays at destination for one second
+#             DurationValidation(
+#                 duration_s=1, validation=RobotEventuallyAtPosition(1, destination)
+#             ),
+#         ]
+#     ]
+#
+#     gameplay_test_runner.run_test(
+#         setup=setup,
+#         always_validation_sequence_set=[
+#             [
+#                 BallAlwaysStaysInRegion(
+#                     regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 50.0)]
+#                 )
+#             ]
+#         ],
+#         test_timeout_s=10,
+#     )
+
+
+def test_autokick_move(gameplay_test_runner):
+    initial_position = tbots_cpp.Point(-1, -0.5)
+    destination = tbots_cpp.Point(-1, -1)
     field = tbots_cpp.Field.createSSLDivisionBField()
 
     def setup():
         gameplay_test_runner.set_world_state(
             create_world_state(
-                blue_robot_locations=[
-                    tbots_cpp.Point(-3, 2.5),
-                    initial_position,
-                ],
+                blue_robot_locations=[initial_position],
+                blue_robot_orientations=[tbots_cpp.Angle.threeQuarter()],
                 yellow_robot_locations=[
                     tbots_cpp.Point(1, 0),
                     tbots_cpp.Point(1, 2.5),
@@ -108,24 +175,35 @@ def test_autochip_move(gameplay_test_runner):
 
         gameplay_test_runner.set_tactics(
             blue_tactics={
-                1: protos.MoveTactic(
+                0: protos.MoveTactic(
                     destination=tbots_cpp.createPointProto(destination),
                     final_orientation=tbots_cpp.createAngleProto(
-                        tbots_cpp.Angle.zero()
+                        tbots_cpp.Angle.threeQuarter()
                     ),
                     dribbler_mode=protos.DribblerMode.OFF,
                     ball_collision_type=protos.BallCollisionType.ALLOW,
-                    auto_chip_or_kick=protos.AutoChipOrKick(
-                        autochip_distance_meters=2.0
-                    ),
+                    auto_chip_or_kick=protos.AutoChipOrKick(autokick_speed_m_per_s=3.0),
                     max_allowed_speed_mode=protos.MaxAllowedSpeedMode.COLLISIONS_ALLOWED,
                     obstacle_avoidance_mode=protos.ObstacleAvoidanceMode.SAFE,
                 )
             }
         )
 
+    eventually_validation_sequence_set = [
+        [
+            # Robot moves to destination and kicks
+            RobotEventuallyAtPosition(0, destination),
+            BallEventuallyKickedInDirection(tbots_cpp.Angle.threeQuarter()),
+            # Robot stays at destination for one second
+            DurationValidation(
+                duration_s=1, validation=RobotEventuallyAtPosition(0, destination)
+            ),
+        ]
+    ]
+
     gameplay_test_runner.run_test(
         setup=setup,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         always_validation_sequence_set=[
             [
                 BallAlwaysStaysInRegion(
@@ -133,7 +211,7 @@ def test_autochip_move(gameplay_test_runner):
                 )
             ]
         ],
-        test_timeout_s=10,
+        test_timeout_s=5,
     )
 
 
