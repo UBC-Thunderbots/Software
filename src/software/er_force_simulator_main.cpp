@@ -24,7 +24,7 @@ static int i{0};
 [[maybe_unused]] void AVAH_LOG(auto x)
 {
     std::ofstream out{path, std::ios::app};
-    out << i++ << ": " << x << "\n";
+    out << i++ << ": " << x << "\n\n";
     out.close();
 }
 
@@ -146,61 +146,47 @@ int main(int argc, char** argv)
         std::queue<TbotsProto::PrimitiveSet> blue_prims;
         std::queue<TbotsProto::PrimitiveSet> yellow_prims;
 
-        bool other_fs_received{false};
-
         auto avah_ack_output =
             ThreadedProtoUnixSender<TbotsProto::AvahAck>(runtime_dir + "/avah_ack");
 
-        auto avah_send_if_both_blue = [&]()
+        auto avah_send_if_both = [&]()
         {
-            if (blue_visions.empty() || blue_prims.empty())
+            if (blue_visions.empty() || blue_prims.empty() || yellow_visions.empty() ||
+                yellow_prims.empty())
             {
                 return;
             }
 
-            auto& world = blue_visions.front();
-            auto& prim  = blue_prims.front();
+            {
+                auto& world = blue_visions.front();
+                auto& prim  = blue_prims.front();
+                AVAH_LOG("Received blue vision");
+                AVAH_LOG_PROTO(world);
+                AVAH_LOG("Received blue prim");
+                AVAH_LOG_PROTO(prim);
+
+                er_force_sim->setBlueRobotPrimitiveSet(
+                    prim, std::make_unique<TbotsProto::World>(world));
+            }
 
             {
-                er_force_sim->setBlueRobotPrimitiveSet(
+                auto& world = yellow_visions.front();
+                auto& prim  = yellow_prims.front();
+                AVAH_LOG("Received yellow vision");
+                AVAH_LOG_PROTO(world);
+                AVAH_LOG("Received yellow prim");
+                AVAH_LOG_PROTO(prim);
+
+                er_force_sim->setYellowRobotPrimitiveSet(
                     prim, std::make_unique<TbotsProto::World>(world));
             }
 
             blue_visions.pop();
             blue_prims.pop();
-
-            if (other_fs_received)
-            {
-                avah_ack_output.sendProto(TbotsProto::AvahAck{});
-                LOG(INFO) << "SENT ACK";
-            }
-            other_fs_received = !other_fs_received;
-        };
-
-        auto avah_send_if_both_yellow = [&]()
-        {
-            if (yellow_visions.empty() || yellow_prims.empty())
-            {
-                return;
-            }
-
-            auto& world = yellow_visions.front();
-            auto& prim  = yellow_prims.front();
-
-            {
-                er_force_sim->setYellowRobotPrimitiveSet(
-                    prim, std::make_unique<TbotsProto::World>(world));
-            }
-
             yellow_visions.pop();
             yellow_prims.pop();
-
-            if (other_fs_received)
-            {
-                avah_ack_output.sendProto(TbotsProto::AvahAck{});
-                LOG(INFO) << "SENT ACK";
-            }
-            other_fs_received = !other_fs_received;
+            AVAH_LOG("Send avah ack");
+            avah_ack_output.sendProto(TbotsProto::AvahAck{});
         };
 
         // Outputs
@@ -234,15 +220,14 @@ int main(int argc, char** argv)
 
         bool has_sent_world_state_trigger = false;
 
-        LOG(INFO) << "Start up";
-
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
             runtime_dir + WORLD_STATE_PATH,
             [&](TbotsProto::WorldState input)
             {
-                // AVAH_LOG("Received world state");
+                AVAH_LOG("Received world state");
+                AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
 
@@ -267,7 +252,7 @@ int main(int argc, char** argv)
                 // AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
                 blue_visions.push(input);
-                avah_send_if_both_blue();
+                avah_send_if_both();
             });
 
         auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
@@ -278,7 +263,7 @@ int main(int argc, char** argv)
                 // AVAH_LOG_PROTO(input);
                 std::scoped_lock lock(simulator_mutex);
                 yellow_visions.push(input);
-                avah_send_if_both_yellow();
+                avah_send_if_both();
             });
 
         // PrimitiveSet Input: set the primitive set with cached vision
@@ -291,7 +276,7 @@ int main(int argc, char** argv)
                     // AVAH_LOG_PROTO(input);
                     std::scoped_lock lock(simulator_mutex);
                     yellow_prims.push(input);
-                    avah_send_if_both_yellow();
+                    avah_send_if_both();
                 });
 
         auto blue_primitive_set_input =
@@ -303,7 +288,7 @@ int main(int argc, char** argv)
                     // AVAH_LOG_PROTO(input);
                     std::scoped_lock lock(simulator_mutex);
                     blue_prims.push(input);
-                    avah_send_if_both_blue();
+                    avah_send_if_both();
                 });
 
         // Simulator Tick Input
@@ -318,13 +303,13 @@ int main(int argc, char** argv)
                 er_force_sim->stepSimulation(
                     Duration::fromMilliseconds(input.milliseconds()));
 
-                // AVAH_LOG("Received simulator tick");
-                AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
-
-                LOG(INFO) << "sim elapsed: " << er_force_sim->getTimestamp();
+                AVAH_LOG("Received simulator tick");
+                AVAH_LOG_PROTO(input);
 
                 for (const auto& packet : er_force_sim->getSSLWrapperPackets())
                 {
+                    AVAH_LOG("Sending SSL wrapper packets");
+                    AVAH_LOG_PROTO(packet);
                     blue_ssl_wrapper_output.sendProto(packet);
                     yellow_ssl_wrapper_output.sendProto(packet);
                     common_ssl_wrapper_output.sendProto(packet);
@@ -332,14 +317,20 @@ int main(int argc, char** argv)
 
                 for (const auto packet : er_force_sim->getBlueRobotStatuses())
                 {
+                    AVAH_LOG("Sending blue robot statuses");
+                    AVAH_LOG_PROTO(packet);
                     blue_robot_status_output.sendProto(packet);
                 }
 
                 for (const auto packet : er_force_sim->getYellowRobotStatuses())
                 {
+                    AVAH_LOG("Sending yellow robot statuses");
+                    AVAH_LOG_PROTO(packet);
                     yellow_robot_status_output.sendProto(packet);
                 }
 
+                AVAH_LOG("Sending simulator state");
+                AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
 
