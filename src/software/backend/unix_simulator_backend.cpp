@@ -118,8 +118,6 @@ void UnixSimulatorBackend::avah_send_both_if_has()
         last_world_time_sec.store(world.getMostRecentTimestamp().toSeconds());
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
     {
         primitive_output->sendProto(primitives);
 
