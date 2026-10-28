@@ -49,6 +49,9 @@ cc_binary(
         "//software/networking/unix:threaded_proto_unix_listener",
         "//software/networking/unix:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
+        "//software/simulation/interface:simulator_team_interface",
+        "//software/simulation/interface:udp_ssl_interface",
+        "//software/simulation/interface:unix_primitive_interface",
         "@boost//:program_options",
     ],
 )
