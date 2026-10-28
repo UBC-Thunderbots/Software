@@ -21,8 +21,6 @@ cc_library(
         "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
         "//shared:constants",
-        "//software/embedded/robot_localizer",
-        "//software/embedded/services:imu",
         "//software/physics:velocity_conversion_util",
         "//software/world",
         "//software/world:field",

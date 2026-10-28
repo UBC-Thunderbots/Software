@@ -312,13 +312,16 @@ void ErForceSimulator::setRobots(
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
-    auto& simulated_robots = (side == gameController::Team::BLUE)
-                                 ? blue_simulated_robots
-                                 : yellow_simulated_robots;
-    simulated_robots.clear();
+    auto* simulated_robots = &yellow_simulated_robots;
+    if (side == gameController::Team::BLUE)
+    {
+        simulated_robots = &blue_simulated_robots;
+    }
+
+    simulated_robots->clear();
     for (auto& [id, robot_state] : robots)
     {
-        simulated_robots.try_emplace(id, id, robot_constants);
+        simulated_robots->try_emplace(id, id, robot_constants);
     }
 }
 
@@ -396,13 +399,15 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     for (auto& [robot_id, simulated_robot] : simulated_robots)
     {
         const auto robot_state_it = robot_map.find(robot_id);
-        const RobotState true_state =
-            (robot_state_it != robot_map.end())
-                ? robot_state_it->second
-                : RobotState(Point(), Vector(), Angle::zero(), AngularVelocity::zero());
+        if (robot_state_it == robot_map.end())
+        {
+            LOG(WARNING) << "Simulated robot with ID " << robot_id
+                         << " has no state in the simulator, skipping it";
+            continue;
+        }
 
         const TbotsProto::DirectControlPrimitive direct_control =
-            simulated_robot.tick(true_state, time_step);
+            simulated_robot.tick(robot_state_it->second, time_step);
 
         auto command = *getRobotCommandFromDirectControl(
             robot_id,
