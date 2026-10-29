@@ -18,6 +18,7 @@ class EspHal final : public PowerHAL
     uint32_t micros() const override;
     bool startChickerPulse(ChickerOutput output, uint32_t pulse_width_us) override;
     void stopChickerPulse() override;
+    bool isChickerPulseActive() const override;
     bool getBreakBeamTripped() override;
     void setDribblerPwm(uint8_t duty_cycle) override;
     void setCapacitorCharging(bool enabled) override;
