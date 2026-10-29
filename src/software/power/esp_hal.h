@@ -27,10 +27,6 @@ class EspHal final : public PowerHAL
     float getCurrentDrawAmp() override;
 
    private:
-    /**
-     * Hardware timer ISR (placed in IRAM) that drives both chicker pins low
-     * when the one-shot pulse duration elapses and clears pulse_active_.
-     */
     static void IRAM_ATTR pulseTimerISR();
 
     /** Configures chicker and break-beam GPIO pins and attaches pulse_timer_. */
@@ -42,13 +38,9 @@ class EspHal final : public PowerHAL
     /** Initializes I2C and the LTC4151 power monitor. */
     void initializePowerMonitor();
 
-    /** One-shot hardware timer for chicker pulse cutoff. */
     hw_timer_t* pulse_timer_ = nullptr;
-    /** True while a chicker pulse is in flight; guarded by timer_mux_. */
     volatile bool pulse_active_ = false;
-    /** Spinlock synchronizing pulse_active_ between main loop and pulseTimerISR. */
     portMUX_TYPE timer_mux_ = portMUX_INITIALIZER_UNLOCKED;
-    /** I2C power monitor driver for battery voltage and current draw. */
     LTC4151 monitor_;
 
     /** Active singleton instance used by static ISRs to access member state. */
