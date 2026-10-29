@@ -1,11 +1,9 @@
 #ifdef PLATFORMIO_BUILD
-#include "charger.h"
-#include "chicker.h"
 #include "constants_platformio.h"
 #include "control_executor.h"
-#include "dribbler.h"
+#include "esp_hal.h"
+#include "power_controller.h"
 #include "power_frame_msg_platformio.h"
-#include "power_monitor.h"
 #include "proto/power_frame_msg.nanopb.h"
 #include "proto/robot_status_msg.nanopb.h"
 #include "uart_framing_platformio.h"
@@ -14,14 +12,15 @@
 #include "proto/robot_status_msg.nanopb.h"
 #include "shared/constants.h"
 #include "shared/uart_framing/uart_framing.hpp"
-#include "software/power/charger.h"
-#include "software/power/chicker.h"
 #include "software/power/control_executor.h"
-#include "software/power/dribbler.h"
-#include "software/power/power_monitor.h"
+#include "software/power/esp/esp_hal.h"
+#include "software/power/power_controller.h"
 #endif
 
 #include <Arduino.h>
+
+#include <memory>
+#include <vector>
 
 #ifdef DEBUG_POWERLOOP
 /**
@@ -38,23 +37,18 @@ bool receiving;
 
 uint32_t sequence_num;
 
-std::shared_ptr<Charger> charger;
-std::shared_ptr<Chicker> chicker;
-std::shared_ptr<PowerMonitor> monitor;
+std::shared_ptr<EspHal> power_hal;
+std::shared_ptr<PowerController> power_controller;
 std::shared_ptr<ControlExecutor> executor;
-std::shared_ptr<Dribbler> dribbler;
 
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
-    receiving    = false;
-    sequence_num = 0;
-    charger      = std::make_shared<Charger>();
-    chicker      = std::make_shared<Chicker>(charger);
-    monitor      = std::make_shared<PowerMonitor>();
-    executor     = std::make_shared<ControlExecutor>(charger, chicker);
-    dribbler     = std::make_shared<Dribbler>();
-    charger->setCapacitorPin(HIGH);
+    receiving        = false;
+    sequence_num     = 0;
+    power_hal        = std::make_shared<EspHal>();
+    power_controller = std::make_shared<PowerController>(*power_hal);
+    executor         = std::make_shared<ControlExecutor>(*power_controller);
 }
 
 void loop()
@@ -79,7 +73,7 @@ void loop()
                     else if (frame.which_power_msg ==
                              TbotsProto_PowerFrame_dribbler_control_tag)
                     {
-                        dribbler->setTargetSpeed(
+                        power_controller->setDribblerTargetSpeed(
                             frame.power_msg.dribbler_control.dribbler_speed);
                     }
                 }
@@ -98,13 +92,13 @@ void loop()
         }
     }
 
-    dribbler->update();
-    charger->update();
+    power_controller->update();
 
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
-        monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), sequence_num++, chicker->getBreakBeamTripped());
+        power_hal->getBatteryVoltage(), power_hal->getCapacitorVoltage(),
+        power_hal->getCurrentDrawAmp(), sequence_num++,
+        power_hal->getBreakBeamTripped());
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);
