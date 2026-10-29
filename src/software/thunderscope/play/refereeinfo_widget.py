@@ -15,6 +15,9 @@ class RefereeInfoWidget(QtWidgets.QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
+    # TeamInfo field holding the remaining time of each active yellow card
+    YELLOW_CARD_TIMES_FIELD = "yellow_card_times"
+
     def __init__(self, buffer_size: int = 1) -> None:
         """Shows the referee information
 
@@ -39,11 +42,12 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         self.team_info = defaultdict(dict)
 
     @staticmethod
-    def _format_field(team_info, field_name: str) -> str:
-        """Return a display string for one TeamInfo field.
+    def _format_field(team_info: protos.Referee.TeamInfo, field_name: str) -> str:
+        """Format one TeamInfo field for display in the referee table.
 
-        Works even if the field is unset or an empty list, so both
-        teams always have a value for every row.
+        The table lists every TeamInfo field for both teams, not just the fields 
+        that are populated, so this returns a default "-" for unset fields and
+        empty repeated fields instead of leaving the row missing
 
         :param team_info: the TeamInfo proto for one team
         :param field_name: the name of the field to format
@@ -52,9 +56,10 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         value = getattr(team_info, field_name)
         field = team_info.DESCRIPTOR.fields_by_name[field_name]
 
+        # Repeated (list) fields have no HasField(), so check for an empty list
         if field.is_repeated:
-            if field_name == "yellow_card_times":
-                return ", ".join(f"{t / 1_000_000:.1f}s" for t in value) or "-"
+            if field_name == RefereeInfoWidget.YELLOW_CARD_TIMES_FIELD:
+                return ", ".join(f"{t * SECONDS_PER_MICROSECOND:.1f}s" for t in value) or "-"
             return ", ".join(str(v) for v in value) or "-"
 
         return str(value) if team_info.HasField(field_name) else "-"
@@ -85,8 +90,8 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         set_table_data(
             {
                 "Team Info": field_names,
-                "Blue": [self._format_field(referee.blue, f) for f in field_names],
-                "Yellow": [self._format_field(referee.yellow, f) for f in field_names],
+                "Blue": [RefereeInfoWidget._format_field(referee.blue, f) for f in field_names],
+                "Yellow": [RefereeInfoWidget._format_field(referee.yellow, f) for f in field_names],
             },
             self.referee_table,
             RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
