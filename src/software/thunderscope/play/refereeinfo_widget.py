@@ -45,7 +45,7 @@ class RefereeInfoWidget(QtWidgets.QWidget):
     def _format_field(team_info: protos.Referee.TeamInfo, field_name: str) -> str:
         """Format one TeamInfo field for display in the referee table.
 
-        The table lists every TeamInfo field for both teams, not just the fields 
+        The table lists every TeamInfo field for both teams, not just the fields
         that are populated, so this returns a default "-" for unset fields and
         empty repeated fields instead of leaving the row missing
 
@@ -59,7 +59,10 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         # Repeated (list) fields have no HasField(), so check for an empty list
         if field.is_repeated:
             if field_name == RefereeInfoWidget.YELLOW_CARD_TIMES_FIELD:
-                return ", ".join(f"{t * SECONDS_PER_MICROSECOND:.1f}s" for t in value) or "-"
+                return (
+                    ", ".join(f"{t * SECONDS_PER_MICROSECOND:.1f}s" for t in value)
+                    or "-"
+                )
             return ", ".join(str(v) for v in value) or "-"
 
         return str(value) if team_info.HasField(field_name) else "-"
@@ -90,8 +93,14 @@ class RefereeInfoWidget(QtWidgets.QWidget):
         set_table_data(
             {
                 "Team Info": field_names,
-                "Blue": [RefereeInfoWidget._format_field(referee.blue, f) for f in field_names],
-                "Yellow": [RefereeInfoWidget._format_field(referee.yellow, f) for f in field_names],
+                "Blue": [
+                    RefereeInfoWidget._format_field(referee.blue, f)
+                    for f in field_names
+                ],
+                "Yellow": [
+                    RefereeInfoWidget._format_field(referee.yellow, f)
+                    for f in field_names
+                ],
             },
             self.referee_table,
             RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
