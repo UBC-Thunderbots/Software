@@ -139,26 +139,17 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     {
         PosMeasurement pos_measurement(best_robot_detection->position.x(),
                                        best_robot_detection->position.y());
-        AngMeasurement revolution_test(best_robot_detection->orientation.toRadians());
-        // To keep Kalman filter linear, we must add revolutions. Otherwise, the Kalman
-        // filter cannot process a rotation, where it would exceed 2pi and return to 0.
-
-        // TODO: fix ts because ts broken asf
-        if ((prev_ang_measurement.has_value()) &&
-            (best_robot_detection->orientation < Angle::quarter()) &&
-            (Angle::fromRadians((*prev_ang_measurement)(0)) > Angle::threeQuarter()))
-        {
-            ++revolutions;
-        }
-        if ((prev_ang_measurement.has_value()) &&
-            (best_robot_detection->orientation > Angle::threeQuarter()) &&
-            (Angle::fromRadians((*prev_ang_measurement)(0)) < Angle::quarter()))
-        {
-            --revolutions;
-        }
-
-        AngMeasurement ang_measurement(best_robot_detection->orientation.toRadians() +
-                                       2 * M_PI * revolutions);
+        // Vision reports orientation wrapped to [-pi, pi], but the Kalman filter is
+        // linear and would see a jump of ~2pi whenever the robot turns across the wrap
+        // point. We unwrap the detection onto the estimate by adding only the shortest
+        // signed difference to it, so the innovation always lies within [-pi, pi].
+        const double predicted_orientation = ang_kalman_filter.state_estimate(0);
+        const Angle orientation_innovation =
+            (best_robot_detection->orientation -
+             Angle::fromRadians(predicted_orientation))
+                .clamp();
+        AngMeasurement ang_measurement(predicted_orientation +
+                                       orientation_innovation.toRadians());
 
         // The first detection is all we know, so we start the estimate on it rather than
         // blending it against a state we never had grounds for
@@ -210,7 +201,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         ang_kalman_filter.state_estimate;
     const Point robot_position(pos_state(0), pos_state(1));
     const Vector robot_velocity(pos_state(2), pos_state(3));
-    const Angle robot_orientation = Angle::fromRadians(ang_state(0)).mod(Angle::full());
+    const Angle robot_orientation = Angle::fromRadians(ang_state(0)).clamp();
     const AngularVelocity robot_angular_velocity =
         AngularVelocity::fromRadians(ang_state(1));
     bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
@@ -326,19 +317,18 @@ void RobotFilter::reset(const PosMeasurement& pos_measurement,
 
     pos_kalman_filter.state_estimate << pos_measurement(0), pos_measurement(1), 0, 0;
     ang_kalman_filter.state_estimate
-        << Angle::fromRadians(ang_measurement(0)).mod(Angle::full()).toRadians(),
+        << Angle::fromRadians(ang_measurement(0)).clamp().toRadians(),
         0;
     pos_kalman_filter.state_covariance = POS_INITIAL_COVARIANCE;
     ang_kalman_filter.state_covariance = ANG_INITIAL_COVARIANCE;
 
-    revolutions          = 0;
     consecutive_outliers = 0;
     // The reset measurement is now what the estimate is built on, so it becomes the
     // reference for the next timestep. Leaving the old timestamp here would make the
     // next predict() jump forward by the whole rejection streak.
     prev_pos_measurement = pos_measurement;
     prev_ang_measurement = AngMeasurement::Constant(
-        Angle::fromRadians(ang_measurement(0)).mod(Angle::full()).toRadians());
+        Angle::fromRadians(ang_measurement(0)).clamp().toRadians());
     prev_detection_timestamp = current_time;
     last_predict_timestamp   = current_time;
 }

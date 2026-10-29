@@ -72,9 +72,6 @@ class RobotFilter
     // No control
     static constexpr int CONTROL_SIZE = 1;
 
-    // Counter to keep track of revolutions, to unwrap to feed to Kalman filter
-    int revolutions = 0;
-
     using PosKalmanFilter =
         LinearKalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
     using AngKalmanFilter =

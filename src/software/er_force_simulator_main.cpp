@@ -14,7 +14,7 @@
 
 // CSV file that the filtered robot state is logged to, alongside the ground truth
 // robot state from the simulator, for evaluating the robot filter
-static const std::string ROBOT_FILTER_CSV_FILE_NAME = "realistic_robot_filter_v1.csv";
+static const std::string ROBOT_FILTER_CSV_FILE_NAME = "realistic_robot_filter_v4.csv";
 
 // Wraps an angle to [-pi, pi] so detected and actual orientations are directly
 // comparable (e.g. -3.1 rad and 3.1 rad aren't reported as a ~6.2 rad error)
