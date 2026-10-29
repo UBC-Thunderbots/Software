@@ -97,8 +97,7 @@ void loop()
     // Read sensor values. These are all instantaneous
     TbotsProto_PowerStatus status = createNanoPbPowerStatus(
         power_hal->getBatteryVoltage(), power_hal->getCapacitorVoltage(),
-        power_hal->getCurrentDrawAmp(), sequence_num++,
-        power_hal->getBreakBeamTripped());
+        power_hal->getCurrentDrawAmp(), sequence_num++, power_hal->getBreakBeamTripped());
 
     // Write sensor values out to Serial
     TbotsProto_PowerFrame status_frame = createUartFrame(status);
