@@ -30,6 +30,8 @@ class PowerHAL
     virtual bool startChickerPulse(ChickerOutput output, uint32_t pulse_width_us) = 0;
     /** Forces both outputs low and cancels any active pulse. */
     virtual void stopChickerPulse() = 0;
+    /** True while a chicker pulse is currently active. */
+    virtual bool isChickerPulseActive() const = 0;
 
     // Chicker break beam
     /** True when the break beam is tripped. */
