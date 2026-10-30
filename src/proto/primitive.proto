@@ -97,7 +97,6 @@ message PowerControl
             float chip_pulse_width           = 5;
         };
     }
-    reserved 2;
     ChickerControl chicker = 1;
 }
 
@@ -113,10 +112,8 @@ message Primitive
     // Sequence number for the primitive
     uint64 sequence_number = 4;
 
-    reserved 5;
-
     // Epoch timestamp when primitives were assigned
-    Timestamp time_sent = 6;
+    Timestamp time_sent = 5;
 }
 
 message MovePrimitive
