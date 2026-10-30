@@ -260,6 +260,8 @@ class Colors:
     SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
+    SIM_YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 150)
+    SIM_BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 150)
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
