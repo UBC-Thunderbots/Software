@@ -118,7 +118,6 @@ message MotorStatus
 /* Data about the network connection with the robots, including network-derived values */
 message NetworkStatus
 {
-
     // Indicates the time elapsed since the last vision packet was received in ms
     double ms_since_last_vision_received = 1;
 
@@ -136,7 +135,7 @@ message PowerStatus
     float battery_voltage   = 1;
     float capacitor_voltage = 2;
     // voltage on the robot’s capacitor, in volts.
-    float current_draw = 3;
+    float current_draw     = 3;
     uint32 sequence_num    = 4;
     bool breakbeam_tripped = 5;
 }
