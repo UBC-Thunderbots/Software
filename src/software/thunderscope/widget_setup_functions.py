@@ -3,6 +3,7 @@ import os
 from typing import Any, Optional
 
 import proto.import_all_protos as protos
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from pyqtgraph.dockarea.Dock import Dock, DockLabel
 from software.py_constants import BALL_MAX_SPEED_METERS_PER_SECOND
 from software.thunderscope import dock_style
@@ -81,8 +82,13 @@ def setup_gl_widget(
     :param send_sync_message: Whether to synchronize Thunderscope with a listener
     :return: The GLWidget
     """
-    # Create ProtoPlayer if replay is enabled
-    player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
+    # Create ProtoPlayer if replay is enabled. Hold playback until the layer
+    # buffers below are registered, otherwise a short log is consumed first.
+    player = (
+        ProtoPlayer(replay_log, full_system_proto_unix_io, autoplay=False)
+        if replay
+        else None
+    )
 
     # Create widget
     gl_widget = GLWidget(
@@ -149,7 +155,7 @@ def setup_gl_widget(
     )
 
     gl_widget.add_layer(world_layer)
-    gl_widget.add_layer(simulator_layer, False)
+    gl_widget.add_layer(simulator_layer, replay)
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(draw_obstacle_layer, False)
@@ -209,6 +215,8 @@ def setup_gl_widget(
         (protos.World, tactic_layer.world_buffer),
         (protos.PlayInfo, tactic_layer.play_info_buffer),
         (protos.ValidationProtoSet, validation_layer.validation_set_buffer),
+        (protos.Referee, simulator_layer.referee_buffer),
+        (SimulatorState, simulator_layer.simulator_state_buffer),
         (protos.SimulationState, simulation_control_toolbar.simulation_state_buffer),
         (protos.CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (protos.World, trail_layer.world_buffer),
@@ -218,6 +226,9 @@ def setup_gl_widget(
         (protos.World, referee_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
+
+    if player is not None:
+        player.play()
 
     return gl_widget
 
