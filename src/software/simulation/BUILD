@@ -12,6 +12,8 @@ cc_library(
     data = [
         "//extlibs/er_force_sim/config/simulator:2020.txt",
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
+        "//extlibs/er_force_sim/config/simulator:default.txt",
+        "//extlibs/er_force_sim/config/simulator:realistic.txt",
     ],
     deps = [
         ":simulated_robot",
@@ -91,13 +93,13 @@ cc_library(
     deps = [
         ":simulated_imu",
         ":simulated_motor",
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_geometry",
         "//shared:constants",
         "//shared:robot_constants",
         "//software/embedded:primitive_executor",
         "//software/embedded/robot_localizer",
-        "//software/embedded/services:imu",
         "//software/time:duration",
         "//software/world:robot_state",
     ],

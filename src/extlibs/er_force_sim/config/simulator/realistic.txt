@@ -1,0 +1,33 @@
+# values from
+# https://github.com/robotics-erlangen/framework/blob/master/config/simulator-realism/Realistic.txt
+
+stddev_ball_p: 0.0014
+stddev_robot_p: 0.0013
+stddev_robot_phi: 0.01
+stddev_ball_area: 6.5
+enable_invisible_ball: true
+ball_visibility_threshold: 0.4
+camera_overlap: 1
+dribbler_ball_detections: 0.05
+camera_position_error: 0.1
+robot_command_loss: 0.03
+robot_response_loss: 0.1
+missing_ball_detections: 0.02
+vision_delay: 35000000 # ns
+vision_processing_time: 10000000  # ns
+simulate_dribbling: false
+
+robot_sensor_noise {
+  imu {
+    linear_acceleration_bias_x_m_per_s_2: 0; # currently unused by robot localizer
+    linear_acceleration_bias_y_m_per_s_2: 0; # currently unused by robot localizer
+    linear_acceleration_stddev_m_per_s_2: 0; # currently unused by robot localizer
+    angular_velocity_bias_rad_per_s: 0; # currently unused by robot localizer
+    # Gyro datasheet noise from imu.h
+    angular_velocity_stddev_rad_per_s: 0.001007
+  }
+  motor {
+    # Error from rounding wheel speed to whole RPM. this need to be retuned once actual encoders come
+    wheel_velocity_stddev_m_per_s: 0.001
+  }
+}

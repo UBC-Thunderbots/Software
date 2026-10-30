@@ -1,5 +1,6 @@
 #pragma once
 
+#include "extlibs/er_force_sim/src/protobuf/ssl_simulation_custom_erforce_realism.pb.h"
 #include "software/embedded/primitive_executor.h"
 #include "software/embedded/robot_localizer/robot_localizer.h"
 #include "software/simulation/simulated_imu.h"
@@ -20,12 +21,13 @@ class SimulatedRobot
      *
      * @param robot_id The ID of the robot
      * @param robot_constants The robot constants
-     * @param enable_realism Whether to add sensor noise and execute primitives on the
+     * @param enable_realism Whether to execute primitives on the
      * robot localizer's estimate instead of the true state
+     * @param sensor_noise The noise to add to the sensor readings
      */
     SimulatedRobot(RobotId robot_id,
                    const robot_constants::RobotConstants& robot_constants,
-                   bool enable_realism);
+                   bool enable_realism, const SimulatedRobotSensorNoise& sensor_noise);
 
     /**
      * Starts executing a new primitive.

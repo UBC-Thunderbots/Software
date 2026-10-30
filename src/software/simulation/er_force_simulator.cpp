@@ -79,7 +79,8 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
-      enable_realism(enable_realism)
+      enable_realism(enable_realism),
+      robot_sensor_noise(realism_config->robot_sensor_noise())
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -127,24 +128,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
 
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConfig()
 {
-    auto realism_config = std::make_unique<RealismConfigErForce>();
-    realism_config->set_stddev_ball_p(0);
-    realism_config->set_stddev_robot_p(0);
-    realism_config->set_stddev_robot_phi(0);
-    realism_config->set_stddev_ball_area(0);
-    realism_config->set_enable_invisible_ball(true);
-    realism_config->set_ball_visibility_threshold(0.4f);
-    realism_config->set_camera_overlap(0.3f);
-    realism_config->set_dribbler_ball_detections(0);
-    realism_config->set_camera_position_error(0);
-    realism_config->set_robot_command_loss(0);
-    realism_config->set_robot_response_loss(0);
-    realism_config->set_missing_ball_detections(0);
-    realism_config->set_vision_delay(0);
-    realism_config->set_vision_processing_time(0);
-    realism_config->set_missing_ball_detections(0);
-    realism_config->set_simulate_dribbling(false);
-    return realism_config;
+    return parseRealismConfig("extlibs/er_force_sim/config/simulator/default.txt");
 }
 
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismConfig()
@@ -152,24 +136,7 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismCo
     /* values from
      * https://github.com/robotics-erlangen/framework/blob/master/config/simulator-realism/Realistic.txt
      */
-    auto realism_config = std::make_unique<RealismConfigErForce>();
-    realism_config->set_stddev_ball_p(0.0014f);
-    realism_config->set_stddev_robot_p(0.0013f);
-    realism_config->set_stddev_robot_phi(0.01f);
-    realism_config->set_stddev_ball_area(6.5f);
-    realism_config->set_enable_invisible_ball(true);
-    realism_config->set_ball_visibility_threshold(0.4f);
-    realism_config->set_camera_overlap(1);
-    realism_config->set_dribbler_ball_detections(0.05f);
-    realism_config->set_camera_position_error(0.1f);
-    realism_config->set_robot_command_loss(0.03f);
-    realism_config->set_robot_response_loss(0.1f);
-    realism_config->set_missing_ball_detections(0.05f);
-    realism_config->set_vision_delay(35000000);
-    realism_config->set_vision_processing_time(10000000);
-    realism_config->set_missing_ball_detections(0.02f);
-    realism_config->set_simulate_dribbling(false);
-    return realism_config;
+    return parseRealismConfig("extlibs/er_force_sim/config/simulator/realistic.txt");
 }
 
 void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
@@ -323,7 +290,8 @@ void ErForceSimulator::setRobots(
     simulated_robots->clear();
     for (auto& [id, robot_state] : robots)
     {
-        simulated_robots->try_emplace(id, id, robot_constants, enable_realism);
+        simulated_robots->try_emplace(id, id, robot_constants, enable_realism,
+                                      robot_sensor_noise);
     }
 
     bool& robots_moved =
@@ -582,4 +550,24 @@ std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
             RobotState(position, velocity, orientation, angular_velocity);
     }
     return robot_map;
+}
+
+std::unique_ptr<RealismConfigErForce> ErForceSimulator::parseRealismConfig(
+    const std::string& path)
+{
+    std::ifstream file(path);
+    if (!file)
+    {
+        LOG(FATAL) << "Could not open realism config file " << path;
+    }
+    std::stringstream contents;
+    contents << file.rdbuf();
+
+    auto realism_config = std::make_unique<RealismConfigErForce>();
+    if (!google::protobuf::TextFormat::ParseFromString(contents.str(),
+                                                       realism_config.get()))
+    {
+        LOG(FATAL) << "Could not parse realism config file " << path;
+    }
+    return realism_config;
 }

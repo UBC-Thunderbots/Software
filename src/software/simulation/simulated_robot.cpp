@@ -1,42 +1,33 @@
 #include "software/simulation/simulated_robot.h"
 
-#include <cmath>
-
 #include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"
-#include "software/embedded/services/imu.h"
 
-namespace
-{
-// Datasheet gyroscope noise, which the robot localizer also assumes
-SimulatedImuService::NoiseConfig realisticImuNoise()
-{
-    return {.angular_velocity_stddev_rad_per_s = std::sqrt(ImuService::IMU_VARIANCE)};
-}
 
-// Standard deviation of rounding wheel speeds to whole RPM, as the motor drivers do
-SimulatedMotorService::NoiseConfig realisticMotorNoise(
-    const robot_constants::RobotConstants& robot_constants)
-{
-    const double one_rpm_m_per_s = 2 * M_PI * robot_constants.wheel_radius_meters / 60;
-    return {.wheel_velocity_stddev_m_per_s = one_rpm_m_per_s / std::sqrt(12.0)};
-}
-}  // namespace
-
-SimulatedRobot::SimulatedRobot(const RobotId robot_id,
+SimulatedRobot::SimulatedRobot(RobotId robot_id,
                                const robot_constants::RobotConstants& robot_constants,
-                               const bool enable_realism)
-    : motor_service_(std::make_unique<SimulatedMotorService>(
-          robot_constants,
-          enable_realism ? realisticMotorNoise(robot_constants)
-                         : SimulatedMotorService::NoiseConfig(),
-          robot_id)),
-      imu_service_(std::make_unique<SimulatedImuService>(
-          enable_realism ? realisticImuNoise() : SimulatedImuService::NoiseConfig(),
-          robot_id)),
-      robot_localizer_(enable_realism ? std::make_unique<RobotLocalizer>() : nullptr),
+                               bool enable_realism,
+                               const SimulatedRobotSensorNoise& sensor_noise)
+    : robot_localizer_(enable_realism ? std::make_unique<RobotLocalizer>() : nullptr),
       primitive_executor_(std::make_unique<PrimitiveExecutor>(robot_constants, robot_id))
 {
+    const SimulatedMotorService::NoiseConfig motor_noise{
+        .wheel_velocity_stddev_m_per_s =
+            sensor_noise.motor().wheel_velocity_stddev_m_per_s()};
+    motor_service_ =
+        std::make_unique<SimulatedMotorService>(robot_constants, motor_noise, robot_id);
+
+    const SimulatedImuService::NoiseConfig imu_noise{
+        .angular_velocity_bias_rad_per_s =
+            sensor_noise.imu().angular_velocity_bias_rad_per_s(),
+        .angular_velocity_stddev_rad_per_s =
+            sensor_noise.imu().angular_velocity_stddev_rad_per_s(),
+        .linear_acceleration_bias_m_per_s_2 =
+            Vector(sensor_noise.imu().linear_acceleration_bias_x_m_per_s_2(),
+                   sensor_noise.imu().linear_acceleration_bias_y_m_per_s_2()),
+        .linear_acceleration_stddev_m_per_s_2 =
+            sensor_noise.imu().linear_acceleration_stddev_m_per_s_2()};
+    imu_service_ = std::make_unique<SimulatedImuService>(imu_noise, robot_id);
 }
 
 void SimulatedRobot::setPrimitive(const TbotsProto::Primitive& primitive,

@@ -25,7 +25,7 @@ class ErForceSimulator
      * @param field_type The field type
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
-     * @param enable_realism Whether robots add sensor noise and execute primitives on
+     * @param enable_realism Whether robots execute primitives on
      * the robot localizer's estimate instead of the true state
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
@@ -130,14 +130,18 @@ class ErForceSimulator
     void resetCurrentTime();
 
     /**
-     * Creates the default realism config using erforce simulator's default config
-     * @return a pointer to default realism config
+     * Loads the default realism config from
+     * extlibs/er_force_sim/config/simulator/default.txt
+     *
+     * @return a pointer to the default realism config
      */
     static std::unique_ptr<RealismConfigErForce> createDefaultRealismConfig();
 
     /**
-     * Creates the realistic realism config
-     * @return a pointer to realistic realism config
+     * Loads the realistic realism config from
+     * extlibs/er_force_sim/config/simulator/realistic.txt
+     *
+     * @return a pointer to the realistic realism config
      */
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
@@ -205,6 +209,16 @@ class ErForceSimulator
      */
     void resetMovedRobots(gameController::Team side);
 
+    /**
+     * Parses a realism config from a text-format protobuf file.
+     *
+     * @param path The path to the config file
+     *
+     * @return The realism config
+     */
+    static std::unique_ptr<RealismConfigErForce> parseRealismConfig(
+        const std::string& path);
+
     // Map of Robot id to the simulated robot running its firmware
     std::unordered_map<RobotId, SimulatedRobot> yellow_simulated_robots;
     std::unordered_map<RobotId, SimulatedRobot> blue_simulated_robots;
@@ -231,6 +245,7 @@ class ErForceSimulator
     std::optional<RobotId> yellow_robot_with_ball;
 
     bool enable_realism;
+    SimulatedRobotSensorNoise robot_sensor_noise;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
