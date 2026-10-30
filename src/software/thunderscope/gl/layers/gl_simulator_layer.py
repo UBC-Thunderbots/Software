@@ -5,7 +5,7 @@ import proto.import_all_protos as protos
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from pyqtgraph.Qt import QtGui
 from software.py_constants import BALL_MAX_RADIUS_METERS
-from software.thunderscope.constants import Colors, DepthValues, LINE_WIDTH
+from software.thunderscope.constants import LINE_WIDTH, Colors, DepthValues
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.helpers.observable_list import ObservableList
