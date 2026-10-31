@@ -214,18 +214,18 @@ void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZone
 {
     for (unsigned int i = 0; i < top_zones.size(); i++)
     {
-        debug_shapes.push_back(*createDebugShape(pitch_division_->getZone(top_zones[i]),
-                                                 std::to_string(i + 1),
-                                                 std::to_string(i + 1)));
+        debug_shapes.push_back(
+            *createDebugShapeProto(pitch_division_->getZone(top_zones[i]),
+                                   std::to_string(i + 1), std::to_string(i + 1)));
 
-        debug_shapes.push_back(*createDebugShape(
+        debug_shapes.push_back(*createDebugShapeProto(
             Circle(
                 best_receiving_positions.find(top_zones[i])->second.pass.receiverPoint(),
                 0.15),
             std::to_string(i + 1) + "rpg", std::to_string(i + 1) + "rpg"));
     }
 
-    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
+    LOG(VISUALIZE) << *createDebugShapesProto(debug_shapes);
 }
 
 template <class ZoneEnum>
