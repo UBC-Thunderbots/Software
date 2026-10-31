@@ -7,8 +7,8 @@ from pyqtgraph.Qt.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from software.thunderscope.binary_context_managers.runtime_manager import (
-    runtime_manager_instance,
+from software.thunderscope.binary_context_managers.runtime_service import (
+    runtime_service_instance,
 )
 
 
@@ -23,8 +23,8 @@ class GLRuntimeSelectorDialog(QDialog):
         """
         super().__init__(parent)
 
-        runtime_options = runtime_manager_instance.fetch_installed_runtimes()
-        runtime_config = runtime_manager_instance.fetch_runtime_config()
+        runtime_options = runtime_service_instance.fetch_installed_runtimes()
+        runtime_config = runtime_service_instance.fetch_runtime_config()
 
         # Put selected runtimes from config at start of list
         blue_runtimes = [runtime_config.blue_runtime] + [
@@ -92,7 +92,7 @@ class GLRuntimeSelectorDialog(QDialog):
 
     def _on_done(self) -> None:
         """Commits the selected runtimes and closes the modal."""
-        runtime_manager_instance.load_selected_runtimes(
+        runtime_service_instance.load_selected_runtimes(
             self._yellow_selection, self._blue_selection
         )
 

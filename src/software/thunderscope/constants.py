@@ -385,8 +385,8 @@ class LogLevels(StrEnum):
     FATAL = "FATAL"
 
 
-class RuntimeManagerConstants:
-    """Constants for Runtime Manager"""
+class RuntimeServiceConstants:
+    """Constants for Runtime Service"""
 
     RUNTIME_CONFIG_BLUE_KEY = "blue_runtime_name"
     RUNTIME_CONFIG_YELLOW_KEY = "yellow_runtime_name"

@@ -62,13 +62,21 @@ py_library(
 )
 
 py_library(
-    name = "runtime_manager",
+    name = "runtime_service",
     srcs = [
         "runtime_installer.py",
         "runtime_loader.py",
-        "runtime_manager.py",
+        "runtime_service.py",
     ],
     deps = [
         requirement("requests"),
     ],
+)
+
+py_library(
+    name = "runtime_manifest",
+    srcs = [
+        "runtime_manifest.py",
+    ],
+    data = ["local_runtime.json"],
 )
