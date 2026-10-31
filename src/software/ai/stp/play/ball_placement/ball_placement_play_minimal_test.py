@@ -34,6 +34,10 @@ def test_two_ai_ball_placement(
                 )
             ]
         ],
+        gc_cmd_with_delay=[
+            (0, protos.Command.Type.STOP, SslTeam.UNKNOWN, None),
+            (0, protos.Command.Type.BALL_PLACEMENT, SslTeam.BLUE, ball_placement_point),
+        ],
     )
 
 
@@ -79,17 +83,6 @@ def ball_placement_play_setup(
             ball_location=ball_start_point,
             ball_velocity=tbots_cpp.Vector(0, 0),
         ),
-    )
-
-    # Game Controller Setup
-    gameplay_test_runner.send_gamecontroller_command(
-        gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
-    )
-    # Pass in placement point here - not required for all play tests
-    gameplay_test_runner.send_gamecontroller_command(
-        gc_command=protos.Command.Type.BALL_PLACEMENT,
-        team=SslTeam.BLUE,
-        final_ball_placement_point=ball_placement_point,
     )
 
     # Force play override here

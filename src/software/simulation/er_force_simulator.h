@@ -155,7 +155,7 @@ class ErForceSimulator
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
-        std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+        std::map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
         const RobotState& robot_state);
 
@@ -194,7 +194,7 @@ class ErForceSimulator
      * @return robot control
      */
     SSLSimulationProto::RobotControl updateSimulatorRobots(
-        std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+        std::map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg, const Duration& time_step,
         gameController::Team side);
@@ -218,9 +218,9 @@ class ErForceSimulator
         Duration time_to_ramp);
 
     // Map of Robot id to Primitive Executor
-    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
+    std::map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
         yellow_primitive_executor_map;
-    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
+    std::map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
         blue_primitive_executor_map;
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
@@ -251,8 +251,8 @@ class ErForceSimulator
     // The previously commanded velocity for each robot, kept per team. When ramping is
     // enabled the wheel velocities are ramped open-loop from these setpoints, mirroring
     // the real motor service
-    std::unordered_map<RobotId, LocalVelocity> blue_prev_ramp_velocities;
-    std::unordered_map<RobotId, LocalVelocity> yellow_prev_ramp_velocities;
+    std::map<RobotId, LocalVelocity> blue_prev_ramp_velocities;
+    std::map<RobotId, LocalVelocity> yellow_prev_ramp_velocities;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
