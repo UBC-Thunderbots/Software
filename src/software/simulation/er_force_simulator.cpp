@@ -3,8 +3,10 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
@@ -19,6 +21,33 @@
 #include "software/physics/velocity_conversion_util.h"
 #include "software/simulation/avah_logger.hpp"
 #include "software/world/robot_state.h"
+
+namespace
+{
+/**
+ * Returns the keys of a protobuf map in ascending order.
+ *
+ * google::protobuf::Map is unordered and its iteration order is not stable across
+ * processes. Anything that feeds into simulation state (for example the order robots
+ * are added to the physics world, which affects Bullet's solver iteration order) must
+ * be iterated deterministically or the simulation will not be reproducible.
+ *
+ * @param map The protobuf map to get the sorted keys of
+ * @return The keys of the map, sorted in ascending order
+ */
+template <typename V>
+std::vector<uint32_t> getSortedKeys(const google::protobuf::Map<uint32_t, V>& map)
+{
+    std::vector<uint32_t> keys;
+    keys.reserve(map.size());
+    for (const auto& entry : map)
+    {
+        keys.emplace_back(entry.first);
+    }
+    std::sort(keys.begin(), keys.end());
+    return keys;
+}
+}  // namespace
 
 robot::Specs ErForceSimulator::createRobotSpecs(
     const robot_constants::RobotConstants& robot_constants)
@@ -255,7 +284,7 @@ void ErForceSimulator::setRobots(
         team = simulator_setup_command->mutable_set_team_yellow();
     }
 
-    for (auto& [id, robot_state] : robots)
+    for (uint32_t id : getSortedKeys(robots))
     {
         auto* robot = team->add_robot();
         robot->CopyFrom(robot_specs);
@@ -276,8 +305,9 @@ void ErForceSimulator::setRobots(
     auto command_simulator = std::make_unique<amun::CommandSimulator>();
 
     // Add each robot to be added to the teleport robot repeated field
-    for (auto& [id, robot_state] : robots)
+    for (uint32_t id : getSortedKeys(robots))
     {
+        const auto& robot_state         = robots.at(id);
         auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
         gameController::BotId* robot_id = new gameController::BotId();
         robot_id->set_id(static_cast<int>(id));
@@ -325,7 +355,7 @@ void ErForceSimulator::setRobots(
         yellow_primitive_executor_map.clear();
     }
 
-    for (auto& [id, robot_state] : robots)
+    for (uint32_t id : getSortedKeys(robots))
     {
         if (side == gameController::Team::BLUE)
         {
@@ -352,7 +382,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
         getRobotIdToRobotStateMap(sim_robots, gameController::Team::YELLOW);
 
     yellow_team_world_msg = std::move(world_msg);
-    for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
+    for (uint32_t robot_id : getSortedKeys(primitive_set_msg.robot_primitives()))
     {
         if (robot_map.contains(robot_id))
         {
@@ -372,7 +402,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         getRobotIdToRobotStateMap(sim_robots, gameController::Team::BLUE);
 
     blue_team_world_msg = std::move(world_msg);
-    for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
+    for (uint32_t robot_id : getSortedKeys(primitive_set_msg.robot_primitives()))
     {
         if (robot_map.contains(robot_id))
         {
