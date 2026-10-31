@@ -72,3 +72,11 @@ py_library(
         requirement("requests"),
     ],
 )
+
+py_library(
+    name = "runtime_manifest",
+    srcs = [
+        "runtime_manifest.py",
+    ],
+    data = ["local_runtime.json"],
+)

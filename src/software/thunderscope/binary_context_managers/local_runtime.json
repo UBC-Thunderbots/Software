@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "thunderbots.local",
+  "name": "Current Fullsystem",
+  "version": "local",
+  "monitor": {
+    "kind": "unix_datagram",
+    "sockets": ["sensor_proto", "play_override"],
+    "timeout_seconds": 10
+  },
+  "launch_path": "../../unix_full_system"
+}
