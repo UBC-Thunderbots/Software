@@ -5,7 +5,7 @@
 #include <thread>
 #include <utility>
 
-#include "software/networking/udp/proto_udp_bidrectional.hpp"
+#include "software/networking/udp/proto_udp_bidirectional.hpp"
 
 /** Runs protobuf UDP request/reply handling on an owned IO thread. */
 template <class ReceiveProtoT, class SendProtoT>
