@@ -163,6 +163,12 @@ gdb --args bazel-bin/{simulator_command}
                 self.simulator_runtime_dir, *arg
             )
 
+        # TODO: the simulator now sends each team's robot statuses inside a single
+        # SensorProto together with that tick's vision frame, instead of on separate
+        # RobotStatus sockets (this keeps sensor fusion deterministic). As a result,
+        # Thunderscope no longer receives RobotStatus in simulation, so the breakbeam
+        # indicator is not visualized in the simulated view. Restore it by extracting
+        # SensorProto.robot_status_msgs into a visualization-only buffer here.
         for arg in [
             (BLUE_SENSOR_PROTO_PATH, protos.SensorProto),
             (SIMULATOR_STATE_PATH, SimulatorState),

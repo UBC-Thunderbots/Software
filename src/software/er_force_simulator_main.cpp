@@ -169,6 +169,10 @@ int main(int argc, char** argv)
         // full system has to win a race between two sockets to know about a
         // breakbeam trip before it processes the matching vision frame, which makes
         // the resulting World (and therefore the simulation) nondeterministic.
+        //
+        // TODO: the separate per-team RobotStatus messages were removed, so Thunderscope
+        // no longer receives RobotStatus in simulation and the breakbeam indicator is
+        // not visualized in the simulated view. See simulator.py for how to restore it.
         auto blue_sensor_proto_output =
             ThreadedProtoUnixSender<SensorProto>(runtime_dir + BLUE_SENSOR_PROTO_PATH);
         auto yellow_sensor_proto_output =
