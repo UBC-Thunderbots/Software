@@ -51,6 +51,7 @@ cc_library(
     srcs = ["robot_filter.cpp"],
     hdrs = ["robot_filter.h"],
     deps = [
+        ":linear_kalman_filter",
         ":vision_detection",
         "//software/world:robot",
     ],
