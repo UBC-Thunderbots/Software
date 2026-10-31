@@ -9,8 +9,7 @@ import proto.import_all_protos as protos
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.py_constants import (
     BLUE_PRIMITIVE_SET,
-    BLUE_ROBOT_STATUS_PATH,
-    BLUE_SSL_WRAPPER_PATH,
+    BLUE_SENSOR_PROTO_PATH,
     BLUE_WORLD_PATH,
     SIMULATION_TICK_PATH,
     SIMULATOR_STATE_PATH,
@@ -18,8 +17,7 @@ from software.py_constants import (
     WORLD_STATE_PATH,
     WORLD_STATE_RECEIVED_TRIGGER_PATH,
     YELLOW_PRIMITIVE_SET,
-    YELLOW_ROBOT_STATUS_PATH,
-    YELLOW_SSL_WRAPPER_PATH,
+    YELLOW_SENSOR_PROTO_PATH,
     YELLOW_WORLD_PATH,
 )
 from software.thunderscope.binary_context_managers.util import (
@@ -166,8 +164,7 @@ gdb --args bazel-bin/{simulator_command}
             )
 
         for arg in [
-            (BLUE_SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
-            (BLUE_ROBOT_STATUS_PATH, protos.RobotStatus),
+            (BLUE_SENSOR_PROTO_PATH, protos.SensorProto),
             (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(
@@ -184,8 +181,7 @@ gdb --args bazel-bin/{simulator_command}
             )
 
         for arg in [
-            (YELLOW_SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
-            (YELLOW_ROBOT_STATUS_PATH, protos.RobotStatus),
+            (YELLOW_SENSOR_PROTO_PATH, protos.SensorProto),
             (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(

@@ -4,6 +4,7 @@
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
@@ -156,23 +157,22 @@ int main(int argc, char** argv)
         };
 
         // Outputs
-        // SSL Wrapper Output
-        auto blue_ssl_wrapper_output =
-            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
-                                                                 BLUE_SSL_WRAPPER_PATH);
-        auto yellow_ssl_wrapper_output =
-            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
-                                                                 YELLOW_SSL_WRAPPER_PATH);
+        // SSL Wrapper Output (used by Thunderscope to visualize the simulation)
         auto common_ssl_wrapper_output =
             ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
                                                                  SSL_WRAPPER_PATH);
 
-        // Robot Status Outputs
-        auto blue_robot_status_output = ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
-            runtime_dir + BLUE_ROBOT_STATUS_PATH);
-        auto yellow_robot_status_output =
-            ThreadedProtoUnixSender<TbotsProto::RobotStatus>(runtime_dir +
-                                                             YELLOW_ROBOT_STATUS_PATH);
+        // Per-team SensorProto Output
+        //
+        // Each team gets its vision frame and the robot statuses for that same frame
+        // in a single message. Sending them separately means sensor fusion in the
+        // full system has to win a race between two sockets to know about a
+        // breakbeam trip before it processes the matching vision frame, which makes
+        // the resulting World (and therefore the simulation) nondeterministic.
+        auto blue_sensor_proto_output =
+            ThreadedProtoUnixSender<SensorProto>(runtime_dir + BLUE_SENSOR_PROTO_PATH);
+        auto yellow_sensor_proto_output =
+            ThreadedProtoUnixSender<SensorProto>(runtime_dir + YELLOW_SENSOR_PROTO_PATH);
 
         // Simulator State as World State Output
         auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
@@ -277,27 +277,42 @@ int main(int argc, char** argv)
                 avah::AVAH_LOG("AFTER SIM STEP");
                 avah::AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
 
-                for (const auto& packet : er_force_sim->getSSLWrapperPackets())
+                const auto wrapper_packets       = er_force_sim->getSSLWrapperPackets();
+                const auto blue_robot_statuses   = er_force_sim->getBlueRobotStatuses();
+                const auto yellow_robot_statuses = er_force_sim->getYellowRobotStatuses();
+
+                for (const auto& packet : wrapper_packets)
                 {
                     avah::AVAH_LOG("Sending SSL wrapper packets");
                     avah::AVAH_LOG_PROTO(packet);
-                    blue_ssl_wrapper_output.sendProto(packet);
-                    yellow_ssl_wrapper_output.sendProto(packet);
                     common_ssl_wrapper_output.sendProto(packet);
-                }
 
-                for (const auto packet : er_force_sim->getBlueRobotStatuses())
-                {
-                    avah::AVAH_LOG("Sending blue robot statuses");
-                    avah::AVAH_LOG_PROTO(packet);
-                    blue_robot_status_output.sendProto(packet);
-                }
+                    // The robot statuses describe the state of the robots at the
+                    // instant this vision frame was captured, so stamp them with the
+                    // frame's capture time and hand them over together with the frame
+                    auto blue_sensor_proto                      = SensorProto();
+                    *blue_sensor_proto.mutable_ssl_vision_msg() = packet;
+                    for (auto robot_status : blue_robot_statuses)
+                    {
+                        robot_status.mutable_time_sent()->set_epoch_timestamp_seconds(
+                            packet.detection().t_capture());
+                        *blue_sensor_proto.add_robot_status_msgs() = robot_status;
+                    }
+                    avah::AVAH_LOG("Sending blue sensor proto");
+                    avah::AVAH_LOG_PROTO(blue_sensor_proto);
+                    blue_sensor_proto_output.sendProto(blue_sensor_proto);
 
-                for (const auto packet : er_force_sim->getYellowRobotStatuses())
-                {
-                    avah::AVAH_LOG("Sending yellow robot statuses");
-                    avah::AVAH_LOG_PROTO(packet);
-                    yellow_robot_status_output.sendProto(packet);
+                    auto yellow_sensor_proto                      = SensorProto();
+                    *yellow_sensor_proto.mutable_ssl_vision_msg() = packet;
+                    for (auto robot_status : yellow_robot_statuses)
+                    {
+                        robot_status.mutable_time_sent()->set_epoch_timestamp_seconds(
+                            packet.detection().t_capture());
+                        *yellow_sensor_proto.add_robot_status_msgs() = robot_status;
+                    }
+                    avah::AVAH_LOG("Sending yellow sensor proto");
+                    avah::AVAH_LOG_PROTO(yellow_sensor_proto);
+                    yellow_sensor_proto_output.sendProto(yellow_sensor_proto);
                 }
 
                 avah::AVAH_LOG("Sending simulator state");
