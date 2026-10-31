@@ -58,6 +58,9 @@ message RealismConfigErForce
     // 100 in case er force have some updates w new fields at 17, ...
     // and we want to vendor it.
     optional SimulatedRobotSensorNoise robot_sensor_noise = 100;
+    // Whether simulated robots execute primitives on the robot localizer's estimate
+    // instead of the true state
+    optional bool enable_robot_localizer = 101;
 }
 
 

@@ -6,10 +6,9 @@
 
 SimulatedRobot::SimulatedRobot(RobotId robot_id,
                                const robot_constants::RobotConstants& robot_constants,
-                               bool enable_realism,
+                               bool enable_robot_localizer,
                                const SimulatedRobotSensorNoise& sensor_noise)
-    : robot_localizer_(enable_realism ? std::make_unique<RobotLocalizer>() : nullptr),
-      primitive_executor_(std::make_unique<PrimitiveExecutor>(robot_constants, robot_id))
+    : primitive_executor_(std::make_unique<PrimitiveExecutor>(robot_constants, robot_id))
 {
     const SimulatedMotorService::NoiseConfig motor_noise{
         .wheel_velocity_stddev_m_per_s =
@@ -28,6 +27,11 @@ SimulatedRobot::SimulatedRobot(RobotId robot_id,
         .linear_acceleration_stddev_m_per_s_2 =
             sensor_noise.imu().linear_acceleration_stddev_m_per_s_2()};
     imu_service_ = std::make_unique<SimulatedImuService>(imu_noise, robot_id);
+
+    if (enable_robot_localizer)
+    {
+        robot_localizer_ = std::make_unique<RobotLocalizer>();
+    }
 }
 
 void SimulatedRobot::setPrimitive(const TbotsProto::Primitive& primitive,

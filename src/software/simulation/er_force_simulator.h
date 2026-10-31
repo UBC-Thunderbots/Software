@@ -25,13 +25,10 @@ class ErForceSimulator
      * @param field_type The field type
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
-     * @param enable_realism Whether robots execute primitives on
-     * the robot localizer's estimate instead of the true state
      */
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const robot_constants::RobotConstants& robot_constants,
-                              std::unique_ptr<RealismConfigErForce>& realism_config,
-                              bool enable_realism = false);
+                              std::unique_ptr<RealismConfigErForce>& realism_config);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -244,8 +241,8 @@ class ErForceSimulator
     std::optional<RobotId> blue_robot_with_ball;
     std::optional<RobotId> yellow_robot_with_ball;
 
-    bool enable_realism;
-    SimulatedRobotSensorNoise robot_sensor_noise;
+    const bool enable_robot_localizer;
+    const SimulatedRobotSensorNoise robot_sensor_noise;
 
     const std::string CONFIG_FILE      = "simulator/2020";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

@@ -70,8 +70,7 @@ robot::Specs ErForceSimulator::createRobotSpecs(
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool enable_realism)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
@@ -79,7 +78,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
-      enable_realism(enable_realism),
+      enable_robot_localizer(realism_config->enable_robot_localizer()),
       robot_sensor_noise(realism_config->robot_sensor_noise())
 {
     std::string full_filename = CONFIG_DIRECTORY;
@@ -133,9 +132,6 @@ std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConf
 
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismConfig()
 {
-    /* values from
-     * https://github.com/robotics-erlangen/framework/blob/master/config/simulator-realism/Realistic.txt
-     */
     return parseRealismConfig("extlibs/er_force_sim/config/simulator/realistic.txt");
 }
 
@@ -282,21 +278,21 @@ void ErForceSimulator::setRobots(
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
     auto* simulated_robots = &yellow_simulated_robots;
+    bool* robots_moved     = &yellow_robots_moved;
     if (side == gameController::Team::BLUE)
     {
         simulated_robots = &blue_simulated_robots;
+        robots_moved     = &blue_robots_moved;
     }
 
     simulated_robots->clear();
     for (auto& [id, robot_state] : robots)
     {
-        simulated_robots->try_emplace(id, id, robot_constants, enable_realism,
+        simulated_robots->try_emplace(id, id, robot_constants, enable_robot_localizer,
                                       robot_sensor_noise);
     }
 
-    bool& robots_moved =
-        (side == gameController::Team::BLUE) ? blue_robots_moved : yellow_robots_moved;
-    robots_moved = true;
+    *robots_moved = true;
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
@@ -439,19 +435,21 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
 void ErForceSimulator::resetMovedRobots(gameController::Team side)
 {
-    auto& simulated_robots = (side == gameController::Team::BLUE)
-                                 ? blue_simulated_robots
-                                 : yellow_simulated_robots;
-    bool& robots_moved =
-        (side == gameController::Team::BLUE) ? blue_robots_moved : yellow_robots_moved;
-
-    if (robots_moved)
+    auto* simulated_robots = &yellow_simulated_robots;
+    bool* robots_moved     = &yellow_robots_moved;
+    if (side == gameController::Team::BLUE)
     {
-        for (auto& [robot_id, simulated_robot] : simulated_robots)
+        simulated_robots = &blue_simulated_robots;
+        robots_moved     = &blue_robots_moved;
+    }
+
+    if (*robots_moved)
+    {
+        for (auto& [robot_id, simulated_robot] : *simulated_robots)
         {
             simulated_robot.reset();
         }
-        robots_moved = false;
+        *robots_moved = false;
     }
 }
 

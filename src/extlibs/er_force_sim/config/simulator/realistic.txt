@@ -17,12 +17,13 @@ vision_delay: 35000000 # ns
 vision_processing_time: 10000000  # ns
 simulate_dribbling: false
 
+enable_robot_localizer: true
 robot_sensor_noise {
   imu {
     linear_acceleration_bias_x_m_per_s_2: 0; # currently unused by robot localizer
     linear_acceleration_bias_y_m_per_s_2: 0; # currently unused by robot localizer
     linear_acceleration_stddev_m_per_s_2: 0; # currently unused by robot localizer
-    angular_velocity_bias_rad_per_s: 0; # currently unused by robot localizer
+    angular_velocity_bias_rad_per_s: 0;
     # Gyro datasheet noise from imu.h
     angular_velocity_stddev_rad_per_s: 0.001007
   }
