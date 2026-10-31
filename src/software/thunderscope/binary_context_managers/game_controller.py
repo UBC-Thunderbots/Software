@@ -552,13 +552,13 @@ class Gamecontroller:
         world_state.ball_state.global_position.CopyFrom(
             self.latest_world.game_state.ball_placement_point
         )
-        self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
+        # self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
 
     def __reset_world_state(self) -> None:
         """Resets the robot and ball positions"""
-        self.simulator_proto_unix_io.send_proto(
-            protos.WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
-        )
+        # self.simulator_proto_unix_io.send_proto(
+        #     protos.WorldState, create_default_world_state(num_robots=DIV_B_NUM_ROBOTS)
+        # )
         self.send_gc_command(gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN)
 
     def __update_max_allowed_robots(self, referee: protos.Referee) -> None:
@@ -599,7 +599,7 @@ class Gamecontroller:
                 robot.current_state.global_orientation.radians += math.pi
 
         # Send out updated world state
-        self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
+        # self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
 
     @staticmethod
     def __update_robot_count(

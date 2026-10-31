@@ -413,10 +413,12 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sync_simulation(
-                tscope,
-                0 if args.empty else DIV_B_NUM_ROBOTS,
-            )
+            # sync_simulation(
+            #     tscope,
+            #     0 if args.empty else DIV_B_NUM_ROBOTS,
+            # )
+
+            print("TICKED")
 
             if args.ci_mode:
                 async_sim_ticker(

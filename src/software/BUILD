@@ -45,6 +45,7 @@ cc_binary(
         "//software/networking/unix:threaded_proto_unix_listener",
         "//software/networking/unix:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
+        "//software/simulation:avah_logger",
         "@boost//:program_options",
     ],
 )

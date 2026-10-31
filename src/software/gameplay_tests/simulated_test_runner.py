@@ -79,19 +79,23 @@ class SimulatedTestRunner(TbotsTestRunner):
             protos.WorldStateReceivedTrigger, world_state_received_buffer
         )
 
-        while True:
-            setup()
-
-            try:
-                world_state_received_buffer.get(
-                    block=True, timeout=WORLD_BUFFER_TIMEOUT
-                )
-            except queue.Empty:
-                # Did not receive a response within timeout period
-                continue
-            else:
-                # Received a response from the simulator
-                break
+        setup()
+        time.sleep(1)
+        # while True:
+        #     print("sending world state")
+        #
+        #     try:
+        #         world_state_received_buffer.get(
+        #             block=True, timeout=WORLD_BUFFER_TIMEOUT
+        #         )
+        #     except queue.Empty:
+        #         # Did not receive a response within timeout period
+        #         print("resending ehh")
+        #         raise Exception("ReSENT")
+        #         continue
+        #     else:
+        #         # Received a response from the simulator
+        #         break
 
     @override
     def _runner(
@@ -109,13 +113,16 @@ class SimulatedTestRunner(TbotsTestRunner):
             processing_start_time = time.time()
 
             # Check for new GC commands at this time step
-            for delay, cmd, team in gc_cmd_with_delay:
+            for delay, cmd, team, point in gc_cmd_with_delay:
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
+                    self.gamecontroller.send_gc_command(
+                        gc_command=cmd, team=team, final_ball_placement_point=point
+                    )
                     # remove command from the list
-                    gc_cmd_with_delay.remove((delay, cmd, team))
+                    gc_cmd_with_delay.remove((delay, cmd, team, point))
+                    time.sleep(0.2)
 
             tick = protos.SimulatorTick(
                 milliseconds=TICK_DURATION_S * MILLISECONDS_PER_SECOND

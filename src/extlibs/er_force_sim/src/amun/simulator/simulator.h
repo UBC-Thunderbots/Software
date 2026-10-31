@@ -142,7 +142,7 @@ class camun::simulator::Simulator
 
     std::map<size_t, unsigned int> m_lastFrameNumber;
 
-    std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
+    std::mt19937 rand_shuffle_src = std::mt19937(0);
 };
 
 
