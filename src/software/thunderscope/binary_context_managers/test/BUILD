@@ -18,3 +18,14 @@ py_test(
         requirement("pytest"),
     ],
 )
+
+py_test(
+    name = "runtime_catalog_test",
+    srcs = ["runtime_catalog_test.py"],
+    deps = [
+        ":conftest",
+        "//software/gameplay_tests:util",
+        "//software/thunderscope/binary_context_managers:runtime_catalog",
+        requirement("pytest"),
+    ],
+)
