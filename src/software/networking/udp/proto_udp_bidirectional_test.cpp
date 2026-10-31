@@ -1,10 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <memory>
-
 #include "google/protobuf/wrappers.pb.h"
-#include "software/networking/udp/proto_udp_bidrectional.hpp"
+#include "software/networking/udp/proto_udp_bidirectional.hpp"
 
 TEST(ProtoUdpBidirectionalTest, receives_a_request_and_replies)
 {

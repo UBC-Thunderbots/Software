@@ -157,7 +157,7 @@ cc_library(
 cc_library(
     name = "proto_udp_bidirectional",
     hdrs = [
-        "proto_udp_bidrectional.hpp",
+        "proto_udp_bidirectional.hpp",
     ],
     deps = [
         ":proto_udp_listener",
