@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
+
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
@@ -25,6 +27,75 @@ class ErForceSimulatorTest : public ::testing::Test
     robot_constants::RobotConstants robot_constants =
         robot_constants::createRobotConstants();
 };
+
+class ErForceSimulatorSSLTest : public ErForceSimulatorTest
+{
+   protected:
+    void SetUp() override
+    {
+        auto realism = ErForceSimulator::createDefaultRealismConfig();
+        simulator    = std::make_shared<ErForceSimulator>(
+            TbotsProto::FieldType::DIV_B, robot_constants, realism, true, true, true);
+        simulator->setBlueRobots(
+            TestUtil::createStationaryRobotStatesWithId({Point(-1, 1), Point(-1, 2)}));
+        simulator->setYellowRobots(
+            TestUtil::createStationaryRobotStatesWithId({Point(1, 1)}));
+    }
+
+    static SSLSimulationProto::RobotControl move(RobotId id, float forward)
+    {
+        SSLSimulationProto::RobotControl control;
+        auto* robot = control.add_robot_commands();
+        robot->set_id(id);
+        auto* velocity = robot->mutable_move_command()->mutable_local_velocity();
+        velocity->set_forward(forward);
+        velocity->set_left(0);
+        velocity->set_angular(0);
+        return control;
+    }
+};
+
+TEST_F(ErForceSimulatorSSLTest, commands_survive_ticks_and_teams_remain_isolated)
+{
+    for (int i = 0; i < 40; ++i)
+    {
+        simulator->sendBlueSSLControl(move(0, 1));
+        simulator->sendYellowSSLControl(move(0, -1));
+        simulator->stepSimulation(Duration::fromMilliseconds(5));
+    }
+    const auto state = simulator->getSimulatorState();
+    EXPECT_GT(state.blue_robots(0).v_x(), 0.2);
+    EXPECT_LT(state.yellow_robots(0).v_x(), -0.2);
+    EXPECT_NEAR(state.blue_robots(1).v_x(), 0, 0.05);
+}
+
+TEST_F(ErForceSimulatorSSLTest, invalid_commands_do_not_block_valid_commands)
+{
+    auto control                  = move(99, 1);
+    *control.add_robot_commands() = move(0, 1).robot_commands(0);
+    *control.add_robot_commands() =
+        move(1, std::numeric_limits<float>::quiet_NaN()).robot_commands(0);
+    const auto response = simulator->sendBlueSSLControl(control);
+    ASSERT_EQ(response.errors_size(), 2);
+    EXPECT_EQ(response.errors(0).code(), "UNKNOWN_ROBOT");
+    EXPECT_EQ(response.errors(1).code(), "INVALID_COMMAND");
+    ASSERT_EQ(response.feedback_size(), 1);
+    EXPECT_EQ(response.feedback(0).id(), 0);
+}
+
+TEST_F(ErForceSimulatorSSLTest, feedback_reports_contact_only_for_commanded_robots)
+{
+    simulator->setBallState(BallState(Point(-0.92, 1), Vector(0, 0)));
+    simulator->stepSimulation(Duration::fromMilliseconds(20));
+    const auto other = simulator->sendBlueSSLControl(move(1, 0));
+    ASSERT_EQ(other.feedback_size(), 1);
+    EXPECT_EQ(other.feedback(0).id(), 1);
+    EXPECT_FALSE(other.feedback(0).dribbler_ball_contact());
+    const auto response = simulator->sendBlueSSLControl(move(0, 0));
+    ASSERT_EQ(response.feedback_size(), 1);
+    EXPECT_EQ(response.feedback(0).id(), 0);
+    EXPECT_TRUE(response.feedback(0).dribbler_ball_contact());
+}
 
 TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
