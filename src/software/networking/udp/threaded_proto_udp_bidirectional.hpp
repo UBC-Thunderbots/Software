@@ -41,7 +41,8 @@ class ThreadedProtoUdpBidirectional
         udp.sendTo(message, destination);
     }
 
-    /** Stops and joins the IO thread. Do not call from the recieve callback, and don't call when holding a lock that the recieve callback needs. */
+    /** Stops and joins the IO thread. Do not call from the receive callback, and don't
+     * call when holding a lock that the receive callback needs. */
     void close()
     {
         if (io_thread.joinable())
