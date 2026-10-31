@@ -9,6 +9,7 @@ import time
 from subprocess import Popen, TimeoutExpired
 
 import proto.import_all_protos as protos
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.py_constants import (
     DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
     MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC,
@@ -19,6 +20,7 @@ from software.py_constants import (
     ROBOT_LOG_PATH,
     ROBOT_STATUS_PATH,
     SENSOR_PROTO_PATH,
+    SIMULATOR_STATE_PATH,
     SSL_REFEREE_PATH,
     SSL_WRAPPER_PATH,
     TACTIC_OVERRIDE_PATH,
@@ -272,5 +274,6 @@ gdb --args bazel-bin/{self.full_system}
             (ROBOT_CRASH_PATH, protos.RobotCrash),
             (VIRTUAL_OBSTACLES_UNIX_PATH, protos.VirtualObstacles),
             (REPLAY_BOOKMARK_PATH, protos.ReplayBookmark),
+            (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
