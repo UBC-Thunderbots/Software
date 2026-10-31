@@ -1,15 +1,9 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <condition_variable>
-#include <mutex>
 #include <string>
-#include <thread>
 
-#include "software/logger/logger.h"
-#include "software/networking/udp/network_utils.h"
 #include "software/networking/udp/udp_listener.h"
-#include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT, class SendProtoT>
 class ProtoUdpBidirectional
