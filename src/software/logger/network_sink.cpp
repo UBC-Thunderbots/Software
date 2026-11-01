@@ -48,7 +48,7 @@ void NetworkSink::sendOneLogToNetwork(const g3::LogMessage& log)
     if (TbotsProto::LogLevel_Parse(log.level(), &log_level_proto))
     {
         log_msg_proto->set_log_msg(log.message());
-        log_msg_proto->set_robot_id(static_cast<uint32_t>(robot_id));
+        log_msg_proto->set_robot_id(robot_id);
         log_msg_proto->set_log_level(log_level_proto);
         log_msg_proto->set_file_name(log.file());
         log_msg_proto->set_line_number(static_cast<uint32_t>(std::stoul(log.line())));

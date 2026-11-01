@@ -14,15 +14,6 @@ struct AutoChipOrKick
         double autochip_distance_m;
     };
 
-    AutoChipOrKick() = default;
-
-    // Constructor provided so the union member can be initialized without needing
-    // nested braces (which triggers -Wmissing-braces) at every construction site
-    AutoChipOrKick(AutoChipOrKickMode mode, double value)
-        : auto_chip_kick_mode(mode), autokick_speed_m_per_s(value)
-    {
-    }
-
     bool operator==(const AutoChipOrKick& other) const
     {
         if (auto_chip_kick_mode == other.auto_chip_kick_mode)

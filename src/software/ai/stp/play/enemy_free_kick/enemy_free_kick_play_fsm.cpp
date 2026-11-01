@@ -34,7 +34,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
 
 
     // One tactic is always designated as the free kick defender
-    int num_defenders                      = static_cast<int>(num_tactics) - 1;
+    int num_defenders                      = num_tactics - 1;
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     Point block_kick_point;
 
@@ -74,9 +74,9 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     for (int i = 0; i < num_defenders; i++)
     {
         DefenderAssignment defender_assignment;
-        size_t assignment_index_with_skipped =
-            static_cast<size_t>(i) + assignments_skipped.size();
-        size_t assignment_index_last_assignment = assignments.size() - 1;
+        int assignment_index_with_skipped =
+            static_cast<int>(i + assignments_skipped.size());
+        int assignment_index_last_assignment = static_cast<int>(assignments.size()) - 1;
 
         if (assignment_index_with_skipped < assignment_index_last_assignment)
         {
@@ -91,7 +91,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
             {
                 assignments_skipped.push(defender_assignment);
                 assignment_index_with_skipped =
-                    static_cast<size_t>(i) + assignments_skipped.size();
+                    static_cast<int>(i + assignments_skipped.size());
                 defender_assignment = assignments.at(assignment_index_with_skipped);
             }
         }

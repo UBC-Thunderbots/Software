@@ -98,7 +98,7 @@ class Gamecontroller:
 
         :return: gamecontroller context managed instance
         """
-        command = ["/opt/tbots/bin/gamecontroller", "--timeAcquisitionMode", "ci"]
+        command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
         lock_fd = None
         if not self.use_conventional_port:

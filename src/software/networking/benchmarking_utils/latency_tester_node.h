@@ -39,7 +39,7 @@ class LatencyTesterNode
     /**
      * Cleans up the network resources
      */
-    virtual ~LatencyTesterNode();
+    ~LatencyTesterNode();
 
     /**
      * Sends a message to the other network benchmarking node(s)

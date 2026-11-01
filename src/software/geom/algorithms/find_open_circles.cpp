@@ -6,8 +6,6 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/voronoi_diagram.h"
 
-#include <iterator>
-
 std::vector<Circle> findOpenCircles(const Rectangle& bounding_box,
                                     std::vector<Point> points)
 {

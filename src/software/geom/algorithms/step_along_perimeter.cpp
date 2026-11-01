@@ -18,8 +18,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     auto min_it = std::min_element(polygon_segments.begin(), polygon_segments.end(),
                                    [&start](const auto& a, const auto& b)
                                    { return distance(start, a) < distance(start, b); });
-    std::size_t start_segment_index =
-        static_cast<std::size_t>(std::distance(polygon_segments.begin(), min_it));
+    std::size_t start_segment_index = std::distance(polygon_segments.begin(), min_it);
 
     // finds the point closest to start point on the segment
     Point closest_start = closestPoint(start, polygon_segments[start_segment_index]);

@@ -321,6 +321,16 @@ int main(int argc, char** argv)
 
                 avah::AVAH_LOG("Sending simulator state");
                 avah::AVAH_LOG_PROTO(er_force_sim->getSimulatorState());
+                for (const auto& packet : er_force_sim->getBlueRobotStatuses())
+                {
+                    blue_robot_status_output.sendProto(packet);
+                }
+
+                for (const auto& packet : er_force_sim->getYellowRobotStatuses())
+                {
+                    yellow_robot_status_output.sendProto(packet);
+                }
+
                 simulator_state_output.sendProto(er_force_sim->getSimulatorState());
             });
 

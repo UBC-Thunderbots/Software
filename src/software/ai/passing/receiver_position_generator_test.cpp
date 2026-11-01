@@ -50,8 +50,9 @@ class ReceiverPositionGeneratorTest : public testing::Test
         std::vector<Point> best_receiving_positions;
         for (int i = 0; i < 100; ++i)
         {
-            best_receiving_positions = receiver_position_generator.getBestReceivingPositions(
-                *world, static_cast<unsigned int>(num_positions));
+            best_receiving_positions =
+                receiver_position_generator.getBestReceivingPositions(*world,
+                                                                      num_positions);
         }
         return best_receiving_positions;
     }

@@ -68,15 +68,13 @@ void SensorFusion::processSensorProto(const SensorProto& sensor_msg)
 
     if (sensor_fusion_config.override_game_controller_friendly_goalie_id())
     {
-        RobotId friendly_goalie_id_override =
-            static_cast<RobotId>(sensor_fusion_config.friendly_goalie_id());
+        RobotId friendly_goalie_id_override = sensor_fusion_config.friendly_goalie_id();
         friendly_team.assignGoalie(friendly_goalie_id_override);
     }
 
     if (sensor_fusion_config.override_game_controller_enemy_goalie_id())
     {
-        RobotId enemy_goalie_id_override =
-            static_cast<RobotId>(sensor_fusion_config.enemy_goalie_id());
+        RobotId enemy_goalie_id_override = sensor_fusion_config.enemy_goalie_id();
         enemy_team.assignGoalie(enemy_goalie_id_override);
     }
 }

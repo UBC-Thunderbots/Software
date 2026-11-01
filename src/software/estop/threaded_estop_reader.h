@@ -64,6 +64,10 @@ class ThreadedEstopReader
     // tracks the number of unknown messages received in a row
     unsigned int num_consecutive_status_error = 0;
 
+    // Time between reads
+    unsigned int regular_read_interval_ms;
+
+
     // boost construct for managing io operations
     boost::asio::io_service io_service;
 

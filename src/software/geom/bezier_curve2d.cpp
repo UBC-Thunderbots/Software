@@ -83,10 +83,8 @@ const Vector BezierCurve2d::computePolynomialCoefficients(
 
     for (int m = 0; m <= static_cast<int>(j) - 1; m++)
     {
-        result.setX(result.x() *
-                    static_cast<double>(control_points.size() - static_cast<size_t>(m) - 1));
-        result.setY(result.y() *
-                    static_cast<double>(control_points.size() - static_cast<size_t>(m) - 1));
+        result.setX(result.x() * static_cast<double>(control_points.size() - m - 1));
+        result.setY(result.y() * static_cast<double>(control_points.size() - m - 1));
     }
 
     return result;

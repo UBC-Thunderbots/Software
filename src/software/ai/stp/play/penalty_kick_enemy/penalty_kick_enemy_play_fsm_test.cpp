@@ -17,7 +17,7 @@ TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_THEM);
     world->updateGameState(game_state);
 
-    unsigned int num_tactics = 5;
+    int num_tactics = 5;
     std::shared_ptr<GoalieTactic> goalie_tactic =
         std::make_shared<GoalieTactic>(std::make_shared<TbotsProto::AiConfig>());
 

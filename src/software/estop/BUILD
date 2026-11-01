@@ -14,7 +14,6 @@ platformio_project(
     src = "main.cc",
     board = "micro",
     framework = "arduino",
-    platformio = "//starlark/platformio:platformio",
     deps = [
         "//shared:constants_platformio",
     ],

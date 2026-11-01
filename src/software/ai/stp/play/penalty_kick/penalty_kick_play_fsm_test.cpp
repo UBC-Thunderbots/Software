@@ -17,7 +17,7 @@ TEST(PenaltyKickPlayFSMTest, test_transitions)
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_US);
     world->updateGameState(game_state);
 
-    unsigned int num_tactics = 5;
+    int num_tactics = 5;
 
     FSM<PenaltyKickPlayFSM> fsm(
         PenaltyKickPlayFSM{std::make_shared<TbotsProto::AiConfig>()});

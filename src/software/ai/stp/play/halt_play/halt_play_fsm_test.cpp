@@ -14,7 +14,7 @@ TEST(HaltPlayFSMTest, test_transitions)
 
     EXPECT_TRUE(fsm.is(boost::sml::state<HaltPlayFSM::HaltState>));
 
-    unsigned int num_tactics = 6;
+    int num_tactics = 6;
 
     fsm.process_event(HaltPlayFSM::Update(
         HaltPlayFSM::ControlParams{},

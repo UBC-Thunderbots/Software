@@ -35,13 +35,8 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
  *
  * @param FUNCTION The function to turn into a lambda
  */
-// (void)this used to avoid -Wunused-lambda-capture.
 #define DEFINE_SML_GUARD(FUNCTION)                                                       \
-    const auto FUNCTION##_G = [this](auto event)                                         \
-    {                                                                                    \
-        (void)this;                                                                      \
-        return FUNCTION(event);                                                          \
-    };
+    const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
 
 /**
  * Defines lambda wrapper around a function that can be used as an SML action

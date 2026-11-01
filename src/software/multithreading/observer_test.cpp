@@ -33,7 +33,7 @@ namespace TestUtil
     auto wall_time_start = FakeClock::now();
     for (unsigned int i = 0; i < number_of_messages; i++)
     {
-        test_observer.receiveValue(static_cast<int>(i));
+        test_observer.receiveValue(i);
         FakeClock::advance(std::chrono::milliseconds(data_received_period_ms));
     }
 

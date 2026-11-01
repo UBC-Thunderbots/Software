@@ -275,15 +275,14 @@ Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point& ball_pos,
 void BallPlacementPlayFSM::setupMoveTactics(const Update& event)
 {
     // assign all but one of the robots to line up away from the ball placing robot
-    int num_move_tactics = static_cast<int>(event.common.num_tactics) - 1;
+    int num_move_tactics = event.common.num_tactics - 1;
 
     if (num_move_tactics <= 0)
     {
         return;
     }
 
-    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(
-        static_cast<size_t>(num_move_tactics));
+    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
     std::generate(move_tactics.begin(), move_tactics.end(),
                   [this]()
                   { return std::make_shared<PlaceBallMoveTactic>(this->ai_config_ptr); });

@@ -41,6 +41,7 @@ cc_library(
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/embedded/motion_control:orientation_controller",
         "//software/embedded/motion_control:position_controller",
+        "//software/embedded/robot_localizer",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/time:duration",

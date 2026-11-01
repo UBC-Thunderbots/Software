@@ -87,9 +87,9 @@ void FreeKickPlayFSM::setReceiverAndDefenderTactics(
 
     if (num_receivers > 0)
     {
-        updateReceiverPositioningTactics(
-            event.common.world_ptr, static_cast<unsigned int>(num_receivers),
-            existing_receiver_positions, pass_origin_override);
+        updateReceiverPositioningTactics(event.common.world_ptr, num_receivers,
+                                         existing_receiver_positions,
+                                         pass_origin_override);
         tactics_to_run[0].insert(tactics_to_run[0].end(),
                                  receiver_positioning_tactics.begin(),
                                  receiver_positioning_tactics.end());
@@ -100,7 +100,7 @@ void FreeKickPlayFSM::setReceiverAndDefenderTactics(
     if (num_defenders > 0)
     {
         defense_play->updateTactics(PlayUpdate(
-            event.common.world_ptr, static_cast<unsigned int>(num_defenders),
+            event.common.world_ptr, num_defenders,
             [&tactics_to_run](PriorityTacticVector new_tactics)
             {
                 for (const auto& tactic_vector : new_tactics)

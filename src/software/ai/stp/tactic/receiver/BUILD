@@ -33,6 +33,7 @@ cc_test(
     deps = [
         ":receiver_tactic",
         "//software/test_util",
+        "@googletest//:gtest_main",
     ],
 )
 

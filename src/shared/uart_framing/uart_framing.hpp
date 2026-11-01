@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -31,8 +30,8 @@ namespace
 uint16_t crc16(const std::vector<uint8_t>& data, uint16_t length)
 {
     uint8_t x;
-    uint16_t crc  = 0xFFFF;
-    std::size_t i = 0;
+    uint16_t crc = 0xFFFF;
+    int i        = 0;
 
     while (length--)
     {
@@ -97,9 +96,7 @@ std::vector<uint8_t> cobsEncoding(const std::vector<uint8_t>& to_encode)
     {
         if (byte == START_END_FLAG_BYTE)
         {
-            encoded.insert(
-                encoded.begin() + static_cast<std::ptrdiff_t>(overhead_location),
-                overhead);
+            encoded.insert(encoded.begin() + overhead_location, overhead);
             overhead_location = encoded.size();
             overhead          = 0x01;
         }
@@ -108,16 +105,13 @@ std::vector<uint8_t> cobsEncoding(const std::vector<uint8_t>& to_encode)
             encoded.emplace_back(byte);
             if (++overhead == 0xFF)
             {
-                encoded.insert(
-                    encoded.begin() + static_cast<std::ptrdiff_t>(overhead_location),
-                    overhead);
+                encoded.insert(encoded.begin() + overhead_location, overhead);
                 overhead_location = encoded.size();
                 overhead          = 0x01;
             }
         }
     }
-    encoded.insert(encoded.begin() + static_cast<std::ptrdiff_t>(overhead_location),
-                   overhead);
+    encoded.insert(encoded.begin() + overhead_location, overhead);
     encoded.emplace_back(START_END_FLAG_BYTE);
 
     return encoded;

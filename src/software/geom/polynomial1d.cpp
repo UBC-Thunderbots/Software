@@ -46,10 +46,9 @@ Polynomial1d::Polynomial1d(const std::vector<Polynomial1d::Constraint> constrain
     {
         for (size_t col_index = 0; col_index < constraints.size(); col_index++)
         {
-            A(static_cast<Eigen::Index>(row_index),
-              static_cast<Eigen::Index>(col_index)) =
+            A(row_index, col_index) =
                 std::pow(constraints[row_index].input, static_cast<double>(col_index));
-            b(static_cast<Eigen::Index>(row_index)) = constraints[row_index].output;
+            b(row_index) = constraints[row_index].output;
         }
     }
 
@@ -57,7 +56,7 @@ Polynomial1d::Polynomial1d(const std::vector<Polynomial1d::Constraint> constrain
 
     for (size_t i = 0; i < constraints.size(); i++)
     {
-        coeffs.emplace_back(coeff_vector(static_cast<Eigen::Index>(i)));
+        coeffs.emplace_back(coeff_vector(i));
     }
 }
 

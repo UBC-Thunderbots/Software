@@ -1,4 +1,11 @@
 load("@rules_cc//cc:defs.bzl", "cc_toolchain", "cc_toolchain_suite")
+load(
+    ":cc_toolchain_config.bzl",
+    "cc_toolchain_config_fullsystem",
+    "cc_toolchain_config_k8_aarch64_linux",
+    "cc_toolchain_config_stm32",
+    "make_builtin_include_directories",
+)
 
 package(default_visibility = ["//visibility:public"])
 
@@ -42,7 +49,7 @@ config_setting(
 constraint_setting(name = "glibc_version")
 
 constraint_value(
-    name = "glibc_2_28",
+    name = "glibc_2_27",
     constraint_setting = ":glibc_version",
 )
 
@@ -51,7 +58,7 @@ platform(
     constraint_values = [
         "@platforms//cpu:aarch64",
         "@platforms//os:linux",
-        ":glibc_2_28",
+        ":glibc_2_27",
     ],
 )
 
@@ -61,6 +68,35 @@ platform(
         "@platforms//cpu:armv6-m",
         "@platforms//os:none",
     ],
+)
+
+# The toolchain filegroups below are only needed on the host OS they were built for.
+# Selecting on the host platform keeps Bazel from fetching the other platforms' toolchains.
+
+config_setting(
+    name = "is_linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+config_setting(
+    name = "is_linux_x86_64",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+config_setting(
+    name = "is_linux_aarch64",
+    constraint_values = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+)
+
+config_setting(
+    name = "is_macos",
+    constraint_values = ["@platforms//os:macos"],
 )
 
 # This represents a mapping of CPU -> Compiler To Use
@@ -77,4 +113,328 @@ cc_toolchain_suite(
         "k8_aarch64_linux": "cc_toolchain_k8_aarch64_linux",
         "k8_aarch64_linux|compiler": "cc_toolchain_k8_aarch64_linux",
     },
+)
+
+filegroup(
+    name = "empty",
+    srcs = [],
+)
+
+filegroup(
+    name = "k8_aarch64_linux_everything",
+    srcs = glob(["wrapper/k8_aarch64_linux_*"]) + select({
+        ":is_linux": ["@k8_aarch64_linux_gcc//:everything"],
+        "//conditions:default": [],
+    }),
+)
+
+filegroup(
+    name = "linux_gcc_wrapper",
+    srcs = ["wrapper/linux_gcc"],
+)
+
+filegroup(
+    name = "linux_k8_gcc_all",
+    srcs = [
+        ":linux_gcc_wrapper",
+    ] + select({
+        ":is_linux_x86_64": [
+            "@linux_k8_gcc//:includes",
+            "@linux_k8_gcc//:libs",
+            "@linux_k8_gcc//:runtime_libs",
+            "@linux_k8_gcc//:static_libs",
+        ],
+        "//conditions:default": [],
+    }),
+)
+
+filegroup(
+    name = "linux_aarch64_gcc_all",
+    srcs = [
+        ":linux_gcc_wrapper",
+    ] + select({
+        ":is_linux_aarch64": [
+            "@linux_aarch64_gcc//:includes",
+            "@linux_aarch64_gcc//:libs",
+            "@linux_aarch64_gcc//:runtime_libs",
+            "@linux_aarch64_gcc//:static_libs",
+        ],
+        "//conditions:default": [],
+    }),
+)
+
+filegroup(
+    name = "motor_board_gcc_all",
+    srcs = [
+        "@motor_board_gcc//:includes",
+    ],
+)
+
+cc_toolchain_config_fullsystem(
+    name = "linux_k8_gcc",
+    builtin_include_directories = [
+        "/usr/lib/gcc/x86_64-linux-gnu/",
+    ] + make_builtin_include_directories(),
+    host_system_name = "k8",
+    target_cpu = "k8",
+    target_system_name = "k8",
+    toolchain_identifier = "linux_k8_gcc",
+)
+
+cc_toolchain_config_fullsystem(
+    name = "linux_aarch64_gcc",
+    builtin_include_directories = [
+        "/usr/lib/gcc/aarch64-linux-gnu/",
+        "/opt/tbotspython/cross_compile_headers/include/python3.12/",
+    ] + make_builtin_include_directories(),
+    host_system_name = "aarch64",
+    target_cpu = "aarch64",
+    target_system_name = "aarch64",
+    toolchain_identifier = "linux_aarch64_gcc",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_linux_k8_gcc",
+    all_files = ":linux_k8_gcc_all",
+    ar_files = ":linux_k8_gcc_all",
+    as_files = ":linux_k8_gcc_all",
+    compiler_files = ":linux_k8_gcc_all",
+    dwp_files = ":linux_k8_gcc_all",
+    dynamic_runtime_lib = select({
+        ":is_linux_x86_64": "@linux_k8_gcc//:runtime_libs",
+        "//conditions:default": ":empty",
+    }),
+    linker_files = ":linux_k8_gcc_all",
+    objcopy_files = ":linux_k8_gcc_all",
+    static_runtime_lib = select({
+        ":is_linux_x86_64": "@linux_k8_gcc//:static_libs",
+        "//conditions:default": ":empty",
+    }),
+    strip_files = ":linux_k8_gcc_all",
+    supports_param_files = True,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
+    toolchain_config = ":linux_k8_gcc",
+    toolchain_identifier = "k8_gcc",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_linux_aarch64_gcc",
+    all_files = ":linux_aarch64_gcc_all",
+    ar_files = ":linux_aarch64_gcc_all",
+    as_files = ":linux_aarch64_gcc_all",
+    compiler_files = ":linux_aarch64_gcc_all",
+    dwp_files = ":linux_aarch64_gcc_all",
+    dynamic_runtime_lib = select({
+        ":is_linux_aarch64": "@linux_aarch64_gcc//:runtime_libs",
+        "//conditions:default": ":empty",
+    }),
+    linker_files = ":linux_aarch64_gcc_all",
+    objcopy_files = ":linux_aarch64_gcc_all",
+    static_runtime_lib = select({
+        ":is_linux_aarch64": "@linux_aarch64_gcc//:static_libs",
+        "//conditions:default": ":empty",
+    }),
+    strip_files = ":linux_aarch64_gcc_all",
+    supports_param_files = True,
+    toolchain_config = ":linux_aarch64_gcc",
+    toolchain_identifier = "aarch64_gcc",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_k8_aarch64_linux",
+    all_files = ":k8_aarch64_linux_everything",
+    ar_files = ":k8_aarch64_linux_everything",
+    as_files = ":k8_aarch64_linux_everything",
+    compiler_files = ":k8_aarch64_linux_everything",
+    dwp_files = ":empty",
+    linker_files = ":k8_aarch64_linux_everything",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 0,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
+    toolchain_config = ":gcc_k8_aarch64_linux",
+    toolchain_identifier = "gcc-k8-aarch64-linux",
+)
+
+cc_toolchain_config_stm32(
+    name = "gcc-arm-none-abi",
+    builtin_include_directories = [
+        "/opt/tbotspython/arm-none-eabi-gcc/arm-none-eabi/include/",
+        "/opt/tbotspython/arm-none-eabi-gcc/lib/gcc/arm-none-eabi/14.3.1/include/",
+    ],
+    tool_paths = {
+        "ar": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ar",
+        "gcc": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-gcc",
+        "cpp": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-cpp",
+        "ld": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-ld",
+        "nm": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-nm",
+        "objdump": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-objdump",
+        "strip": "/opt/tbotspython/arm-none-eabi-gcc/bin/arm-none-eabi-strip",
+    },
+    toolchain_identifier = "gcc-stm32",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_stm32",
+    all_files = ":motor_board_gcc_all",
+    ar_files = ":motor_board_gcc_all",
+    as_files = ":motor_board_gcc_all",
+    compiler_files = ":motor_board_gcc_all",
+    dwp_files = ":motor_board_gcc_all",
+    linker_files = ":motor_board_gcc_all",
+    objcopy_files = ":motor_board_gcc_all",
+    strip_files = ":motor_board_gcc_all",
+    supports_param_files = True,
+    toolchain_config = ":gcc-arm-none-abi",
+    toolchain_identifier = "stm32_gcc",
+)
+
+cc_toolchain_config_k8_aarch64_linux(
+    name = "gcc_k8_aarch64_linux",
+    builtin_include_directories = [
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/aarch64-tbots-linux-gnu/sysroot/usr/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include/",
+        "/opt/tbotspython/aarch64-tbots-linux-gnu/lib/gcc/aarch64-tbots-linux-gnu/8.5.0/include-fixed",
+        "/opt/tbotspython/cross_compile_headers/include/",
+    ] + make_builtin_include_directories(),
+    host_unfiltered_compile_flags = [
+        "-I/opt/tbotspython/cross_compile_headers/include",
+    ],
+    tool_paths = {
+        "ar": "wrapper/k8_aarch64_linux_ar",
+        "cpp": "wrapper/k8_aarch64_linux_cpp",
+        "dwp": "wrapper/k8_aarch64_linux_dwp",
+        "gcc": "wrapper/k8_aarch64_linux_gcc",
+        "gcov": "wrapper/k8_aarch64_linux_gcov",
+        "ld": "wrapper/k8_aarch64_linux_ld",
+        "nm": "wrapper/k8_aarch64_linux_nm",
+        "objcopy": "wrapper/k8_aarch64_linux_objcopy",
+        "objdump": "wrapper/k8_aarch64_linux_objdump",
+        "strip": "wrapper/k8_aarch64_linux_strip",
+    },
+    toolchain_identifier = "gcc-k8-aarch64-linux",
+)
+
+toolchain(
+    name = "cc_toolchain_for_k8_aarch64_linux",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+        ":glibc_2_27",
+    ],
+    toolchain = ":cc_toolchain_k8_aarch64_linux",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+MACOS_ROBOT_TC = "/opt/homebrew/opt/aarch64-unknown-linux-gnu/toolchain"
+
+cc_toolchain_config_k8_aarch64_linux(
+    name = "gcc_macos_robot",
+    builtin_include_directories = [
+        "/opt/homebrew/opt/aarch64-unknown-linux-gnu",  # symlink-reported (libstdc++ headers)
+        "/opt/homebrew/Cellar/aarch64-unknown-linux-gnu",  # realpath-reported (sysroot headers)
+    ] + make_builtin_include_directories(),
+    tool_paths = {
+        "ar": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ar",
+        "cpp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-cpp",
+        # messense ships no dwp; point at gcc (unused without fission).
+        "dwp": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-gcc",
+        "gcc": "wrapper/macos_robot_gcc",
+        "gcov": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-gcov",
+        "ld": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-ld",
+        "nm": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-nm",
+        "objcopy": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-objcopy",
+        "objdump": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-objdump",
+        "strip": MACOS_ROBOT_TC + "/bin/aarch64-unknown-linux-gnu-strip",
+    },
+    toolchain_identifier = "gcc-macos-robot",
+)
+
+filegroup(
+    name = "macos_robot_everything",
+    srcs = [
+        "wrapper/macos_robot_gcc",
+    ] + select({
+        ":is_macos": ["@macos_robot_gcc//:everything"],
+        "//conditions:default": [],
+    }),
+)
+
+cc_toolchain(
+    name = "cc_toolchain_macos_robot",
+    all_files = ":macos_robot_everything",
+    ar_files = ":macos_robot_everything",
+    as_files = ":macos_robot_everything",
+    compiler_files = ":macos_robot_everything",
+    dwp_files = ":macos_robot_everything",
+    linker_files = ":macos_robot_everything",
+    objcopy_files = ":macos_robot_everything",
+    strip_files = ":macos_robot_everything",
+    supports_param_files = 0,
+    tags = ["no-ide"],
+    toolchain_config = ":gcc_macos_robot",
+    toolchain_identifier = "gcc-macos-robot",
+)
+
+toolchain(
+    name = "cc_toolchain_for_macos_robot",
+    exec_compatible_with = [
+        "@platforms//os:macos",
+        "@platforms//cpu:aarch64",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+        ":glibc_2_27",
+    ],
+    toolchain = ":cc_toolchain_macos_robot",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_for_k8",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":cc_toolchain_linux_k8_gcc",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_for_aarch64",
+    exec_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":cc_toolchain_linux_aarch64_gcc",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_for_stm32",
+    target_compatible_with = [
+        "@platforms//cpu:armv6-m",
+        "@platforms//os:none",
+    ],
+    toolchain = ":cc_toolchain_stm32",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )

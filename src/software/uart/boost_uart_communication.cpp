@@ -40,17 +40,15 @@ void BoostUartCommunication::openPort(IoService& ioService, int baud_rate,
     serial_port = SerialPortPtr(std::make_shared<boost::asio::serial_port>(
         boost::asio::serial_port(ioService, device_serial_port)));
 
-    serial_port->set_option(
-        boost::asio::serial_port_base::baud_rate(static_cast<unsigned int>(baud_rate)));
+    serial_port->set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
     serial_port->set_option(boost::asio::serial_port::flow_control(
         boost::asio::serial_port::flow_control::none));
     serial_port->set_option(
         boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
     serial_port->set_option(
         boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
-    serial_port->set_option(
-        boost::asio::serial_port::character_size(boost::asio::serial_port::character_size(
-            static_cast<unsigned int>(uart_character_size_bits))));
+    serial_port->set_option(boost::asio::serial_port::character_size(
+        boost::asio::serial_port::character_size(uart_character_size_bits)));
 }
 
 void BoostUartCommunication::closePort()

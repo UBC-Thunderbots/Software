@@ -144,7 +144,7 @@ void KickoffEnemyPlayFSM::kickoff(const Update& event)
                                        world_ptr->field().centerPoint());
     if (robot.has_value())
     {
-        RobotId robot_id = robot.value().id();
+        int robot_id = robot.value().id();
         enemy_team.removeRobotWithId(robot_id);
     }
     else

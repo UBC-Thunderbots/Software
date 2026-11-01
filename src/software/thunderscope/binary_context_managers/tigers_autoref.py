@@ -6,7 +6,6 @@ import queue
 import threading
 import time
 from subprocess import Popen
-from pathlib import Path
 
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
@@ -40,8 +39,8 @@ class TigersAutoref:
     BUFFER_TIMEOUT = 10
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
-    AUTOREF_DIR = "/opt/tbots/autoReferee"
-    AUTOREF_BINARY = "bin/autoReferee"
+    AUTOREF_DIR = "/opt/tbotspython/autoReferee"
+    AUTOREF_JAVA_HOME = "/opt/tbotspython/bin/jdk"
 
     def __init__(
         self,
@@ -76,7 +75,7 @@ class TigersAutoref:
         self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
-        if not os.path.exists(Path(self.AUTOREF_DIR) / self.AUTOREF_BINARY):
+        if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
             logging.warning(
                 "Could not find autoref binary, did you run ./setup_software.sh"
             )
@@ -216,7 +215,10 @@ class TigersAutoref:
 
     def _start_autoref(self) -> None:
         """Starts the TigersAutoref binary."""
-        autoref_cmd = self.AUTOREF_BINARY
+        env = os.environ.copy()
+        env["JAVA_HOME"] = self.AUTOREF_JAVA_HOME
+
+        autoref_cmd = "bin/autoReferee"
         kill_cmd_if_running([autoref_cmd])
         autoref_cmd += " -a"
 
@@ -232,11 +234,12 @@ class TigersAutoref:
                     autoref_cmd.split(" "),
                     stdout=fp,
                     stderr=fp,
+                    env=env,
                     cwd=self.AUTOREF_DIR,
                 )
         else:
             self.tigers_autoref_proc = Popen(
-                autoref_cmd.split(" "), cwd=self.AUTOREF_DIR
+                autoref_cmd.split(" "), env=env, cwd=self.AUTOREF_DIR
             )
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:

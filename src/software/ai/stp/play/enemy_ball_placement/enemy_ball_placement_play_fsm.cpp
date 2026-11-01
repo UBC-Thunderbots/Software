@@ -51,7 +51,7 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
     Vector placement_point_to_ball = ball_pos - placement_point;
 
     // Check if robots are inside the ball placement stadium
-    size_t idx = 0;
+    int idx = 0;
     for (auto const& robot : world_ptr->friendlyTeam().getAllRobots())
     {
         if (contains(stadium, robot.position()))

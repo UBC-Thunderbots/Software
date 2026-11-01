@@ -9,7 +9,6 @@
 #include <unistd.h>        // needed for sysconf(int name);
 
 #include <boost/program_options.hpp>
-#include <cstddef>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
@@ -59,15 +58,15 @@ static void configureMallocBehaviour(void)
  *
  * @param size How many bytes to reserve
  */
-static void reserveProcessMemory(std::size_t size)
+static void reserveProcessMemory(int size)
 {
-    std::size_t i;
+    long int i;
     char* buffer;
 
     buffer = static_cast<char*>(malloc(size));
 
     // Touch each page in this piece of memory to get it mapped into RAM
-    for (i = 0; i < size; i += static_cast<std::size_t>(sysconf(_SC_PAGESIZE)))
+    for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
     {
         // Each write to this buffer will generate a pagefault.
         // Once the pagefault is handled a page will be locked in
@@ -109,7 +108,7 @@ int main(int argc, char** argv)
     configureMallocBehaviour();
 
     // 100MB pagefault free buffer
-    const std::size_t pre_allocation_size = 20 * 1024 * 1024;
+    const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
     auto thunderloop = Thunderloop(robot_constants::createRobotConstants(),
