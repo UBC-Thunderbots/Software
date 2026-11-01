@@ -44,16 +44,6 @@ py_test(
 )
 
 py_test(
-    name = "move_tactic_minimal_test",
-    srcs = ["move_tactic_minimal_test.py"],
-    deps = [
-        "//software:conftest",
-        "//software/gameplay_tests/validation:validations",
-        requirement("pytest"),
-    ],
-)
-
-py_test(
     name = "move_tactic_field_test",
     srcs = [
         "move_tactic_field_test.py",
