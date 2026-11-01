@@ -19,7 +19,6 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
-#include "software/simulation/avah_logger.hpp"
 #include "software/world/robot_state.h"
 
 namespace
@@ -422,8 +421,6 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
     current_time = current_time + time_step;
-    avah::AVAH_LOG("CURRENT TIME");
-    avah::AVAH_LOG(current_time);
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_simulated_robots, *yellow_team_world_msg, time_step,
@@ -432,9 +429,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     SSLSimulationProto::RobotControl blue_robot_control =
         updateSimulatorRobots(blue_simulated_robots, *blue_team_world_msg, time_step,
                               gameController::Team::BLUE);
-
-    avah::AVAH_LOG_PROTO(blue_robot_control);
-    avah::AVAH_LOG_PROTO(yellow_robot_control);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
@@ -446,7 +440,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     for (const auto& response : yellow_radio_responses)
     {
-        avah::AVAH_LOG_PROTO(response);
         if (response.has_ball_detected() && response.ball_detected())
         {
             yellow_robot_with_ball = response.id();
@@ -455,20 +448,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     for (const auto& response : blue_radio_responses)
     {
-        avah::AVAH_LOG_PROTO(response);
         if (response.has_ball_detected() && response.ball_detected())
         {
             blue_robot_with_ball = response.id();
         }
-    }
-
-    if (yellow_robot_with_ball)
-    {
-        avah::AVAH_LOG(*yellow_robot_with_ball);
-    }
-    if (blue_robot_with_ball)
-    {
-        avah::AVAH_LOG(*blue_robot_with_ball);
     }
 
     er_force_sim->stepSimulation(time_step.toSeconds());

@@ -16,6 +16,7 @@ logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 0.5
+ACK_BUFFER_TIMEOUT = 0.5
 TICK_DURATION_S = DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 
 
@@ -79,23 +80,19 @@ class SimulatedTestRunner(TbotsTestRunner):
             protos.WorldStateReceivedTrigger, world_state_received_buffer
         )
 
-        setup()
-        time.sleep(1)
-        # while True:
-        #     print("sending world state")
-        #
-        #     try:
-        #         world_state_received_buffer.get(
-        #             block=True, timeout=WORLD_BUFFER_TIMEOUT
-        #         )
-        #     except queue.Empty:
-        #         # Did not receive a response within timeout period
-        #         print("resending ehh")
-        #         raise Exception("ReSENT")
-        #         continue
-        #     else:
-        #         # Received a response from the simulator
-        #         break
+        while True:
+            setup()
+
+            try:
+                world_state_received_buffer.get(
+                    block=True, timeout=WORLD_BUFFER_TIMEOUT
+                )
+            except queue.Empty:
+                # Did not receive a response within timeout period
+                continue
+            else:
+                # Received a response from the simulator
+                break
 
     @override
     def _runner(
@@ -113,16 +110,13 @@ class SimulatedTestRunner(TbotsTestRunner):
             processing_start_time = time.time()
 
             # Check for new GC commands at this time step
-            for delay, cmd, team, point in gc_cmd_with_delay:
+            for delay, cmd, team in gc_cmd_with_delay:
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_gc_command(
-                        gc_command=cmd, team=team, final_ball_placement_point=point
-                    )
+                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
                     # remove command from the list
-                    gc_cmd_with_delay.remove((delay, cmd, team, point))
-                    time.sleep(0.2)
+                    gc_cmd_with_delay.remove((delay, cmd, team))
 
             tick = protos.SimulatorTick(
                 milliseconds=TICK_DURATION_S * MILLISECONDS_PER_SECOND
@@ -133,7 +127,7 @@ class SimulatedTestRunner(TbotsTestRunner):
             while True:
                 try:
                     self.avah_ack_buffer.get(
-                        block=True, timeout=1.0, return_cached=False
+                        block=True, timeout=ACK_BUFFER_TIMEOUT, return_cached=False
                     )
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
@@ -142,19 +136,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                     break
                 except queue.Empty:
                     raise RuntimeError("AVAH ACK NOT RECEIVED")
-                    # If we timeout, that means full_system missed the last
-                    # wrapper and robot status, lets resend it.
-                    # logger.warning("Fullsystem missed last wrapper, resending ...")
-
-                    # ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    # robot_status = self.robot_status_buffer.get(block=False)
-                    #
-                    # self.blue_full_system_proto_unix_io.send_proto(
-                    #     protos.SSL_WrapperPacket, ssl_wrapper
-                    # )
-                    # self.blue_full_system_proto_unix_io.send_proto(
-                    #     protos.RobotStatus, robot_status
-                    # )
 
             # get the time difference after we get the primitive (after any blocking that happened)
             processing_time = time.time() - processing_start_time

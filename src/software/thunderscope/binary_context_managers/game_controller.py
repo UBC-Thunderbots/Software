@@ -656,5 +656,4 @@ class Gamecontroller:
             gateway_ip, interface_name = default
             return interface_name
 
-        return "lo0"
-        # raise RuntimeError("Could not determine the default network interface on macOS")
+        raise RuntimeError("Could not determine the default network interface on macOS")
