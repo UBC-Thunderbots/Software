@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from proto.import_all_protos import *
 from software.gameplay_tests import fixture
 from software.gameplay_tests.util import discover_tests
 from software.logger.logger import create_logger
