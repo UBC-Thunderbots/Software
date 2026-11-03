@@ -21,8 +21,7 @@ class ProtoUdpListener
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller
      *
-     * @throws TbotsNetworkException if the multicast group could not be joined if the
-     * multicast option is requested
+     * @throws TbotsNetworkException if we can't set up the endpoint.
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param ip_address The ip address of on which to listen for the given ReceiveProtoT
@@ -45,8 +44,7 @@ class ProtoUdpListener
      * received, the receive_callback will be called to perform any operations desired by
      * the caller
      *
-     * @throws TbotsNetworkException if the multicast group could not be joined if the
-     * multicast option is requested
+     * @throws TbotsNetworkException if we can't set up the endpoint.
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param port The port on which to listen for ReceiveProtoT packets
