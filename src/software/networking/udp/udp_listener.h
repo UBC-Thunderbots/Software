@@ -53,7 +53,7 @@ class UdpListener
     virtual ~UdpListener();
 
     /**
-     * Sends a datagram through the listening socket. 
+     * Sends a datagram through the listening socket.
      *
      * This posts to the `io_context`, so that needs to run for the send
      * to go through.

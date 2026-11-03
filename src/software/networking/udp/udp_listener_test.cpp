@@ -108,11 +108,11 @@ TEST_P(UdpListenerTest, replies_to_saved_senders_from_the_listening_port)
     const std::array<std::string, 2> replies = {std::string("a\0b", 3), ""};
     listener->sendTo(replies[1], senders[1]);
     listener->sendTo(replies[0], senders[0]);
-    
+
     // sends are async, so this flushes them before we check the results
     io_service.restart();
     io_service.poll();
-    
+
     for (size_t i = 0; i < clients.size(); ++i)
     {
         std::array<char, 16> buffer;
