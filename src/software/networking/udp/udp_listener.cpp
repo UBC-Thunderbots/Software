@@ -95,8 +95,28 @@ UdpListener::~UdpListener() {}
 void UdpListener::sendTo(const std::string& message,
                          const boost::asio::ip::udp::endpoint& destination)
 {
-    socket_.send_to(boost::asio::buffer(message), destination);
+    auto buf = std::make_shared<std::string>(message);
+
+    // kind of horrific double lambda
+    boost::asio::post(socket_.get_executor(),
+                      [this, buf, destination]()
+                      {
+                          // this lambda has stuff that gets called from within the
+                          // io_context thread
+                          socket_.async_send_to(
+                              boost::asio::buffer(*buf), destination,
+                              [buf](const boost::system::error_code& ec, std::size_t)
+                              {
+                                  // this lambda gets called when the udp send completes
+                                  if (ec)
+                                  {
+                                      LOG(WARNING) << "send failed from UdpListener: "
+                                                   << ec.message();
+                                  }
+                              });
+                      });
 }
+
 
 void UdpListener::close()
 {
