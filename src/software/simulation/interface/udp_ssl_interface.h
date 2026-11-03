@@ -8,6 +8,9 @@
 #include "software/networking/udp/threaded_proto_udp_bidirectional.hpp"
 #include "software/simulation/interface/simulator_team_interface.h"
 
+/**
+ * The interface for external teams connecting over UDP and communicating with SSL
+ */
 class UdpSslInterface : public SimulatorTeamInterface
 {
    public:
@@ -27,7 +30,12 @@ class UdpSslInterface : public SimulatorTeamInterface
                                            const boost::asio::ip::udp::endpoint& sender)
                                     { onRobotControl(command, sender); });
     }
-
+    /**
+     * The callback for robot control messages sent over UDP
+     *
+     * @param command The ssl command to forward to the sim
+     * @param sender Who sent the message
+     */
     void onRobotControl(const SSLSimulationProto::RobotControl& command,
                         const boost::asio::ip::udp::endpoint& sender)
     {

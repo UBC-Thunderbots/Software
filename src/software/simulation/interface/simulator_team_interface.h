@@ -6,6 +6,9 @@
 
 #include "software/simulation/er_force_simulator.h"
 
+/**
+ * Abstract class to be extended by the interfaces for the er force simulator.
+ */
 class SimulatorTeamInterface
 {
    public:

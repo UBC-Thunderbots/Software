@@ -9,6 +9,9 @@
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/interface/simulator_team_interface.h"
 
+/**
+ * The interface for our AI that communicate via primitives
+ */
 class UnixPrimitiveInterface : public SimulatorTeamInterface
 {
    public:
@@ -37,12 +40,22 @@ class UnixPrimitiveInterface : public SimulatorTeamInterface
                                     { onPrimitiveSetInput(primitives); });
     }
 
+    /**
+     * The callback for teams sending their world model
+     *
+     * @param input The updated world model
+     */
     void onWorldInput(const TbotsProto::World& input)
     {
         std::scoped_lock lock(simulator_mutex);
         team_vision = input;
     }
 
+    /**
+     * The callback for teams sending their primitive set
+     *
+     * @param input The updated primitive set
+     */
     void onPrimitiveSetInput(const TbotsProto::PrimitiveSet& input)
     {
         std::scoped_lock lock(simulator_mutex);
