@@ -162,10 +162,21 @@ class ErForceSimulator
     static std::unique_ptr<RealismConfigErForce> createRealisticRealismConfig();
 
    private:
+    /**
+     * Sends a raw SSL control from a team
+     *
+     * @param command The SSL command
+     * @param is_blue True for blue, false for yellow
+     */
     SSLSimulationProto::RobotControlResponse sendSSLControl(
         const SSLSimulationProto::RobotControl& command, bool is_blue);
 
-    // Returns accepted commands and appends validation errors to the response.
+    /**
+     * Returns accepted commands, appends validation errors to response
+     *
+     * @param command The SSL command
+     * @param is_blue True for blue, false for yellow
+     */
     SSLSimulationProto::RobotControl validateSSLControl(
         const SSLSimulationProto::RobotControl& command, bool is_blue,
         SSLSimulationProto::RobotControlResponse& response) const;
