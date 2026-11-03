@@ -69,7 +69,7 @@ class UdpSender
     /**
      * Set up multicast for the given multicast ip address and interface
      *
-     * @throws TbotsNetworkException if the multicast coud not be configured
+     * @throws TbotsNetworkException if the multicast could not be configured
      *
      * @param ip_address The multicast ip address
      * @param interface The interface to configure the multicast on
