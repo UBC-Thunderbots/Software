@@ -15,8 +15,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 0.5
-ACK_BUFFER_TIMEOUT = 0.5
+WORLD_BUFFER_TIMEOUT = 1.5
+ACK_BUFFER_TIMEOUT = 1.5
 TICK_DURATION_S = DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 
 
