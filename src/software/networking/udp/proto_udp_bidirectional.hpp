@@ -13,7 +13,8 @@ class ProtoUdpBidirectional
      * Creates an ProtoUdpBidirectional that will listen for ReceiveProtoT packets from
      * the network on the multicast group of given address and port. For every
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
-     * operations desired by the caller
+     * operations desired by the caller. The ProtoUdpBidirectional can also send packets
+     * of type SendProtoT.
      *
      * @throws TbotsNetworkException if the multicast group could not be joined if the
      * multicast option is requested
@@ -39,7 +40,7 @@ class ProtoUdpBidirectional
      * Creates an ProtoUdpBidirectional that will listen for ReceiveProtoT packets from
      * the network on any local address with given port. For every ReceiveProtoT packet
      * received, the receive_callback will be called to perform any operations desired by
-     * the caller
+     * the caller. The ProtoUdpBidirectional can also send packets of type SendProtoT.
      *
      * @throws TbotsNetworkException if the multicast group could not be joined if the
      * multicast option is requested
@@ -54,6 +55,14 @@ class ProtoUdpBidirectional
         std::function<void(ReceiveProtoT&, const boost::asio::ip::udp::endpoint&)>
             receive_callback);
 
+    /**
+     * Sends the message to the specified endpoint. The send happens asynchronously on the
+     * io_context thread, so it needs to be running for the send to go through.
+     *
+     * @param message The proto message to send
+     * @param endpoint The endpoint to send the message to (likely sender_endpoint from
+     * the callback)
+     */
     void sendTo(const SendProtoT& message,
                 const boost::asio::ip::udp::endpoint& endpoint);
 
@@ -131,8 +140,8 @@ void ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::handleDataReception(
     receive_callback(packet_data, sender_endpoint);
 }
 
-template <class RecieveProtoT, class SendProtoT>
-void ProtoUdpBidirectional<RecieveProtoT, SendProtoT>::sendTo(
+template <class ReceiveProtoT, class SendProtoT>
+void ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::sendTo(
     const SendProtoT& message, const boost::asio::ip::udp::endpoint& endpoint)
 {
     std::string data_buffer;
