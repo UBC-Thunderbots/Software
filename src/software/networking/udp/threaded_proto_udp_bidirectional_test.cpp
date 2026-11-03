@@ -53,7 +53,6 @@ TEST(ThreadedProtoUdpBidirectionalTest, replies_from_callback_and_calling_thread
         Response extra_reply;
         extra_reply.set_value("second reply");
         server->sendTo(extra_reply, result.get());
-        client.non_blocking(true);
         for (const auto& expected : {request.value(), extra_reply.value()})
         {
             std::array<char, 128> buffer;
