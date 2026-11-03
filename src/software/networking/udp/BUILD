@@ -145,7 +145,7 @@ cc_library(
         "proto_udp_bidirectional.hpp",
     ],
     deps = [
-        ":proto_udp_listener",
+        ":udp_listener",
         "@boost//:asio",
     ],
 )
