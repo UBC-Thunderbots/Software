@@ -19,7 +19,7 @@ class UdpSender
      *  example IPv6: ff02::c3d0:42d2:bb8
      * @param port The port to send SendString data to
      * @param interface The interface to send data on
-     * @param multicast If true, joins the multicast group of given ip_address
+     * @param multicast If true, configures to send with multicast
      */
     UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
               unsigned short port, const std::string& interface, bool multicast);
@@ -69,10 +69,10 @@ class UdpSender
     /**
      * Set up multicast for the given multicast ip address and interface
      *
-     * @throws TbotsNetworkException if the multicast group could not be joined
+     * @throws TbotsNetworkException if the multicast could not be configured
      *
-     * @param ip_address The multicast ip address to join
-     * @param interface The interface to join the multicast group on
+     * @param ip_address The multicast ip address
+     * @param interface The interface to configure the multicast on
      */
     void setupMulticast(const boost::asio::ip::address& ip_address,
                         const std::string& interface);
