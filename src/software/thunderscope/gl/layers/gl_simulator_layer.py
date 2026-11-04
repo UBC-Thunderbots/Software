@@ -90,7 +90,7 @@ class GLSimulatorLayer(GLLayer):
         graphic = GLRobotOutline(
             outline_color=outline_color,
             fill_color=fill_color,
-            line_width=LINE_WIDTH * 2,
+            line_width=LINE_WIDTH,
         )
         graphic.scale(GHOST_ROBOT_SCALE, GHOST_ROBOT_SCALE, 1, local=True)
         graphic.translate(0, 0, GHOST_Z_METERS)
