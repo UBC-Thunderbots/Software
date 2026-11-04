@@ -46,8 +46,9 @@ class GLSimulatorLayer(GLLayer):
             color=Colors.SIM_BALL_COLOR,
         )
 
-        # Enables transparency
+        # Enables transparency. Hidden until a SimulatorState actually has a ball;
         self.ball_graphic.setGLOptions("translucent")
+        self.ball_graphic.hide()
 
         self.blue_robot_graphics = ObservableList(self._graphics_changed)
         self.yellow_robot_graphics = ObservableList(self._graphics_changed)
@@ -128,11 +129,15 @@ class GLSimulatorLayer(GLLayer):
         self._update_defending_side()
         sim_world_state = self.simulator_state_buffer.get(block=False)
 
-        # X and Y reversed due to ER-Force's coordinate conventions
-        ball_x, ball_y, _ = self._to_display_frame(
-            sim_world_state.ball.p_y, -sim_world_state.ball.p_x
-        )
-        self.ball_graphic.set_position(ball_x, ball_y, sim_world_state.ball.p_z)
+        # Buffer's cached default has no ball. Reading it returns a SimBall at (0, 0, 0)
+        if sim_world_state.HasField("ball"):
+            ball_x, ball_y, _ = self._to_display_frame(
+                sim_world_state.ball.p_y, -sim_world_state.ball.p_x
+            )
+            self.ball_graphic.set_position(ball_x, ball_y, sim_world_state.ball.p_z)
+            self.ball_graphic.show()
+        else:
+            self.ball_graphic.hide()
 
         self._update_robot_graphics(
             sim_world_state.blue_robots,
