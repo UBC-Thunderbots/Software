@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/parameters.pb.h"
 #include "proto/replay_bookmark.pb.h"
 #include "proto/robot_crash_msg.pb.h"
@@ -51,6 +52,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
         dynamic_parameter_update_request_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>>
         validation_proto_set_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<world::SimulatorState>>
+        simulator_state_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotLog>> robot_log_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotCrash>>
         robot_crash_listener;

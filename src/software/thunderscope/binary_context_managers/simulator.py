@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from subprocess import Popen
+from threading import Thread
 
 import proto.import_all_protos as protos
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
@@ -27,6 +28,7 @@ from software.thunderscope.binary_context_managers.util import (
     kill_cmd_if_running,
 )
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class Simulator:
@@ -162,7 +164,6 @@ gdb --args bazel-bin/{simulator_command}
         for arg in [
             (BLUE_SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
             (BLUE_ROBOT_STATUS_PATH, protos.RobotStatus),
-            (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             blue_full_system_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, *arg
@@ -180,11 +181,25 @@ gdb --args bazel-bin/{simulator_command}
         for arg in [
             (YELLOW_SSL_WRAPPER_PATH, protos.SSL_WrapperPacket),
             (YELLOW_ROBOT_STATUS_PATH, protos.RobotStatus),
-            (SIMULATOR_STATE_PATH, SimulatorState),
         ]:
             yellow_full_system_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, *arg
             )
+
+        simulator_proto_unix_io.attach_unix_receiver(
+            self.simulator_runtime_dir, SIMULATOR_STATE_PATH, SimulatorState
+        )
+
+        forward_buffer = ThreadSafeBuffer(5, SimulatorState)
+        simulator_proto_unix_io.register_observer(SimulatorState, forward_buffer)
+
+        def forward_simulator_state() -> None:
+            while True:
+                msg = forward_buffer.get(block=True, return_cached=False)
+                blue_full_system_proto_unix_io.send_proto(SimulatorState, msg)
+                yellow_full_system_proto_unix_io.send_proto(SimulatorState, msg)
+
+        Thread(target=forward_simulator_state, daemon=True).start()
 
         autoref_proto_unix_io.attach_unix_receiver(
             self.simulator_runtime_dir, SSL_WRAPPER_PATH, protos.SSL_WrapperPacket
