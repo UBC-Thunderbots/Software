@@ -26,11 +26,10 @@ def get_runtime_dir():
     """
     import uuid
 
-    if not hasattr(get_runtime_dir, "dir"):
-        get_runtime_dir.dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
-        os.makedirs(get_runtime_dir.dir, exist_ok=True)
+    runtime_dir = os.path.join("/tmp", f"tbots_{uuid.uuid4().hex[:8]}")
+    os.makedirs(runtime_dir, exist_ok=True)
 
-    return get_runtime_dir.dir
+    return runtime_dir
 
 
 def get_pytest_name():
@@ -66,6 +65,7 @@ def load_command_line_arguments(allow_unrecognized: bool = False):
 
     :param allow_unrecognized: if true, does not raise an error for unrecognized arguments
     """
+    # TODO: creates temp directory even if already created one before
     RUNTIME_DIR = get_runtime_dir()
 
     parser = argparse.ArgumentParser(
