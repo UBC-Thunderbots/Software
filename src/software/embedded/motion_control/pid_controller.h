@@ -68,15 +68,15 @@ class PidController
         last_error_ = std::nullopt;
     }
 
-    const T& getProportionalGain() const {
+    const T& getProportional() const {
         return k_p_;
     }
 
-    const T& getIntegralGain() const {
+    const T& getIntegral() const {
         return k_i_;
     }
 
-    const T& getDerivativeGain() const {
+    const T& getDerivative() const {
         return k_d_;
     }
 

@@ -28,3 +28,7 @@ void OrientationController::reset()
 {
     w_pid_.reset();
 }
+
+const PidController<double>& OrientationController::getPid() const {
+    return w_pid_;
+}
