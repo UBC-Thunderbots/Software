@@ -112,7 +112,7 @@ class TbotsProtobufTest : public ::testing::Test
 
 TEST(TbotsProtobufTest, timestamp_msg_test)
 {
-    auto timestamp_msg = createCurrentTimestamp();
+    auto timestamp_msg = createCurrentTimestampProto();
     TbotsProtobufTest::assertSaneTimestamp(*timestamp_msg);
 }
 
