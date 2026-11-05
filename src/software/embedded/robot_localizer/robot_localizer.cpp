@@ -12,12 +12,16 @@ RobotLocalizer::RobotLocalizer()
         PROCESS_MODEL_INITIAL_VARIANCE *
         Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
 
+    // TODO remove this later on just a mac issue
+    static constexpr double IMU_VARIANCE =
+        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) * (4.0 * 14.4222 / 1000.0 * M_PI / 180.0);
+
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
             VISION_X_INITIAL_VARIANCE_M, VISION_Y_INITIAL_VARIANCE_M,
             VISION_THETA_INITIAL_VARIANCE_RAD, MOTOR_X_INITIAL_VARIANCE_M_S,
             MOTOR_Y_INITIAL_VARIANCE_M_S, MOTOR_THETA_INITIAL_VARIANCE_RAD_S,
-            ImuService::IMU_VARIANCE)
+            IMU_VARIANCE)
             .asDiagonal();
 }
 
@@ -50,8 +54,7 @@ void RobotLocalizer::update(const VisionData& data)
     }
 
     auto rollback_point = std::find_if(
-        history.begin(), history.end(),
-        [&](const FilterStep& step)
+        history.begin(), history.end(), [&](const FilterStep& step)
         { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
     // If rollback point is at the start, vision is newer than all history steps
