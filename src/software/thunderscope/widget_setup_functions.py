@@ -193,6 +193,10 @@ def setup_gl_widget(
             protos.SimulationState, gl_widget.simulation_state_buffer
         )
 
+    # TODO: in simulated tests RobotStatus is no longer received, because the simulator
+    # sends robot statuses inside the per-team SensorProto (see simulator.py). This means
+    # world_layer.robot_status_buffer never gets data and the breakbeam indicator is not
+    # visualized in the simulated view.
     for arg in [
         (protos.World, world_layer.world_buffer),
         (protos.World, cost_vis_layer.world_buffer),

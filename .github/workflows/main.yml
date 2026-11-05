@@ -159,7 +159,14 @@ jobs:
             //software/ai/stp/...                                         \
             //software/ai/navigator/...                                   \
             //software/simulation/...
-            
+
+      - name: Upload er force simulator logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: er-force-sim-logs
+          path: /tmp/tbots_*/test/*/*.log
+
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()

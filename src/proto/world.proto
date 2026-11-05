@@ -56,6 +56,8 @@ message WorldState
 
 message WorldStateReceivedTrigger {}
 
+message AvahAck {}
+
 message SimulatorTick
 {
     // The duration to step the simulation

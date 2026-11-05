@@ -23,6 +23,8 @@ const std::string SENSOR_PROTO_PATH                      = "/sensor_proto";
 const std::string WORLD_STATE_PATH                       = "/world_state";
 const std::string BLUE_ROBOT_STATUS_PATH                 = "/blue_robot_status";
 const std::string YELLOW_ROBOT_STATUS_PATH               = "/yellow_robot_status";
+const std::string BLUE_SENSOR_PROTO_PATH                 = "/blue_sensor_proto";
+const std::string YELLOW_SENSOR_PROTO_PATH               = "/yellow_sensor_proto";
 const std::string SIMULATION_TICK_PATH                   = "/simulation_tick";
 const std::string YELLOW_WORLD_PATH                      = "/yellow_world";
 const std::string BLUE_WORLD_PATH                        = "/blue_world";
@@ -37,6 +39,11 @@ const std::string DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH  = "/dynamic_parameter_r
 const std::string DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH = "/dynamic_parameter_response";
 const std::string WORLD_STATE_RECEIVED_TRIGGER_PATH = "/world_state_received_trigger";
 const std::string VIRTUAL_OBSTACLES_UNIX_PATH       = "/virtual_obstacles";
+
+// The simulator sends a team's vision frame together with the robot statuses for
+// that same frame in one SensorProto on BLUE_SENSOR_PROTO_PATH / YELLOW_SENSOR_PROTO_PATH
+// so sensor fusion always sees them in the same order, instead of depending on which
+// socket delivers first.
 
 const unsigned UNIX_BUFFER_SIZE = 20000;
 
