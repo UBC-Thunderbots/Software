@@ -26,11 +26,11 @@ class PositionController : public MotionController<Point, TrajectoryPath, Vector
      * @param delta_time The time passed since last time step.
      *
      * @return A target velocity as the sum of a feed forward vector and an error
-     * correction vector. 
-     * 
+     * correction vector.
+     *
      * @note @ref elapsed_time and @ref delta_time expect positive @ref Duration
      * values.
-     * 
+     *
      * @note The @ref elapsed_time is used with the @ref target_trajectory to determine
      * where the position should be.
      */
