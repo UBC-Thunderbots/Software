@@ -28,8 +28,8 @@ from software.py_constants import (
 from software.stats.loggers.stats_logger import StatsLogger
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.runtime_manager import (
-    runtime_manager_instance,
+from software.thunderscope.binary_context_managers.runtime_service import (
+    runtime_service_instance,
 )
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
@@ -300,7 +300,7 @@ if __name__ == "__main__":
         )
 
         # Fetch the AI runtime/backends
-        runtime_config = runtime_manager_instance.fetch_runtime_config()
+        runtime_config = runtime_service_instance.fetch_runtime_config()
 
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
@@ -432,7 +432,7 @@ if __name__ == "__main__":
                 )
 
         # Fetch the AI runtime/backends
-        runtime_config = runtime_manager_instance.fetch_runtime_config()
+        runtime_config = runtime_service_instance.fetch_runtime_config()
 
         # Launch all binaries
         with (
