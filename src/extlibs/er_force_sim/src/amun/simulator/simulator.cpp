@@ -81,6 +81,7 @@ Simulator::Simulator(const amun::SimulatorSetup& setup)
     m_data->robotReplyPacketLoss     = 0;
     m_data->missingBallDetections    = 0;
     m_data->dribblePerfect           = false;
+    m_data->commandDelay             = 0;
 
     // no robots after initialisation
 }
@@ -100,33 +101,45 @@ std::vector<robot::RadioResponse> Simulator::acceptYellowRobotControlCommand(
 std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
     const SSLSimulationProto::RobotControl& control, bool isBlue)
 {
+    std::deque<QueuedRobotControl>& queue = isBlue ? m_blueCommands : m_yellowCommands;
+    queue.push_back({control, m_time});
+
     // collect responses from robots
     std::vector<robot::RadioResponse> responses;
 
     Simulator::RobotMap& robotMap = isBlue ? m_data->robotsBlue : m_data->robotsYellow;
 
-    for (const SSLSimulationProto::RobotCommand& command : control.robot_commands())
+    // only apply commands that the robots have already received, i.e. whose
+    // command delay has passed
+    while (!queue.empty() && queue.front().receive_time + m_data->commandDelay <= m_time)
     {
-        if (!robotMap.contains(command.id()))
-        {
-            return responses;
-        }
+        const SSLSimulationProto::RobotControl due_control = std::move(queue.front().control);
+        queue.pop_front();
 
-        // pass radio command to robot that matches the id
-        robot::RadioResponse response = robotMap.at(command.id())
-                                            ->setCommand(command, *m_data->ball, m_charge,
-                                                         m_data->robotCommandPacketLoss,
-                                                         m_data->robotReplyPacketLoss);
-        response.set_time(m_time);
-        response.set_is_blue(isBlue);
-
-        // only collect valid responses
-        if (response.IsInitialized())
+        for (const SSLSimulationProto::RobotCommand& command : due_control.robot_commands())
         {
-            if (m_data->robotReplyPacketLoss == 0 ||
-                m_data->rng.uniformFloat(0, 1) > m_data->robotReplyPacketLoss)
+            if (!robotMap.contains(command.id()))
             {
-                responses.emplace_back(response);
+                return responses;
+            }
+
+            // pass radio command to robot that matches the id
+            robot::RadioResponse response =
+                robotMap.at(command.id())
+                    ->setCommand(command, *m_data->ball, m_charge,
+                                 m_data->robotCommandPacketLoss,
+                                 m_data->robotReplyPacketLoss);
+            response.set_time(m_time);
+            response.set_is_blue(isBlue);
+
+            // only collect valid responses
+            if (response.IsInitialized())
+            {
+                if (m_data->robotReplyPacketLoss == 0 ||
+                    m_data->rng.uniformFloat(0, 1) > m_data->robotReplyPacketLoss)
+                {
+                    responses.emplace_back(response);
+                }
             }
         }
     }
@@ -690,6 +703,11 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
             {
                 m_data->dribblePerfect      = !realism.simulate_dribbling();
                 teamOrPerfectDribbleChanged = true;
+            }
+
+            if (realism.has_command_delay())
+            {
+                m_data->commandDelay = std::max<int64_t>(0l, realism.command_delay());
             }
         }
 
