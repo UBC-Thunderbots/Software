@@ -49,6 +49,8 @@ class camun::simulator::SimField
     std::unique_ptr<btCollisionShape> m_plane;
     std::unique_ptr<btCollisionShape> m_goalSide;
     std::unique_ptr<btCollisionShape> m_goalBack;
+    std::unique_ptr<btCollisionShape> m_cornerBlockShape;
+    std::unique_ptr<btCollisionShape> m_goalLineBoundaryShape;
     std::vector<std::unique_ptr<btCollisionObject>> m_objects;
 };
 
