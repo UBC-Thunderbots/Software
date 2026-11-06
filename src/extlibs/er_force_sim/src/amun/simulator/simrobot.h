@@ -23,6 +23,8 @@
 
 #include <btBulletDynamicsCommon.h>
 
+#include <Eigen/Dense>
+
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
 #include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
@@ -102,6 +104,9 @@ class camun::simulator::SimRobot
     void calculateDribblerMove(const btVector3 pos, const btQuaternion rot,
                                const btVector3 linVel, float omega);
     void dribble(const SimBall& ball, float speed);
+    void generateVelocityCoupling();
+    Eigen::Vector3f limitAcceleration(float a_f, float a_s, float a_phi, float v_f,
+                                      float v_s, float omega) const;
 
     RNG m_rng;
     robot::Specs m_specs;
@@ -125,6 +130,10 @@ class camun::simulator::SimRobot
     float m_error_sum_v_s;
     float m_error_sum_v_f;
     float m_error_sum_omega;
+
+    // maps robot velocity (side, forward, rotation) to wheel speeds [rot/s]
+    Eigen::Matrix<float, 4, 3> m_velocityCoupling;
+    Eigen::CompleteOrthogonalDecomposition<Eigen::Matrix<float, 3, 4>> m_inverseCoupling;
 
     bool m_perfectDribbler = false;
 

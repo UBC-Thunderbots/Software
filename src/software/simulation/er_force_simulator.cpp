@@ -49,6 +49,15 @@ robot::Specs ErForceSimulator::createRobotSpecs(
     acceleration->set_a_brake_phi_max(
         robot_constants.robot_max_ang_acceleration_rad_per_s_2);
 
+    // per-wheel acceleration limit, converted from wheel-surface m/s^2 to rot/s^2
+    const float wheel_circumference_m =
+        2.0f * static_cast<float>(M_PI) * robot_constants.wheel_radius_meters;
+    const float wheel_accel_rot_per_s_2 =
+        robot_constants.motor_max_acceleration_m_per_s_2 / wheel_circumference_m;
+    auto* simulation_limits = specs.mutable_simulation_limits();
+    simulation_limits->set_a_speedup_wheel_max(wheel_accel_rot_per_s_2);
+    simulation_limits->set_a_brake_wheel_max(wheel_accel_rot_per_s_2);
+
     auto* strategy = specs.mutable_strategy();
     strategy->set_a_speedup_f_max(
         robot_constants.robot_trajectory_max_acceleration_m_per_s_2);

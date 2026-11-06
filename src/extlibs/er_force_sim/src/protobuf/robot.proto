@@ -46,6 +46,9 @@ message Specs
     optional float ir_param        = 15;
     optional float shoot_radius    = 17;
     optional float dribbler_height = 18;
+    // if not present, the 'acceleration' field is used instead (with an additional
+    // acceleration factor)
+    optional SimulationLimits simulation_limits = 21;
     reserved 20;
 };
 

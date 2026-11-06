@@ -128,6 +128,8 @@ SimRobot::SimRobot(const robot::Specs& specs,
 
     m_shapes.push_back(std::move(wholeShape));
     m_shapes.push_back(std::move(dribblerShape));
+
+    generateVelocityCoupling();
 }
 
 SimRobot::~SimRobot()
