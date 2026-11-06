@@ -13,6 +13,13 @@ message LimitParameters
     optional float a_brake_phi_max   = 6;
 };
 
+message SimulationLimits
+{
+    // Limits maximum acceleration per wheel in the simulator
+    optional float a_speedup_wheel_max = 1;  // [rot/s^2]
+    optional float a_brake_wheel_max   = 2;  // [rot/s^2]
+};
+
 message Specs
 {
     enum GenerationType
