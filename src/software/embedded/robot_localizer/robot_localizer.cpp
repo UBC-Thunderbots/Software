@@ -1,13 +1,14 @@
 #include "robot_localizer.h"
-#include "shared/robot_constants.h" 
+
 #include <cmath>
-#include <iostream>
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/physics/velocity_conversion_util.h"
 
-RobotLocalizer::RobotLocalizer() {
+RobotLocalizer::RobotLocalizer()
+{
     filter_.state_covariance =
         PROCESS_MODEL_INITIAL_VARIANCE *
         Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
@@ -19,8 +20,9 @@ RobotLocalizer::RobotLocalizer() {
         Eigen::Vector<double, MEASUREMENT_SIZE>(
             VISION_X_INITIAL_VARIANCE_M, VISION_Y_INITIAL_VARIANCE_M,
             VISION_THETA_INITIAL_VARIANCE_RAD, MOTOR_X_INITIAL_VARIANCE_M_S,
-              MOTOR_Y_INITIAL_VARIANCE_M_S, MOTOR_THETA_INITIAL_VARIANCE_RAD_S,
-              robot_constants.imu_variance).asDiagonal();
+            MOTOR_Y_INITIAL_VARIANCE_M_S, MOTOR_THETA_INITIAL_VARIANCE_RAD_S,
+            robot_constants.imu_variance)
+            .asDiagonal();
 }
 
 void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delta_time)
@@ -52,8 +54,7 @@ void RobotLocalizer::update(const VisionData& data)
     }
 
     auto rollback_point = std::find_if(
-        history.begin(), history.end(),
-        [&](const FilterStep& step)
+        history.begin(), history.end(), [&](const FilterStep& step)
         { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
     // If rollback point is at the start, vision is newer than all history steps
