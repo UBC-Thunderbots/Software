@@ -1,7 +1,6 @@
 #include "robot_localizer.h"
 #include "shared/robot_constants.h" 
 #include <cmath>
-#include <iostream>
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"
