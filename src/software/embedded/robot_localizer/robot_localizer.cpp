@@ -1,24 +1,25 @@
 #include "robot_localizer.h"
-
+#include "shared/robot_constants.h" 
 #include <cmath>
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"
 #include "software/physics/velocity_conversion_util.h"
 
-RobotLocalizer::RobotLocalizer()
-{
+RobotLocalizer::RobotLocalizer() {
     filter_.state_covariance =
         PROCESS_MODEL_INITIAL_VARIANCE *
         Eigen::Vector<double, STATE_SIZE>(1, 1, 1, 1, 1, 1).asDiagonal();
+
+    robot_constants::RobotConstants robot_constants =
+        robot_constants::createRobotConstants();
 
     filter_.measurement_covariance =
         Eigen::Vector<double, MEASUREMENT_SIZE>(
             VISION_X_INITIAL_VARIANCE_M, VISION_Y_INITIAL_VARIANCE_M,
             VISION_THETA_INITIAL_VARIANCE_RAD, MOTOR_X_INITIAL_VARIANCE_M_S,
-            MOTOR_Y_INITIAL_VARIANCE_M_S, MOTOR_THETA_INITIAL_VARIANCE_RAD_S,
-            ImuService::IMU_VARIANCE)
-            .asDiagonal();
+              MOTOR_Y_INITIAL_VARIANCE_M_S, MOTOR_THETA_INITIAL_VARIANCE_RAD_S,
+              robot_constants.imu_variance).asDiagonal();
 }
 
 void RobotLocalizer::predict(const Vector& target_velocity, const Duration& delta_time)
