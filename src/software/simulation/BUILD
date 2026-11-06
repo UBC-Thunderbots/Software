@@ -10,8 +10,8 @@ cc_library(
     srcs = ["er_force_simulator.cpp"],
     hdrs = ["er_force_simulator.h"],
     data = [
-        "//extlibs/er_force_sim/config/simulator:2020.txt",
-        "//extlibs/er_force_sim/config/simulator:2020B.txt",
+        "//extlibs/er_force_sim/config/simulator:2023B.txt",
+        "//extlibs/er_force_sim/config/simulator:2026.txt",
         "//extlibs/er_force_sim/config/simulator:default.txt",
         "//extlibs/er_force_sim/config/simulator:realistic.txt",
     ],

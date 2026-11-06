@@ -94,12 +94,12 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
 
     if (field_type == TbotsProto::FieldType::DIV_A)
     {
-        full_filename = full_filename + CONFIG_FILE + ".txt";
+        full_filename = full_filename + CONFIG_FILE_DIV_A;
     }
     else
     {
         // loading division B configuration
-        full_filename = full_filename + CONFIG_FILE + "B.txt";
+        full_filename = full_filename + CONFIG_FILE_DIV_B;
     }
 
     std::ifstream config_file(full_filename);
