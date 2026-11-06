@@ -1,6 +1,9 @@
 exports_files([
     "2020.txt",
     "2020B.txt",
+    "2023.txt",
+    "2023B.txt",
+    "2026.txt",
     "default.txt",
     "realistic.txt",
 ])
