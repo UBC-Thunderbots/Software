@@ -24,6 +24,7 @@
 #include <btBulletDynamicsCommon.h>
 
 #include <Eigen/Dense>
+#include <Eigen/QR>
 
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
@@ -133,7 +134,7 @@ class camun::simulator::SimRobot
 
     // maps robot velocity (side, forward, rotation) to wheel speeds [rot/s]
     Eigen::Matrix<float, 4, 3> m_velocityCoupling;
-    Eigen::CompleteOrthogonalDecomposition<Eigen::Matrix<float, 3, 4>> m_inverseCoupling;
+    Eigen::CompleteOrthogonalDecomposition<Eigen::Matrix<float, 4, 3>> m_inverseCoupling;
 
     bool m_perfectDribbler = false;
 
