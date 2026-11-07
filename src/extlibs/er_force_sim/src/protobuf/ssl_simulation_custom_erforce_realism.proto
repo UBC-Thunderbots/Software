@@ -53,4 +53,33 @@ message RealismConfigErForce
     // Simulates an offset of all reported object positions (robots, ball) at this
     // magnitude [m]
     optional float object_position_offset = 16;
+
+    // Config for Thunderbots' robot and sensors
+    // 100 in case er force have some updates w new fields at 17, ...
+    // and we want to vendor it.
+    optional SimulatedRobotSensorNoise robot_sensor_noise = 100;
+    // Whether simulated robots execute primitives on the robot localizer's estimate
+    // instead of the true state
+    optional bool enable_robot_localizer = 101;
+}
+
+
+
+// Thunderbots noise for SimulatedRobot's sensors
+message SimulatedRobotSensorNoise
+{
+    message Imu
+    {
+        optional float angular_velocity_bias_rad_per_s      = 1;
+        optional float angular_velocity_stddev_rad_per_s    = 2;
+        optional float linear_acceleration_bias_x_m_per_s_2 = 3;
+        optional float linear_acceleration_bias_y_m_per_s_2 = 4;
+        optional float linear_acceleration_stddev_m_per_s_2 = 5;
+    }
+    message Motor
+    {
+        optional float wheel_velocity_stddev_m_per_s = 1;
+    }
+    optional Imu imu     = 1;
+    optional Motor motor = 2;
 }

@@ -2,9 +2,7 @@ import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 from software.gameplay_tests.validation.ball_enters_region import (
     BallAlwaysStaysInRegion,
     BallEventuallyEntersRegion,
@@ -128,10 +126,10 @@ def test_dribble(
     dribble_orientation,
     ball_pos,
     ball_vel,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -155,7 +153,7 @@ def test_dribble(
                 tbots_cpp.createAngleProto(dribble_orientation)
             )
 
-        simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
+        gameplay_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     eventually_validations = [[RobotEventuallyReceivedBall(robot_id=1)]]
 
@@ -176,12 +174,10 @@ def test_dribble(
     # TODO (#2514): tune dribbling and re-enable
     # Robot always not excessively dribbling
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=25,
-        run_till_end=False,
     )
 
 
@@ -295,11 +291,11 @@ def test_excessive_dribbling_without_enemies(
     dribble_destination,
     final_dribble_orientation,
     should_excessively_dribble,
-    simulated_test_runner,
+    gameplay_test_runner,
     blue_robot_location,
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[blue_robot_location],
                 yellow_robot_locations=[],
@@ -308,7 +304,7 @@ def test_excessive_dribbling_without_enemies(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: protos.DribbleTactic(
                     dribble_destination=tbots_cpp.createPointProto(dribble_destination),
@@ -329,23 +325,21 @@ def test_excessive_dribbling_without_enemies(
         always_validation_sequence_set = [[NeverExcessivelyDribbles()]]
         eventually_validation_sequence_set = [[]]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=5,
     )
 
 
-def test_dribble_with_excessive_dribbling(simulated_test_runner):
+def test_dribble_with_excessive_dribbling(gameplay_test_runner):
     dribble_destination = tbots_cpp.Point(3, 2)
     initial_position = tbots_cpp.Point(4.5, -3.0)
     dribble_orientation = tbots_cpp.Angle.half()
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -357,7 +351,7 @@ def test_dribble_with_excessive_dribbling(simulated_test_runner):
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 1: protos.DribbleTactic(
                     dribble_destination=tbots_cpp.createPointProto(dribble_destination),
@@ -378,16 +372,15 @@ def test_dribble_with_excessive_dribbling(simulated_test_runner):
         [EventuallyStartsExcessivelyDribbling()],
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
         test_timeout_s=10,
     )
 
 
 def test_run_into_enemy_robot_knock_ball_away(
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     initial_position = tbots_cpp.Point(-2, 1.5)
     dribble_destination = tbots_cpp.Point(-1, 2)
@@ -395,8 +388,8 @@ def test_run_into_enemy_robot_knock_ball_away(
     ball_pos = tbots_cpp.Point(2, -2)
     ball_vel = tbots_cpp.Vector(2, 4)
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[
                     tbots_cpp.Point(-3, 2.5),
@@ -415,7 +408,7 @@ def test_run_into_enemy_robot_knock_ball_away(
             final_dribble_orientation=tbots_cpp.createAngleProto(dribble_orientation),
         )
 
-        simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
+        gameplay_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     eventually_validations = [
         [
@@ -429,24 +422,23 @@ def test_run_into_enemy_robot_knock_ball_away(
     # TODO (#2514): tune dribbling and re-enable
     # Robot always not excessively dribbling
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
+        eventually_validation_sequence_set=eventually_validations,
         test_timeout_s=12,
     )
 
 
 def test_robot_not_bumping_ball_when_turning(
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
     # The ball is placed right behind the friendly robot. Verify that the robot
     # does not bump the ball away when turning around to dribble it.
     robot_location = tbots_cpp.Point(-1, 0)
     ball_location = robot_location + tbots_cpp.Vector(ROBOT_MAX_RADIUS_METERS, 0)
 
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[tbots_cpp.Point(-3, 2.5), robot_location],
                 blue_robot_orientations=[
@@ -461,7 +453,7 @@ def test_robot_not_bumping_ball_when_turning(
         )
 
         dribble_params = protos.DribbleTactic(allow_excessive_dribbling=False)
-        simulated_test_runner.set_tactics(blue_tactics={1: dribble_params})
+        gameplay_test_runner.set_tactics(blue_tactics={1: dribble_params})
 
     eventually_validations = [
         [
@@ -475,12 +467,10 @@ def test_robot_not_bumping_ball_when_turning(
         [BallAlwaysStaysInRegion([tbots_cpp.Circle(ball_location, 0.2)])]
     ]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validations,
-        ag_eventually_validation_sequence_set=eventually_validations,
-        inv_always_validation_sequence_set=always_validations,
-        ag_always_validation_sequence_set=always_validations,
+        eventually_validation_sequence_set=eventually_validations,
+        always_validation_sequence_set=always_validations,
     )
 
 

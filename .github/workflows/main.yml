@@ -149,17 +149,16 @@ jobs:
       - uses: ./.github/actions/environment-setup
 
       - name: Simulated Test Run
-          # TODO (#2908): reenable once field tests can be ran as simulated
-          # //software/gameplay_tests/...    \
         run: |
           cd src
           bazel test //software/gameplay_tests:requirements.test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
-            --test_arg="--ci_mode"            \
-            -- //software:unix_full_system       \
-            -//software/gameplay_tests:requirements.test \
-            //software/ai/stp/...              \
-            //software/ai/navigator/...
+            --test_arg="--ci_mode"                                        \
+            -- //software:unix_full_system                                \
+            -//software/gameplay_tests:requirements.test                  \
+            //software/ai/stp/...                                         \
+            //software/ai/navigator/...                                   \
+            //software/simulation/...
             
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded

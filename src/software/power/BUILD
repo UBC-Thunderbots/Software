@@ -40,16 +40,6 @@ platformio_library(
 )
 
 platformio_library(
-    name = "geneva",
-    src = "geneva.cpp",
-    hdr = "geneva.h",
-    deps = [
-        ":pins",
-        "//proto:tbots_nanopb_proto",
-    ],
-)
-
-platformio_library(
     name = "charger",
     src = "charger.cpp",
     hdr = "charger.h",
@@ -73,7 +63,6 @@ platformio_library(
     deps = [
         ":charger",
         ":chicker",
-        ":geneva",
         ":pins",
         "//proto:tbots_nanopb_proto",
     ],
@@ -95,13 +84,12 @@ platformio_project(
     }),
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
-    platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+    platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
     deps = [
         ":charger",
         ":chicker",
         ":control_executor",
         ":dribbler",
-        ":geneva",
         ":pins",
         ":power_monitor",
         "//proto:tbots_nanopb_proto",

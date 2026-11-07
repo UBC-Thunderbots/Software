@@ -2,7 +2,7 @@ import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
-from software.gameplay_tests.simulated_test_fixture import (
+from software.gameplay_tests.util import (
     pytest_main,
 )
 from software.gameplay_tests.validation.ball_enters_region import (
@@ -43,10 +43,10 @@ def test_ball_chipped_on_intercept(
     ball_initial_position,
     ball_initial_velocity,
     position_to_block_from,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[position_to_block_from],
@@ -55,7 +55,7 @@ def test_ball_chipped_on_intercept(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: protos.PassDefenderTactic(
                     position_to_block_from=tbots_cpp.createPointProto(
@@ -82,12 +82,10 @@ def test_ball_chipped_on_intercept(
 
     eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -116,10 +114,10 @@ def test_avoid_intercept_scenario(
     ball_initial_position,
     ball_initial_velocity,
     position_to_block_from,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 [],
                 blue_robot_locations=[position_to_block_from],
@@ -128,7 +126,7 @@ def test_avoid_intercept_scenario(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: protos.PassDefenderTactic(
                     position_to_block_from=tbots_cpp.createPointProto(
@@ -173,12 +171,10 @@ def test_avoid_intercept_scenario(
 
     eventually_validation_sequence_set = [[BallSpeedEventuallyBelowThreshold(0.4)]]
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
@@ -249,10 +245,10 @@ def test_steal_ball(
     position_to_block_from,
     enemy_kicker_position,
     should_steal,
-    simulated_test_runner,
+    gameplay_test_runner,
 ):
-    def setup(*args):
-        simulated_test_runner.set_world_state(
+    def setup():
+        gameplay_test_runner.set_world_state(
             create_world_state(
                 blue_robot_locations=[position_to_block_from],
                 yellow_robot_locations=[enemy_kicker_position],
@@ -261,7 +257,7 @@ def test_steal_ball(
             )
         )
 
-        simulated_test_runner.set_tactics(
+        gameplay_test_runner.set_tactics(
             blue_tactics={
                 0: protos.PassDefenderTactic(
                     position_to_block_from=tbots_cpp.createPointProto(
@@ -294,12 +290,10 @@ def test_steal_ball(
             FriendlyNeverHasBallPossession(tolerance=0.05)
         )
 
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
     )
 
 

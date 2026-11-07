@@ -4,13 +4,11 @@ import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
-from software.gameplay_tests.simulated_test_fixture import (
-    pytest_main,
-)
+from software.gameplay_tests.util import pytest_main
 
 
-def test_shoot_or_chip_play(simulated_test_runner):
-    def setup(*args):
+def test_shoot_or_chip_play(gameplay_test_runner):
+    def setup():
         ball_initial_pos = tbots_cpp.Point(-1.4, 2)
         ball_initial_vel = tbots_cpp.Vector(0, 0)
 
@@ -47,25 +45,24 @@ def test_shoot_or_chip_play(simulated_test_runner):
 
         world_state.yellow_robots.robot_states[5].CopyFrom(last_robot)
 
-        simulated_test_runner.set_world_state(world_state)
+        gameplay_test_runner.set_world_state(world_state)
 
-        simulated_test_runner.set_plays(
+        gameplay_test_runner.set_plays(
             blue_play=protos.PlayName.ShootOrChipPlay,
             yellow_play=protos.PlayName.HaltPlay,
         )
 
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
         )
-        simulated_test_runner.send_gamecontroller_command(
+        gameplay_test_runner.send_gamecontroller_command(
             gc_command=protos.Command.Type.FORCE_START, team=SslTeam.BLUE
         )
 
     # TODO (#3651): add validations
-    simulated_test_runner.run_test(
+    gameplay_test_runner.run_test(
         setup=setup,
-        inv_eventually_validation_sequence_set=[[]],
-        ag_eventually_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
         test_timeout_s=10,
     )
 
