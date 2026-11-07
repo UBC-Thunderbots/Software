@@ -32,6 +32,11 @@ Team RobotTeamFilter::getFilteredData(
         {
             new_filtered_robot_data.emplace_back(*data);
         }
+        else
+        {
+            // Destroy if expired filter
+            it = robot_filters.erase(it);
+        }
     }
 
     Team new_team_state = current_team_state;
