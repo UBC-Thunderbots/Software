@@ -154,6 +154,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         // linear and would see a jump of ~2pi whenever the robot turns across the wrap
         // point. We unwrap the detection onto the estimate by adding only the shortest
         // signed difference to it, so the innovation always lies within [-pi, pi].
+
         const double predicted_orientation = ang_kalman_filter.state_estimate(POS_W);
         const Angle orientation_innovation = (best_robot_detection->orientation -
                                               Angle::fromRadians(predicted_orientation))
