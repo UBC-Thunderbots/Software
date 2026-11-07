@@ -44,11 +44,13 @@ const Eigen::Matrix<double, 1, 1> ANG_MEASUREMENT_COVARIANCE =
     (ANG_VISION_NOISE_RAD * ANG_VISION_NOISE_RAD);
 
 // Vision measures robot's position, orientation but not its velocity nor angular velocity
+// clang-format off
 const Eigen::Matrix<double, 2, 4> POS_MEASUREMENT_MODEL =
-    (Eigen::Matrix<double, 2, 4>() << 1, 0, 0, 0, 0, 1, 0, 0).finished();
+    (Eigen::Matrix<double, 2, 4>() << 1, 0, 0, 0,
+                                      0, 1, 0, 0).finished();
 const Eigen::Matrix<double, 1, 2> ANG_MEASUREMENT_MODEL =
     (Eigen::Matrix<double, 1, 2>() << 1, 0).finished();
-
+// clang-format on
 
 // TODO: test these
 // The fastest we will believe the robot could be travelling when deciding whether a
@@ -144,10 +146,9 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         // point. We unwrap the detection onto the estimate by adding only the shortest
         // signed difference to it, so the innovation always lies within [-pi, pi].
         const double predicted_orientation = ang_kalman_filter.state_estimate(0);
-        const Angle orientation_innovation =
-            (best_robot_detection->orientation -
-             Angle::fromRadians(predicted_orientation))
-                .clamp();
+        const Angle orientation_innovation = (best_robot_detection->orientation -
+                                              Angle::fromRadians(predicted_orientation))
+                                                 .clamp();
         AngMeasurement ang_measurement(predicted_orientation +
                                        orientation_innovation.toRadians());
 
@@ -248,9 +249,14 @@ void RobotFilter::predict(double delta_t)
 {
     // because robots move using motors that stay on, unlike balls that just roll, i will
     // be assuming that they keep moving with the same velocity
-    pos_kalman_filter.process_model << 1, 0, delta_t, 0, 0, 1, 0, delta_t, 0, 0, 1, 0, 0,
-        0, 0, 1;
-    ang_kalman_filter.process_model << 1, delta_t, 0, 1;
+    // clang-format off
+    pos_kalman_filter.process_model <<  1, 0, delta_t, 0,
+                                        0, 1, 0, delta_t,
+                                        0, 0, 1, 0,
+                                        0, 0, 0, 1;
+    ang_kalman_filter.process_model <<  1, delta_t,
+                                        0, 1;
+    // clang-format on
 
 
     // We compute position process covariance with the Discrete White Noise Acceleration

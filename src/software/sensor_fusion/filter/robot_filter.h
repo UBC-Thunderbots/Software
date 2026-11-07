@@ -43,8 +43,8 @@ class RobotFilter
      *
      * @return The new Robot based on the estimated state of the Robot given the new data.
      * If there is no robot data for this robot, it will return the prediction of the
-     * filter for a few updates, but if there are (EXPIRED_FRAME_THRESHOLD) consecutive
-     * missing frames, returns std::nullopt
+     * filter for a few updates, but if it does not receive data for
+     * expiry_buffer_duration, returns std::nullopt
      */
     std::optional<Robot> estimateRobotState(
         const std::vector<RobotDetection>& new_robot_data, const Timestamp& current_time,
