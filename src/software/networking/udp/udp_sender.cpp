@@ -3,10 +3,10 @@
 #include "software/networking/tbots_network_exception.h"
 #include "software/networking/udp/network_utils.h"
 
-UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
+UdpSender::UdpSender(boost::asio::io_context& io_context, const std::string& ip_address,
                      const unsigned short port, const std::string& interface,
                      bool multicast)
-    : socket_(io_service), interface_(interface), ip_address_(ip_address)
+    : socket_(io_context), interface_(interface), ip_address_(ip_address)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
     if (isIpv6(ip_address))
