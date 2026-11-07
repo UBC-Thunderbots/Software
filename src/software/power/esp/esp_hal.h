@@ -39,9 +39,9 @@ class EspHal final : public PowerHAL
     /** Initializes I2C and the LTC4151 power monitor. */
     void initializePowerMonitor();
 
-    hw_timer_t* pulse_timer_    = nullptr;
-    volatile bool pulse_active_ = false;
-    portMUX_TYPE timer_mux_     = portMUX_INITIALIZER_UNLOCKED;
+    hw_timer_t* pulse_timer_        = nullptr;
+    volatile bool pulse_active_     = false;
+    mutable portMUX_TYPE timer_mux_ = portMUX_INITIALIZER_UNLOCKED;
     LTC4151 monitor_;
 
     /** Active singleton instance used by static ISRs to access member state. */
