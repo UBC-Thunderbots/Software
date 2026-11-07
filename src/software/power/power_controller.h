@@ -44,10 +44,10 @@ class PowerController
     uint32_t target_dribbler_rpm_          = 0;
     uint32_t current_dribbler_rpm_         = 0;
 
-    static constexpr uint32_t COOLDOWN_US            = 3000000;
-    static constexpr uint32_t CHARGE_TOGGLE_DELAY_US = 5000;
-    static constexpr uint32_t MAX_CHARGE_DURATION_US    = 2000000;
+    static constexpr uint32_t COOLDOWN_US                = 3000000;
+    static constexpr uint32_t CHARGE_TOGGLE_DELAY_US     = 5000;
+    static constexpr uint32_t MAX_CHARGE_DURATION_US     = 2000000;
     static constexpr uint32_t MAX_CHICKER_PULSE_WIDTH_US = 20000;
-    static constexpr uint32_t MAX_DRIBBLER_SPEED_RPM    = 11040;
-    static constexpr uint32_t DRIBBLER_RAMP_FACTOR      = 4;
+    static constexpr uint32_t MAX_DRIBBLER_SPEED_RPM     = 11040;
+    static constexpr uint32_t DRIBBLER_RAMP_FACTOR       = 4;
 };

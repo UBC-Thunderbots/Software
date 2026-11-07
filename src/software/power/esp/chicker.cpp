@@ -9,7 +9,9 @@ void EspHal::initializeChicker()
     digitalWrite(CHIPPER_PIN, LOW);
     digitalWrite(KICKER_PIN, LOW);
 
-    pulse_timer_ = timerBegin(CHICKER_PULSE_TIMER, 80, true); //80 is dividing factor for timer from 80 Mhz to 1Mhz
+    pulse_timer_ =
+        timerBegin(CHICKER_PULSE_TIMER, 80,
+                   true);  // 80 is dividing factor for timer from 80 Mhz to 1Mhz
     if (pulse_timer_ != nullptr)
         timerAttachInterrupt(pulse_timer_, &EspHal::pulseTimerISR, true);
 }
