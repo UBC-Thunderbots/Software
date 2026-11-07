@@ -148,4 +148,7 @@ class RobotFilter
     std::optional<Timestamp> last_predict_timestamp;
     int consecutive_outliers;
     Duration expiry_buffer_duration;
+
+    // I am unsure if we will ever properly use multiple cameras, but if we do, consider
+    // looking into health based uncertainty.
 };

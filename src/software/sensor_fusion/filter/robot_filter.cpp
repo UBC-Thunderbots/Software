@@ -1,108 +1,21 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 
+#include "software/sensor_fusion/filter/robot_filter_constants.h"
 #include "software/world/robot.h"
-
-namespace
-{
-// The robot starts out unknown, so the initial estimate is given a covariance wide
-// enough to cover anywhere on the field it might be and any speed it might legally be
-// moving at. This makes the filter trust the first detections it sees almost
-// entirely, letting it converge onto the robot within a few frames.
-constexpr double INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
-constexpr double INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
-constexpr double INITIAL_ORIENTATION_UNCERTAINTY_RAD  = M_PI * M_PI / 3;
-// TODO: do measurements for this
-// not magic number trust in my mental simulation i think maximum angular velocity is like
-// 2 revs per second so that's like 4pi and then variance = (w_max / 2)^2 so 4 * pi^2
-// mental simulation means i imagined it btw i'll probably get a better number when i test
-constexpr double INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 4 * M_PI * M_PI;
-
-const Eigen::Vector<double, RobotFilter::POS_STATE_SIZE> POS_INITIAL_STATE =
-    Eigen::Vector<double, RobotFilter::POS_STATE_SIZE>::Zero();
-const Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE> ANG_INITIAL_STATE =
-    Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE>::Zero();
-const Eigen::Matrix<double, RobotFilter::POS_STATE_SIZE, RobotFilter::POS_STATE_SIZE>
-    POS_INITIAL_COVARIANCE =
-        Eigen::Vector<double, RobotFilter::POS_STATE_SIZE>(
-            INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
-            INITIAL_POSITION_UNCERTAINTY_M* INITIAL_POSITION_UNCERTAINTY_M,
-            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
-            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
-            .asDiagonal();
-const Eigen::Matrix<double, RobotFilter::ANG_STATE_SIZE, RobotFilter::ANG_STATE_SIZE>
-    ANG_INITIAL_COVARIANCE =
-        Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE>(
-            INITIAL_ORIENTATION_UNCERTAINTY_RAD * INITIAL_ORIENTATION_UNCERTAINTY_RAD,
-            INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S*
-                INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S)
-            .asDiagonal();
-
-
-// How noisy we expect SSL Vision's robot position detections to be. Measure this by
-// logging a stationary robot and taking the standard deviation of the detections.
-// TODO: do measurements for this
-constexpr double POS_VISION_NOISE_M = 0.01;
-const Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
-                    RobotFilter::POS_MEASUREMENT_SIZE>
-    POS_MEASUREMENT_COVARIANCE =
-        Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
-                      RobotFilter::POS_MEASUREMENT_SIZE>::Identity() *
-        (POS_VISION_NOISE_M * POS_VISION_NOISE_M);
-constexpr double ANG_VISION_NOISE_RAD = .1;
-const Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
-                    RobotFilter::ANG_MEASUREMENT_SIZE>
-    ANG_MEASUREMENT_COVARIANCE =
-        Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
-                      RobotFilter::ANG_MEASUREMENT_SIZE>::Identity() *
-        (ANG_VISION_NOISE_RAD * ANG_VISION_NOISE_RAD);
-
-// Vision measures robot's position, orientation but not its velocity nor angular velocity
-// clang-format off
-const Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE, RobotFilter::POS_STATE_SIZE> POS_MEASUREMENT_MODEL =
-    (Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE, RobotFilter::POS_STATE_SIZE>() << 1, 0, 0, 0,
-                                      0, 1, 0, 0).finished();
-const Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE, RobotFilter::ANG_STATE_SIZE> ANG_MEASUREMENT_MODEL =
-    (Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE, RobotFilter::ANG_STATE_SIZE>() << 1, 0).finished();
-// clang-format on
-
-// TODO: test these
-// The fastest we will believe the robot could be travelling when deciding whether a
-// detection could plausibly belong to it.
-constexpr double MAX_ROBOT_SPEED_M_PER_S = 6.0;
-
-// Slack on the max robot speed gate, so that vision noise on a robot that has been
-// sitting still cannot by itself push a detection out of reach of the estimate
-constexpr double MAX_ROBOT_SPEED_GATE_TOLERANCE_M = 0.05;
-
-// The standard deviation of the acceleration that the constant velocity motion model
-// does not account for: deflections, uneven turf, and the tail of a kick. A kick
-// itself is far larger than this, but it is also abrupt enough that the outlier gates
-// catch it and reset the filter, so this does not need to cover one.
-// TODO: this does NOT apply to a robot but like whatever man lol
-constexpr double ACCELERATION_NOISE_M_PER_S_SQUARED       = 4.0;
-constexpr double ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED = 1.0;
-
-// Maximum Mahalanobi's Distance before rejecting as outlier
-constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
-
-// How many detections in a row may be rejected as outliers before we conclude the
-// estimate itself is wrong and reset onto the newest detection
-constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
-}  // namespace
 
 // control model = 0.
 RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state),
-      pos_kalman_filter(POS_INITIAL_STATE, POS_INITIAL_COVARIANCE,
+      pos_kalman_filter(RF_POS_INITIAL_STATE, RF_POS_INITIAL_COVARIANCE,
                         Eigen::Matrix<double, POS_STATE_SIZE, POS_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, POS_STATE_SIZE, POS_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, POS_STATE_SIZE, CONTROL_SIZE>::Zero(),
-                        POS_MEASUREMENT_MODEL, POS_MEASUREMENT_COVARIANCE),
-      ang_kalman_filter(ANG_INITIAL_STATE, ANG_INITIAL_COVARIANCE,
+                        RF_POS_MEASUREMENT_MODEL, RF_POS_MEASUREMENT_COVARIANCE),
+      ang_kalman_filter(RF_ANG_INITIAL_STATE, RF_ANG_INITIAL_COVARIANCE,
                         Eigen::Matrix<double, ANG_STATE_SIZE, ANG_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, ANG_STATE_SIZE, ANG_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, ANG_STATE_SIZE, CONTROL_SIZE>::Zero(),
-                        ANG_MEASUREMENT_MODEL, ANG_MEASUREMENT_COVARIANCE),
+                        RF_ANG_MEASUREMENT_MODEL, RF_ANG_MEASUREMENT_COVARIANCE),
       consecutive_outliers(0),
       expiry_buffer_duration(expiry_buffer_duration)
 {
@@ -112,16 +25,16 @@ RobotFilter::RobotFilter(RobotDetection current_robot_state,
     : current_robot_state(current_robot_state.id, current_robot_state.position,
                           Vector(0, 0), current_robot_state.orientation,
                           AngularVelocity::zero(), current_robot_state.timestamp),
-      pos_kalman_filter(POS_INITIAL_STATE, POS_INITIAL_COVARIANCE,
+      pos_kalman_filter(RF_POS_INITIAL_STATE, RF_POS_INITIAL_COVARIANCE,
                         Eigen::Matrix<double, POS_STATE_SIZE, POS_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, POS_STATE_SIZE, POS_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, POS_STATE_SIZE, CONTROL_SIZE>::Zero(),
-                        POS_MEASUREMENT_MODEL, POS_MEASUREMENT_COVARIANCE),
-      ang_kalman_filter(ANG_INITIAL_STATE, ANG_INITIAL_COVARIANCE,
+                        RF_POS_MEASUREMENT_MODEL, RF_POS_MEASUREMENT_COVARIANCE),
+      ang_kalman_filter(RF_ANG_INITIAL_STATE, RF_ANG_INITIAL_COVARIANCE,
                         Eigen::Matrix<double, ANG_STATE_SIZE, ANG_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, ANG_STATE_SIZE, ANG_STATE_SIZE>::Zero(),
                         Eigen::Matrix<double, ANG_STATE_SIZE, CONTROL_SIZE>::Zero(),
-                        ANG_MEASUREMENT_MODEL, ANG_MEASUREMENT_COVARIANCE),
+                        RF_ANG_MEASUREMENT_MODEL, RF_ANG_MEASUREMENT_COVARIANCE),
       consecutive_outliers(0),
       expiry_buffer_duration(expiry_buffer_duration)
 {
@@ -135,7 +48,10 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     const std::optional<RobotDetection> best_robot_detection =
         getBestRobotDetection(new_robot_data);
 
-    // If the timestamp is ahead of current time, then ignores it.
+
+    // If the current_time called is ahead of current time, then runs predict step
+    // Updates the last_predict_timestamp to the current time called.
+    // Therefore, we must keey estimating with further points ahead.
     if (last_predict_timestamp && current_time > *last_predict_timestamp)
     {
         predict((current_time - *last_predict_timestamp).toSeconds());
@@ -146,10 +62,12 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         last_predict_timestamp = current_time;
     }
 
+
     if (best_robot_detection)
     {
         PosMeasurement pos_measurement(best_robot_detection->position.x(),
                                        best_robot_detection->position.y());
+
         // Vision reports orientation wrapped to [-pi, pi], but the Kalman filter is
         // linear and would see a jump of ~2pi whenever the robot turns across the wrap
         // point. We unwrap the detection onto the estimate by adding only the shortest
@@ -171,9 +89,11 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         // Two gates determining whether we take the detection:
         // 1. Whether it is physically possible to arrive the new destination
         // 2. Statistical gating using Mahalanobis
+        // TODO: mahalanobisDistance and update both calculate pseudoinverse. is this a
+        // problem?
         else if (isWithinMaxRobotSpeed(best_robot_detection->position, current_time) &&
                  pos_kalman_filter.mahalanobisDistance(pos_measurement) <
-                     MAHALANOBIS_GATE_THRESHOLD)
+                     RF_MAHALANOBIS_GATE_THRESHOLD)
         {
             pos_kalman_filter.update(pos_measurement);
             ang_kalman_filter.update(ang_measurement);
@@ -187,7 +107,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         else
         {
             consecutive_outliers++;
-            if (consecutive_outliers > CONSECUTIVE_OUTLIERS_THRESHOLD)
+            if (consecutive_outliers > RF_CONSECUTIVE_OUTLIERS_THRESHOLD)
             {
                 reset(pos_measurement, ang_measurement, current_time);
             }
@@ -272,7 +192,7 @@ void RobotFilter::predict(double delta_t)
     // model. It depends on delta_t, so we compute it dynamically based on time passed
     // since last prediction
     const double acceleration_variance =
-        ACCELERATION_NOISE_M_PER_S_SQUARED * ACCELERATION_NOISE_M_PER_S_SQUARED;
+        RF_ACCELERATION_NOISE_M_PER_S_SQUARED * RF_ACCELERATION_NOISE_M_PER_S_SQUARED;
     const double delta_t_squared = delta_t * delta_t;
     const double position_noise =
         acceleration_variance * delta_t_squared * delta_t_squared / 4.0;
@@ -282,8 +202,8 @@ void RobotFilter::predict(double delta_t)
 
     // For angle kalman, we compute the angle process covariance with Continuous White
     // Noise Acceleration model. i don't know anymore i just pray it works.
-    const double ang_acceleration_variance = ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED *
-                                             ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED;
+    const double ang_acceleration_variance = RF_ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED *
+                                             RF_ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED;
     const double angle_noise =
         ang_acceleration_variance * delta_t_squared * delta_t / 3.0;
     const double ang_correlation_noise =
@@ -314,8 +234,8 @@ bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
     const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
     const Point predicted_position(pos_kalman_filter.state_estimate(POS_X),
                                    pos_kalman_filter.state_estimate(POS_Y));
-    const double reachable_distance = MAX_ROBOT_SPEED_M_PER_S * std::max(delta_t, 0.0) +
-                                      MAX_ROBOT_SPEED_GATE_TOLERANCE_M;
+    const double reachable_distance = RF_MAX_ROBOT_SPEED_M_PER_S * std::max(delta_t, 0.0) +
+                                      RF_MAX_ROBOT_SPEED_GATE_TOLERANCE_M;
 
     return (detection_position - predicted_position).length() <= reachable_distance;
 }
@@ -335,8 +255,8 @@ void RobotFilter::reset(const PosMeasurement& pos_measurement,
     ang_kalman_filter.state_estimate
         << Angle::fromRadians(ang_measurement(0)).clamp().toRadians(),
         0;
-    pos_kalman_filter.state_covariance = POS_INITIAL_COVARIANCE;
-    ang_kalman_filter.state_covariance = ANG_INITIAL_COVARIANCE;
+    pos_kalman_filter.state_covariance = RF_POS_INITIAL_COVARIANCE;
+    ang_kalman_filter.state_covariance = RF_ANG_INITIAL_COVARIANCE;
 
     consecutive_outliers = 0;
     // The reset measurement is now what the estimate is built on, so it becomes the
