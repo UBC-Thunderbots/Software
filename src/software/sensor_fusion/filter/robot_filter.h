@@ -5,6 +5,7 @@
 
 #include "software/constants.h"
 #include "software/geom/point.h"
+// TODO: Investigate if a non-linear Kalman filter would return significant improvements
 #include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/duration.h"
@@ -57,9 +58,6 @@ class RobotFilter
      */
     unsigned int getRobotId() const;
 
-   private:
-    Robot current_robot_state;
-
     // KF Dimensions
     // Position State: position x, position y, velocity x, velocity y
     // Angle State: angle theta, angular velocity w
@@ -71,6 +69,22 @@ class RobotFilter
     static constexpr int ANG_MEASUREMENT_SIZE = 1;
     // No control
     static constexpr int CONTROL_SIZE = 1;
+
+    enum PosStateIndex : int
+    {
+        POS_X = 0,
+        POS_Y = 1,
+        VEL_X = 2,
+        VEL_Y = 3,
+    };
+    enum AngStateIndex : int
+    {
+        POS_W = 0,
+        VEL_W = 1,
+    };
+
+   private:
+    Robot current_robot_state;
 
     using PosKalmanFilter =
         LinearKalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
