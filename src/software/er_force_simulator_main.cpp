@@ -114,7 +114,7 @@ int main(int argc, char** argv)
         std::queue<TbotsProto::PrimitiveSet> yellow_prims;
 
         auto avah_ack_output =
-            ThreadedProtoUnixSender<TbotsProto::AvahAck>(runtime_dir + "/avah_ack");
+            ThreadedProtoUnixSender<TbotsProto::SimulatorTickFinished>(runtime_dir + "/avah_ack");
 
         auto avah_send_if_both = [&]()
         {
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
             yellow_visions.pop();
             yellow_prims.pop();
             avah::AVAH_LOG("Send avah ack");
-            avah_ack_output.sendProto(TbotsProto::AvahAck{});
+            avah_ack_output.sendProto(TbotsProto::SimulatorTickFinished{});
         };
 
         // Outputs

@@ -16,7 +16,7 @@ logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
 WORLD_BUFFER_TIMEOUT = 1.5
-ACK_BUFFER_TIMEOUT = 1.5
+SIMULATOR_TICK_BUFFER_TIMEOUT = 1.5
 TICK_DURATION_S = DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 
 
@@ -52,11 +52,11 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.ci_mode = ci_mode
-        self.avah_ack_buffer = ThreadSafeBuffer(
-            buffer_size=10, protobuf_type=protos.AvahAck
+        self.simulator_tick_finished_buffer = ThreadSafeBuffer(
+            buffer_size=10, protobuf_type=protos.SimulatorTickFinished
         )
         self.simulator_proto_unix_io.register_observer(
-            protos.AvahAck, self.avah_ack_buffer
+            protos.SimulatorTickFinished, self.simulator_tick_finished_buffer
         )
 
     @override
@@ -126,16 +126,25 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             while True:
                 try:
-                    self.avah_ack_buffer.get(
-                        block=True, timeout=ACK_BUFFER_TIMEOUT, return_cached=False
+                    self.simulator_tick_finished_buffer.get(
+                        block=True,
+                        timeout=SIMULATOR_TICK_BUFFER_TIMEOUT,
+                        return_cached=False,
                     )
+
+                    break
+                except queue.Empty:
+                    raise RuntimeError("SIMULATOR TICK FINISHED NOT RECEIVED")
+
+            while True:
+                try:
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
                     break
                 except queue.Empty:
-                    raise RuntimeError("AVAH ACK NOT RECEIVED")
+                    raise RuntimeError("BLUE WORLD NOT RECEIVED")
 
             # get the time difference after we get the primitive (after any blocking that happened)
             processing_time = time.time() - processing_start_time

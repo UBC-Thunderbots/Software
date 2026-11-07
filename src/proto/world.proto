@@ -56,13 +56,13 @@ message WorldState
 
 message WorldStateReceivedTrigger {}
 
-message AvahAck {}
-
 message SimulatorTick
 {
     // The duration to step the simulation
     required double milliseconds = 1;
 }
+
+message SimulatorTickFinished {}
 
 message SimulationState
 {
