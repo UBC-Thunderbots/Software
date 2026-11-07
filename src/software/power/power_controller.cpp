@@ -40,7 +40,8 @@ void PowerController::autochip(uint32_t pulse_width_us)
 
 void PowerController::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
 {
-    if (pulsing_ || on_cooldown_ || !hal_.startChickerPulse(output, pulse_width_us))
+    if (pulse_width_us > MAX_CHICKER_PULSE_WIDTH_US || pulsing_ || on_cooldown_ ||
+        !hal_.startChickerPulse(output, pulse_width_us))
     {
         return;
     }

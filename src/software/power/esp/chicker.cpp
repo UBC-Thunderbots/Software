@@ -9,7 +9,7 @@ void EspHal::initializeChicker()
     digitalWrite(CHIPPER_PIN, LOW);
     digitalWrite(KICKER_PIN, LOW);
 
-    pulse_timer_ = timerBegin(CHICKER_PULSE_TIMER, 80, true);
+    pulse_timer_ = timerBegin(CHICKER_PULSE_TIMER, 80, true); //80 is dividing factor for timer from 80 Mhz to 1Mhz
     if (pulse_timer_ != nullptr)
         timerAttachInterrupt(pulse_timer_, &EspHal::pulseTimerISR, true);
 }
@@ -21,8 +21,7 @@ bool EspHal::getBreakBeamTripped()
 
 bool EspHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
 {
-    if (pulse_width_us == 0 ||
-        (output != ChickerOutput::Kicker && output != ChickerOutput::Chipper))
+    if (pulse_width_us == 0)
         return false;
 
     portENTER_CRITICAL(&timer_mux_);
