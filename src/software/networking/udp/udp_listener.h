@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <memory>
 #include <string>
 
 typedef std::function<void(const char*, const size_t&,
@@ -76,6 +77,12 @@ class UdpListener
      */
     void handleDataReception(const boost::system::error_code& error,
                              std::size_t bytes_transferred);
+
+    /**
+     * The sending logic that runs within the `io_context` thread.
+     */
+    void doSend(std::shared_ptr<std::string> buf,
+                const boost::asio::ip::udp::endpoint& destination);
 
     /**
      * Starts listening for data on the socket.
