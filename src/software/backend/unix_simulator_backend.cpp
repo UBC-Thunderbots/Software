@@ -1,9 +1,5 @@
 #include "software/backend/unix_simulator_backend.h"
 
-#include <chrono>
-#include <thread>
-#include <vector>
-
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
@@ -26,8 +22,9 @@ UnixSimulatorBackend::UnixSimulatorBackend(
         [&](TbotsProto::RobotStatus& msg) { receiveRobotStatus(msg); }, proto_logger));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
-        runtime_dir + SSL_WRAPPER_PATH, [&](SSLProto::SSL_WrapperPacket& msg)
-        { receiveSSLWrapperPacket(msg); }, proto_logger));
+        runtime_dir + SSL_WRAPPER_PATH,
+        [&](SSLProto::SSL_WrapperPacket& msg) { receiveSSLWrapperPacket(msg); },
+        proto_logger));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         runtime_dir + SSL_REFEREE_PATH,
@@ -89,55 +86,26 @@ void UnixSimulatorBackend::receiveThunderbotsConfig(TbotsProto::ThunderbotsConfi
     dynamic_parameter_update_respone_sender->sendProto(request);
 }
 
-namespace
-{
-std::queue<TbotsProto::PrimitiveSet> avah_prims;
-std::queue<World> avah_worlds;
-}  // namespace
-
-void UnixSimulatorBackend::avah_send_both_if_has()
-{
-    if (avah_prims.empty() || avah_worlds.empty())
-    {
-        return;
-    }
-
-    const auto world = avah_worlds.front();
-    avah_worlds.pop();
-    const auto primitives = avah_prims.front();
-    avah_prims.pop();
-
-    {
-        world_output->sendProto(*createWorldWithSequenceNumber(world, sequence_number++));
-
-        LOG(VISUALIZE) << *createNamedValue(
-            "World Hz",
-            static_cast<float>(
-                FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
-
-        last_world_time_sec.store(world.getMostRecentTimestamp().toSeconds());
-    }
-
-    {
-        primitive_output->sendProto(primitives);
-
-        LOG(VISUALIZE) << *createNamedValue(
-            "Primitive Hz",
-            static_cast<float>(FirstInFirstOutThreadedObserver<
-                               TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
-    }
-}
-
 void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
-    avah_prims.push(primitives);
-    avah_send_both_if_has();
+    primitive_output->sendProto(primitives);
+
+    LOG(VISUALIZE) << *createNamedValue(
+        "Primitive Hz",
+        static_cast<float>(FirstInFirstOutThreadedObserver<
+                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
 }
 
 void UnixSimulatorBackend::onValueReceived(World world)
 {
-    avah_worlds.push(world);
-    avah_send_both_if_has();
+    world_output->sendProto(*createWorldWithSequenceNumber(world, sequence_number++));
+
+    LOG(VISUALIZE) << *createNamedValue(
+        "World Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+
+    last_world_time_sec.store(world.getMostRecentTimestamp().toSeconds());
 }
 
 double UnixSimulatorBackend::getLastWorldTimeSec()
