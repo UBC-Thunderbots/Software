@@ -1,5 +1,7 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 
+#include "software/world/robot.h"
+
 namespace
 {
 // The robot starts out unknown, so the initial estimate is given a covariance wide
@@ -15,41 +17,52 @@ constexpr double INITIAL_ORIENTATION_UNCERTAINTY_RAD  = M_PI * M_PI / 3;
 // mental simulation means i imagined it btw i'll probably get a better number when i test
 constexpr double INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 4 * M_PI * M_PI;
 
-const Eigen::Vector<double, 4> POS_INITIAL_STATE = Eigen::Vector<double, 4>::Zero();
-const Eigen::Vector<double, 2> ANG_INITIAL_STATE = Eigen::Vector<double, 2>::Zero();
-const Eigen::Matrix<double, 4, 4> POS_INITIAL_COVARIANCE =
-    Eigen::Vector<double, 4>(
-        INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
-        INITIAL_POSITION_UNCERTAINTY_M* INITIAL_POSITION_UNCERTAINTY_M,
-        INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
-        INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
-        .asDiagonal();
-const Eigen::Matrix<double, 2, 2> ANG_INITIAL_COVARIANCE =
-    Eigen::Vector<double, 2>(
-        INITIAL_ORIENTATION_UNCERTAINTY_RAD * INITIAL_ORIENTATION_UNCERTAINTY_RAD,
-        INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S*
-            INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S)
-        .asDiagonal();
+const Eigen::Vector<double, RobotFilter::POS_STATE_SIZE> POS_INITIAL_STATE =
+    Eigen::Vector<double, RobotFilter::POS_STATE_SIZE>::Zero();
+const Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE> ANG_INITIAL_STATE =
+    Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE>::Zero();
+const Eigen::Matrix<double, RobotFilter::POS_STATE_SIZE, RobotFilter::POS_STATE_SIZE>
+    POS_INITIAL_COVARIANCE =
+        Eigen::Vector<double, RobotFilter::POS_STATE_SIZE>(
+            INITIAL_POSITION_UNCERTAINTY_M * INITIAL_POSITION_UNCERTAINTY_M,
+            INITIAL_POSITION_UNCERTAINTY_M* INITIAL_POSITION_UNCERTAINTY_M,
+            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
+            INITIAL_VELOCITY_UNCERTAINTY_M_PER_S* INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
+            .asDiagonal();
+const Eigen::Matrix<double, RobotFilter::ANG_STATE_SIZE, RobotFilter::ANG_STATE_SIZE>
+    ANG_INITIAL_COVARIANCE =
+        Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE>(
+            INITIAL_ORIENTATION_UNCERTAINTY_RAD * INITIAL_ORIENTATION_UNCERTAINTY_RAD,
+            INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S*
+                INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S)
+            .asDiagonal();
 
 
 // How noisy we expect SSL Vision's robot position detections to be. Measure this by
 // logging a stationary robot and taking the standard deviation of the detections.
 // TODO: do measurements for this
 constexpr double POS_VISION_NOISE_M = 0.01;
-const Eigen::Matrix<double, 2, 2> POS_MEASUREMENT_COVARIANCE =
-    Eigen::Matrix<double, 2, 2>::Identity() * (POS_VISION_NOISE_M * POS_VISION_NOISE_M);
+const Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
+                    RobotFilter::POS_MEASUREMENT_SIZE>
+    POS_MEASUREMENT_COVARIANCE =
+        Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
+                      RobotFilter::POS_MEASUREMENT_SIZE>::Identity() *
+        (POS_VISION_NOISE_M * POS_VISION_NOISE_M);
 constexpr double ANG_VISION_NOISE_RAD = .1;
-const Eigen::Matrix<double, 1, 1> ANG_MEASUREMENT_COVARIANCE =
-    Eigen::Matrix<double, 1, 1>::Identity() *
-    (ANG_VISION_NOISE_RAD * ANG_VISION_NOISE_RAD);
+const Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
+                    RobotFilter::ANG_MEASUREMENT_SIZE>
+    ANG_MEASUREMENT_COVARIANCE =
+        Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
+                      RobotFilter::ANG_MEASUREMENT_SIZE>::Identity() *
+        (ANG_VISION_NOISE_RAD * ANG_VISION_NOISE_RAD);
 
 // Vision measures robot's position, orientation but not its velocity nor angular velocity
 // clang-format off
-const Eigen::Matrix<double, 2, 4> POS_MEASUREMENT_MODEL =
-    (Eigen::Matrix<double, 2, 4>() << 1, 0, 0, 0,
+const Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE, RobotFilter::POS_STATE_SIZE> POS_MEASUREMENT_MODEL =
+    (Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE, RobotFilter::POS_STATE_SIZE>() << 1, 0, 0, 0,
                                       0, 1, 0, 0).finished();
-const Eigen::Matrix<double, 1, 2> ANG_MEASUREMENT_MODEL =
-    (Eigen::Matrix<double, 1, 2>() << 1, 0).finished();
+const Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE, RobotFilter::ANG_STATE_SIZE> ANG_MEASUREMENT_MODEL =
+    (Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE, RobotFilter::ANG_STATE_SIZE>() << 1, 0).finished();
 // clang-format on
 
 // TODO: test these
@@ -75,11 +88,8 @@ constexpr double MAHALANOBIS_GATE_THRESHOLD = 5;
 // How many detections in a row may be rejected as outliers before we conclude the
 // estimate itself is wrong and reset onto the newest detection
 constexpr int CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
-
-// Number of missing robot detections the filter will tolerate before returning nullopt
-// If under this number, it will return the predicted value if missing a frame
-constexpr int EXPIRED_FRAME_THRESHOLD = 10;
 }  // namespace
+
 // control model = 0.
 RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state),
@@ -97,7 +107,6 @@ RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_durat
       expiry_buffer_duration(expiry_buffer_duration)
 {
 }
-// change the constructor initializations
 RobotFilter::RobotFilter(RobotDetection current_robot_state,
                          Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state.id, current_robot_state.position,
@@ -145,7 +154,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         // linear and would see a jump of ~2pi whenever the robot turns across the wrap
         // point. We unwrap the detection onto the estimate by adding only the shortest
         // signed difference to it, so the innovation always lies within [-pi, pi].
-        const double predicted_orientation = ang_kalman_filter.state_estimate(0);
+        const double predicted_orientation = ang_kalman_filter.state_estimate(POS_W);
         const Angle orientation_innovation = (best_robot_detection->orientation -
                                               Angle::fromRadians(predicted_orientation))
                                                  .clamp();
@@ -200,11 +209,11 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         pos_kalman_filter.state_estimate;
     const Eigen::Vector<double, ANG_STATE_SIZE> ang_state =
         ang_kalman_filter.state_estimate;
-    const Point robot_position(pos_state(0), pos_state(1));
-    const Vector robot_velocity(pos_state(2), pos_state(3));
-    const Angle robot_orientation = Angle::fromRadians(ang_state(0)).clamp();
+    const Point robot_position(pos_state(POS_X), pos_state(POS_Y));
+    const Vector robot_velocity(pos_state(VEL_X), pos_state(VEL_Y));
+    const Angle robot_orientation = Angle::fromRadians(ang_state(POS_W)).clamp();
     const AngularVelocity robot_angular_velocity =
-        AngularVelocity::fromRadians(ang_state(1));
+        AngularVelocity::fromRadians(ang_state(VEL_W));
     bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
     this->current_robot_state =
         Robot(this->getRobotId(), robot_position, robot_velocity, robot_orientation,
@@ -213,7 +222,6 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     return std::make_optional(this->current_robot_state);
 }
 
-// completely fine DO NOT TOUCH
 unsigned int RobotFilter::getRobotId() const
 {
     return this->current_robot_state.id();
@@ -303,8 +311,8 @@ bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
     }
 
     const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
-    const Point predicted_position(pos_kalman_filter.state_estimate(0),
-                                   pos_kalman_filter.state_estimate(1));
+    const Point predicted_position(pos_kalman_filter.state_estimate(POS_X),
+                                   pos_kalman_filter.state_estimate(POS_Y));
     const double reachable_distance = MAX_ROBOT_SPEED_M_PER_S * std::max(delta_t, 0.0) +
                                       MAX_ROBOT_SPEED_GATE_TOLERANCE_M;
 
@@ -321,7 +329,8 @@ void RobotFilter::reset(const PosMeasurement& pos_measurement,
     // below lets the next few detections pull the velocity in on their own.
 
 
-    pos_kalman_filter.state_estimate << pos_measurement(0), pos_measurement(1), 0, 0;
+    pos_kalman_filter.state_estimate << pos_measurement(POS_X), pos_measurement(POS_Y), 0,
+        0;
     ang_kalman_filter.state_estimate
         << Angle::fromRadians(ang_measurement(0)).clamp().toRadians(),
         0;
@@ -334,7 +343,7 @@ void RobotFilter::reset(const PosMeasurement& pos_measurement,
     // next predict() jump forward by the whole rejection streak.
     prev_pos_measurement = pos_measurement;
     prev_ang_measurement = AngMeasurement::Constant(
-        Angle::fromRadians(ang_measurement(0)).clamp().toRadians());
+        Angle::fromRadians(ang_measurement(POS_W)).clamp().toRadians());
     prev_detection_timestamp = current_time;
     last_predict_timestamp   = current_time;
 }
