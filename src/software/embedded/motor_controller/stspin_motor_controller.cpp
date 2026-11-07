@@ -483,7 +483,7 @@ void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
 
     const MotorStatus& motor_status = motor_status_.at(motor);
 
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+    LOG(PLOTJUGGLER) << *createPlotJugglerValueProto({
         {"speed_" + motor, motor_status.speed},
         {"speed_ref_" + motor, motor_status.speed_ref},
         {"iq_" + motor, motor_status.iq},
