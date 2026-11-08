@@ -96,6 +96,17 @@ pip.parse(
     ],
 )
 use_repo(pip, "platformio_deps")
+pip.parse(
+    hub_name = "lint_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//starlark/lint:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
+)
+use_repo(pip, "lint_deps")
 
 ##############################################
 # Configure Dependencies
