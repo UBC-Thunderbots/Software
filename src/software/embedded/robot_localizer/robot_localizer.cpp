@@ -54,7 +54,8 @@ void RobotLocalizer::update(const VisionData& data)
     }
 
     auto rollback_point = std::find_if(
-        history.begin(), history.end(), [&](const FilterStep& step)
+        history.begin(), history.end(),
+        [&](const FilterStep& step)
         { return (current_time_seconds_ - step.time_seconds) >= data.age_seconds; });
 
     // If rollback point is at the start, vision is newer than all history steps
