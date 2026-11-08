@@ -1,0 +1,5 @@
+ansible-lint==26.10.1
+clang-format==14.0.6 # TODO: Update to v20+
+codespell==2.2.6
+md-toc==9.0.0
+ruff==0.5.5
