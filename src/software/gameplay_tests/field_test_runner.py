@@ -86,7 +86,7 @@ class FieldTestRunner(TbotsTestRunner):
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
+                    self.send_gamecontroller_command(cmd, team)
                     # remove command from the list
                     gc_cmd_with_delay.remove((delay, cmd, team))
 
