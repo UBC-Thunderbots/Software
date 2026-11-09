@@ -235,7 +235,7 @@ git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "g
 
 git_repository(
     name = "mdv6.5_firmware",
-    build_file = "@//extlibs:mdv6_firmware.bzl",
+    build_file = "@//extlibs:mdv6.5_firmware.bzl",
     # Pinning to the exact commit guarantees Bazel will rebuild when this commit SHA is updated
     commit = "abb8ea585131690f506be406e0ddbd849ca75146",  # latest commit on main branch
     remote = "https://github.com/UBC-Thunderbots/MDv6.5_Firmware.git",

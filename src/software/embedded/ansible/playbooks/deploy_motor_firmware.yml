@@ -4,8 +4,8 @@
 
   vars:
     repo_root: "{{ workspace_dir | default(playbook_dir + '/../../../../') }}"
-    firmware_bin_name: "mdv6_firmware_main.bin"
-    firmware_archive_name: "mdv6_firmware.tar.gz"
+    firmware_bin_name: "mdv6.5_firmware_main.bin"
+    firmware_archive_name: "mdv6.5_firmware.tar.gz"
     script_path: "software/embedded/drivers/flash_motor_drivers.py"
     cfg_path: "software/embedded/drivers/raspberrypi.cfg"
     stm32_cfg_path: "software/embedded/drivers/stm32_rpi.cfg"
@@ -20,14 +20,14 @@
 
     - name: Build firmware locally
       delegate_to: localhost
-      ansible.builtin.command: "bazel build @mdv6.5_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board"
+      ansible.builtin.command: "bazel build @mdv6.5_firmware//:mdv6.5_firmware_main --platforms=//toolchains/cc:motor_board"
       args:
         chdir: "{{ repo_root }}"
       changed_when: false
 
     - name: Get binary path
       delegate_to: localhost
-      ansible.builtin.command: "bazel cquery @mdv6.5_firmware//:mdv6_firmware_main --output=files --platforms=//toolchains/cc:motor_board"
+      ansible.builtin.command: "bazel cquery @mdv6.5_firmware//:mdv6.5_firmware_main --output=files --platforms=//toolchains/cc:motor_board"
       args:
         chdir: "{{ repo_root }}"
       register: cquery_result

@@ -3,7 +3,7 @@ load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_binary(
-    name = "mdv6_firmware_main",
+    name = "mdv6.5_firmware_main",
     # Linker file informs the toolchain how much RAM and flash you have as well as its locations on the chip
     additional_linker_inputs = [
         "Official_MD65_Proj/STM32CubeIDE/STM32G431VBTX_FLASH.ld",
@@ -14,30 +14,30 @@ cc_binary(
         "@platforms//os:none",
     ],
     deps = [
-        ":mdv6_firmware",
+        ":mdv6.5_firmware",
     ],
 )
 
 openocd_flash(
-    name = "mdv6_firmware_flash",
+    name = "mdv6.5_firmware_flash",
     device_configs = [
         # Part of the STM32G4 family
         # https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf
         "target/stm32g4x.cfg",
     ],
-    # WARNING! `flash_offset` attribute is broken in the Bazel rule. The .elf file (mdv6_firmware_main.stripped)
+    # WARNING! `flash_offset` attribute is broken in the Bazel rule. The .elf file (mdv6.5_firmware_main.stripped)
     # contains the memory mappings already, so this attribute is necessary.
     flash_offset = "",
     # .stripped strips debug symbols to reduce the size of the binary.
     # see: https://bazel.build/reference/be/c-cpp#cc_binary
-    image = ":mdv6_firmware_main.stripped",
+    image = ":mdv6.5_firmware_main.stripped",
     interface_configs = [
         "interface/stlink.cfg",  # The ST-Link V2 programmer is used to flash the firmware.
     ],
 )
 
 cc_library(
-    name = "mdv6_firmware",
+    name = "mdv6.5_firmware",
     # Same source set as the STM32CubeIDE project (STM32CubeIDE/.project).
     srcs = glob([
         "Official_MD65_Proj/Src/*.c",
