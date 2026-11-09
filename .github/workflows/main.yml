@@ -91,7 +91,7 @@ jobs:
       - name: Motor Firmware build Test
         run: |
           cd src
-          bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
+          bazel build @mdv6.5_firmware//:mdv6.5_firmware_main --platforms=//toolchains/cc:motor_board
 
   motor-firmware:
     name: Motor Firmware
@@ -103,7 +103,7 @@ jobs:
       - name: Build Motor Firmware
         run: |
           cd src
-          bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board
+          bazel build @mdv6.5_firmware//:mdv6.5_firmware_main --platforms=//toolchains/cc:motor_board
 
   software-tests:
     needs: check-and-clear-cache

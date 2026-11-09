@@ -55,7 +55,7 @@ class MotorDriverFlasher:
                     "init",
                     # Modern atomic command
                     "-c",
-                    "program mdv6_firmware_main.bin verify reset exit 0x08000000",
+                    "program mdv6.5_firmware_main.bin verify reset exit 0x08000000",
                 ],
                 capture_output=True,
                 text=True,
