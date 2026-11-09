@@ -40,7 +40,7 @@ class GLSimulatorLayer(GLLayer):
 
         self.ball_graphic = GLSphere(
             parent_item=self,
-            radius=BALL_MAX_RADIUS_METERS * GHOST_BALL_RADIUS_SCALE,
+            radius=BALL_MAX_RADIUS_METERS * self.GHOST_BALL_RADIUS_SCALE,
             color=Colors.SIM_BALL_COLOR,
         )
 
@@ -90,8 +90,8 @@ class GLSimulatorLayer(GLLayer):
             fill_color=fill_color,
             line_width=LINE_WIDTH,
         )
-        graphic.scale(GHOST_ROBOT_SCALE, GHOST_ROBOT_SCALE, 1, local=True)
-        graphic.translate(0, 0, GHOST_Z_METERS)
+        graphic.scale(self.GHOST_ROBOT_SCALE, self.GHOST_ROBOT_SCALE, 1, local=True)
+        graphic.translate(0, 0, self.GHOST_Z_METERS)
         if graphic.fill_graphic is not None:
             graphic.fill_graphic.setGLOptions("translucent")
         return graphic
