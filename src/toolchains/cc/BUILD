@@ -65,7 +65,7 @@ platform(
 platform(
     name = "motor_board",
     constraint_values = [
-        "@platforms//cpu:armv6-m",
+        "@platforms//cpu:armv7e-m",
         "@platforms//os:none",
     ],
 )
@@ -432,7 +432,7 @@ toolchain(
 toolchain(
     name = "cc_toolchain_for_stm32",
     target_compatible_with = [
-        "@platforms//cpu:armv6-m",
+        "@platforms//cpu:armv7e-m",
         "@platforms//os:none",
     ],
     toolchain = ":cc_toolchain_stm32",
