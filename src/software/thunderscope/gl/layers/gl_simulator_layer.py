@@ -1,8 +1,8 @@
 import math
-from typing import override
+from typing import Sequence, override
 
 import proto.import_all_protos as protos
-from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimRobot, SimulatorState
 from pyqtgraph.Qt import QtGui
 from software.py_constants import BALL_MAX_RADIUS_METERS
 from software.thunderscope.constants import LINE_WIDTH, Colors, DepthValues
@@ -97,7 +97,7 @@ class GLSimulatorLayer(GLLayer):
 
     def _update_robot_graphics(
         self,
-        robots,
+        robots: Sequence[SimRobot],
         graphics: ObservableList,
         outline_color: QtGui.QColor,
         fill_color: QtGui.QColor,
