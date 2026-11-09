@@ -33,6 +33,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class Simulator:
     """Simulator Context Manager"""
+    
+    SIMULATOR_STATE_FORWARD_BUFFER_SIZE = 5
 
     def __init__(
         self,
@@ -190,7 +192,9 @@ gdb --args bazel-bin/{simulator_command}
             self.simulator_runtime_dir, SIMULATOR_STATE_PATH, SimulatorState
         )
 
-        forward_buffer = ThreadSafeBuffer(5, SimulatorState)
+        forward_buffer = ThreadSafeBuffer(
+            self.SIMULATOR_STATE_FORWARD_BUFFER_SIZE, SimulatorState
+        )
         simulator_proto_unix_io.register_observer(SimulatorState, forward_buffer)
 
         def forward_simulator_state() -> None:

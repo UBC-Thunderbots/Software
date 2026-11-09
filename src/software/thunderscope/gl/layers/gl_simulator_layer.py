@@ -12,15 +12,12 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-# The fused robots are the same size and, with realism off, the same pose.
-# A larger outline just above the field stays visible around them.
-GHOST_ROBOT_SCALE = 1.45
-GHOST_Z_METERS = 0.02
-GHOST_BALL_RADIUS_SCALE = 2.5
-
-
 class GLSimulatorLayer(GLLayer):
     """GLLayer that visualizes the simulator"""
+
+    GHOST_ROBOT_SCALE = 1.45
+    GHOST_Z_METERS = 0.02
+    GHOST_BALL_RADIUS_SCALE = 2.5
 
     def __init__(
         self, name: str, friendly_colour_yellow: bool, buffer_size: int = 5
