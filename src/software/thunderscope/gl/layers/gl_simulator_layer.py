@@ -12,6 +12,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+
 class GLSimulatorLayer(GLLayer):
     """GLLayer that visualizes the simulator"""
 
