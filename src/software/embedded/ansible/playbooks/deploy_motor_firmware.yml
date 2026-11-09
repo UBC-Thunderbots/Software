@@ -20,14 +20,14 @@
 
     - name: Build firmware locally
       delegate_to: localhost
-      ansible.builtin.command: "bazel build @mdv6_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board"
+      ansible.builtin.command: "bazel build @mdv6.5_firmware//:mdv6_firmware_main --platforms=//toolchains/cc:motor_board"
       args:
         chdir: "{{ repo_root }}"
       changed_when: false
 
     - name: Get binary path
       delegate_to: localhost
-      ansible.builtin.command: "bazel cquery @mdv6_firmware//:mdv6_firmware_main --output=files --platforms=//toolchains/cc:motor_board"
+      ansible.builtin.command: "bazel cquery @mdv6.5_firmware//:mdv6_firmware_main --output=files --platforms=//toolchains/cc:motor_board"
       args:
         chdir: "{{ repo_root }}"
       register: cquery_result
