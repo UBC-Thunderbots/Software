@@ -19,13 +19,13 @@ SimHal::~SimHal()
 
 uint32_t SimHal::micros() const
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return state.current_time_us;
 }
 
 bool SimHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (faults.fail_start_chicker_pulse)
     {
         return false;
@@ -56,7 +56,7 @@ bool SimHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
 
 void SimHal::stopChickerPulse()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     state.pulse_active     = false;
     state.pulse_width_us   = 0;
     state.kicker_pin_high  = false;
@@ -65,19 +65,19 @@ void SimHal::stopChickerPulse()
 
 bool SimHal::isChickerPulseActive() const
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return state.pulse_active;
 }
 
 bool SimHal::getBreakBeamTripped()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return state.break_beam_tripped;
 }
 
 void SimHal::setDribblerPwm(uint8_t duty_cycle)
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!faults.stuck_dribbler_pwm)
     {
         state.dribbler_pwm = duty_cycle;
@@ -87,7 +87,7 @@ void SimHal::setDribblerPwm(uint8_t duty_cycle)
 
 void SimHal::setCapacitorCharging(bool enabled)
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!faults.stuck_charger_pin)
     {
         state.charger_enabled_pin = enabled;
@@ -98,7 +98,7 @@ void SimHal::setCapacitorCharging(bool enabled)
 
 bool SimHal::isCapacitorChargeDone()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (faults.force_charge_never_done)
     {
         return false;
@@ -108,32 +108,32 @@ bool SimHal::isCapacitorChargeDone()
 
 float SimHal::getCapacitorVoltage()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return state.capacitor_voltage;
 }
 
 float SimHal::getBatteryVoltage()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return state.battery_voltage;
 }
 
 float SimHal::getCurrentDrawAmp()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return state.current_draw_amp;
 }
 
 void SimHal::setMicros(uint32_t time_us)
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     state.current_time_us = time_us;
     checkAndExpirePulseLocked();
 }
 
 void SimHal::advanceMicros(uint32_t delta_us)
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     updateHardwarePhysicsLocked(delta_us);
     state.current_time_us += delta_us;
     checkAndExpirePulseLocked();
@@ -141,7 +141,12 @@ void SimHal::advanceMicros(uint32_t delta_us)
 
 void SimHal::pulseTimerISR()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    pulseTimerISRLocked();
+}
+
+void SimHal::pulseTimerISRLocked()
+{
     state.kicker_pin_high  = false;
     state.chipper_pin_high = false;
     state.pulse_active     = false;
@@ -151,7 +156,7 @@ void SimHal::pulseTimerISR()
 
 void SimHal::reset()
 {
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     state   = State{};
     faults  = FaultConfig{};
     physics = PhysicsConfig{};
@@ -179,11 +184,6 @@ bool SimHal::isAutoOrchestrationRunning() const
     return auto_running_.load(std::memory_order_acquire);
 }
 
-std::recursive_mutex& SimHal::mutex() const
-{
-    return mutex_;
-}
-
 void SimHal::checkAndExpirePulseLocked()
 {
     if (!state.pulse_active || faults.disable_auto_isr_expiry)
@@ -195,7 +195,7 @@ void SimHal::checkAndExpirePulseLocked()
         static_cast<uint32_t>(state.current_time_us - state.pulse_started_us);
     if (elapsed_us >= state.pulse_width_us)
     {
-        pulseTimerISR();
+        pulseTimerISRLocked();
     }
 }
 
