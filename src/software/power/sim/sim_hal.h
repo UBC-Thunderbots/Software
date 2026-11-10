@@ -116,15 +116,13 @@ class SimHal final : public PowerHAL
     /** Whether background simulation is active. */
     bool isAutoOrchestrationRunning() const;
 
-    /** Mutex for synchronized state access. */
-    std::recursive_mutex& mutex() const;
-
    private:
     void checkAndExpirePulseLocked();
+    void pulseTimerISRLocked();
     void updateHardwarePhysicsLocked(uint32_t delta_us);
     void backgroundLoop();
 
-    mutable std::recursive_mutex mutex_;
+    mutable std::mutex mutex_;
     std::atomic<bool> auto_running_{false};
     std::atomic<double> time_scale_{1.0};
     std::thread background_thread_;
