@@ -4,6 +4,7 @@ load(
     "platformio_library",
     "platformio_project",
 )
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -30,6 +31,20 @@ platformio_library(
     hdr = "power_hal.h",
 )
 
+cc_library(
+    name = "power_hal_cc",
+    hdrs = ["power_hal.h"],
+    includes = ["."],
+)
+
+cc_library(
+    name = "sim_hal",
+    srcs = ["sim/sim_hal.cpp"],
+    hdrs = ["sim/sim_hal.h"],
+    includes = ["sim"],
+    deps = [":power_hal_cc"],
+)
+
 platformio_library(
     name = "esp_hal",
     src = "esp/esp_hal.cpp",
@@ -54,12 +69,31 @@ platformio_library(
     deps = [":power_hal"],
 )
 
+cc_library(
+    name = "power_controller_cc",
+    srcs = ["power_controller.cpp"],
+    hdrs = ["power_controller.h"],
+    includes = ["."],
+    deps = [":power_hal_cc"],
+)
+
 platformio_library(
     name = "control_executor",
     src = "control_executor.cpp",
     hdr = "control_executor.h",
     deps = [
         ":power_controller",
+        "//proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "control_executor_cc",
+    srcs = ["control_executor.cpp"],
+    hdrs = ["control_executor.h"],
+    includes = ["."],
+    deps = [
+        ":power_controller_cc",
         "//proto:tbots_nanopb_proto",
     ],
 )
