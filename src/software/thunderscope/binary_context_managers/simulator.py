@@ -197,6 +197,7 @@ gdb --args bazel-bin/{simulator_command}
         )
         simulator_proto_unix_io.register_observer(SimulatorState, forward_buffer)
 
+        # TODO(#4053): Drop this thread once Simulator has the full-system runtime dirs.
         def forward_simulator_state() -> None:
             while True:
                 msg = forward_buffer.get(block=True, return_cached=False)
