@@ -32,8 +32,8 @@ TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expired_test)
     robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
     const unsigned int last_detection_ms = 200;
-    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
-                       Timestamp::fromMilliseconds(last_detection_ms)}};
+    new_robot_data                       = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
+                                             Timestamp::fromMilliseconds(last_detection_ms)}};
     robot_filter.estimateRobotState(new_robot_data,
                                     Timestamp::fromMilliseconds(last_detection_ms));
 
@@ -72,8 +72,8 @@ TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expiry_boundary_test)
     robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
     const unsigned int last_detection_ms = 200;
-    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
-                       Timestamp::fromMilliseconds(last_detection_ms)}};
+    new_robot_data                       = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
+                                             Timestamp::fromMilliseconds(last_detection_ms)}};
     robot_filter.estimateRobotState(new_robot_data,
                                     Timestamp::fromMilliseconds(last_detection_ms));
 
@@ -138,10 +138,10 @@ TEST_F(RobotFilterTest, large_orientation_angle_wrapping_test)
     robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
     const unsigned int last_detection_ms = 200;
-    new_robot_data              = {{1, Point(2, 0), after_wrap, 0.5,
-                                    Timestamp::fromMilliseconds(last_detection_ms)}};
-    std::optional<Robot> result = robot_filter.estimateRobotState(
-        new_robot_data, Timestamp::fromMilliseconds(last_detection_ms));
+    new_robot_data                       = {{1, Point(2, 0), after_wrap, 0.5,
+                                             Timestamp::fromMilliseconds(last_detection_ms)}};
+    std::optional<Robot> result          = robot_filter.estimateRobotState(
+                 new_robot_data, Timestamp::fromMilliseconds(last_detection_ms));
 
     // The estimate should follow the detection across the wrap point, and see a small
     // counterclockwise turn rather than an almost full turn clockwise
@@ -177,10 +177,10 @@ TEST_F(RobotFilterTest, older_timestamp_robot_data_ignored_test)
     robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
     const unsigned int last_detection_ms = 200;
-    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
-                       Timestamp::fromMilliseconds(last_detection_ms)}};
-    std::optional<Robot> latest_result = robot_filter.estimateRobotState(
-        new_robot_data, Timestamp::fromMilliseconds(last_detection_ms));
+    new_robot_data                       = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
+                                             Timestamp::fromMilliseconds(last_detection_ms)}};
+    std::optional<Robot> latest_result   = robot_filter.estimateRobotState(
+          new_robot_data, Timestamp::fromMilliseconds(last_detection_ms));
     ASSERT_TRUE(latest_result.has_value());
 
     // A detection from before the last one, at a different position
