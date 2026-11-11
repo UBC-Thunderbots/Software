@@ -527,9 +527,9 @@ void SimRobot::begin(SimBall& ball, double time)
                     accelScale * m_specs.strategy().a_brake_f_max());
         a_s = bound(a_s_raw, v_s, accelScale * m_specs.strategy().a_speedup_s_max(),
                     accelScale * m_specs.strategy().a_brake_s_max());
-        a_phi = bound(a_phi_raw, omega,
-                      accelScale * m_specs.strategy().a_speedup_phi_max(),
-                      accelScale * m_specs.strategy().a_brake_phi_max());
+        a_phi =
+            bound(a_phi_raw, omega, accelScale * m_specs.strategy().a_speedup_phi_max(),
+                  accelScale * m_specs.strategy().a_brake_phi_max());
     }
 
     const btVector3 force(a_s * m_specs.mass(), a_f * m_specs.mass(), 0);
