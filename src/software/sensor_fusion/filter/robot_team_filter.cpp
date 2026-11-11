@@ -24,6 +24,7 @@ Team RobotTeamFilter::getFilteredData(
     // handle robot expiry (robots disappearing after not being detected for a while),
     // so we ignore any expired robots
     std::vector<Robot> new_filtered_robot_data;
+    std::vector<RobotId> expired_robot_ids;
     // it is added if there is data, because if there isn't, it is erased and
     // so it skips over a robot
     for (auto it = robot_filters.begin(); it != robot_filters.end();)
@@ -37,18 +38,22 @@ Team RobotTeamFilter::getFilteredData(
         }
         else
         {
-            // Destroy if expired filter
+            // Destroy if expired filter, and remove robot from the team below
+            expired_robot_ids.push_back(it->first);
             it = robot_filters.erase(it);
         }
     }
 
     Team new_team_state = current_team_state;
+    // Remove all robots that were expired
+    for (const RobotId id : expired_robot_ids)
+    {
+        new_team_state.removeRobotWithId(id);
+    }
     new_team_state.updateRobots(new_filtered_robot_data);
 
     // Using the most recent timestamp for the team, remove any robots that have not
     // been detected for a while
-    // TODO: Mathew - The RobotFilter and Team are both handling expiry now?
-    // Just the filter probably should
     auto most_recent_team_timestamp = new_team_state.timestamp();
     if (most_recent_team_timestamp)
     {
