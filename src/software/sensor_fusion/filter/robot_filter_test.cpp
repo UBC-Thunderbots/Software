@@ -17,7 +17,8 @@ class RobotFilterTest : public ::testing::Test
     Timestamp default_timestamp;
 };
 
-// Robot expires when it hasn't received its own data for at least 200 milliseconds.
+// Robot keeps being predicted while it hasn't received its own data for less than
+// 1000 milliseconds, and expires once it has gone more than 1000 milliseconds without.
 TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expired_test)
 {
     Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
@@ -25,47 +26,70 @@ TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expired_test)
     RobotFilter robot_filter(robot);
     std::vector<RobotDetection> new_robot_data;
 
-    // Give it 1 data point so that it doesn't break due to "prev_" variables
+    // Two detections of the robot, 100 milliseconds apart
     new_robot_data = {
-        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(10)}};
-    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(15));
+        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(100)}};
+    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
-    new_robot_data = {
-        {2, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(110)}};
+    const unsigned int last_detection_ms = 200;
+    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
+                       Timestamp::fromMilliseconds(last_detection_ms)}};
+    robot_filter.estimateRobotState(new_robot_data,
+                                    Timestamp::fromMilliseconds(last_detection_ms));
 
+    // From here on, only another robot is detected
+    new_robot_data = {{2, Point(2, 0), Angle::fromRadians(1), 0.5,
+                       Timestamp::fromMilliseconds(last_detection_ms)}};
+
+    // 500 milliseconds after the last detection, the robot is still predicted
+    std::optional<Robot> result = robot_filter.estimateRobotState(
+        new_robot_data,
+        Timestamp::fromMilliseconds(last_detection_ms +
+                                    ROBOT_DEBOUNCE_DURATION_MILLISECONDS / 2));
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result->id(), 1);
+
+    // Just past the expiry buffer after the last detection, the robot has expired
     EXPECT_EQ(std::nullopt,
               robot_filter.estimateRobotState(
-                  new_robot_data, Timestamp::fromMilliseconds(
-                                      ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 115)));
+                  new_robot_data,
+                  Timestamp::fromMilliseconds(last_detection_ms +
+                                              ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 1)));
 }
 
-// Robot does not expire when it hasn't received its own data for less than 200
-// milliseconds.
-TEST_F(RobotFilterTest, no_match_robot_data_robot_state_not_expired_test)
+// Robot has not expired yet when exactly 1000 milliseconds have passed since it last
+// received its own data
+TEST_F(RobotFilterTest, no_match_robot_data_robot_state_expiry_boundary_test)
 {
     Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
                 AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0));
     RobotFilter robot_filter(robot);
     std::vector<RobotDetection> new_robot_data;
 
-    // Give it 1 data point so that it doesn't break due to "prev_" variables
+    // Two detections of the robot, 100 milliseconds apart
     new_robot_data = {
         {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(100)}};
-    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(105));
+    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
-    new_robot_data = {
-        {2, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(110)}};
+    const unsigned int last_detection_ms = 200;
+    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
+                       Timestamp::fromMilliseconds(last_detection_ms)}};
+    robot_filter.estimateRobotState(new_robot_data,
+                                    Timestamp::fromMilliseconds(last_detection_ms));
 
+    // From here on, only another robot is detected
+    new_robot_data = {{2, Point(2, 0), Angle::fromRadians(1), 0.5,
+                       Timestamp::fromMilliseconds(last_detection_ms)}};
+
+    // Exactly at the end of the expiry buffer, the robot is still predicted
     std::optional<Robot> result = robot_filter.estimateRobotState(
-        new_robot_data,
-        Timestamp::fromMilliseconds(ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 100));
-
-    // Result isn't Optional
+        new_robot_data, Timestamp::fromMilliseconds(
+                            last_detection_ms + ROBOT_DEBOUNCE_DURATION_MILLISECONDS));
     ASSERT_TRUE(result.has_value());
-    // test
     EXPECT_EQ(result->id(), 1);
     EXPECT_EQ(result->timestamp(),
-              Timestamp::fromMilliseconds(ROBOT_DEBOUNCE_DURATION_MILLISECONDS + 100));
+              Timestamp::fromMilliseconds(last_detection_ms +
+                                          ROBOT_DEBOUNCE_DURATION_MILLISECONDS));
 }
 
 // tests multiple detections
@@ -102,27 +126,38 @@ TEST_F(RobotFilterTest, large_orientation_angle_wrapping_test)
     Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromDegrees(1.0),
                 AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0));
     RobotFilter robot_filter(robot);
-
     std::vector<RobotDetection> new_robot_data;
 
-    // Give it 1 data point so that it doesn't break due to "prev_" variables
+    // Two detections of the robot, 100 milliseconds apart, turning counterclockwise
+    // by 0.2 rad across the wrap point at +-pi
+    const Angle before_wrap = Angle::fromRadians(M_PI - 0.1);
+    const Angle after_wrap  = Angle::fromRadians(-M_PI + 0.1);
+
     new_robot_data = {
-        {1, Point(2, 0), Angle::fromRadians(0), 0.5, Timestamp::fromSeconds(0.1)}};
-    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(0.2));
+        {1, Point(2, 0), before_wrap, 0.5, Timestamp::fromMilliseconds(100)}};
+    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
 
-    // make it rotate a lot
-    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(M_PI * 2 - 0.2), 0.5,
-                       Timestamp::fromSeconds(3)}};
-    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(3.01));
+    const unsigned int last_detection_ms = 200;
+    new_robot_data              = {{1, Point(2, 0), after_wrap, 0.5,
+                                    Timestamp::fromMilliseconds(last_detection_ms)}};
+    std::optional<Robot> result = robot_filter.estimateRobotState(
+        new_robot_data, Timestamp::fromMilliseconds(last_detection_ms));
 
-    // feed it data for another robot, make it predict what it will be
-    new_robot_data = {{2, Point(2, 0), Angle::fromRadians(M_PI * 2 - 0.2), 0.5,
-                       Timestamp::fromSeconds(3.1)}};
-    std::optional<Robot> result =
-        robot_filter.estimateRobotState(new_robot_data, Timestamp::fromSeconds(3.11));
-
-    // Result isn't Optional
+    // The estimate should follow the detection across the wrap point, and see a small
+    // counterclockwise turn rather than an almost full turn clockwise
     ASSERT_TRUE(result.has_value());
-    // Test that the Orientation is less than PI, as it should have crossed over by then
-    EXPECT_LT(result->orientation(), Angle::fromRadians(M_PI));
+    EXPECT_LT(result->orientation().minDiff(after_wrap), Angle::fromRadians(0.05));
+    EXPECT_GT(result->angularVelocity(), AngularVelocity::zero());
+
+    // From here on, only another robot is detected
+    new_robot_data = {{2, Point(2, 0), after_wrap, 0.5,
+                       Timestamp::fromMilliseconds(last_detection_ms)}};
+
+    // Within the expiry buffer, the prediction should keep turning counterclockwise
+    // past the last detection
+    result = robot_filter.estimateRobotState(
+        new_robot_data, Timestamp::fromMilliseconds(last_detection_ms + 100));
+    ASSERT_TRUE(result.has_value());
+    EXPECT_GT((result->orientation() - after_wrap).clamp(), Angle::zero());
+    EXPECT_GT(result->angularVelocity(), AngularVelocity::zero());
 }
