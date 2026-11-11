@@ -24,13 +24,16 @@ Team RobotTeamFilter::getFilteredData(
     // handle robot expiry (robots disappearing after not being detected for a while),
     // so we ignore any expired robots
     std::vector<Robot> new_filtered_robot_data;
-    for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
+    // it is added if there is data, because if there isn't, it is erased and
+    // so it skips over a robot
+    for (auto it = robot_filters.begin(); it != robot_filters.end();)
     {
         auto data = it->second.estimateRobotState(new_robot_detections, capture_timestamp,
                                                   breakbeam_tripped_id);
         if (data)
         {
             new_filtered_robot_data.emplace_back(*data);
+            ++it;
         }
         else
         {

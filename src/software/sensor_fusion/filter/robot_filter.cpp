@@ -70,8 +70,9 @@ std::optional<Robot> RobotFilter::estimateRobotState(
 
         // Vision reports orientation wrapped to [-pi, pi], but the Kalman filter is
         // linear and would see a jump of ~2pi whenever the robot turns across the wrap
-        // point. We unwrap the detection onto the estimate by adding only the shortest
-        // signed difference to it, so the innovation always lies within [-pi, pi].
+        // point. We unwrap the detection onto the estimate by adding clamp(new
+        // orientation - predicted orientation) signed difference to it, so the innovation
+        // always lies within [-pi, pi].
 
         const double predicted_orientation = ang_kalman_filter.state_estimate(POS_W);
         const Angle orientation_innovation = (best_robot_detection->orientation -
@@ -87,8 +88,9 @@ std::optional<Robot> RobotFilter::estimateRobotState(
             reset(pos_measurement, ang_measurement, current_time);
         }
         // Two gates determining whether we take the detection:
-        // 1. Whether it is physically possible to arrive the new destination
-        // 2. Statistical gating using Mahalanobis
+        // 1. Whether it is physically possible to arrive the new destination at max
+        // velocity
+        // 2. Statistical gating using Mahalanobis distance
         // TODO: mahalanobisDistance and update both calculate pseudoinverse. is this a
         // problem?
         else if (isWithinMaxRobotSpeed(best_robot_detection->position, current_time) &&
@@ -123,6 +125,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     }
     if (!prev_detection_timestamp)
     {
+        // TODO: is this a problem?
         return std::nullopt;
     }
 
@@ -234,8 +237,9 @@ bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
     const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
     const Point predicted_position(pos_kalman_filter.state_estimate(POS_X),
                                    pos_kalman_filter.state_estimate(POS_Y));
-    const double reachable_distance = RF_MAX_ROBOT_SPEED_M_PER_S * std::max(delta_t, 0.0) +
-                                      RF_MAX_ROBOT_SPEED_GATE_TOLERANCE_M;
+    const double reachable_distance =
+        RF_MAX_ROBOT_SPEED_M_PER_S * std::max(delta_t, 0.0) +
+        RF_MAX_ROBOT_SPEED_GATE_TOLERANCE_M;
 
     return (detection_position - predicted_position).length() <= reachable_distance;
 }
