@@ -8,6 +8,14 @@
 #   This target provides runtime files only. Starting AutoRef with a
 #   Bazel-managed Java runtime is handled separately.
 
+load("@rules_java//java:java_import.bzl", "java_import")
+
+java_import(
+    name = "jars",
+    jars = glob(["lib/*.jar"]),
+    visibility = ["//visibility:public"],
+)
+
 AUTOREF_RUNTIME_FILES = [
     # Upstream launch scripts.
     "bin/**",
@@ -17,8 +25,6 @@ AUTOREF_RUNTIME_FILES = [
     "lib/**",
 ]
 
-# Keep the complete distribution available to consumers so the launcher's
-# expected bin/, config/, and lib/ directory layout can be preserved.
 filegroup(
     name = "distribution",
     srcs = glob(AUTOREF_RUNTIME_FILES),
