@@ -126,6 +126,9 @@ std::optional<Robot> RobotFilter::estimateRobotState(
             }
         }
     }
+    // If there isn't a best robot detection, there's been a previous detection, and it
+    // has been over the expiry_buffer_duration since last update, return nullopt. This
+    // will destroy the robot filter in robot_team_filter.
     else
     {
         if (prev_detection_timestamp &&
@@ -136,7 +139,6 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     }
     if (!prev_detection_timestamp)
     {
-        // TODO: is this a problem?
         return std::nullopt;
     }
 
@@ -191,7 +193,7 @@ std::optional<RobotDetection> RobotFilter::getBestRobotDetection(
 void RobotFilter::predict(double delta_t)
 {
     // because robots move using motors that stay on, unlike balls that just roll, i will
-    // be assuming that they keep moving with the same velocity
+    // be assuming that they keep moving with constant velocity
     // clang-format off
     pos_kalman_filter.process_model <<  1, 0, delta_t, 0,
                                         0, 1, 0, delta_t,
@@ -224,11 +226,14 @@ void RobotFilter::predict(double delta_t)
         ang_acceleration_variance * delta_t_squared / 2.0;
     const double ang_velocity_noise = ang_acceleration_variance * delta_t;
 
-    pos_kalman_filter.process_covariance << position_noise, 0, correlation_noise, 0, 0,
-        position_noise, 0, correlation_noise, correlation_noise, 0, velocity_noise, 0, 0,
-        correlation_noise, 0, velocity_noise;
+    // clang-format off
+    pos_kalman_filter.process_covariance << position_noise, 0, correlation_noise, 0,
+                                            0, position_noise, 0, correlation_noise,
+                                            correlation_noise, 0, velocity_noise, 0,
+                                            0, correlation_noise, 0, velocity_noise;
     ang_kalman_filter.process_covariance << angle_noise, ang_correlation_noise,
-        ang_correlation_noise, ang_velocity_noise;
+                                            ang_correlation_noise, ang_velocity_noise;
+    // clang-format on
 
     // Prediction Steps, which gets new state estimate and state covariance
     pos_kalman_filter.predict(Eigen::Vector<double, CONTROL_SIZE>::Zero());
