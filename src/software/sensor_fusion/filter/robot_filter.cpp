@@ -44,6 +44,17 @@ std::optional<Robot> RobotFilter::estimateRobotState(
     const std::vector<RobotDetection>& new_robot_data, const Timestamp& current_time,
     const std::optional<RobotId> breakbeam_tripped_id)
 {
+    // Data older than what the filter has already processed (e.g. a stale or out of
+    // order vision packet) is ignored, as the filter cannot run backwards in time
+    if (last_predict_timestamp && current_time < *last_predict_timestamp)
+    {
+        if (!prev_detection_timestamp)
+        {
+            return std::nullopt;
+        }
+        return current_robot_state;
+    }
+
     // Gets best detection in case camera accidentally has multiple detections
     const std::optional<RobotDetection> best_robot_detection =
         getBestRobotDetection(new_robot_data);

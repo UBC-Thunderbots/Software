@@ -161,3 +161,46 @@ TEST_F(RobotFilterTest, large_orientation_angle_wrapping_test)
     EXPECT_GT((result->orientation() - after_wrap).clamp(), Angle::zero());
     EXPECT_GT(result->angularVelocity(), AngularVelocity::zero());
 }
+
+// Robot ignores data that is older than what it has already processed, and keeps
+// returning its latest state
+TEST_F(RobotFilterTest, older_timestamp_robot_data_ignored_test)
+{
+    Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
+                AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0));
+    RobotFilter robot_filter(robot);
+    std::vector<RobotDetection> new_robot_data;
+
+    // Two detections of the robot, 100 milliseconds apart
+    new_robot_data = {
+        {1, Point(2, 0), Angle::fromRadians(1), 0.5, Timestamp::fromMilliseconds(100)}};
+    robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(100));
+
+    const unsigned int last_detection_ms = 200;
+    new_robot_data = {{1, Point(2, 0), Angle::fromRadians(1), 0.5,
+                       Timestamp::fromMilliseconds(last_detection_ms)}};
+    std::optional<Robot> latest_result = robot_filter.estimateRobotState(
+        new_robot_data, Timestamp::fromMilliseconds(last_detection_ms));
+    ASSERT_TRUE(latest_result.has_value());
+
+    // A detection from before the last one, at a different position
+    new_robot_data = {
+        {1, Point(2.5, 0), Angle::fromRadians(1.5), 0.5, Timestamp::fromMilliseconds(0)}};
+    std::optional<Robot> result =
+        robot_filter.estimateRobotState(new_robot_data, Timestamp::fromMilliseconds(0));
+
+    // The old detection is ignored, and the latest state is returned unchanged
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result->timestamp(), latest_result->timestamp());
+    EXPECT_EQ(result->position(), latest_result->position());
+    EXPECT_EQ(result->orientation(), latest_result->orientation());
+
+    // The old detection does not move the last detection time back either, so the
+    // robot is still predicted exactly at the end of the expiry buffer after the last
+    // detection
+    EXPECT_TRUE(robot_filter
+                    .estimateRobotState(
+                        {}, Timestamp::fromMilliseconds(
+                                last_detection_ms + ROBOT_DEBOUNCE_DURATION_MILLISECONDS))
+                    .has_value());
+}
