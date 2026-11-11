@@ -117,6 +117,15 @@ use_repo(pybind11_configure, "pybind11")
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
+    name = "tigers_autoref",
+    build_file = "@//extlibs:tigers_autoref.bzl",
+    sha256 = "31bc916126e262093d539a15a60418e3b54712ba6525f4758adc7ff3109e8ed6",
+    strip_prefix = "autoReferee",
+    urls = ["https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip",
+    ],
+)
+
+http_archive(
     name = "tomlplusplus",
     build_file = "@//extlibs:tomlplusplus.bzl",
     patches = ["//starlark/patches/tomlplusplus:fix_arm_alignment.patch"],
