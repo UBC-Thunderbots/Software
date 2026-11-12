@@ -33,7 +33,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class Simulator:
     """Simulator Context Manager"""
-    
+
     SIMULATOR_STATE_FORWARD_BUFFER_SIZE = 5
 
     def __init__(
