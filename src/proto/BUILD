@@ -1,13 +1,10 @@
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
+load("@rules_python//python:defs.bzl", "py_library")
 load("//starlark/nanopb:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
-
-proto_library(
-    name = "geneva_proto",
-    srcs = [":geneva_slot.proto"],
-)
 
 proto_library(
     name = "geometry_proto",
@@ -23,7 +20,6 @@ proto_library(
         "tbots_timestamp_msg.proto",
     ],
     deps = [
-        ":geneva_proto",
         ":geometry_proto",
         "@nanopb//:nanopb_proto",
     ],
@@ -48,7 +44,6 @@ proto_library(
         "world.proto",
     ],
     deps = [
-        ":geneva_proto",
         ":geometry_proto",
         ":robot_proto",
         "@nanopb//:nanopb_proto",

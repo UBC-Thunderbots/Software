@@ -1,6 +1,6 @@
 #include "software/ai/motion_constraint/motion_constraint_visitor.h"
 
-#include "software/ai/hl/stp/tactic/all_tactics.h"
+#include "software/ai/stp/tactic/all_tactics.h"
 
 void MotionConstraintVisitor::visit(const GoalieTactic& tactic)
 {
@@ -19,10 +19,6 @@ void MotionConstraintVisitor::visit(const CreaseDefenderTactic& tactic)
 void MotionConstraintVisitor::visit(const ShadowEnemyTactic& tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveTactic& tactic) {}
-
-void MotionConstraintVisitor::visit(const ChipTactic& tactic) {}
-
-void MotionConstraintVisitor::visit(const KickTactic& tactic) {}
 
 void MotionConstraintVisitor::visit(const PivotKickTactic& tactic) {}
 
@@ -106,6 +102,8 @@ void MotionConstraintVisitor::visit(const AvoidInterferenceTactic& tactic)
 {
     current_motion_constraints.clear();
 }
+
+void MotionConstraintVisitor::visit(const KickOrChipTactic& tactic) {}
 
 void MotionConstraintVisitor::visit(const PassDefenderTactic& tactic) {}
 

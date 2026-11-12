@@ -3,8 +3,8 @@
 #include <functional>
 
 #include "proto/play_info_msg.pb.h"
-#include "software/ai/hl/stp/play/play.h"
 #include "software/ai/play_selection_fsm.h"
+#include "software/ai/stp/play/play.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -56,20 +56,18 @@ class Ai final
     void overridePlayFromProto(TbotsProto::Play play_proto);
 
     /**
-     * Update the AiConfig proto
+     * Mark the shared AI config as updated.
      *
-     * @param ai_config The new AiConfig proto
+     * Only used so we can adjust to changes in the control config's play override, other
+     * config fields just get read on demand from the shared config.
      */
-    void updateAiConfig();
+    void markAiConfigUpdated();
 
    private:
     void checkAiConfig();
 
     std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
-    std::unique_ptr<Play> override_play;
-    std::unique_ptr<Play> current_play;
-    TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 
     // inter play communication

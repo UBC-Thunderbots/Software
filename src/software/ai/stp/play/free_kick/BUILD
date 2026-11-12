@@ -1,0 +1,47 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "free_kick_play",
+    srcs = [
+        "free_kick_play.cpp",
+        "free_kick_play_fsm.cpp",
+    ],
+    hdrs = [
+        "free_kick_play.h",
+        "free_kick_play_fsm.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
+        "//software/ai/evaluation:possession",
+        "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:receiver_position_generator",
+        "//software/ai/stp/play",
+        "//software/ai/stp/play/defense:defense_play",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/stp/tactic/kick_or_chip:kick_or_chip_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/ai/stp/tactic/receiver:receiver_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+        "//software/world:ball",
+    ],
+    alwayslink = True,
+)
+
+py_test(
+    name = "free_kick_play_test",
+    srcs = ["free_kick_play_test.py"],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

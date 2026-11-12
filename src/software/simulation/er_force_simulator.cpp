@@ -3,6 +3,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
 
+#include <cmath>
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
@@ -10,27 +11,75 @@
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_status_msg.pb.h"
+#include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
 
+robot::Specs ErForceSimulator::createRobotSpecs(
+    const robot_constants::RobotConstants& robot_constants)
+{
+    robot::Specs specs;
+    robotSetDefault(&specs);
+
+    const float radius = robot_constants.robot_radius_m;
+    const float angle =
+        2 * std::asin(robot_constants.front_of_robot_width_meters / (2 * radius));
+    const float dribbler_width = robot_constants.dribbler_width_meters;
+
+    const float v_max     = robot_constants.robot_max_speed_m_per_s;
+    const float omega_max = robot_constants.robot_max_ang_speed_rad_per_s;
+
+    specs.set_radius(radius);
+    specs.set_angle(angle);
+    specs.set_dribbler_width(dribbler_width);
+    specs.set_v_max(v_max);
+    specs.set_omega_max(omega_max);
+
+    auto* acceleration = specs.mutable_acceleration();
+    acceleration->set_a_speedup_f_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_s_max(robot_constants.robot_max_acceleration_m_per_s_2);
+    acceleration->set_a_speedup_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    acceleration->set_a_brake_f_max(robot_constants.robot_max_deceleration_m_per_s_2);
+    acceleration->set_a_brake_s_max(robot_constants.robot_max_deceleration_m_per_s_2);
+    acceleration->set_a_brake_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+
+    auto* strategy = specs.mutable_strategy();
+    strategy->set_a_speedup_f_max(
+        robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
+    strategy->set_a_speedup_s_max(
+        robot_constants.robot_trajectory_max_acceleration_m_per_s_2);
+    strategy->set_a_speedup_phi_max(
+        robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+    strategy->set_a_brake_f_max(
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    strategy->set_a_brake_s_max(
+        robot_constants.robot_trajectory_max_deceleration_m_per_s_2);
+    strategy->set_a_brake_phi_max(robot_constants.robot_max_ang_acceleration_rad_per_s_2);
+
+
+    return specs;
+}
+
+
+
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const robot_constants::RobotConstants& robot_constants,
-                                   std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping,
-                                   Duration primitive_executor_time_step)
+                                   std::unique_ptr<RealismConfigErForce>& realism_config)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
-      primitive_executor_time_step(primitive_executor_time_step),
       frame_number(0),
-      euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
       field(Field::createField(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
-      ramping(ramping)
+      enable_robot_localizer(realism_config->enable_robot_localizer()),
+      robot_sensor_noise(realism_config->robot_sensor_noise())
 {
     std::string full_filename = CONFIG_DIRECTORY;
 
@@ -56,14 +105,11 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
     std::string config_str = config_ss.str();
 
     google::protobuf::TextFormat::Parser parser;
-    parser.ParseFromString(config_str, &er_force_sim_setup);
+    std::ignore  = parser.ParseFromString(config_str, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
-    // start with default robots, take ER-Force specs.
-    robot::Specs ERForce;
-    robotSetDefault(&ERForce);
     Team friendly_team = Team();
     Team enemy_team    = Team();
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -81,49 +127,12 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
 
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createDefaultRealismConfig()
 {
-    auto realism_config = std::make_unique<RealismConfigErForce>();
-    realism_config->set_stddev_ball_p(0);
-    realism_config->set_stddev_robot_p(0);
-    realism_config->set_stddev_robot_phi(0);
-    realism_config->set_stddev_ball_area(0);
-    realism_config->set_enable_invisible_ball(true);
-    realism_config->set_ball_visibility_threshold(0.4f);
-    realism_config->set_camera_overlap(0.3f);
-    realism_config->set_dribbler_ball_detections(0);
-    realism_config->set_camera_position_error(0);
-    realism_config->set_robot_command_loss(0);
-    realism_config->set_robot_response_loss(0);
-    realism_config->set_missing_ball_detections(0);
-    realism_config->set_vision_delay(0);
-    realism_config->set_vision_processing_time(0);
-    realism_config->set_missing_ball_detections(0);
-    realism_config->set_simulate_dribbling(false);
-    return realism_config;
+    return parseRealismConfig("extlibs/er_force_sim/config/simulator/default.txt");
 }
 
 std::unique_ptr<RealismConfigErForce> ErForceSimulator::createRealisticRealismConfig()
 {
-    /* values from
-     * https://github.com/robotics-erlangen/framework/blob/master/config/simulator-realism/Realistic.txt
-     */
-    auto realism_config = std::make_unique<RealismConfigErForce>();
-    realism_config->set_stddev_ball_p(0.0014f);
-    realism_config->set_stddev_robot_p(0.0013f);
-    realism_config->set_stddev_robot_phi(0.01f);
-    realism_config->set_stddev_ball_area(6.5f);
-    realism_config->set_enable_invisible_ball(true);
-    realism_config->set_ball_visibility_threshold(0.4f);
-    realism_config->set_camera_overlap(1);
-    realism_config->set_dribbler_ball_detections(0.05f);
-    realism_config->set_camera_position_error(0.1f);
-    realism_config->set_robot_command_loss(0.03f);
-    realism_config->set_robot_response_loss(0.1f);
-    realism_config->set_missing_ball_detections(0.05f);
-    realism_config->set_vision_delay(35000000);
-    realism_config->set_vision_processing_time(10000000);
-    realism_config->set_missing_ball_detections(0.02f);
-    realism_config->set_simulate_dribbling(false);
-    return realism_config;
+    return parseRealismConfig("extlibs/er_force_sim/config/simulator/realistic.txt");
 }
 
 void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
@@ -194,8 +203,7 @@ void ErForceSimulator::setRobots(
 {
     auto simulator_setup_command = std::make_unique<amun::Command>();
 
-    robot::Specs ERForce;
-    robotSetDefault(&ERForce);
+    const robot::Specs robot_specs = createRobotSpecs(robot_constants);
 
     // Initialize Team Robots at the bottom of the field
     ::robot::Team* team;
@@ -211,7 +219,7 @@ void ErForceSimulator::setRobots(
     for (auto& [id, robot_state] : robots)
     {
         auto* robot = team->add_robot();
-        robot->CopyFrom(ERForce);
+        robot->CopyFrom(robot_specs);
         robot->set_id(id);
     }
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
@@ -269,30 +277,22 @@ void ErForceSimulator::setRobots(
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
+    auto* simulated_robots = &yellow_simulated_robots;
+    bool* robots_moved     = &yellow_robots_moved;
     if (side == gameController::Team::BLUE)
     {
-        blue_primitive_executor_map.clear();
-    }
-    else
-    {
-        yellow_primitive_executor_map.clear();
+        simulated_robots = &blue_simulated_robots;
+        robots_moved     = &blue_robots_moved;
     }
 
+    simulated_robots->clear();
     for (auto& [id, robot_state] : robots)
     {
-        if (side == gameController::Team::BLUE)
-        {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants);
-            blue_primitive_executor_map.insert({id, robot_primitive_executor});
-        }
-        else
-        {
-            auto robot_primitive_executor =
-                std::make_shared<PrimitiveExecutor>(robot_constants);
-            yellow_primitive_executor_map.insert({id, robot_primitive_executor});
-        }
+        simulated_robots->try_emplace(id, id, robot_constants, enable_robot_localizer,
+                                      robot_sensor_noise);
     }
+
+    *robots_moved = true;
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
@@ -304,15 +304,13 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const auto robot_map =
         getRobotIdToRobotStateMap(sim_robots, gameController::Team::YELLOW);
 
-    yellow_team_world_msg               = std::move(world_msg);
-    const TbotsProto::World world_proto = *yellow_team_world_msg;
+    yellow_team_world_msg = std::move(world_msg);
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         if (robot_map.contains(robot_id))
         {
-            const auto& robot_state = robot_map.at(robot_id);
-            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, robot_state);
+            setRobotPrimitive(robot_id, primitive_set_msg, yellow_simulated_robots,
+                              robot_map.at(robot_id));
         }
     }
 }
@@ -326,47 +324,39 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const auto robot_map =
         getRobotIdToRobotStateMap(sim_robots, gameController::Team::BLUE);
 
-    blue_team_world_msg                 = std::move(world_msg);
-    const TbotsProto::World world_proto = *blue_team_world_msg;
-
+    blue_team_world_msg = std::move(world_msg);
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         if (robot_map.contains(robot_id))
         {
-            const auto& robot_state = robot_map.at(robot_id);
-            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                              world_proto, robot_state);
+            setRobotPrimitive(robot_id, primitive_set_msg, blue_simulated_robots,
+                              robot_map.at(robot_id));
         }
     }
 }
 
 void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
-    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-        robot_primitive_executor_map,
-    const TbotsProto::World& world_msg, const RobotState& robot_state)
+    std::unordered_map<RobotId, SimulatedRobot>& simulated_robots,
+    const RobotState& robot_state)
 {
-    // Set to NEG_X because the world msg in this simulator is normalized
-    // correctly
-    auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);
+    auto simulated_robot_iter = simulated_robots.find(id);
 
-    if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
+    if (simulated_robot_iter != simulated_robots.end())
     {
-        auto primitive_executor = robot_primitive_executor_iter->second;
-        primitive_executor->updateState(robot_state);
-        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
+        simulated_robot_iter->second.setPrimitive(
+            primitive_set_msg.robot_primitives().at(id), robot_state);
     }
     else
     {
-        LOG(WARNING) << "Primitive Executor for robot with ID " << id << " not found"
-                     << std::endl;
+        LOG(WARNING) << "Simulated robot with ID " << id << " not found" << std::endl;
     }
 }
 
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
-    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
-        robot_primitive_executor_map,
-    const TbotsProto::World& world_msg, gameController::Team side)
+    std::unordered_map<RobotId, SimulatedRobot>& simulated_robots,
+    const TbotsProto::World& world_msg, const Duration& time_step,
+    gameController::Team side)
 {
     SSLSimulationProto::RobotControl robot_control;
 
@@ -376,101 +366,26 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
                                  : sim_state.yellow_robots();
     const auto robot_map   = getRobotIdToRobotStateMap(sim_robots, side);
 
-    for (auto& [robot_id, primitive_executor] : robot_primitive_executor_map)
+    for (auto& [robot_id, simulated_robot] : simulated_robots)
     {
-        std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control;
-
-        TbotsProto::PrimitiveExecutorStatus status;  // Added for compilation
-        if (ramping)
+        const auto robot_state_it = robot_map.find(robot_id);
+        if (robot_state_it == robot_map.end())
         {
-            auto direct_control_no_ramp =
-                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
-
-            auto* prev_ramp_velocities = &yellow_prev_ramp_velocities;
-            if (side == gameController::Team::BLUE)
-            {
-                prev_ramp_velocities = &blue_prev_ramp_velocities;
-            }
-            auto prev_it = prev_ramp_velocities->find(robot_id);
-            if (prev_it == prev_ramp_velocities->end())
-            {
-                LocalVelocity seed{Vector(0, 0), AngularVelocity::zero()};
-                auto robot_state_it = robot_map.find(robot_id);
-                if (robot_state_it != robot_map.end())
-                {
-                    seed = LocalVelocity{robot_state_it->second.localVelocity(),
-                                         robot_state_it->second.angularVelocity()};
-                }
-                prev_it = prev_ramp_velocities->insert({robot_id, seed}).first;
-            }
-
-            direct_control = getRampedVelocityPrimitive(
-                prev_it->second.linear, prev_it->second.angular, *direct_control_no_ramp,
-                primitive_executor_time_step);
-
-            // Persist the ramped command as the setpoint to ramp from next tick.
-            const auto& ramped =
-                direct_control->motor_control().direct_velocity_control();
-            prev_it->second =
-                LocalVelocity{Vector(ramped.velocity().x_component_meters(),
-                                     ramped.velocity().y_component_meters()),
-                              AngularVelocity::fromRadians(
-                                  ramped.angular_velocity().radians_per_second())};
+            LOG(WARNING) << "Simulated robot with ID " << robot_id
+                         << " has no state in the simulator, skipping it";
+            continue;
         }
-        else
-        {
-            direct_control =
-                primitive_executor->stepPrimitive(status, primitive_executor_time_step);
-        }
+
+        const TbotsProto::DirectControlPrimitive direct_control =
+            simulated_robot.tick(robot_state_it->second, time_step);
 
         auto command = *getRobotCommandFromDirectControl(
-            robot_id, std::move(direct_control), robot_constants);
+            robot_id,
+            std::make_unique<TbotsProto::DirectControlPrimitive>(direct_control),
+            robot_constants);
         *(robot_control.mutable_robot_commands()->Add()) = command;
     }
     return robot_control;
-}
-
-std::unique_ptr<TbotsProto::DirectControlPrimitive>
-ErForceSimulator::getRampedVelocityPrimitive(
-    const Vector current_local_velocity,
-    const AngularVelocity current_local_angular_velocity,
-    TbotsProto::DirectControlPrimitive& target_velocity_primitive, Duration time_to_ramp)
-{
-    TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
-        target_velocity_primitive.motor_control().direct_velocity_control();
-
-    // getting the target wheel velocity
-    EuclideanSpace_t target_euclidean_velocity = {
-        direct_velocity.velocity().x_component_meters(),
-        direct_velocity.velocity().y_component_meters(),
-        direct_velocity.angular_velocity().radians_per_second()};
-
-    WheelSpace_t target_wheel_velocity =
-        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
-
-    // getting the current wheel velocity
-    EuclideanSpace_t current_euclidean_velocity = {
-        current_local_velocity.x(), current_local_velocity.y(),
-        current_local_angular_velocity.toRadians()};
-
-    WheelSpace_t current_wheel_velocity =
-        euclidean_to_four_wheel.getWheelVelocity(current_euclidean_velocity);
-
-    WheelSpace_t ramped_four_wheel = euclidean_to_four_wheel.rampWheelVelocity(
-        current_wheel_velocity, target_wheel_velocity, time_to_ramp.toSeconds());
-
-    EuclideanSpace_t ramped_euclidean =
-        euclidean_to_four_wheel.getEuclideanVelocity(ramped_four_wheel);
-
-    auto mutable_direct_velocity = target_velocity_primitive.mutable_motor_control()
-                                       ->mutable_direct_velocity_control();
-    *(mutable_direct_velocity->mutable_velocity()) =
-        *createVectorProto({ramped_euclidean[0], ramped_euclidean[1]});
-    *(mutable_direct_velocity->mutable_angular_velocity()) =
-        *createAngularVelocityProto(AngularVelocity::fromRadians(ramped_euclidean[2]));
-
-    return std::make_unique<TbotsProto::DirectControlPrimitive>(
-        target_velocity_primitive);
 }
 
 void ErForceSimulator::stepSimulation(const Duration& time_step)
@@ -478,11 +393,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg,
+        updateSimulatorRobots(yellow_simulated_robots, *yellow_team_world_msg, time_step,
                               gameController::Team::YELLOW);
 
-    SSLSimulationProto::RobotControl blue_robot_control = updateSimulatorRobots(
-        blue_primitive_executor_map, *blue_team_world_msg, gameController::Team::BLUE);
+    SSLSimulationProto::RobotControl blue_robot_control =
+        updateSimulatorRobots(blue_simulated_robots, *blue_team_world_msg, time_step,
+                              gameController::Team::BLUE);
 
     auto yellow_radio_responses =
         er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
@@ -510,7 +426,31 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     er_force_sim->stepSimulation(time_step.toSeconds());
 
+    // After the physics step, since that is when ER-Force applies moves
+    resetMovedRobots(gameController::Team::BLUE);
+    resetMovedRobots(gameController::Team::YELLOW);
+
     frame_number++;
+}
+
+void ErForceSimulator::resetMovedRobots(gameController::Team side)
+{
+    auto* simulated_robots = &yellow_simulated_robots;
+    bool* robots_moved     = &yellow_robots_moved;
+    if (side == gameController::Team::BLUE)
+    {
+        simulated_robots = &blue_simulated_robots;
+        robots_moved     = &blue_robots_moved;
+    }
+
+    if (*robots_moved)
+    {
+        for (auto& [robot_id, simulated_robot] : *simulated_robots)
+        {
+            simulated_robot.reset();
+        }
+        *robots_moved = false;
+    }
 }
 
 std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
@@ -608,4 +548,24 @@ std::map<RobotId, RobotState> ErForceSimulator::getRobotIdToRobotStateMap(
             RobotState(position, velocity, orientation, angular_velocity);
     }
     return robot_map;
+}
+
+std::unique_ptr<RealismConfigErForce> ErForceSimulator::parseRealismConfig(
+    const std::string& path)
+{
+    std::ifstream file(path);
+    if (!file)
+    {
+        LOG(FATAL) << "Could not open realism config file " << path;
+    }
+    std::stringstream contents;
+    contents << file.rdbuf();
+
+    auto realism_config = std::make_unique<RealismConfigErForce>();
+    if (!google::protobuf::TextFormat::ParseFromString(contents.str(),
+                                                       realism_config.get()))
+    {
+        LOG(FATAL) << "Could not parse realism config file " << path;
+    }
+    return realism_config;
 }

@@ -1,13 +1,13 @@
-import software.python_bindings as tbots_cpp
-import proto.import_all_protos as protos
+from typing import override
 
-from software.gameplay_tests.validation.validation import (
-    create_validation_types,
-)
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.friendly_has_ball_possession import (
     FriendlyHasBallPossession,
 )
-from typing import override
+from software.gameplay_tests.validation.validation import (
+    create_validation_types,
+)
 
 
 class FriendlyReceivesBallSlow(FriendlyHasBallPossession):

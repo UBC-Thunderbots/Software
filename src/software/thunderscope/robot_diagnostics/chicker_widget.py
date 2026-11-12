@@ -1,8 +1,8 @@
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt import QtWidgets
-from software.py_constants import CHICKER_TIMEOUT
-import proto.import_all_protos as protos
 from enum import Enum
+
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtCore, QtWidgets
+from software.py_constants import CHICKER_TIMEOUT
 from software.thunderscope.common import common_widgets
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -254,7 +254,6 @@ class ChickerWidget(QtWidgets.QWidget):
 
         # Send kick, chip, autokick, or autochip primitive
         power_control = protos.PowerControl()
-        power_control.geneva_slot = 3
 
         if command == ChickerCommandMode.KICK:
             power_control.chicker.kick_speed_m_per_s = kick_power
@@ -290,7 +289,7 @@ class ChickerWidget(QtWidgets.QWidget):
             # buffer, the last sent message will be repeatedly resent to the robot, which we don't
             # want for kick/chip.
             power_control = protos.PowerControl()
-            power_control.geneva_slot = 3
+
             self.proto_unix_io.send_proto(protos.PowerControl, power_control, True)
 
     def enable(self) -> None:

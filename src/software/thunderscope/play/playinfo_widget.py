@@ -1,7 +1,6 @@
 import proto.import_all_protos as protos
 from pyqtgraph.Qt import QtWidgets
 from software.thunderscope.common.common_widgets import set_table_data
-
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 

@@ -131,6 +131,10 @@ struct RobotConstants
     float kalman_vision_noise_variance_rad_2;
 
     float kalman_motor_sensor_noise_variance_rad_per_s_2;
+    float kalman_motor_sensor_noise_variance_m_per_s_2;
+
+    // The variance of the IMU sensor
+    double imu_variance;
 };
 
 /**

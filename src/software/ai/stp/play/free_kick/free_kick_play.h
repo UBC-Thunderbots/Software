@@ -1,0 +1,22 @@
+#pragma once
+
+#include "software/ai/stp/play/free_kick/free_kick_play_fsm.h"
+#include "software/ai/stp/play/play_base.hpp"
+
+/**
+ * A play for free kicks
+ */
+
+class FreeKickPlay : public PlayBase<FreeKickPlayFSM>
+{
+   public:
+    /**
+     * Creates a free kick play
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    FreeKickPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
+    void updateTactics(const PlayUpdate& play_update) override;
+    std::vector<std::string> getState() override;
+};

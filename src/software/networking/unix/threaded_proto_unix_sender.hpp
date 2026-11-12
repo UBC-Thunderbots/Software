@@ -37,7 +37,7 @@ class ThreadedProtoUnixSender : private ThreadedUnixSender
 template <class SendProtoT>
 void ThreadedProtoUnixSender<SendProtoT>::sendProto(const SendProtoT& message)
 {
-    message.SerializeToString(&data_buffer);
+    std::ignore = message.SerializeToString(&data_buffer);
     sendString(data_buffer);
 
     if (proto_logger)

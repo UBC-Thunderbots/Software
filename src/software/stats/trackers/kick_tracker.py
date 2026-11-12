@@ -1,13 +1,12 @@
-from typing import Optional
+import queue
+from typing import Optional, override
 
-import software.python_bindings as tbots_cpp
 import proto.import_all_protos as protos
-from typing import override
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+import software.python_bindings as tbots_cpp
+from software.stats.logs.event_log import EventType
 from software.stats.trackers.tracker import Tracker
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.logs.event_log import EventType
-import queue
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class KickTracker(Tracker):

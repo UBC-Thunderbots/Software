@@ -1,19 +1,19 @@
-import os
-
-from software.stats.trackers import (
-    PossessionTracker,
-    ShotTracker,
-    PassTracker,
-    TrackerBuilder,
-    RefereeTracker,
-    GoalieTracker,
-)
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.constants import RuntimeManagerConstants
-from software.stats.logs.event_log import EventLog
 import logging
+import os
 import queue
+
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.stats.logs.event_log import EventLog
+from software.stats.trackers import (
+    GoalieTracker,
+    PassTracker,
+    PossessionTracker,
+    RefereeTracker,
+    ShotTracker,
+    TrackerBuilder,
+)
+from software.thunderscope.constants import RuntimeManagerConstants
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class StatsLogger:

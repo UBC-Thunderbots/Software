@@ -255,7 +255,7 @@ class Field
      *
      * @return The area within the field boundary as a rectangle
      */
-    Rectangle fieldBoundary() const;
+    const Rectangle& fieldBoundary() const;
 
     /**
      * Gets the position of the centre of the friendly goal.
@@ -459,6 +459,7 @@ class Field
     Rectangle field_lines_;
     Rectangle enemy_goal_;
     Rectangle friendly_goal_;
+    Rectangle field_boundary_;
 };
 
 namespace std

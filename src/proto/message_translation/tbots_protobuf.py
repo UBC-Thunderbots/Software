@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import math
+
+import numpy
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
-import numpy
-import math
 
 
 def create_world_state(

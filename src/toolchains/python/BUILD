@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_runtime", "py_runtime_pair")
 load("@rules_python//python/cc:py_cc_toolchain.bzl", "py_cc_toolchain")
 
@@ -57,7 +58,10 @@ py_cc_toolchain(
 
 py_cc_toolchain(
     name = "k8_aarch64_linux_py_cc_toolchain_data",
-    headers = "@py_cc_toolchain_for_k8_aarch64_linux//:headers",
+    headers = select({
+        "//toolchains/cc:is_linux": "@py_cc_toolchain_for_k8_aarch64_linux//:headers",
+        "//conditions:default": ":empty",
+    }),
     libs = ":empty",
     python_version = "3.12",
 )

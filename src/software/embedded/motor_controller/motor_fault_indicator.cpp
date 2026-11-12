@@ -10,5 +10,5 @@ MotorFaultIndicator::MotorFaultIndicator(
 
 bool MotorFaultIndicator::requiresReset() const
 {
-    return !drive_enabled || faults.find(TbotsProto::MotorFault::RESET) != faults.end();
+    return !drive_enabled;
 }

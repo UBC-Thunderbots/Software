@@ -1,7 +1,6 @@
-load("@protobuf//:protobuf_deps.bzl", "protobuf_deps")
 load("@robot_diagnostics_cli_deps//:requirements.bzl", "requirement")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//starlark:defs.bzl", "pkg_executable")
 

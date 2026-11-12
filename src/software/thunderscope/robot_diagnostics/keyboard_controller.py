@@ -1,8 +1,7 @@
 from abc import ABCMeta
 
-from pyqtgraph.Qt.QtCore import Qt, QObject, QEvent
+from pyqtgraph.Qt.QtCore import QEvent, QObject, Qt
 from pyqtgraph.Qt.QtWidgets import QApplication
-
 from software.thunderscope.constants import DiagnosticsConstants
 from software.thunderscope.robot_diagnostics.controller_base import IControllerBase
 

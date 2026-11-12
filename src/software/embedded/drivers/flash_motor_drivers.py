@@ -1,6 +1,7 @@
 import subprocess
-import time
 import sys
+import time
+
 from gpiozero import LED
 
 # The reset pin for the motor drivers

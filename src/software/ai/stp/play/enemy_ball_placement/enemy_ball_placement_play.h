@@ -1,0 +1,21 @@
+#pragma once
+
+#include "software/ai/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h"
+#include "software/ai/stp/play/play_base.hpp"
+
+/**
+ * A play to set up robots during enemy ball placement
+ */
+class EnemyBallPlacementPlay : public PlayBase<EnemyBallPlacementPlayFSM>
+{
+   public:
+    /**
+     * Constructor for EnemyBallPlacementPlay
+     *
+     * @param ai_config_ptr shared pointer to ai_config
+     */
+    EnemyBallPlacementPlay(std::shared_ptr<const TbotsProto::AiConfig> ai_config_ptr);
+
+    void updateTactics(const PlayUpdate& play_update) override;
+    std::vector<std::string> getState() override;
+};

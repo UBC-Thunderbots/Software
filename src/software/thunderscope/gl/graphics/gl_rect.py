@@ -1,13 +1,11 @@
-from pyqtgraph.Qt import QtGui
-import pyqtgraph.opengl as gl
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.thunderscope.constants import Colors, LINE_WIDTH
-from software.thunderscope.gl.graphics.gl_shape import GLShape
-
 from typing import Optional, override
 
 import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import LINE_WIDTH, Colors
+from software.thunderscope.gl.graphics.gl_shape import GLShape
 
 
 class GLRect(GLShape):

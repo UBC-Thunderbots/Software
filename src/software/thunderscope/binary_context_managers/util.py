@@ -1,6 +1,7 @@
 import logging
-import psutil
 from collections.abc import Iterator
+
+import psutil
 
 
 def _find_cmd(command: list[str]) -> Iterator[psutil.Process]:

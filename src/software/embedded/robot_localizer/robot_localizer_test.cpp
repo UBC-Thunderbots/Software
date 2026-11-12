@@ -1,0 +1,102 @@
+#include "robot_localizer.h"
+
+#include <gtest/gtest.h>
+
+#include <cmath>
+
+#include "shared/constants.h"
+#include "software/physics/velocity_conversion_util.h"
+#include "software/time/duration.h"
+#include "software/world/robot.h"
+
+namespace
+{
+// Mirror the values thunderloop constructs the localizer with (DivB constants).
+
+constexpr double LOOP_HZ = 300.0;
+constexpr double DT      = 1.0 / LOOP_HZ;
+
+// Drives the localizer through one second of a robot moving straight along global +X at
+// a constant 1 m/s (heading along +X, not rotating), feeding it the same inputs
+// thunderloop does each tick. If feed_vision is false, only the initial vision seed is
+// provided (isolates whether the periodic vision fix corrupts the velocity estimate).
+RobotLocalizer runConstantVelocity(bool feed_vision, double vision_age = RTT_S / 2)
+{
+    RobotLocalizer localizer = RobotLocalizer();
+
+    const Vector true_velocity(1.0, 0.0);
+    const Angle true_orientation = Angle::zero();
+    Point true_position(0.0, 0.0);
+
+    localizer.update(
+        RobotLocalizer::VisionData{true_position, true_orientation, RTT_S / 2});
+
+    for (int tick = 0; tick < static_cast<int>(LOOP_HZ); ++tick)
+    {
+        true_position += true_velocity * DT;
+
+        localizer.update(RobotLocalizer::ImuData{AngularVelocity::zero()});
+
+        const Vector local_velocity =
+            globalToLocalVelocity(true_velocity, true_orientation);
+        localizer.update(
+            RobotLocalizer::MotorData{local_velocity, AngularVelocity::zero()});
+
+        // predict() uses the commanded (target) velocity directly as the new velocity
+        // estimate (see RobotLocalizer::updateFilterPredictionMatrices).
+        localizer.predict(true_velocity, Duration::fromSeconds(DT));
+
+        // Periodic vision fix (~60 Hz). Feed the position from RTT_S/2 ago, consistent
+        // with the reported age.
+        if (feed_vision && tick % 5 == 0)
+        {
+            localizer.update(
+                RobotLocalizer::VisionData{true_position - true_velocity * vision_age,
+                                           true_orientation, vision_age});
+        }
+    }
+
+    return localizer;
+}
+}  // namespace
+
+// Regression test mirroring the (fixed) thunderloop wiring: orientation, velocity, and
+// position should all track a constant-velocity robot.
+TEST(RobotLocalizer, tracks_constant_forward_velocity)
+{
+    const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/true);
+
+    std::cerr << "[motor+vision] pos=(" << localizer.getPosition().x() << ", "
+              << localizer.getPosition().y() << ") vel=("
+              << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y()
+              << ") orient=" << localizer.getOrientation().toDegrees() << "deg\n";
+
+    EXPECT_NEAR(localizer.getOrientation().toDegrees(), 0.0, 10.0);
+    EXPECT_NEAR(localizer.getGlobalVelocity().x(), 1.0, 0.2)
+        << "Forward velocity estimate does not track";
+    EXPECT_NEAR(localizer.getGlobalVelocity().y(), 0.0, 0.2);
+}
+
+TEST(RobotLocalizer, velocity_tracks_from_motors_without_vision)
+{
+    const RobotLocalizer localizer = runConstantVelocity(/*feed_vision=*/false);
+
+    std::cerr << "[motor only]   vel=(" << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y() << ")\n";
+
+    EXPECT_NEAR(localizer.getGlobalVelocity().x(), 1.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().y(), 0.0, 0.2);
+}
+
+TEST(RobotLocalizer, velocity_with_zero_age_vision)
+{
+    const RobotLocalizer localizer =
+        runConstantVelocity(/*feed_vision=*/true, /*vision_age=*/1e-6);
+
+    std::cerr << "[zero-age vision] vel=(" << localizer.getGlobalVelocity().x() << ", "
+              << localizer.getGlobalVelocity().y() << ")\n";
+
+    EXPECT_NEAR(localizer.getGlobalVelocity().x(), 1.0, 0.2);
+    EXPECT_NEAR(localizer.getGlobalVelocity().y(), 0.0, 0.2);
+}

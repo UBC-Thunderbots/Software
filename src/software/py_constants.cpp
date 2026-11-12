@@ -1,5 +1,8 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#pragma GCC diagnostic pop
 
 #include "shared/constants.h"
 #include "software/constants.h"
@@ -142,9 +145,8 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("REPLAY_FILE_VERSION_PREFIX") = REPLAY_FILE_VERSION_PREFIX;
     m.attr("REPLAY_FILE_VERSION")        = REPLAY_FILE_VERSION;
 
-    m.attr("NUM_GENEVA_ANGLES") = NUM_GENEVA_ANGLES;
-    m.attr("CHICKER_TIMEOUT")   = CHICKER_TIMEOUT;
 
+    m.attr("CHICKER_TIMEOUT")        = CHICKER_TIMEOUT;
     m.attr("MAX_ROBOT_IDS_PER_SIDE") = MAX_ROBOT_IDS_PER_SIDE;
     m.attr("DIV_A_NUM_ROBOTS")       = DIV_A_NUM_ROBOTS;
     m.attr("DIV_B_NUM_ROBOTS")       = DIV_B_NUM_ROBOTS;

@@ -20,7 +20,7 @@
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/unix/threaded_proto_unix_listener.hpp"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 // ProtoLogger has to be defined as a global variable so that it can be accessed by the
 // cleanup callback.

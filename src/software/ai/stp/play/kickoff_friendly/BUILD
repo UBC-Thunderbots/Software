@@ -1,0 +1,38 @@
+load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "kickoff_friendly_play",
+    srcs = [
+        "kickoff_friendly_play.cpp",
+        "kickoff_friendly_play_fsm.cpp",
+    ],
+    hdrs = [
+        "kickoff_friendly_play.h",
+        "kickoff_friendly_play_fsm.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
+        "//software/ai/stp/play",
+        "//software/ai/stp/tactic/kick_or_chip:kick_or_chip_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+    ],
+    alwayslink = True,
+)
+
+py_test(
+    name = "kickoff_friendly_play_test",
+    srcs = ["kickoff_friendly_play_test.py"],
+    deps = [
+        "//software:conftest",
+        "//software/gameplay_tests/validation:validations",
+        requirement("pytest"),
+    ],
+)

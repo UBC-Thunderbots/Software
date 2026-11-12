@@ -150,12 +150,12 @@ class SensorFusionTest : public ::testing::Test
     {
         const uint32_t camera_id    = 0;
         const uint32_t frame_number = 40391;
-
+        BallState moved_ball(ball_state.position() + Vector(0.1, 0),
+                             ball_state.velocity(), ball_state.distanceFromGround());
         return createSSLDetectionFrame(camera_id, current_time + Duration::fromSeconds(1),
-                                       frame_number, {ball_state}, yellow_robot_states,
+                                       frame_number, {moved_ball}, yellow_robot_states,
                                        blue_robot_states);
     }
-
     std::unique_ptr<SSLProto::SSL_GeometryData> initSSLDivBGeomData()
     {
         Field field           = Field::createSSLDivisionBField();
