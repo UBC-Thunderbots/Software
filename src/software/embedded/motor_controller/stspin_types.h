@@ -24,7 +24,7 @@ enum class StSpinResponseType
     IQ_AND_IQ_REF             = 0x05,
     ID_AND_ID_REF             = 0x06,
     SPEED_AND_SPEED_REF       = 0x07,
-    MOTOR_STATUS              = 0x08,
+    MOTOR_STATE               = 0x08,
 };
 
 enum class StSpinFaultCode
@@ -60,7 +60,7 @@ enum class StSpinMotorState
     WAIT_STOP_MOTOR = 20,
     OTF_DETECTION   = 21,
     OTF_BRAKE       = 22
-}
+};
 
 struct NoOpMessage
 {
