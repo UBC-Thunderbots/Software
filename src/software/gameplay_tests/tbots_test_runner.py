@@ -1,4 +1,3 @@
-import queue
 import threading
 import time
 from abc import abstractmethod
@@ -6,18 +5,10 @@ from typing import Any
 
 import proto.import_all_protos as protos
 import pytest
-from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-
-logger = create_logger(__name__)
 
 PAUSE_AFTER_FAIL_DELAY_S = 3
 PROCESS_BUFFER_DELAY_S = 0.01
-
-# The gamecontroller publishes commands as a short burst that can be dropped, so
-# re-send until the command is acknowledged or these limits are reached.
-GC_COMMAND_ACK_TIMEOUT_S = 2.0
-GC_COMMAND_ACK_MAX_ATTEMPTS = 3
 
 
 class TbotsTestRunner:
@@ -91,98 +82,14 @@ class TbotsTestRunner:
         """Sends a gamecontroller command that is to be broadcasted to the given team
 
         :param gc_command: the gamecontroller command
-        :param team: the team the command applies to
+        :param is_friendly: whether the command should be sent to the friendly team
         :param final_ball_placement_point: where to place the ball in ball placement
-        :return: the CiOutput protos returned by the gamecontroller
         """
-        ci_output_list = self.gamecontroller.send_gc_command(
+        self.gamecontroller.send_gc_command(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
         )
-        self._deliver_referee_to_full_systems(ci_output_list)
-        return ci_output_list
-
-    def _deliver_referee_to_full_systems(self, ci_output_list) -> None:
-        """Override to deliver referee messages to the full systems."""
-        return
-
-    def send_gc_command_and_wait(
-        self,
-        gc_command: protos.Command.Type,
-        team: protos.Team,
-        expected_referee_command: int,
-        final_ball_placement_point=None,
-        timeout_s: float = GC_COMMAND_ACK_TIMEOUT_S,
-        max_attempts: int = GC_COMMAND_ACK_MAX_ATTEMPTS,
-    ):
-        """Send a gamecontroller command and block until the friendly full system applies it.
-
-        Re-sends the command until the friendly World reports
-        ``expected_referee_command``, advancing the simulation if needed.
-
-        :param gc_command: the gamecontroller command to send
-        :param team: the team the command applies to
-        :param expected_referee_command: the RefereeCommand the friendly full system
-            should report once the command is applied
-        :param final_ball_placement_point: where to place the ball in ball placement
-        :param timeout_s: how long to wait for an acknowledgement after each send
-        :param max_attempts: how many times to send the command before giving up
-        :raises AssertionError: if the command is never acknowledged
-        """
-        for attempt in range(max_attempts):
-            # Only acknowledge Worlds produced after this command was sent.
-            self._drain_world_buffer()
-
-            self.send_gamecontroller_command(
-                gc_command, team, final_ball_placement_point
-            )
-
-            if self._wait_for_referee_command(expected_referee_command, timeout_s):
-                return
-
-            logger.warning(
-                f"GC command {gc_command} was not acknowledged after attempt "
-                f"{attempt + 1}/{max_attempts}, re-sending"
-            )
-
-        raise AssertionError(
-            f"GC command {gc_command} was never acknowledged by the friendly "
-            f"full system (expected game state {expected_referee_command})"
-        )
-
-    def _wait_for_referee_command(
-        self,
-        expected_referee_command: int,
-        timeout_s: float,
-    ) -> bool:
-        """Wait until the friendly full system reports the expected referee command."""
-        deadline = time.time() + timeout_s
-        while time.time() < deadline:
-            world = self._next_world(deadline - time.time())
-            if (
-                world is not None
-                and world.game_state.command == expected_referee_command
-            ):
-                return True
-        return False
-
-    def _next_world(self, timeout_s: float):
-        """Return the next World, or None on timeout.
-
-        :param timeout_s: how long to wait for a World
-        """
-        try:
-            return self.world_buffer.get(
-                block=True, timeout=max(timeout_s, 0.0), return_cached=False
-            )
-        except queue.Empty:
-            return None
-
-    def _drain_world_buffer(self) -> None:
-        """Discard any Worlds currently buffered from the friendly full system."""
-        while self.world_buffer.get(block=False, return_cached=False) is not None:
-            pass
 
     def set_tactics(
         self,

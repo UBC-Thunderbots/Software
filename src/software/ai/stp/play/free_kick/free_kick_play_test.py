@@ -1,7 +1,6 @@
 import proto.import_all_protos as protos
 import pytest
 import software.python_bindings as tbots_cpp
-from proto.game_state_pb2 import GameState
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.gameplay_tests.util import pytest_main
@@ -57,24 +56,18 @@ def test_free_kick_play_friendly(ball_initial_pos, must_score, gameplay_test_run
             ),
         )
 
-        gameplay_test_runner.set_plays(
-            blue_play=protos.PlayName.FreeKickPlay, yellow_play=protos.PlayName.HaltPlay
+        gameplay_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+        )
+        gameplay_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.NORMAL_START, team=SslTeam.BLUE
+        )
+        gameplay_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.DIRECT, team=SslTeam.BLUE
         )
 
-        gameplay_test_runner.send_gc_command_and_wait(
-            gc_command=protos.Command.Type.STOP,
-            team=SslTeam.UNKNOWN,
-            expected_referee_command=GameState.RefereeCommand.REFEREE_COMMAND_STOP,
-        )
-        gameplay_test_runner.send_gc_command_and_wait(
-            gc_command=protos.Command.Type.NORMAL_START,
-            team=SslTeam.BLUE,
-            expected_referee_command=GameState.RefereeCommand.REFEREE_COMMAND_NORMAL_START,
-        )
-        gameplay_test_runner.send_gc_command_and_wait(
-            gc_command=protos.Command.Type.DIRECT,
-            team=SslTeam.BLUE,
-            expected_referee_command=GameState.RefereeCommand.REFEREE_COMMAND_DIRECT_FREE_US,
+        gameplay_test_runner.set_plays(
+            blue_play=protos.PlayName.FreeKickPlay, yellow_play=protos.PlayName.HaltPlay
         )
 
     eventually_validations = [

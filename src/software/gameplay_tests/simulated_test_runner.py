@@ -68,70 +68,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         self.simulator_proto_unix_io.send_proto(protos.WorldState, worldstate)
 
     @override
-    def _deliver_referee_to_full_systems(self, ci_output_list) -> None:
-        """Inject referee messages before the next simulator tick.
-
-        This avoids relying on the gamecontroller's lossy multicast forwarding,
-        so the command is applied before that tick's vision frame.
-
-        :param ci_output_list: the CiOutput protos returned by the gamecontroller
-        """
-        for ci_output in ci_output_list or []:
-            if not ci_output.HasField("referee_msg"):
-                continue
-
-            for proto_unix_io in (
-                self.blue_full_system_proto_unix_io,
-                self.yellow_full_system_proto_unix_io,
-            ):
-                proto_unix_io.send_proto(
-                    protos.SensorProto,
-                    protos.SensorProto(ssl_referee_msg=ci_output.referee_msg),
-                    block=True,
-                )
-
-    @override
-    def _next_world(self, timeout_s: float):
-        """Tick the simulator once, then return the resulting World.
-
-        :param timeout_s: how long to wait for the World after ticking
-        :return: the next World, or None if none arrived in time
-        """
-        deadline = time.time() + timeout_s
-
-        # Drop stale tick acknowledgements
-        while (
-            self.simulator_tick_finished_buffer.get(
-                block=False, return_cached=False
-            )
-            is not None
-        ):
-            pass
-
-        tick = protos.SimulatorTick(
-            milliseconds=TICK_DURATION_S * MILLISECONDS_PER_SECOND
-        )
-        self.simulator_proto_unix_io.send_proto(protos.SimulatorTick, tick)
-
-        try:
-            self.simulator_tick_finished_buffer.get(
-                block=True,
-                timeout=max(deadline - time.time(), 0.01),
-                return_cached=False,
-            )
-        except queue.Empty:
-            return None
-
-        try:
-            return self.world_buffer.get(
-                block=True,
-                timeout=max(deadline - time.time(), 0.01),
-                return_cached=False,
-            )
-        except queue.Empty:
-            return None
-
-    @override
     def _pre_run_setup(self, setup: (lambda: None)):
         """Run setup until simulator has received game state
 
@@ -178,7 +114,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 # If delay matches time
                 if delay <= time_elapsed_s:
                     # send command
-                    self.send_gamecontroller_command(cmd, team)
+                    self.gamecontroller.send_gc_command(gc_command=cmd, team=team)
                     # remove command from the list
                     gc_cmd_with_delay.remove((delay, cmd, team))
 
