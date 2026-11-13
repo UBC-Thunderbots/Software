@@ -264,6 +264,7 @@ def execute_command(command: list[str], print_only: bool = False):
         code = os.system(cmd_str)
         sys.exit(1 if code != 0 else 0)
 
+
 if __name__ == "__main__":
     # When started with `bazel run`, we begin in Bazel's hidden runfiles folder.
     # Move back to src/ so the Bazel commands we run work like before.
