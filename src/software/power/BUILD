@@ -53,19 +53,6 @@ cc_library(
 )
 
 platformio_library(
-    name = "power_command_handler",
-    hdr = "power_command_handler.h",
-    deps = ["//proto:tbots_nanopb_proto"],
-)
-
-cc_library(
-    name = "power_command_handler_cc",
-    hdrs = ["power_command_handler.h"],
-    includes = ["."],
-    deps = ["//proto:tbots_nanopb_proto"],
-)
-
-platformio_library(
     name = "esp_hal",
     src = "esp/esp_hal.cpp",
     add_srcs = [
@@ -113,58 +100,14 @@ cc_library(
 )
 
 platformio_library(
-    name = "power_command_receiver",
-    src = "power_command_receiver.cpp",
-    hdr = "power_command_receiver.h",
-    deps = [
-        "//proto:tbots_nanopb_proto",
-        "//shared/uart_framing:uart_framing_platformio",
-    ],
-)
-
-cc_library(
-    name = "power_command_receiver_cc",
-    srcs = ["power_command_receiver.cpp"],
-    hdrs = ["power_command_receiver.h"],
-    includes = ["."],
-    deps = [
-        "//proto:tbots_nanopb_proto",
-        "//shared/uart_framing:uart_framing",
-    ],
-)
-
-platformio_library(
-    name = "control_executor",
-    src = "control_executor.cpp",
-    hdr = "control_executor.h",
-    deps = [
-        ":power_controller",
-        ":power_command_handler",
-        "//proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "control_executor_cc",
-    srcs = ["control_executor.cpp"],
-    hdrs = ["control_executor.h"],
-    includes = ["."],
-    deps = [
-        ":power_controller_cc",
-        ":power_command_handler_cc",
-        "//proto:tbots_nanopb_proto",
-    ],
-)
-
-platformio_library(
     name = "power_board_runtime",
     src = "power_board_runtime.cpp",
     hdr = "power_board_runtime.h",
     deps = [
         ":dribbler_controller",
-        ":power_command_handler",
-        ":power_command_receiver",
+        ":power_controller",
         ":power_hal",
+        "//proto:tbots_nanopb_proto",
         "//proto/message_translation:power_frame_msg_platformio",
         "//shared/uart_framing:uart_framing_platformio",
     ],
@@ -177,9 +120,9 @@ cc_library(
     includes = ["."],
     deps = [
         ":dribbler_controller_cc",
-        ":power_command_handler_cc",
-        ":power_command_receiver_cc",
+        ":power_controller_cc",
         ":power_hal_cc",
+        "//proto:tbots_nanopb_proto",
         "//proto/message_translation:power_frame_msg",
         "//shared/uart_framing:uart_framing",
     ],
@@ -203,7 +146,6 @@ platformio_project(
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
     deps = [
-        ":control_executor",
         ":dribbler_controller",
         ":esp_hal",
         ":pins",
