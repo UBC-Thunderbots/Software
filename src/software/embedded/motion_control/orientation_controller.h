@@ -25,6 +25,15 @@ class OrientationController
      * @param target_trajectory The target angular trajectory.
      * @param elapsed_time The elapsed time since the trajectory was created.
      * @param delta_time The time passed since last time step.
+     *
+     * @return A target velocity as the sum of a feed forward vector and an error
+     * correction vector.
+     *
+     * @note @ref elapsed_time and @ref delta_time expect positive @ref Duration
+     * values.
+     *
+     * @note The @ref elapsed_time is used with the @ref target_trajectory to determine
+     * where the position should be.
      */
     AngularVelocity step(const Angle& orientation,
                          const BangBangTrajectory1DAngular& target_trajectory,
@@ -34,6 +43,8 @@ class OrientationController
      * Resets the state of this orientation controller.
      */
     void reset() override;
+
+    const PidController<double>& getPid() const;
 
    private:
     // TODO(#3737): tune constants
