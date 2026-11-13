@@ -13,8 +13,7 @@
 class PowerBoardRuntime
 {
    public:
-    PowerBoardRuntime(PowerHAL& hal, PowerController& power_controller,
-                      DribblerController& dribbler_controller);
+    explicit PowerBoardRuntime(PowerHAL& hal);
 
     /** Passes one byte from the command transport and dispatches complete commands. */
     void receiveByte(uint8_t byte);
@@ -29,8 +28,8 @@ class PowerBoardRuntime
     static constexpr std::size_t MAX_PACKET_SIZE = TbotsProto_PowerFrame_size * 2 + 4;
 
     PowerHAL& hal_;
-    PowerController& power_controller_;
-    DribblerController& dribbler_controller_;
+    PowerController power_controller_;
+    DribblerController dribbler_controller_;
     std::vector<uint8_t> receive_buffer_;
     bool receiving_        = false;
     uint32_t sequence_num_ = 0;

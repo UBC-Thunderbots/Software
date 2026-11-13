@@ -1,13 +1,9 @@
 #ifdef PLATFORMIO_BUILD
-#include "dribbler_controller.h"
 #include "esp_hal.h"
 #include "power_board_runtime.h"
-#include "power_controller.h"
 #else
-#include "software/power/dribbler_controller.h"
 #include "software/power/esp/esp_hal.h"
 #include "software/power/power_board_runtime.h"
-#include "software/power/power_controller.h"
 #endif
 
 #include <Arduino.h>
@@ -25,18 +21,13 @@ void loop() {}
 #else
 
 std::shared_ptr<EspHal> power_hal;
-std::shared_ptr<PowerController> power_controller;
-std::shared_ptr<DribblerController> dribbler_controller;
 std::shared_ptr<PowerBoardRuntime> runtime;
 
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
-    power_hal           = std::make_shared<EspHal>();
-    power_controller    = std::make_shared<PowerController>(*power_hal);
-    dribbler_controller = std::make_shared<DribblerController>(*power_hal);
-    runtime = std::make_shared<PowerBoardRuntime>(*power_hal, *power_controller,
-                                                  *dribbler_controller);
+    power_hal = std::make_shared<EspHal>();
+    runtime   = std::make_shared<PowerBoardRuntime>(*power_hal);
 }
 
 void loop()
