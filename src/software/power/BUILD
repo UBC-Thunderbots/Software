@@ -78,23 +78,46 @@ cc_library(
 )
 
 platformio_library(
-    name = "control_executor",
-    src = "control_executor.cpp",
-    hdr = "control_executor.h",
+    name = "dribbler_controller",
+    src = "dribbler_controller.cpp",
+    hdr = "dribbler_controller.h",
+    deps = [":power_hal"],
+)
+
+cc_library(
+    name = "dribbler_controller_cc",
+    srcs = ["dribbler_controller.cpp"],
+    hdrs = ["dribbler_controller.h"],
+    includes = ["."],
+    deps = [":power_hal_cc"],
+)
+
+platformio_library(
+    name = "power_board_runtime",
+    src = "power_board_runtime.cpp",
+    hdr = "power_board_runtime.h",
     deps = [
+        ":dribbler_controller",
         ":power_controller",
+        ":power_hal",
         "//proto:tbots_nanopb_proto",
+        "//proto/message_translation:power_frame_msg_platformio",
+        "//shared/uart_framing:uart_framing_platformio",
     ],
 )
 
 cc_library(
-    name = "control_executor_cc",
-    srcs = ["control_executor.cpp"],
-    hdrs = ["control_executor.h"],
+    name = "power_board_runtime_cc",
+    srcs = ["power_board_runtime.cpp"],
+    hdrs = ["power_board_runtime.h"],
     includes = ["."],
     deps = [
+        ":dribbler_controller_cc",
         ":power_controller_cc",
+        ":power_hal_cc",
         "//proto:tbots_nanopb_proto",
+        "//proto/message_translation:power_frame_msg",
+        "//shared/uart_framing",
     ],
 )
 
@@ -116,14 +139,12 @@ platformio_project(
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
     deps = [
-        ":control_executor",
+        ":dribbler_controller",
         ":esp_hal",
         ":pins",
+        ":power_board_runtime",
         ":power_controller",
         ":power_hal",
-        "//proto:tbots_nanopb_proto",
-        "//shared:constants_platformio",
-        "//shared/uart_framing:uart_framing_platformio",
     ],
 )
 
