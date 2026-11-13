@@ -28,7 +28,7 @@ py_binary(
         "//software/stats/loggers:stats_logger",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
-        "//software/thunderscope/binary_context_managers:runtime_manager",
+        "//software/thunderscope/binary_context_managers:runtime_service",
         "//software/thunderscope/binary_context_managers:simulator",
     ],
 )
