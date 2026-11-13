@@ -37,3 +37,8 @@ void ControlExecutor::execute(const TbotsProto_PowerPulseControl& control)
             break;
     }
 }
+
+void ControlExecutor::update()
+{
+    power_controller_.update();
+}

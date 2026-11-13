@@ -1,8 +1,5 @@
 #include "power_controller.h"
 
-#include <algorithm>
-#include <limits>
-
 PowerController::PowerController(PowerHAL& hal) : hal_(hal)
 {
     hal_.setCapacitorCharging(true);
@@ -58,12 +55,6 @@ void PowerController::restartCapacitorCharging(uint32_t now_us)
     charge_toggle_started_us_ = now_us;
 }
 
-// Dribbler policy.
-void PowerController::setDribblerTargetSpeed(uint32_t speed_rpm)
-{
-    target_dribbler_rpm_ = std::min(speed_rpm, MAX_DRIBBLER_SPEED_RPM);
-}
-
 void PowerController::update()
 {
     const uint32_t now_us = hal_.micros();
@@ -105,19 +96,4 @@ void PowerController::update()
         hal_.setCapacitorCharging(false);
         charging_ = false;
     }
-
-    if (target_dribbler_rpm_ <= current_dribbler_rpm_)
-    {
-        current_dribbler_rpm_ = target_dribbler_rpm_;
-    }
-    else
-    {
-        current_dribbler_rpm_ +=
-            (target_dribbler_rpm_ - current_dribbler_rpm_) / DRIBBLER_RAMP_FACTOR + 1;
-    }
-
-    const uint8_t duty_cycle =
-        static_cast<uint8_t>(current_dribbler_rpm_ * std::numeric_limits<uint8_t>::max() /
-                             MAX_DRIBBLER_SPEED_RPM);
-    hal_.setDribblerPwm(duty_cycle);
 }
