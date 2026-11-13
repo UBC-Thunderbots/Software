@@ -26,6 +26,4 @@ const uint8_t PM_SCL = 14;
 const uint8_t DRIBBLER_PIN = 4;
 
 // Timers
-const uint8_t CHICKER_PULSE_TIMER     = 0;
-const uint8_t CHICKER_COOLDOWN_TIMER  = 3;
-const uint32_t MICROSECONDS_IN_SECOND = 1000000;
+const uint8_t CHICKER_PULSE_TIMER = 0;

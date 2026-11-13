@@ -58,6 +58,7 @@ cc_binary(
     ],
     deps = [
         ":motor_controller",
+        "//software/embedded/toml_config",
         "//software/logger",
         "//software/logger:network_logger",
         "@boost//:program_options",
