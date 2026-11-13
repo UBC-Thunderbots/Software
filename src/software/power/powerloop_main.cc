@@ -1,11 +1,9 @@
 #ifdef PLATFORMIO_BUILD
-#include "control_executor.h"
 #include "dribbler_controller.h"
 #include "esp_hal.h"
 #include "power_board_runtime.h"
 #include "power_controller.h"
 #else
-#include "software/power/control_executor.h"
 #include "software/power/dribbler_controller.h"
 #include "software/power/esp/esp_hal.h"
 #include "software/power/power_board_runtime.h"
@@ -29,7 +27,6 @@ void loop() {}
 std::shared_ptr<EspHal> power_hal;
 std::shared_ptr<PowerController> power_controller;
 std::shared_ptr<DribblerController> dribbler_controller;
-std::shared_ptr<ControlExecutor> executor;
 std::shared_ptr<PowerBoardRuntime> runtime;
 
 void setup()
@@ -38,9 +35,8 @@ void setup()
     power_hal           = std::make_shared<EspHal>();
     power_controller    = std::make_shared<PowerController>(*power_hal);
     dribbler_controller = std::make_shared<DribblerController>(*power_hal);
-    executor            = std::make_shared<ControlExecutor>(*power_controller);
-    runtime =
-        std::make_shared<PowerBoardRuntime>(*power_hal, *executor, *dribbler_controller);
+    runtime = std::make_shared<PowerBoardRuntime>(*power_hal, *power_controller,
+                                                  *dribbler_controller);
 }
 
 void loop()
