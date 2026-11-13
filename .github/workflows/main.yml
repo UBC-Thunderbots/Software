@@ -153,6 +153,7 @@ jobs:
           cd src
           bazel test //software/gameplay_tests:requirements.test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
+            --cache_test_results=false                                    \
             --test_arg="--ci_mode"                                        \
             -- //software:unix_full_system                                \
             -//software/gameplay_tests:requirements.test                  \
