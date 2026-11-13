@@ -5,7 +5,6 @@ load(
     "platformio_project",
 )
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -44,12 +43,6 @@ cc_library(
     hdrs = ["sim/sim_hal.h"],
     includes = ["sim"],
     deps = [":power_hal_cc"],
-)
-
-cc_library(
-    name = "power_hal_cc",
-    hdrs = ["power_hal.h"],
-    includes = ["."],
 )
 
 platformio_library(
@@ -124,7 +117,7 @@ cc_library(
         ":power_hal_cc",
         "//proto:tbots_nanopb_proto",
         "//proto/message_translation:power_frame_msg",
-        "//shared/uart_framing:uart_framing",
+        "//shared/uart_framing",
     ],
 )
 
