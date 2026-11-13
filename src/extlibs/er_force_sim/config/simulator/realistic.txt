@@ -16,6 +16,7 @@ missing_ball_detections: 0.02
 vision_delay: 35000000 # ns
 vision_processing_time: 10000000  # ns
 simulate_dribbling: false
+command_delay: 3000000  # ns
 
 enable_robot_localizer: true
 robot_sensor_noise {
