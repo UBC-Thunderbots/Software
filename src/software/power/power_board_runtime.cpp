@@ -8,11 +8,8 @@
 #include "shared/uart_framing/uart_framing.hpp"
 #endif
 
-PowerBoardRuntime::PowerBoardRuntime(PowerHAL& hal, PowerController& power_controller,
-                                     DribblerController& dribbler_controller)
-    : hal_(hal),
-      power_controller_(power_controller),
-      dribbler_controller_(dribbler_controller)
+PowerBoardRuntime::PowerBoardRuntime(PowerHAL& hal)
+    : hal_(hal), power_controller_(hal), dribbler_controller_(hal)
 {
 }
 
