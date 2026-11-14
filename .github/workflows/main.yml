@@ -2,11 +2,7 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ 
-      master,
-      avah/minimal_environment_setup_tscope,
-      grant/add_macos_action_runners
-    ] # !!!
+    branches: [ master ]
   pull_request:
     branches: [ 
       master,
