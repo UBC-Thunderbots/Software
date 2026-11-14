@@ -54,6 +54,10 @@ UnixSimulatorBackend::UnixSimulatorBackend(
             runtime_dir + VALIDATION_PROTO_SET_PATH,
             [](TbotsProto::ValidationProtoSet& v) {}, proto_logger));
 
+    simulator_state_listener.reset(new ThreadedProtoUnixListener<world::SimulatorState>(
+        runtime_dir + SIMULATOR_STATE_PATH, [](world::SimulatorState& v) {},
+        proto_logger));
+
     robot_log_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotLog>(
         runtime_dir + ROBOT_LOG_PATH, [](TbotsProto::RobotLog& v) {}, proto_logger));
 

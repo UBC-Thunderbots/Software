@@ -58,12 +58,18 @@ class ProtoPlayer:
     BOOKMARK_INDEX_FILE_VERSION = 1
 
     def __init__(
-        self, log_folder_path: os.PathLike, proto_unix_io: ProtoUnixIO
+        self,
+        log_folder_path: os.PathLike,
+        proto_unix_io: ProtoUnixIO,
+        autoplay: bool = True,
     ) -> None:
         """Creates a proto player that plays back all protos
 
         :param log_folder_path: The path to the log file.
         :param proto_unix_io: The proto_unix_io to send the protos to.
+        :param autoplay: When True, playback starts immediately. Replay views pass
+                         False and call play() after observers are registered, so a
+                         short log is not finished before anything is listening.
         """
         self.log_folder_path = log_folder_path
         self.proto_unix_io = proto_unix_io
@@ -75,7 +81,7 @@ class ProtoPlayer:
             return
 
         # Playback controls, see __play_protobufs
-        self.is_playing = True
+        self.is_playing = autoplay
         self.playback_speed = 1.0
         self.replay_controls_mutex = threading.RLock()
         self.seek_offset_time = 0.0
