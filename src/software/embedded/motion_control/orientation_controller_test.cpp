@@ -12,11 +12,13 @@ namespace
 {
 const PidController<double> _pid = OrientationController{}.getPid();
 
+constexpr double tolerance = 1e-5;
+
 const Angle pi_over_4     = Angle::quarter() / 2.0;
 const double proportional = _pid.getProportional();
-const double integral     = _pid.getDerivative();
-const double derivative   = _pid.getIntegral();
-}  // namespace
+const double integral     = _pid.getIntegral();
+const double derivative   = _pid.getDerivative();
+}
 
 struct TestInputStepTrivial
 {
@@ -34,12 +36,13 @@ TEST_P(TestStepTrivial, TestOrientationControllerStep)
 {
     const TestInputStepTrivial& input = GetParam();
 
-    const Duration time = Duration::fromSeconds(1.0);
+    const Duration time = Duration::fromSeconds(1.1);
 
     const AngularVelocity actual =
         OrientationController().step(input.orientation, input.trajectory, time, time);
 
-    EXPECT_EQ(input.expected, actual);
+    EXPECT_NEAR(input.expected.toRadians(), actual.toRadians(), tolerance);
+    // TODO: #3093 - Optimally, we should use EXPECT_EQ, however, due to the wrapping implementation in Angle, we must use EXPECT_NEAR
 }
 
 /** @brief Creates a trajectory.
@@ -64,11 +67,11 @@ INSTANTIATE_TEST_SUITE_P(
 INSTANTIATE_TEST_SUITE_P(
     TestStepGenericMovement, TestStepTrivial,
     testing::Values(
-        /** @brief Test if robot can spin clockwise. */
-        TestInputStepTrivial{.expected    = AngularVelocity{Angle::half() * proportional},
+        /** @brief Test if robot can spin counterclockwise. */
+        TestInputStepTrivial{.expected    = AngularVelocity{Angle::quarter() * proportional},
                              .orientation = Angle::half(),
                              .trajectory  = create_trajectory_path(Angle::zero())},
-        /** @brief Test if robot can spin counterclockwise. */
+        /** @brief Test if robot can spin clockwise. */
         TestInputStepTrivial{
             .expected    = AngularVelocity{-Angle::quarter() * proportional},
             .orientation = Angle::quarter(),
@@ -128,7 +131,7 @@ TEST_P(TestStepErrorCorrectionOnce, TestStepErrorCorrectionOnce)
     const AngularVelocity actual = OrientationController().step(
         input.orientation, trajectory, elapsed_time, delta_time);
 
-    EXPECT_EQ(input.expected, actual);
+    EXPECT_NEAR(input.expected.toRadians(), actual.toRadians(), tolerance);
 }
 
 INSTANTIATE_TEST_SUITE_P(

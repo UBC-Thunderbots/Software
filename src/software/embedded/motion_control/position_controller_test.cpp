@@ -17,7 +17,7 @@ namespace
 {
 const PositionController _position_controller;
 const PidController<double> _x_pid = _position_controller.getXPid();
-const PidController<double> _y_pid = _position_controller.getXPid();
+const PidController<double> _y_pid = _position_controller.getYPid();
 
 const double sqrt2          = std::sqrt(2.0);
 const double x_proportional = _x_pid.getProportional();
@@ -26,7 +26,7 @@ const double x_integral     = _x_pid.getIntegral();
 const double y_proportional = _y_pid.getProportional();
 const double y_derivative   = _y_pid.getDerivative();
 const double y_integral     = _y_pid.getIntegral();
-}  // namespace
+}
 
 struct TestInputStepTrivial
 {
