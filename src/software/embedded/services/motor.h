@@ -31,14 +31,23 @@ class MotorService
     explicit MotorService(const robot_constants::RobotConstants& robot_constants);
 
     /**
-     * Polls the motor service to execute the given DirectControlPrimitive and
-     * update the current motor status.
+     * Polls the motors for their current state (velocities and faults) and updates
+     * the motor status in the given RobotStatus. Does not command new targets; call
+     * send() for that.
+     *
+     * @param robot_status RobotStatus message to modify with the current motor status
+     */
+    void poll(TbotsProto::RobotStatus& robot_status);
+
+    /**
+     * Updates the target velocities from the given DirectControlPrimitive and sends
+     * them to the motors.
      *
      * @param primitive DirectControlPrimitive to execute
-     * @param robot_status RobotStatus message to modify with the current motor status
+     * @param robot_status RobotStatus message to record the service's timing in
      * @param time_elapsed_since_last_poll The time since the last poll
      */
-    void poll(const TbotsProto::DirectControlPrimitive& primitive,
+    void send(const TbotsProto::DirectControlPrimitive& primitive,
               TbotsProto::RobotStatus& robot_status,
               const Duration& time_elapsed_since_last_poll);
 
@@ -59,12 +68,27 @@ class MotorService
     void resetMotorsIfNeeded();
 
     /**
-     * Writes the target velocities to the motors and reads back the current velocities.
+     * Reads the current velocities from the motors.
      *
      * @return the current wheel velocities in m/s and the dribbler RPM read from the
      * dribbler motor
      */
-    std::pair<WheelSpace_t, double> driveMotors();
+    std::pair<WheelSpace_t, double> readMotors();
+
+    /**
+     * Writes the target velocities to the motors.
+     */
+    void writeMotors();
+
+    /**
+     * Writes the target velocities to the motors and reads back the current velocities.
+     * The motor controller can only read as part of a write, so readMotors() and
+     * writeMotors() both go through this.
+     *
+     * @return the current wheel velocities in m/s and the dribbler RPM read from the
+     * dribbler motor
+     */
+    std::pair<WheelSpace_t, double> transferMotors();
 
     /**
      * Disables the motors and halts Thunderloop if any wheel velocity has changed by

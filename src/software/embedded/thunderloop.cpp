@@ -211,20 +211,24 @@ void Thunderloop::runLoop()
             primitive_executor_->updatePrimitive(primitive.value(), robot_status_);
         }
 
+        imu_service_->poll(robot_status_);
+
+#ifndef DISABLE_MOTOR_SERVICE
+        motor_service_->poll(robot_status_);
+#endif
+
         robot_localizer_->predict(primitive_executor_->getPrevCommandedVelocity(),
                                   delta_time);
         updateRobotLocalizer(robot_status_);
 
         primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
 
-        imu_service_->poll(robot_status_);
-
         const TbotsProto::DirectControlPrimitive direct_control_primitive =
             primitive_executor_->stepPrimitive(robot_status_, delta_time);
 
 
 #ifndef DISABLE_MOTOR_SERVICE
-        motor_service_->poll(direct_control_primitive, robot_status_, delta_time);
+        motor_service_->send(direct_control_primitive, robot_status_, delta_time);
 #endif
 
 #ifndef DISABLE_POWER_SERVICE
