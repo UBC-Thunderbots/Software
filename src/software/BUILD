@@ -41,10 +41,12 @@ cc_binary(
     name = "er_force_simulator_main",
     srcs = ["er_force_simulator_main.cpp"],
     deps = [
+        "//proto:sensor_msg_cc_proto",
         "//software:constants",
         "//software/networking/unix:threaded_proto_unix_listener",
         "//software/networking/unix:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
+        "//software/simulation:avah_logger",
         "@boost//:program_options",
     ],
 )

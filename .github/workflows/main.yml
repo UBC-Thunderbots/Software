@@ -153,13 +153,21 @@ jobs:
           cd src
           bazel test //software/gameplay_tests:requirements.test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
+            --cache_test_results=false                                    \
             --test_arg="--ci_mode"                                        \
             -- //software:unix_full_system                                \
             -//software/gameplay_tests:requirements.test                  \
             //software/ai/stp/...                                         \
             //software/ai/navigator/...                                   \
             //software/simulation/...
-            
+
+      - name: Upload er force simulator logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: er-force-sim-logs
+          path: /tmp/tbots_*/test/*/*.log
+
       - name: Upload simulated test proto logs
         # Ensure that simulated test logs get uploaded
         if: always()

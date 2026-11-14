@@ -15,7 +15,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 logger = create_logger(__name__)
 
 LAUNCH_DELAY_S = 0.1
-WORLD_BUFFER_TIMEOUT = 0.5
+WORLD_BUFFER_TIMEOUT = 1.5
+SIMULATOR_TICK_BUFFER_TIMEOUT = 1.5
 TICK_DURATION_S = DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK
 
 
@@ -51,6 +52,12 @@ class SimulatedTestRunner(TbotsTestRunner):
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.ci_mode = ci_mode
+        self.simulator_tick_finished_buffer = ThreadSafeBuffer(
+            buffer_size=10, protobuf_type=protos.SimulatorTickFinished
+        )
+        self.simulator_proto_unix_io.register_observer(
+            protos.SimulatorTickFinished, self.simulator_tick_finished_buffer
+        )
 
     @override
     def set_world_state(self, worldstate: protos.WorldState):
@@ -119,33 +126,25 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             while True:
                 try:
-                    world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    self.simulator_tick_finished_buffer.get(
+                        block=True,
+                        timeout=SIMULATOR_TICK_BUFFER_TIMEOUT,
+                        return_cached=False,
                     )
 
-                    # We block until the timeout for the new primitives from AI. if not found still,
-                    # the SSL Wrapper packet is resent in a loop until we actually get a primitive set from AI
-                    # Otherwise, if the AI misses the first SSL Wrapper packet and doesn't start
-                    # the simulated test will continue to tick forward, causes syncing issues with the AI
-                    self.primitive_set_buffer.get(
+                    break
+                except queue.Empty:
+                    raise RuntimeError("SIMULATOR TICK FINISHED NOT RECEIVED")
+
+            while True:
+                try:
+                    world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
                     break
                 except queue.Empty:
-                    # If we timeout, that means full_system missed the last
-                    # wrapper and robot status, lets resend it.
-                    logger.warning("Fullsystem missed last wrapper, resending ...")
-
-                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    robot_status = self.robot_status_buffer.get(block=False)
-
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        protos.SSL_WrapperPacket, ssl_wrapper
-                    )
-                    self.blue_full_system_proto_unix_io.send_proto(
-                        protos.RobotStatus, robot_status
-                    )
+                    raise RuntimeError("BLUE WORLD NOT RECEIVED")
 
             # get the time difference after we get the primitive (after any blocking that happened)
             processing_time = time.time() - processing_start_time
