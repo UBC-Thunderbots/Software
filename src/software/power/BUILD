@@ -30,6 +30,22 @@ platformio_library(
     hdr = "power_hal.h",
 )
 
+# Package the SML version already pinned by Thunderbots for PlatformIO.
+platformio_library(
+    name = "sml_headers",
+    hdr = "@sml//:include/boost/sml.hpp",
+)
+
+platformio_library(
+    name = "power_state_machine",
+    src = "power_state_machine.cpp",
+    hdr = "power_state_machine.h",
+    deps = [
+        ":power_hal",
+        ":sml_headers",
+    ],
+)
+
 platformio_library(
     name = "esp_hal",
     src = "esp/esp_hal.cpp",
@@ -51,7 +67,10 @@ platformio_library(
     name = "power_controller",
     src = "power_controller.cpp",
     hdr = "power_controller.h",
-    deps = [":power_hal"],
+    deps = [
+        ":power_hal",
+        ":power_state_machine",
+    ],
 )
 
 platformio_library(
@@ -73,14 +92,20 @@ platformio_project(
     name = "powerloop_main",
     src = "powerloop_main.cc",
     board = "pico32",
-    build_flags = ["-DPB_FIELD_32BIT=1"] + select({
+    build_flags = ["-DPB_FIELD_32BIT=1", "-std=gnu++17"] + select({
         #Makes platformio use 16 bit numbers for size
         ":debug_powerloop_enabled": ["-DDEBUG_POWERLOOP"],
         "//conditions:default": [],
     }),
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
-    platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+        platform = (
+        "espressif32@7.1.0\n" +
+        "upload_port = /dev/ttyAMA0\n" +
+        "board_upload.before_reset = no_reset\n" +
+        "upload_speed = 115200\n" +
+        "build_unflags = -std=gnu++11"
+    ),
     deps = [
         ":control_executor",
         ":esp_hal",
