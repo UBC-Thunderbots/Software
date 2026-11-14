@@ -172,7 +172,6 @@ class BallFilter
     BallKalmanFilter kalman_filter;
     int consecutive_outliers;
     std::optional<Timestamp> prev_detection_timestamp;
-    std::optional<Measurement> prev_measurement;
     std::optional<Timestamp> last_predict_timestamp;
     int consecutive_in_contact_;
 };
