@@ -28,14 +28,7 @@ on:
 
 jobs:
   prepare_release:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          ubuntu-24.04,
-          macos-latest
-        ]
+    runs-on: ubuntu-24.04
     outputs:
       tag: ${{ steps.bump_logic.outputs.tag }}
       should_release: ${{ steps.check.outputs.count > 0 }}
@@ -121,14 +114,7 @@ jobs:
   upload_assets:
     needs: prepare_release
     if: needs.prepare_release.outputs.should_release == 'true'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          ubuntu-24.04,
-          macos-latest
-        ]
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
@@ -155,14 +141,7 @@ jobs:
 
   publish_release:
     needs: [prepare_release, upload_assets]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          ubuntu-24.04,
-          macos-latest
-        ]
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:

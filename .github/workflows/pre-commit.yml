@@ -14,14 +14,7 @@ concurrency:
 jobs:
   formatting-check:
     name: Formatting and FSM diagram generation with pre-commit-ci-lite
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          ubuntu-24.04,
-          macos-latest
-        ]
+    runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
