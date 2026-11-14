@@ -28,9 +28,9 @@ class PowerController
     bool isInState() const
     {
         bool active = false;
-        fsm_.visit_current_states([&active](auto current) {
-            active |= std::is_same<typename decltype(current)::type, State>::value;
-        });
+        fsm_.visit_current_states(
+            [&active](auto current)
+            { active |= std::is_same<typename decltype(current)::type, State>::value; });
         return active;
     }
 
@@ -42,18 +42,18 @@ class PowerController
     boost::sml::sm<PowerStateMachine> fsm_;
 
     // Timing only. Operating states belong to the FSM, not to these members.
-    uint32_t cooldown_started_us_ = 0;
-    uint32_t charge_started_us_   = 0;
+    uint32_t cooldown_started_us_      = 0;
+    uint32_t charge_started_us_        = 0;
     uint32_t restart_stage_started_us_ = 0;
-    uint32_t arm_refreshed_us_    = 0;
+    uint32_t arm_refreshed_us_         = 0;
 
     uint32_t target_dribbler_rpm_  = 0;
     uint32_t current_dribbler_rpm_ = 0;
 
     // Values carried over from the original power_controller.h.
-    static constexpr uint32_t COOLDOWN_US                = 3000000;
-    static constexpr uint32_t CHARGE_TOGGLE_DELAY_US     = 5000;  // TODO: Verify with team.
-    static constexpr uint32_t MAX_CHARGE_DURATION_US     = 2000000;
+    static constexpr uint32_t COOLDOWN_US            = 3000000;
+    static constexpr uint32_t CHARGE_TOGGLE_DELAY_US = 5000;  // TODO: Verify with team.
+    static constexpr uint32_t MAX_CHARGE_DURATION_US = 2000000;
     static constexpr uint32_t MAX_CHICKER_PULSE_WIDTH_US = 20000;
     static constexpr uint32_t MAX_DRIBBLER_SPEED_RPM     = 11040;
     static constexpr uint32_t DRIBBLER_RAMP_FACTOR       = 4;
@@ -61,4 +61,3 @@ class PowerController
     // Temporary policy until the desired command/arm expiration is confirmed.
     static constexpr uint32_t ARM_TIMEOUT_US = 100000;  // TODO: Verify with team.
 };
-
