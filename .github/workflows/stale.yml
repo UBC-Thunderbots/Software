@@ -12,8 +12,13 @@ on:
 
 jobs:
   stale:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [
+          ubuntu-24.04
+          macos-latest
+        ]
     permissions:
       pull-requests: write
 
