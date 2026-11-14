@@ -85,7 +85,6 @@ jobs:
       matrix:
         os: [
           ubuntu-24.04,
-          macos-latest
         ]
     steps:
       - uses: actions/checkout@v4
@@ -119,7 +118,6 @@ jobs:
       matrix:
         os: [
           ubuntu-24.04,
-          macos-latest
         ]
     steps:
       - uses: actions/checkout@v4

@@ -27,6 +27,12 @@ runs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get install xvfb libxcb-cursor0 python3-pyqt6
+    
+    - name: Install GUI dependencies for MacOS
+      shell: bash
+      if: runner.os == 'MacOS'
+      run: | # !!!
+        brew install pyqt@6
 
     - name: Cache Bazel disk cache
       uses: actions/cache@v4
