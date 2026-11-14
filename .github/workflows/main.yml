@@ -2,7 +2,10 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ 
+      master,
+      grant/add_macos_action_runners
+    ]
   pull_request:
     branches: [ master ]
   schedule:
