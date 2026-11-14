@@ -37,7 +37,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     outputs:
@@ -83,7 +83,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     steps:
@@ -116,7 +116,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     steps:
@@ -136,7 +136,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     steps:
@@ -161,7 +161,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     steps:
@@ -181,7 +181,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     steps:
@@ -224,7 +224,7 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-24.04
+          ubuntu-24.04,
           macos-latest
         ]
     steps:
