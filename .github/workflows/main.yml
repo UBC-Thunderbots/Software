@@ -236,9 +236,13 @@ jobs:
       - uses: ./.github/actions/environment-setup
 
       - name: AI vs AI (3 minutes)
-        run: |
+        run: | # !!!
           cd src
-          bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          else
+            bazel run //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          fi
 
       - name: Upload AI vs AI logs
         # Ensure that simulated test logs get uploaded
