@@ -59,42 +59,38 @@ class RobotFilter
     unsigned int getRobotId() const;
 
     // KF Dimensions
-    // Position State: position x, position y, velocity x, velocity y
-    // Angle State: angle theta, angular velocity w
-    static constexpr int POS_STATE_SIZE = 4;
-    static constexpr int ANG_STATE_SIZE = 2;
-    // Position Measurement: x and y from vision
-    // Angle Measurement: theta from vision
-    static constexpr int POS_MEASUREMENT_SIZE = 2;
-    static constexpr int ANG_MEASUREMENT_SIZE = 1;
+    // State: position x, position y, velocity x, velocity y, angle theta, angular
+    // velocity w
+    static constexpr int STATE_SIZE = 6;
+    // Measurement: x, y and theta from vision
+    static constexpr int MEASUREMENT_SIZE = 3;
     // No control
     static constexpr int CONTROL_SIZE = 1;
 
-    enum PosStateIndex : int
+    enum StateIndex : int
     {
         POS_X = 0,
         POS_Y = 1,
         VEL_X = 2,
         VEL_Y = 3,
+        POS_W = 4,
+        VEL_W = 5,
     };
-    enum AngStateIndex : int
+    enum MeasurementIndex : int
     {
-        POS_W = 0,
-        VEL_W = 1,
+        MEAS_X = 0,
+        MEAS_Y = 1,
+        MEAS_W = 2,
     };
 
    private:
     Robot current_robot_state;
 
-    using PosKalmanFilter =
-        LinearKalmanFilter<POS_STATE_SIZE, POS_MEASUREMENT_SIZE, CONTROL_SIZE>;
-    using AngKalmanFilter =
-        LinearKalmanFilter<ANG_STATE_SIZE, ANG_MEASUREMENT_SIZE, CONTROL_SIZE>;
+    using KalmanFilter = LinearKalmanFilter<STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE>;
 
     // Will be keeping Position and Angle in double, in units of metres and radians
     // respectively
-    using PosMeasurement = Eigen::Vector<double, POS_MEASUREMENT_SIZE>;
-    using AngMeasurement = Eigen::Vector<double, ANG_MEASUREMENT_SIZE>;
+    using Measurement = Eigen::Vector<double, MEASUREMENT_SIZE>;
 
     /**
      * Returns the detection we should treat as the robot this frame, which is the
@@ -137,14 +133,11 @@ class RobotFilter
      * @param measurement The measurement to reinitialize the estimate on
      * @param current_time The time the measurement was taken at
      */
-    void reset(const PosMeasurement& pos_measurement,
-               const AngMeasurement& ang_measurement, const Timestamp& current_time);
+    void reset(const Measurement& measurement, const Timestamp& current_time);
 
-    PosKalmanFilter pos_kalman_filter;
-    AngKalmanFilter ang_kalman_filter;
+    KalmanFilter kalman_filter;
     std::optional<Timestamp> prev_detection_timestamp;
-    std::optional<PosMeasurement> prev_pos_measurement;
-    std::optional<AngMeasurement> prev_ang_measurement;
+    std::optional<Measurement> prev_measurement;
     std::optional<Timestamp> last_predict_timestamp;
     int consecutive_outliers;
     Duration expiry_buffer_duration;

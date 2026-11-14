@@ -42,55 +42,38 @@ constexpr double RF_POS_VISION_NOISE_M   = 0.01;
 constexpr double RF_ANG_VISION_NOISE_RAD = .1;
 
 
-const Eigen::Vector<double, RobotFilter::POS_STATE_SIZE> RF_POS_INITIAL_STATE =
-    Eigen::Vector<double, RobotFilter::POS_STATE_SIZE>::Zero();
-const Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE> RF_ANG_INITIAL_STATE =
-    Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE>::Zero();
-const Eigen::Matrix<double, RobotFilter::POS_STATE_SIZE, RobotFilter::POS_STATE_SIZE>
-    RF_POS_INITIAL_COVARIANCE =
-        Eigen::Vector<double, RobotFilter::POS_STATE_SIZE>(
+const Eigen::Vector<double, RobotFilter::STATE_SIZE> RF_INITIAL_STATE =
+    Eigen::Vector<double, RobotFilter::STATE_SIZE>::Zero();
+const Eigen::Matrix<double, RobotFilter::STATE_SIZE, RobotFilter::STATE_SIZE>
+    RF_INITIAL_COVARIANCE =
+        Eigen::Vector<double, RobotFilter::STATE_SIZE>(
             RF_INITIAL_POSITION_UNCERTAINTY_M * RF_INITIAL_POSITION_UNCERTAINTY_M,
             RF_INITIAL_POSITION_UNCERTAINTY_M* RF_INITIAL_POSITION_UNCERTAINTY_M,
             RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S*
                 RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
             RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S*
-                RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S)
+                RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S,
+            RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD*
+                RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD,
+            RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S*
+                RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S)
             .asDiagonal();
-const Eigen::Matrix<double, RobotFilter::ANG_STATE_SIZE, RobotFilter::ANG_STATE_SIZE>
-    RF_ANG_INITIAL_COVARIANCE = Eigen::Vector<double, RobotFilter::ANG_STATE_SIZE>(
-                                    RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD *
-                                        RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD,
-                                    RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S*
-                                        RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S)
-                                    .asDiagonal();
 
-
-const Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
-                    RobotFilter::POS_MEASUREMENT_SIZE>
-    RF_POS_MEASUREMENT_COVARIANCE =
-        Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
-                      RobotFilter::POS_MEASUREMENT_SIZE>::Identity() *
-        (RF_POS_VISION_NOISE_M * RF_POS_VISION_NOISE_M);
-const Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
-                    RobotFilter::ANG_MEASUREMENT_SIZE>
-    RF_ANG_MEASUREMENT_COVARIANCE =
-        Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
-                      RobotFilter::ANG_MEASUREMENT_SIZE>::Identity() *
-        (RF_ANG_VISION_NOISE_RAD * RF_ANG_VISION_NOISE_RAD);
+const Eigen::Matrix<double, RobotFilter::MEASUREMENT_SIZE, RobotFilter::MEASUREMENT_SIZE>
+    RF_MEASUREMENT_COVARIANCE =
+        Eigen::Vector<double, RobotFilter::MEASUREMENT_SIZE>(
+            RF_POS_VISION_NOISE_M * RF_POS_VISION_NOISE_M,
+            RF_POS_VISION_NOISE_M* RF_POS_VISION_NOISE_M,
+            RF_ANG_VISION_NOISE_RAD* RF_ANG_VISION_NOISE_RAD)
+            .asDiagonal();
 
 // Vision measures robot's position, orientation but not its velocity nor angular velocity
 // clang-format off
-const Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
-                    RobotFilter::POS_STATE_SIZE>
-    RF_POS_MEASUREMENT_MODEL = (Eigen::Matrix<double, RobotFilter::POS_MEASUREMENT_SIZE,
-                                              RobotFilter::POS_STATE_SIZE>()
-                                     << 1, 0, 0, 0,
-                                        0, 1, 0, 0)
-                                   .finished();
-const Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
-                    RobotFilter::ANG_STATE_SIZE>
-    RF_ANG_MEASUREMENT_MODEL = (Eigen::Matrix<double, RobotFilter::ANG_MEASUREMENT_SIZE,
-                                              RobotFilter::ANG_STATE_SIZE>()
-                                    << 1, 0)
-                                   .finished();
+const Eigen::Matrix<double, RobotFilter::MEASUREMENT_SIZE, RobotFilter::STATE_SIZE>
+    RF_MEASUREMENT_MODEL = (Eigen::Matrix<double, RobotFilter::MEASUREMENT_SIZE,
+                                          RobotFilter::STATE_SIZE>()
+                                 << 1, 0, 0, 0, 0, 0,
+                                    0, 1, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 1, 0)
+                               .finished();
 // clang-format on
