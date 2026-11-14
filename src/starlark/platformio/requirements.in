@@ -5,3 +5,4 @@
 # Instead it is provided hermetically through rules_python so that the build
 # does not depend on the developer's PATH or a /usr/local/bin symlink.
 platformio==6.1.18
+chardet==5.2.0 # necessary for macOS, added here so Linux also pulls it explicitly
