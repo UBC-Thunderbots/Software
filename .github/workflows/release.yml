@@ -30,6 +30,7 @@ jobs:
   prepare_release:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [
           ubuntu-24.04,
@@ -120,15 +121,14 @@ jobs:
   upload_assets:
     needs: prepare_release
     if: needs.prepare_release.outputs.should_release == 'true'
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        platform: [ubuntu-x86, mac-arm64]
-        include:
-          - platform: ubuntu-x86
-            runner: ubuntu-24.04,
-          - platform: mac-arm64
-            runner: macos-latest
-    runs-on: ${{ matrix.runner }}
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     permissions:
       contents: write
     steps:
@@ -155,7 +155,14 @@ jobs:
 
   publish_release:
     needs: [prepare_release, upload_assets]
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     permissions:
       contents: write
     steps:
