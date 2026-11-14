@@ -4,7 +4,7 @@ on:
   push:
     branches: [ 
       master,
-      grant/add_macos_action_runners
+      avah/minimal_environment_setup_tscope # TODO Remove this after Bazel Hermeticity RFC
     ]
   pull_request:
     branches: [ master ]
