@@ -80,14 +80,31 @@ struct GoalLane : ShootingLane
  * @param threats all enemy threats to consider in determining defender assignments,
  * in order of decreasing threat
  * @param field the field being played on
+ * @param ball the ball
  * @param config the DefenderAssignmentConfig used for tuning assignments
  *
  * @return a list of all possible defender assignments in order of decreasing
  * coverage rating
  */
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat>& threats, const Field& field,
+    const std::vector<EnemyThreat>& threats, const Field& field, const Ball& ball,
     const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig& config);
+
+/**
+ * Multiplies the coverage rating of every assignment that matches one chosen on the
+ * previous update (same type, target within match_radius_meters), then re-sorts in
+ * decreasing coverage rating. Each previous assignment matches at most one new
+ * assignment (the nearest). This makes the choice of defender assignments sticky so that
+ * near-equal assignments do not flip between updates.
+ *
+ * @param assignments the assignments to adjust, in order of decreasing coverage rating
+ * @param previously_chosen the assignments that were chosen on the previous update
+ * @param multiplier the rating multiplier for a matched assignment (1.0 disables)
+ * @param match_radius_meters how close targets must be to count as the same assignment
+ */
+void applyAssignmentHysteresis(std::vector<DefenderAssignment>& assignments,
+                               const std::vector<DefenderAssignment>& previously_chosen,
+                               double multiplier, double match_radius_meters);
 
 /**
  * Filters out enemy threats with similar positioning/angle to the primary threat

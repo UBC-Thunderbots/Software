@@ -6,7 +6,7 @@
 #include "software/math/math_functions.h"
 
 std::vector<DefenderAssignment> getAllDefenderAssignments(
-    const std::vector<EnemyThreat>& threats, const Field& field,
+    const std::vector<EnemyThreat>& threats, const Field& field, const Ball& ball,
     const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig& config)
 {
     if (threats.size() == 0)
@@ -55,6 +55,14 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     for (unsigned int i = 0; i < relevant_threats.size(); i++)
     {
         auto threat_position = relevant_threats.at(i).robot.position();
+        if (i == 0)
+        {
+            threat_position = ball.position();
+        }
+        if (!canShootOnFriendlyGoal(field, threat_position))
+        {
+            continue;
+        }
 
         // Clamp threat position to field lines
         threat_position.setX(std::clamp(threat_position.x(), field.fieldLines().xMin(),
@@ -114,22 +122,71 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
     return assignments;
 }
 
+void applyAssignmentHysteresis(std::vector<DefenderAssignment>& assignments,
+                               const std::vector<DefenderAssignment>& previously_chosen,
+                               double multiplier, double match_radius_meters)
+{
+    if (multiplier == 1.0 || previously_chosen.empty() || assignments.empty())
+    {
+        return;
+    }
+
+    std::vector<bool> already_matched(assignments.size(), false);
+    for (const auto& previous : previously_chosen)
+    {
+        std::optional<size_t> nearest_index;
+        double nearest_distance = match_radius_meters;
+        for (size_t i = 0; i < assignments.size(); i++)
+        {
+            if (already_matched[i] || assignments[i].type != previous.type)
+            {
+                continue;
+            }
+            double distance_to_previous =
+                distance(assignments[i].target, previous.target);
+            if (distance_to_previous <= nearest_distance)
+            {
+                nearest_index    = i;
+                nearest_distance = distance_to_previous;
+            }
+        }
+
+        if (nearest_index)
+        {
+            already_matched[*nearest_index] = true;
+            assignments[*nearest_index].coverage_rating *= multiplier;
+        }
+    }
+
+    // Stable so assignments with equal ratings keep their relative order
+    std::stable_sort(assignments.begin(), assignments.end(),
+                     [](const auto& a, const auto& b)
+                     { return a.coverage_rating > b.coverage_rating; });
+}
+
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat>& threats,
                                                  double min_distance,
                                                  const Angle& min_angle)
 {
     std::vector<EnemyThreat> filtered_threats;
+    if (threats.empty())
+    {
+        return filtered_threats;
+    }
 
     // The primary threat is always included in our list of filtered threats
     auto primary_threat = threats.front();
     filtered_threats.emplace_back(primary_threat);
 
-    for (const auto& threat : threats)
+    // The primary threat is already included; only inspect secondary threats.
+    for (size_t i = 1; i < threats.size(); ++i)
     {
+        const auto& threat = threats[i];
         double distance_between_threats =
             distance(threat.robot.position(), primary_threat.robot.position());
 
-        if (distance_between_threats < min_distance)
+        // Coincident threats do not define a passing lane, even with filtering off.
+        if (distance_between_threats == 0 || distance_between_threats < min_distance)
         {
             continue;
         }

@@ -30,44 +30,69 @@ bool DefensePlayFSM::shouldDefendAggressively(const Update& event)
     return defenders > attackers;
 }
 
-void DefensePlayFSM::blockShots(const Update& event)
+std::vector<EnemyThreat> DefensePlayFSM::getStableEnemyThreats(const Update& event)
 {
+    const auto& assignment_config =
+        ai_config_ptr->defense_play_config().defender_assignment_config();
     auto enemy_threats = getAllEnemyThreats(
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
-        event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
+        event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false,
+        previous_baller_id,
+        Duration::fromSeconds(
+            assignment_config.effective_possession_switch_margin_seconds()),
+        &previous_baller_id);
+
+    stabilizePrimaryThreat(
+        enemy_threats, previous_primary_threat_id,
+        Angle::fromDegrees(ai_config_ptr->defense_play_config()
+                               .defender_assignment_config()
+                               .primary_threat_hysteresis_degrees()));
+    holdPrimaryThreat(enemy_threats, previous_primary_threat_id, primary_hold,
+                      assignment_config.primary_threat_hold_updates());
+    previous_primary_threat_id =
+        enemy_threats.empty() ? std::nullopt
+                              : std::make_optional(enemy_threats.front().robot.id());
+
+    return enemy_threats;
+}
+
+void DefensePlayFSM::blockShots(const Update& event)
+{
+    auto enemy_threats = getStableEnemyThreats(event);
 
     updateCreaseAndPassDefenders(event, enemy_threats);
-    updateShadowers(event, {});
 
     setTactics(event);
 }
 
 void DefensePlayFSM::shadowAndBlockShots(const Update& event)
 {
-    auto enemy_threats = getAllEnemyThreats(
-        event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
-        event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
+    auto enemy_threats = getStableEnemyThreats(event);
 
-    updateCreaseAndPassDefenders(event, enemy_threats);
-
-    if (pass_defenders.size() > 0)
-    {
-        pass_defenders.erase(pass_defenders.begin());
-        updateShadowers(event, {enemy_threats.front()});
-    }
+    updateCreaseAndPassDefenders(event, enemy_threats, true);
 
     setTactics(event);
 }
 
 void DefensePlayFSM::updateCreaseAndPassDefenders(
-    const Update& event, const std::vector<EnemyThreat>& enemy_threats)
+    const Update& event, const std::vector<EnemyThreat>& enemy_threats,
+    bool shadow_primary_threat)
 {
     auto defender_assignment_config =
         ai_config_ptr->defense_play_config().defender_assignment_config();
     auto assignments = getAllDefenderAssignments(
-        enemy_threats, event.common.world_ptr->field(), defender_assignment_config);
+        enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
+        defender_assignment_config);
+    applyAssignmentHysteresis(
+        assignments, previous_chosen_assignments,
+        defender_assignment_config.assignment_hysteresis_multiplier(),
+        ASSIGNMENT_MATCH_RADIUS_METERS);
     if (assignments.size() == 0)
     {
+        previous_chosen_assignments.clear();
+        setUpCreaseDefenders(0);
+        setUpPassDefenders(0);
+        updateShadowers(event, {});
         return;
     }
 
@@ -78,44 +103,63 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
     // of tactics available to set
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
-    for (unsigned int i = 0; i < event.common.num_tactics; i++)
+    const auto best_pass = std::find_if(assignments.begin(), assignments.end(),
+                                        [](const auto& assignment)
+                                        { return assignment.type == PASS_DEFENDER; });
+    unsigned int used    = 0;
+    for (const auto& assignment : assignments)
     {
-        DefenderAssignment defender_assignment;
-        if (i < assignments.size())
+        if (used >= event.common.num_tactics)
+            break;
+        if (assignment.type == CREASE_DEFENDER)
         {
-            defender_assignment = assignments.at(i);
-        }
-        else
-        {
-            // If we have more tactics to set than determined defender assignments,
-            // assign remaining defenders to the defender assignment with the
-            // highest coverage rating
-            defender_assignment = assignments.front();
-        }
-
-        if (defender_assignment.type == CREASE_DEFENDER && max_num_crease_defenders > 0)
-        {
-            crease_defender_assignments.emplace_back(defender_assignment);
-            max_num_crease_defenders--;
-
-            // If we have at least two available defenders, two defenders should
-            // be assigned to the highest scoring crease defender assignment to better
-            // block the shot cone of the most threatening enemy
-            if (i == 0 && event.common.num_tactics >= 2 && max_num_crease_defenders > 0)
+            if (max_num_crease_defenders == 0)
+                continue;
+            crease_defender_assignments.push_back(assignment);
+            --max_num_crease_defenders;
+            ++used;
+            // Double coverage for the first assignment, within the cap and budget.
+            if (used == 1 && used < event.common.num_tactics &&
+                max_num_crease_defenders > 0)
             {
-                crease_defender_assignments.emplace_back(defender_assignment);
-                i++;
-                max_num_crease_defenders--;
+                crease_defender_assignments.push_back(assignment);
+                --max_num_crease_defenders;
+                ++used;
             }
         }
         else
         {
-            pass_defender_assignments.emplace_back(defender_assignment);
+            pass_defender_assignments.push_back(assignment);
+            ++used;
         }
+    }
+    // Surplus robots can only repeat a genuine pass-blocking target.
+    while (used < event.common.num_tactics && best_pass != assignments.end())
+    {
+        pass_defender_assignments.push_back(*best_pass);
+        ++used;
+    }
+
+    // Allocate the shadow slot before setting up tactics so unchanged updates retain
+    // their pass-defender FSMs instead of rebuilding them on every tick.
+    if (shadow_primary_threat && !pass_defender_assignments.empty())
+    {
+        pass_defender_assignments.erase(pass_defender_assignments.begin());
+        updateShadowers(event, {enemy_threats.front()});
+    }
+    else
+    {
+        updateShadowers(event, {});
     }
 
     // Reset tactics if the number of crease defenders or pass defenders
     // we intend to assign has changed
+    // Remember what we chose so the next update prefers the same assignments
+    previous_chosen_assignments = crease_defender_assignments;
+    previous_chosen_assignments.insert(previous_chosen_assignments.end(),
+                                       pass_defender_assignments.begin(),
+                                       pass_defender_assignments.end());
+
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
     setAlignment(event, crease_defender_assignments, TbotsProto::BallStealMode::STEAL);

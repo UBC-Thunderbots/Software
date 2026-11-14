@@ -149,7 +149,9 @@ cc_test(
     name = "enemy_threat_test",
     srcs = ["enemy_threat_test.cpp"],
     deps = [
+        ":calc_best_shot",
         ":enemy_threat",
+        ":possession",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world:ball",
@@ -212,6 +214,8 @@ cc_test(
     deps = [
         ":intercept",
         "//shared/test_util:tbots_gtest_main",
+        "//software/geom/algorithms",
+        "//software/optimization:gradient_descent",
         "//software/test_util",
     ],
 )

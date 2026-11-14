@@ -9,6 +9,7 @@
 #include "software/geom/algorithms/intersects.h"
 #include "software/world/team.h"
 
+
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
     const std::vector<Robot>& possible_passers,
     const std::vector<Robot>& possible_receivers, const std::vector<Robot>& all_robots)
@@ -23,41 +24,20 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
     {
         for (const auto& receiver : possible_receivers)
         {
-            // Create a vector of obstacles that includes all robots except the
-            // current passer and receiver
-            std::vector<Robot> obstacles = all_robots;
-            obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), passer),
-                            obstacles.end());
-            obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), receiver),
-                            obstacles.end());
-
-            // Check if the pass from the passer to the receiver would be blocked by any
-            // robots
-            bool pass_blocked =
-                std::any_of(obstacles.begin(), obstacles.end(),
-                            [passer, receiver](const Robot& obstacle)
-                            {
-                                return intersects(
-                                    Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
-                                    Segment(passer.position(), receiver.position()));
-                            });
+            const Segment pass(passer.position(), receiver.position());
+            bool pass_blocked = std::any_of(
+                all_robots.begin(), all_robots.end(),
+                [&](const Robot& obstacle)
+                {
+                    return !(obstacle == passer) && !(obstacle == receiver) &&
+                           intersects(
+                               Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
+                               pass);
+                });
 
             if (!pass_blocked)
             {
-                if (receiver_passer_pairs.count(receiver) > 0)
-                {
-                    // This receiver already exists in the map and can
-                    // already be passed to by another robot. We add the passer
-                    // to the list of possible passers for this robot
-                    receiver_passer_pairs.at(receiver).emplace_back(passer);
-                }
-                else
-                {
-                    // This receiver robot does not exist in the map. Create a
-                    // new entry to track this receiver and add the passer
-                    receiver_passer_pairs.insert(
-                        std::make_pair(receiver, std::vector<Robot>{passer}));
-                }
+                receiver_passer_pairs[receiver].emplace_back(passer);
             }
         }
     }
@@ -65,8 +45,6 @@ std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPa
     return receiver_passer_pairs;
 }
 
-namespace
-{
 /**
  * Returns whether a robot at the given position could shoot on the friendly goal
  */
@@ -83,6 +61,8 @@ bool canShootOnFriendlyGoal(const Field& field, const Point& position)
     return goal_to_position.dot(towards_enemy_goal.normalize()) > ROBOT_MAX_RADIUS_METERS;
 }
 
+namespace
+{
 // Maps a robot to the number of passes needed to reach it and the robot it receives from
 using NumPassesToRobotMap =
     std::map<Robot, std::pair<int, std::optional<Robot>>, Robot::cmpRobotByID>;
@@ -114,12 +94,10 @@ NumPassesToRobotMap getNumPassesToAllRobots(const Robot& initial_passer,
     unvisited_robots.erase(
         std::remove(unvisited_robots.begin(), unvisited_robots.end(), initial_passer),
         unvisited_robots.end());
-    std::vector<Robot> all_robots   = passing_team.getAllRobots();
-    std::vector<Robot> other_robots = other_team.getAllRobots();
+    const auto& all_robots = passing_team.getAllRobots();
     // TODO: possibly re-enable using friendly robots as obstacles if we can find a way to
     // stop defenders from oscillating between positions See
     // https://github.com/UBC-Thunderbots/Software/issues/642
-    // all_robots.insert(all_robots.end(), other_robots.begin(), other_robots.end());
 
     // On each iteration, check what robots can be passed to. These receivers will
     // become the passers on the next iteration. This is like expanding the frontier
@@ -143,6 +121,7 @@ NumPassesToRobotMap getNumPassesToAllRobots(const Robot& initial_passer,
 
         // Create a list of all robots that could receive the ball this iteration
         std::vector<Robot> all_receivers;
+        all_receivers.reserve(receiver_passer_pairs.size());
         for (const auto& [receiver, passers] : receiver_passer_pairs)
         {
             // If there are multiple robots that can pass to the robot, we assume it
@@ -154,18 +133,17 @@ NumPassesToRobotMap getNumPassesToAllRobots(const Robot& initial_passer,
             all_receivers.emplace_back(receiver);
         }
 
-        // All robots that could have received the ball now become passers
-        current_passers = all_receivers;
-
         // Remove any receivers from the unvisited robots, since they have
         // now been visited
         unvisited_robots.erase(remove_if(unvisited_robots.begin(), unvisited_robots.end(),
-                                         [&](auto x) {
+                                         [&](const Robot& x) {
                                              return find(all_receivers.begin(),
                                                          all_receivers.end(),
                                                          x) != all_receivers.end();
                                          }),
                                unvisited_robots.end());
+        // Reuse the receiver vector as the next frontier without copying robots.
+        current_passers = std::move(all_receivers);
     }
 
     return num_passes_to_robot;
@@ -184,7 +162,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     auto num_passes_to_robot =
         getNumPassesToAllRobots(initial_passer, passing_team, other_team);
     auto pass_data = num_passes_to_robot.find(final_receiver);
-
+c
     // If we have checked all the robots we can and still haven't found the robot we
     // are looking for, it must be blocked and unable to be passed to in the current
     // state. Therefore, we return an std::nullopt
@@ -245,7 +223,12 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
                 // defenders could oscillate between enemies since when the defender
                 // blocks one enemy, the unblocked one becomes more threatening and the
                 // defender would then move there.
-                return a.goal_angle < b.goal_angle;
+                if (a.goal_angle != b.goal_angle)
+                {
+                    return a.goal_angle < b.goal_angle;
+                }
+                // Fully deterministic order so equal threats can't swap between ticks
+                return a.robot.id() > b.robot.id();
             }
         }
     };
@@ -255,9 +238,69 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats)
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
 }
 
-std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& friendly_team,
-                                            Team enemy_team, const Ball& ball,
-                                            bool include_goalie)
+void stabilizePrimaryThreat(std::vector<EnemyThreat>& threats,
+                            std::optional<RobotId> previous_primary, const Angle& margin)
+{
+    if (!previous_primary || threats.size() < 2 ||
+        threats.front().robot.id() == *previous_primary)
+    {
+        return;
+    }
+
+    auto previous = std::find_if(threats.begin(), threats.end(),
+                                 [&](const EnemyThreat& threat)
+                                 { return threat.robot.id() == *previous_primary; });
+    if (previous == threats.end())
+    {
+        return;
+    }
+
+    const auto& leader = threats.front();
+    if (previous->has_ball == leader.has_ball &&
+        previous->num_passes_to_get_possession == leader.num_passes_to_get_possession &&
+        leader.goal_angle.minDiff(previous->goal_angle) <= margin)
+    {
+        std::rotate(threats.begin(), previous, previous + 1);
+    }
+}
+
+void holdPrimaryThreat(std::vector<EnemyThreat>& threats,
+                       std::optional<RobotId> previous_primary, PrimaryThreatHold& state,
+                       unsigned int hold_updates)
+{
+    if (!previous_primary || threats.empty())
+    {
+        state.updates_held = hold_updates;
+        return;
+    }
+    if (threats.front().robot.id() == *previous_primary)
+    {
+        state.updates_held = std::min(state.updates_held + 1, hold_updates);
+        return;
+    }
+
+    auto previous = std::find_if(threats.begin(), threats.end(),
+                                 [&](const EnemyThreat& threat)
+                                 { return threat.robot.id() == *previous_primary; });
+    const bool previous_contests_ball =
+        previous != threats.end() &&
+        (previous->has_ball || previous->num_passes_to_get_possession <= 1);
+    const bool leader_takes_ball =
+        previous != threats.end() && threats.front().has_ball && !previous->has_ball;
+    if (hold_updates == 0 || !previous_contests_ball || leader_takes_ball ||
+        state.updates_held >= hold_updates)
+    {
+        state.updates_held = 0;
+        return;
+    }
+    state.updates_held++;
+    std::rotate(threats.begin(), previous, previous + 1);
+}
+
+std::vector<EnemyThreat> getAllEnemyThreats(
+    const Field& field, const Team& friendly_team, Team enemy_team, const Ball& ball,
+    bool include_goalie, std::optional<RobotId> previous_baller,
+    const Duration& baller_switch_margin, std::optional<RobotId>* baller_out)
 {
     if (!include_goalie && enemy_team.getGoalieId())
     {
@@ -265,9 +308,17 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
     }
 
     std::vector<EnemyThreat> threats;
+    threats.reserve(enemy_team.numRobots());
 
     auto robot_with_effective_possession =
-        getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+        getRobotWithEffectiveBallPossession(enemy_team, ball, field, previous_baller,
+                                            baller_switch_margin);
+    if (baller_out)
+    {
+        *baller_out = robot_with_effective_possession
+                          ? std::make_optional(robot_with_effective_possession->id())
+                          : std::nullopt;
+    }
 
     NumPassesToRobotMap num_passes_to_robot;
     if (robot_with_effective_possession)
@@ -278,7 +329,8 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
 
     for (const auto& robot : enemy_team.getAllRobots())
     {
-        bool has_ball = robot.isNearDribbler(ball.position());
+        bool has_ball            = robot.isNearDribbler(ball.position());
+        const bool shot_eligible = canShootOnFriendlyGoal(field, robot.position());
 
         // Get the angle from the robot to each friendly goalpost, then find the
         // difference between these angles to get the goal_angle for the robot.
@@ -286,7 +338,7 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
         // between them is wide even though they have no net to shoot at. Give them an
         // angle of zero
         Angle goal_angle = Angle::zero();
-        if (canShootOnFriendlyGoal(field, robot.position()))
+        if (shot_eligible)
         {
             auto friendly_goalpost_angle_1 =
                 (field.friendlyGoalpostPos() - robot.position()).orientation();
@@ -298,8 +350,10 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& frie
         std::optional<Angle> best_shot_angle  = std::nullopt;
         std::optional<Point> best_shot_target = std::nullopt;
         auto best_shot_data =
-            calcBestShotOnGoal(field, friendly_team, enemy_team, robot.position(),
-                               TeamType::FRIENDLY, {robot});
+            shot_eligible
+                ? calcBestShotOnGoal(field, friendly_team, enemy_team, robot.position(),
+                                     TeamType::FRIENDLY, {robot})
+                : std::nullopt;
         if (best_shot_data)
         {
             best_shot_angle  = best_shot_data->getOpenAngle();

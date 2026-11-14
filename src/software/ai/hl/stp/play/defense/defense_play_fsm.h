@@ -31,6 +31,16 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     bool shouldDefendAggressively(const Update& event);
 
     /**
+     * Gets all enemy threats in order of decreasing threat, keeping the previous
+     * primary threat in front while it is still essentially tied with the new leader
+     *
+     * @param event the FSM event
+     *
+     * @return the enemy threats in order of decreasing threat
+     */
+    std::vector<EnemyThreat> getStableEnemyThreats(const Update& event);
+
+    /**
      * Action to identify all immediate enemy threats and assign
      * defenders to block enemy shots and passes
      *
@@ -52,9 +62,11 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      *
      * @param event the FSM event
      * @param enemy_threats the enemy threats to defend against
+     * @param shadow_primary_threat replace one pass defender with a primary shadower
      */
     void updateCreaseAndPassDefenders(const Update& event,
-                                      const std::vector<EnemyThreat>& enemy_threats);
+                                      const std::vector<EnemyThreat>& enemy_threats,
+                                      bool shadow_primary_threat = false);
 
     /**
      * Helper function to update shadowers to shadow specified threats
@@ -113,4 +125,21 @@ struct DefensePlayFSM : public DefensePlayFSMBase
     // Where to shadow, gathered experimentally after seeing
     // how far is far enough that the robot couldn't get dribbled past
     static constexpr double ROBOT_SHADOWING_DISTANCE_METERS = 0.36;
+
+    // How close a new defender assignment's target must be to one chosen on the
+    // previous update to count as the same assignment for hysteresis
+    static constexpr double ASSIGNMENT_MATCH_RADIUS_METERS = 0.5;
+
+    // The primary threat on the previous update, used for hysteresis
+    std::optional<RobotId> previous_primary_threat_id;
+
+    // The state used to hold the primary threat steady, see holdPrimaryThreat
+    PrimaryThreatHold primary_hold;
+
+    // The enemy robot judged to have effective ball possession on the previous update
+    std::optional<RobotId> previous_baller_id;
+
+    // The crease and pass defender assignments chosen on the previous update,
+    // used for hysteresis
+    std::vector<DefenderAssignment> previous_chosen_assignments;
 };

@@ -10,6 +10,9 @@
 /**
  * Finds the best place for the given robot to intercept the given ball
  *
+ * Older ball observations are advanced to the robot timestamp before prediction.
+ * Robots with nonpositive maximum speed only cover a stationary ball at their position.
+ *
  * @param ball The ball to intercept
  * @param field The field on which we want the intercept to occur
  * @param robot The robot that will hopefully intercept the ball

@@ -100,6 +100,43 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
 void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats);
 
 /**
+ * Keeps the previous primary threat in front if it is still essentially tied with the
+ * new leader: same has_ball, same num_passes_to_get_possession, and a goal angle within
+ * margin. A real change in ball possession or pass distance is never overridden.
+ * The vector is modified in-place.
+ *
+ * @param threats The threats in order of decreasing threat
+ * @param previous_primary The id of the primary threat on the previous update, if any
+ * @param margin How much smaller the previous primary's goal angle may be and still
+ * keep the primary spot
+ */
+void stabilizePrimaryThreat(std::vector<EnemyThreat>& threats,
+                            std::optional<RobotId> previous_primary, const Angle& margin);
+
+/** Tracks how many updates the current primary threat has held the primary spot. */
+struct PrimaryThreatHold
+{
+    unsigned int updates_held = 0;
+};
+
+/**
+ * Stops the primary threat from changing faster than once per hold_updates updates
+ * while the previous primary is still contesting the ball (has the ball, or needs at
+ * most one pass to get it). A new leader that has the ball when the previous primary
+ * does not takes over immediately. If the previous primary is gone or no longer
+ * contests the ball the change is accepted immediately. The vector is modified
+ * in-place.
+ *
+ * @param threats The threats in order of decreasing threat
+ * @param previous_primary The id of the primary threat on the previous update, if any
+ * @param state The hold state carried between updates
+ * @param hold_updates Minimum updates between primary threat changes (0 disables)
+ */
+void holdPrimaryThreat(std::vector<EnemyThreat>& threats,
+                       std::optional<RobotId> previous_primary, PrimaryThreatHold& state,
+                       unsigned int hold_updates);
+
+/**
  * Calculates the threat of each enemy robot on the field, and returns them in order
  * of decreasing threat. The EnemyThreat contains information about how threatening
  * an enemy robot is to the friendly team, as well as useful information the caller
@@ -114,8 +151,18 @@ void sortThreatsInDecreasingOrder(std::vector<EnemyThreat>& threats);
  * @param ball The ball
  * @param include_goalie Whether or not to include the enemy goalie in the evaluation
  * and resultant threats
+ * @param previous_baller The enemy robot judged to have effective ball possession on the
+ * previous update, if any (see getRobotWithEffectiveBallPossession)
+ * @param baller_switch_margin How much sooner another robot must reach the ball to
+ * replace previous_baller
+ * @param baller_out If not null, set to the robot judged to have effective possession
  * @return A list of EnemyThreats in order of decreasing threat
  */
-std::vector<EnemyThreat> getAllEnemyThreats(const Field& field, const Team& friendly_team,
-                                            Team enemy_team, const Ball& ball,
-                                            bool include_goalie);
+std::vector<EnemyThreat> getAllEnemyThreats(
+    const Field& field, const Team& friendly_team, Team enemy_team, const Ball& ball,
+    bool include_goalie, std::optional<RobotId> previous_baller = std::nullopt,
+    const Duration& baller_switch_margin = Duration::fromSeconds(0),
+    std::optional<RobotId>* baller_out = nullptr);
+
+/** Whether the position is more than a robot radius ahead of the friendly goal. */
+bool canShootOnFriendlyGoal(const Field& field, const Point& position);

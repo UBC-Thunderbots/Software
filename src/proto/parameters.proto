@@ -529,6 +529,37 @@ message DefensePlayConfig
         // The max number of crease defender can be created at a moment
         required uint32 max_num_crease_defenders = 6
             [default = 2, (bounds).min_int_value = 1, (bounds).max_int_value = 3];
+
+        // Rating multiplier for a defender assignment that was chosen on the previous
+        // update, so near-equal assignments do not flip (1.0 disables)
+        required double assignment_hysteresis_multiplier = 7 [
+            default                   = 1.5,
+            (bounds).min_double_value = 1.0,
+            (bounds).max_double_value = 5.0
+        ];
+
+        // How much smaller (in goal angle) the previous primary threat may be than the
+        // new leader, among threats tied on ball possession and pass count, and still
+        // remain the primary threat
+        required double primary_threat_hysteresis_degrees = 8 [
+            default                   = 5.0,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 90.0
+        ];
+
+        // How much sooner (in seconds) another enemy robot must be able to reach the
+        // ball than the one judged to have possession on the previous update to be
+        // judged the new ball possessor (0 disables)
+        required double effective_possession_switch_margin_seconds = 9 [
+            default                   = 0.0,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 2.0
+        ];
+
+        // The minimum number of updates between primary threat changes while the
+        // previous primary threat is still contesting the ball (0 disables)
+        required uint32 primary_threat_hold_updates = 10
+            [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 600];
     }
 
     // The distance at which a threat is considered "immediate" if there is only 1

@@ -5,10 +5,51 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/optimization/gradient_descent_optimizer.hpp"
 
-std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball& ball,
-                                                                   const Field& field,
-                                                                   const Robot& robot)
+std::optional<std::pair<Point, Duration>> findBestInterceptForBall(
+    const Ball& observed_ball, const Field& field, const Robot& robot)
 {
+    // With no velocity or acceleration, every future ball position is the current
+    // position. The numerical search returns the robot's travel time to that point.
+    // Check components exactly so a slowly moving ball still uses the normal search.
+    const bool stationary =
+        observed_ball.velocity().x() == 0 && observed_ball.velocity().y() == 0 &&
+        observed_ball.acceleration().x() == 0 && observed_ball.acceleration().y() == 0;
+    // Predict from the robot's observation time. Mixing elapsed time since the ball
+    // observation with the robot's future travel time can reject reachable balls.
+    std::optional<Ball> synchronized_ball;
+    if (!stationary && robot.timestamp() > observed_ball.timestamp())
+    {
+        synchronized_ball.emplace(observed_ball.estimateFutureState(
+                                      robot.timestamp() - observed_ball.timestamp()),
+                                  robot.timestamp(), observed_ball.acceleration());
+    }
+    const auto& ball = synchronized_ball ? *synchronized_ball : observed_ball;
+    // The travel-time model divides by maximum speed and cannot evaluate an immobile
+    // robot. It can still cover a stationary ball already at its exact position.
+    if (robot.robotConstants().robot_trajectory_max_speed_m_per_s <= 0)
+    {
+        if (stationary && robot.position().x() == ball.position().x() &&
+            robot.position().y() == ball.position().y() &&
+            contains(field.fieldLines(), ball.position()))
+        {
+            return std::make_pair(ball.position(), Duration::fromSeconds(0));
+        }
+        return std::nullopt;
+    }
+    if (stationary)
+    {
+        if (!contains(field.fieldLines(), ball.position()))
+        {
+            return std::nullopt;
+        }
+        const auto travel_time = robot.getTimeToPosition(ball.position());
+        if (!std::isfinite(travel_time.toSeconds()))
+        {
+            return std::nullopt;
+        }
+        return std::make_pair(ball.position(), travel_time);
+    }
+
     static const double gradient_approx_step_size = 0.000001;
 
     // We use this to take a smooth absolute value in our objective function
@@ -21,14 +62,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball& b
     {
         // We take the absolute value here because a negative time makes no sense
         double duration = std::abs(x.at(0));
-
-        // If the ball timestamp is less then the robot timestamp, add the difference
-        // here so that we're optimizing to a duration that is after the robot
-        // timestamp
-        if (ball.timestamp() < robot.timestamp())
-        {
-            duration += (robot.timestamp() - ball.timestamp()).toSeconds();
-        }
 
         // Estimate the ball position
         Point new_ball_pos =
@@ -56,25 +89,15 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball& b
     Duration best_ball_travel_duration = Duration::fromSeconds(
         std::abs(optimizer.minimize(objective_function, {0}, 50).at(0)));
 
-    // In the objective function above, if the robot timestamp > ball timestamp, we
-    // add on the difference so we get a intercept time after the robot timestamp, so
-    // we need to do the same here to get the duration we actually optimized on
-    if (robot.timestamp() > ball.timestamp())
-    {
-        best_ball_travel_duration =
-            best_ball_travel_duration + (robot.timestamp() - ball.timestamp());
-    }
-
     Point best_ball_intercept_pos =
         ball.estimateFutureState(best_ball_travel_duration).position();
 
     // Check that we can get to the best position in time
     Duration time_to_ball_pos     = robot.getTimeToPosition(best_ball_intercept_pos);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
-    // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
-    // check isn't relevant in that case
-    if (ball.currentState().velocity().length() != 0 &&
-        std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
+    // Stationary balls returned above. Balls accelerating from rest still need this
+    // check: zero initial speed does not make a moving intercept reachable.
+    if (std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
     {
         return std::nullopt;
     }

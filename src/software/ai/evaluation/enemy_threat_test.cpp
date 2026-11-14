@@ -2,7 +2,14 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <iostream>
+#include <random>
+
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/possession.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/test_util/test_util.h"
 
 TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)
@@ -932,4 +939,552 @@ TEST(EnemyThreatTest, enemies_in_and_behind_the_goal_mouth_have_no_view_of_the_n
     EXPECT_EQ(goal_angle_by_id.at(in_the_mouth.id()), Angle::zero());
     EXPECT_EQ(goal_angle_by_id.at(on_the_line.id()), Angle::zero());
     EXPECT_EQ(goal_angle_by_id.at(behind_the_line.id()), Angle::zero());
+}
+
+namespace
+{
+auto referencePassSearch(const std::vector<Robot>& passers,
+                         const std::vector<Robot>& receivers,
+                         const std::vector<Robot>& robots)
+{
+    std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> result;
+    for (const auto& passer : passers)
+        for (const auto& receiver : receivers)
+        {
+            auto obstacles = robots;
+            obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), passer),
+                            obstacles.end());
+            obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), receiver),
+                            obstacles.end());
+            if (!std::any_of(obstacles.begin(), obstacles.end(),
+                             [passer, receiver](const Robot& obstacle)
+                             {
+                                 return intersects(
+                                     Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
+                                     Segment(passer.position(), receiver.position()));
+                             }))
+            {
+                if (result.count(receiver) > 0)
+                    result.at(receiver).emplace_back(passer);
+                else
+                    result.insert(std::make_pair(receiver, std::vector<Robot>{passer}));
+            }
+        }
+    return result;
+}
+
+std::vector<std::vector<Robot>> passSearchLayouts()
+{
+    std::mt19937 random(6157);
+    std::uniform_real_distribution<double> position(-4, 4);
+    std::vector<std::vector<Robot>> layouts;
+    for (int layout = 0; layout < 100; ++layout)
+    {
+        std::vector<Robot> robots;
+        for (unsigned int id = 0; id < 12; ++id)
+            robots.emplace_back(id, Point(position(random), position(random)), Vector(),
+                                Angle::zero(), AngularVelocity::zero(), Timestamp());
+        layouts.push_back(robots);
+    }
+    for (double offset : {0.0, ROBOT_MAX_RADIUS_METERS - 1e-9, ROBOT_MAX_RADIUS_METERS,
+                          ROBOT_MAX_RADIUS_METERS + 1e-9})
+    {
+        std::vector<Robot> robots;
+        for (const auto& point :
+             {Point(0, 0), Point(2, 0), Point(1, offset), Point(0, offset)})
+            robots.emplace_back(static_cast<unsigned int>(robots.size()), point, Vector(),
+                                Angle::zero(), AngularVelocity::zero(), Timestamp());
+        layouts.push_back(robots);
+    }
+    return layouts;
+}
+}  // namespace
+
+TEST(FindAllPasserReceiverPairsTest, matches_previous_algorithm)
+{
+    EXPECT_TRUE(findAllReceiverPasserPairs({}, {}, {}).empty());
+    for (auto robots : passSearchLayouts())
+    {
+        // Include an equal duplicate and a robot with the same ID but different state.
+        robots.push_back(robots.front());
+        robots.emplace_back(robots.front().id(), Point(0.4, -0.2), Vector(),
+                            Angle::zero(), AngularVelocity::zero(), Timestamp());
+        auto receivers = robots;
+        std::reverse(receivers.begin(), receivers.end());
+        EXPECT_EQ(findAllReceiverPasserPairs(robots, receivers, robots),
+                  referencePassSearch(robots, receivers, robots));
+    }
+}
+
+TEST(FindAllPasserReceiverPairsTest, DISABLED_benchmark)
+{
+    const auto layouts = passSearchLayouts();
+    size_t consumed    = 0;
+    auto measure       = [&](auto search)
+    {
+        auto start = std::chrono::steady_clock::now();
+        for (int batch = 0; batch < 20; ++batch)
+            for (const auto& robots : layouts)
+                for (const auto& [receiver, passers] : search(robots, robots, robots))
+                {
+                    consumed += receiver.id();
+                    for (const auto& passer : passers)
+                        consumed += passer.id() + 1;
+                }
+        return std::chrono::duration<double, std::milli>(
+                   std::chrono::steady_clock::now() - start)
+            .count();
+    };
+    measure(referencePassSearch);
+    measure(findAllReceiverPasserPairs);
+    for (int repeat = 0; repeat < 5; ++repeat)
+        std::cout << "old_ms=" << measure(referencePassSearch)
+                  << " new_ms=" << measure(findAllReceiverPasserPairs) << std::endl;
+    std::cout << "consumed=" << consumed << std::endl;
+}
+
+TEST(EnemyThreatTest, shot_eligibility_boundaries_preserve_possession)
+{
+    auto world = TestUtil::createBlankTestingWorld();
+    for (double offset :
+         {-0.1, 0.0, ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS + 1e-9})
+    {
+        Point position = world->field().friendlyGoalCenter() + Vector(offset, 0);
+        TestUtil::setEnemyRobotPositions(world, {position}, Timestamp());
+        TestUtil::setBallPosition(world, position + Vector(0.09, 0), Timestamp());
+        auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                          world->enemyTeam(), world->ball(), false);
+        ASSERT_EQ(threats.size(), 1);
+        EXPECT_TRUE(threats[0].has_ball);
+        EXPECT_EQ(threats[0].num_passes_to_get_possession, 0);
+        if (offset <= ROBOT_MAX_RADIUS_METERS)
+        {
+            EXPECT_EQ(threats[0].goal_angle, Angle::zero());
+            EXPECT_FALSE(threats[0].best_shot_angle);
+            EXPECT_FALSE(threats[0].best_shot_target);
+        }
+        else
+            EXPECT_GT(threats[0].goal_angle, Angle::zero());
+    }
+}
+
+TEST(EnemyThreatTest, DISABLED_evaluation_benchmark)
+{
+    const auto field   = Field::createSSLDivisionBField();
+    const auto layouts = passSearchLayouts();
+    size_t consumed    = 0;
+    for (unsigned int team_size : {6u, 12u})
+        for (double ball_speed : {0.0, 2.0})
+        {
+            std::vector<World> worlds;
+            for (size_t i = 0; i < 16; ++i)
+            {
+                Team friendly(Duration::fromSeconds(1)), enemy(Duration::fromSeconds(1));
+                std::vector<Robot> enemies(layouts[i].begin(),
+                                           layouts[i].begin() + team_size);
+                friendly.updateRobots(layouts[i + 16]);
+                enemy.updateRobots(enemies);
+                worlds.emplace_back(
+                    field, Ball(Point(0.2, -0.3), Vector(ball_speed, 0), Timestamp()),
+                    friendly, enemy);
+            }
+            auto evaluate = [&](const World& world)
+            {
+                auto threats = getAllEnemyThreats(field, world.friendlyTeam(),
+                                                  world.enemyTeam(), world.ball(), false);
+                for (const auto& threat : threats)
+                {
+                    consumed += threat.robot.id() +
+                                static_cast<size_t>(threat.num_passes_to_get_possession);
+                    if (threat.best_shot_target)
+                        consumed += 1;
+                }
+            };
+            auto measure = [&](auto operation)
+            {
+                auto start = std::chrono::steady_clock::now();
+                for (int batch = 0; batch < 10; ++batch)
+                    for (const auto& world : worlds)
+                        operation(world);
+                return std::chrono::duration<double, std::micro>(
+                           std::chrono::steady_clock::now() - start)
+                           .count() /
+                       160;
+            };
+            measure(evaluate);
+            for (int repeat = 0; repeat < 5; ++repeat)
+                std::cout
+                    << "evaluation_us size=" << team_size << " speed=" << ball_speed
+                    << " total=" << measure(evaluate) << " possession="
+                    << measure(
+                           [&](const World& world)
+                           {
+                               auto robot = getRobotWithEffectiveBallPossession(
+                                   world.enemyTeam(), world.ball(), field);
+                               if (robot)
+                                   consumed += robot->id();
+                           })
+                    << " shots="
+                    << measure(
+                           [&](const World& world)
+                           {
+                               for (const auto& robot : world.enemyTeam().getAllRobots())
+                               {
+                                   if (!canShootOnFriendlyGoal(field, robot.position()))
+                                       continue;
+                                   auto shot = calcBestShotOnGoal(
+                                       field, world.friendlyTeam(), world.enemyTeam(),
+                                       robot.position(), TeamType::FRIENDLY, {robot});
+                                   if (shot)
+                                       consumed += 1;
+                               }
+                           })
+                    << std::endl;
+        }
+    std::cout << "evaluation_consumed=" << consumed << std::endl;
+}
+
+TEST(EnemyThreatTest, pass_counts_and_nearest_passers_match_independent_graph_search)
+{
+    auto layouts = passSearchLayouts();
+    // A blocked direct pass with two equally close, two-pass predecessors.
+    std::vector<Robot> diamond;
+    for (const auto& position :
+         {Point(-2, 0), Point(0, -1), Point(0, 1), Point(2, 0), Point(-1, 0)})
+        diamond.emplace_back(static_cast<RobotId>(diamond.size()), position, Vector(),
+                             Angle::zero(), AngularVelocity::zero(), Timestamp());
+    layouts.push_back(diamond);
+    unsigned int unreachable = 0, multiple_passes = 0;
+    for (const auto& robots : layouts)
+    {
+        const auto pairs = referencePassSearch(robots, robots, robots);
+        std::vector<std::vector<bool>> edges(robots.size(),
+                                             std::vector<bool>(robots.size(), false));
+        for (size_t p = 0; p < robots.size(); ++p)
+            for (size_t r = 0; r < robots.size(); ++r)
+            {
+                const auto receiver = pairs.find(robots[r]);
+                if (receiver != pairs.end())
+                    edges[p][r] =
+                        std::find(receiver->second.begin(), receiver->second.end(),
+                                  robots[p]) != receiver->second.end();
+            }
+        Team team(Duration::fromSeconds(1)), other(Duration::fromSeconds(1));
+        auto reversed = robots;
+        std::reverse(reversed.begin(), reversed.end());
+        team.updateRobots(reversed);
+        for (size_t source = 0; source < robots.size(); ++source)
+        {
+            std::vector<int> passes(robots.size(), -1);
+            std::vector<size_t> queue{source};
+            passes[source] = 0;
+            for (size_t head = 0; head < queue.size(); ++head)
+                for (size_t receiver = 0; receiver < robots.size(); ++receiver)
+                    if (edges[queue[head]][receiver] && passes[receiver] < 0)
+                    {
+                        passes[receiver] = passes[queue[head]] + 1;
+                        queue.push_back(receiver);
+                    }
+            for (size_t receiver = 0; receiver < robots.size(); ++receiver)
+            {
+                auto actual =
+                    getNumPassesToRobot(robots[source], robots[receiver], team, other);
+                ASSERT_EQ(actual.has_value(), passes[receiver] >= 0);
+                if (!actual)
+                {
+                    ++unreachable;
+                    continue;
+                }
+                EXPECT_EQ(actual->first, passes[receiver]);
+                std::optional<Robot> nearest;
+                if (passes[receiver] > 0)
+                    for (size_t p = 0; p < robots.size(); ++p)
+                        if (edges[p][receiver] && passes[p] == passes[receiver] - 1 &&
+                            (!nearest ||
+                             (robots[p].position() - robots[receiver].position())
+                                     .length() <
+                                 (nearest->position() - robots[receiver].position())
+                                     .length()))
+                            nearest = robots[p];
+                EXPECT_EQ(actual->second, nearest);
+                if (passes[receiver] > 1)
+                    ++multiple_passes;
+            }
+        }
+    }
+    EXPECT_GT(unreachable, 0);
+    EXPECT_GT(multiple_passes, 0);
+    Team team(Duration::fromSeconds(1)), other(Duration::fromSeconds(1));
+    team.updateRobots(diamond);
+    const auto tie = getNumPassesToRobot(diamond[0], diamond[3], team, other);
+    ASSERT_TRUE(tie);
+    EXPECT_EQ(tie->first, 2);
+    ASSERT_TRUE(tie->second);
+    EXPECT_EQ(tie->second->id(), 1);
+}
+
+namespace
+{
+EnemyThreat makeThreat(RobotId id, bool has_ball, double goal_angle_degrees,
+                       int num_passes)
+{
+    Robot robot(id, Point(-1, id), Vector(), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    return EnemyThreat{robot,
+                       has_ball,
+                       Angle::fromDegrees(goal_angle_degrees),
+                       Angle::fromDegrees(goal_angle_degrees),
+                       Point(-4.5, 0),
+                       num_passes,
+                       std::nullopt};
+}
+}  // namespace
+
+TEST(SortEnemyThreatsTest, threats_equal_in_every_criterion_have_a_deterministic_order)
+{
+    auto threat_low_id  = makeThreat(2, false, 30, 1);
+    auto threat_high_id = makeThreat(5, false, 30, 1);
+
+    std::vector<EnemyThreat> threats = {threat_high_id, threat_low_id};
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{threat_low_id, threat_high_id}));
+
+    threats = {threat_low_id, threat_high_id};
+    sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{threat_low_id, threat_high_id}));
+}
+
+TEST(StabilizePrimaryThreatTest, previous_primary_stays_when_tied_within_margin)
+{
+    auto leader   = makeThreat(0, false, 30, 1);
+    auto previous = makeThreat(1, false, 28, 1);
+    std::vector<EnemyThreat> threats = {leader, previous};
+
+    stabilizePrimaryThreat(threats, 1, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{previous, leader}));
+}
+
+TEST(StabilizePrimaryThreatTest, previous_primary_promoted_from_the_back_keeps_the_rest)
+{
+    auto leader   = makeThreat(0, false, 30, 1);
+    auto middle   = makeThreat(1, false, 29, 1);
+    auto previous = makeThreat(2, false, 28, 1);
+    std::vector<EnemyThreat> threats = {leader, middle, previous};
+
+    stabilizePrimaryThreat(threats, 2, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{previous, leader, middle}));
+}
+
+TEST(StabilizePrimaryThreatTest, previous_primary_loses_spot_beyond_margin)
+{
+    auto leader   = makeThreat(0, false, 30, 1);
+    auto previous = makeThreat(1, false, 20, 1);
+    std::vector<EnemyThreat> threats = {leader, previous};
+
+    stabilizePrimaryThreat(threats, 1, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+}
+
+TEST(StabilizePrimaryThreatTest, never_overrides_a_different_pass_distance)
+{
+    auto leader   = makeThreat(0, false, 30, 0);
+    auto previous = makeThreat(1, false, 30, 1);
+    std::vector<EnemyThreat> threats = {leader, previous};
+
+    stabilizePrimaryThreat(threats, 1, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+}
+
+TEST(StabilizePrimaryThreatTest, never_overrides_ball_possession)
+{
+    auto leader   = makeThreat(0, true, 30, 0);
+    auto previous = makeThreat(1, false, 30, 0);
+    std::vector<EnemyThreat> threats = {leader, previous};
+
+    stabilizePrimaryThreat(threats, 1, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+}
+
+TEST(StabilizePrimaryThreatTest, no_previous_or_missing_previous_changes_nothing)
+{
+    auto leader = makeThreat(0, false, 30, 1);
+    auto other  = makeThreat(1, false, 30, 1);
+    std::vector<EnemyThreat> threats = {leader, other};
+
+    stabilizePrimaryThreat(threats, std::nullopt, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, other}));
+
+    stabilizePrimaryThreat(threats, 7, Angle::fromDegrees(5));
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, other}));
+
+    std::vector<EnemyThreat> empty;
+    stabilizePrimaryThreat(empty, 0, Angle::fromDegrees(5));
+    EXPECT_TRUE(empty.empty());
+}
+
+TEST(HoldPrimaryThreatTest, contesting_previous_primary_is_held_then_released)
+{
+    auto previous = makeThreat(0, false, 20, 0);
+    auto leader   = makeThreat(1, false, 30, 0);
+    PrimaryThreatHold state;
+    std::optional<RobotId> primary = 0;
+
+    // The first update after the previous primary was chosen: it has held 0 updates
+    state.updates_held = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        std::vector<EnemyThreat> threats = {leader, previous};
+        holdPrimaryThreat(threats, primary, state, 3);
+        EXPECT_EQ(threats.front().robot.id(), 0) << i;
+    }
+    std::vector<EnemyThreat> threats = {leader, previous};
+    holdPrimaryThreat(threats, primary, state, 3);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+    EXPECT_EQ(state.updates_held, 0);
+}
+
+TEST(HoldPrimaryThreatTest, change_is_blocked_for_the_hold_after_a_switch)
+{
+    auto a = makeThreat(0, false, 30, 0);
+    auto b = makeThreat(1, false, 20, 0);
+    PrimaryThreatHold state;
+    state.updates_held = 5;
+
+    std::vector<EnemyThreat> threats = {b, a};
+    holdPrimaryThreat(threats, 0, state, 5);  // held long enough: b takes over
+    EXPECT_EQ(threats.front().robot.id(), 1);
+    threats = {a, b};
+    holdPrimaryThreat(threats, 1, state, 5);  // a wants it back right away: held
+    EXPECT_EQ(threats.front().robot.id(), 1);
+}
+
+TEST(HoldPrimaryThreatTest, never_holds_a_primary_that_no_longer_contests_the_ball)
+{
+    auto previous = makeThreat(0, false, 30, 2);
+    auto leader   = makeThreat(1, false, 20, 0);
+    PrimaryThreatHold state;
+    std::vector<EnemyThreat> threats = {leader, previous};
+    holdPrimaryThreat(threats, 0, state, 50);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+}
+
+TEST(HoldPrimaryThreatTest, a_new_ball_carrier_takes_over_immediately)
+{
+    auto previous = makeThreat(0, false, 30, 0);
+    auto leader   = makeThreat(1, true, 20, 0);
+    PrimaryThreatHold state;
+    std::vector<EnemyThreat> threats = {leader, previous};
+    holdPrimaryThreat(threats, 0, state, 50);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+}
+
+TEST(HoldPrimaryThreatTest, disabled_or_missing_previous_changes_nothing)
+{
+    auto previous = makeThreat(0, false, 30, 0);
+    auto leader   = makeThreat(1, false, 20, 0);
+    PrimaryThreatHold state;
+    std::vector<EnemyThreat> threats = {leader, previous};
+    holdPrimaryThreat(threats, 0, state, 0);
+    holdPrimaryThreat(threats, std::nullopt, state, 5);
+    holdPrimaryThreat(threats, 9, state, 5);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{leader, previous}));
+
+    std::vector<EnemyThreat> empty;
+    holdPrimaryThreat(empty, 0, state, 5);
+    EXPECT_TRUE(empty.empty());
+}
+
+TEST(HoldPrimaryThreatTest, a_previous_primary_one_pass_away_still_contests_the_ball)
+{
+    auto previous = makeThreat(0, false, 20, 1);
+    auto leader   = makeThreat(1, false, 30, 0);
+    PrimaryThreatHold state;
+    state.updates_held = 0;
+    std::vector<EnemyThreat> threats = {leader, previous};
+    holdPrimaryThreat(threats, 0, state, 4);
+    EXPECT_EQ(threats, (std::vector<EnemyThreat>{previous, leader}));
+    EXPECT_EQ(state.updates_held, 1);
+}
+
+TEST(EnemyThreatTest, previous_baller_with_margin_keeps_the_primary_threat)
+{
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setEnemyRobotPositions(world, {Point(-1, 0), Point(0.9, 0)},
+                                       Timestamp::fromSeconds(0));
+    const auto get = [&](std::optional<RobotId> previous, double margin_s,
+                         std::optional<RobotId>* baller)
+    {
+        return getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                  world->enemyTeam(), world->ball(), true, previous,
+                                  Duration::fromSeconds(margin_s), baller);
+    };
+
+    // The default arguments behave exactly like no previous baller and no margin
+    const auto defaults = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                             world->enemyTeam(), world->ball(), true);
+    std::optional<RobotId> baller;
+    EXPECT_EQ(get(std::nullopt, 0, &baller), defaults);
+    EXPECT_EQ(baller, 1);
+    EXPECT_EQ(defaults.front().robot.id(), 1);
+
+    // A previous baller without a margin does not change anything
+    EXPECT_EQ(get(0, 0, &baller), defaults);
+    EXPECT_EQ(baller, 1);
+
+    // With a margin the farther previous baller stays the primary threat
+    const auto kept = get(0, 1.0, &baller);
+    EXPECT_EQ(baller, 0);
+    EXPECT_EQ(kept.front().robot.id(), 0);
+    EXPECT_EQ(kept.front().num_passes_to_get_possession, 0);
+
+    // A previous baller that is not on the enemy team is ignored
+    EXPECT_EQ(get(7, 1.0, &baller), defaults);
+    EXPECT_EQ(baller, 1);
+}
+
+TEST(HoldPrimaryThreatTest, a_hold_of_one_update_blocks_exactly_one_update)
+{
+    auto a = makeThreat(0, false, 30, 0);
+    auto b = makeThreat(1, false, 20, 0);
+    PrimaryThreatHold state;
+    state.updates_held = 1;
+
+    std::vector<EnemyThreat> threats = {b, a};
+    holdPrimaryThreat(threats, 0, state, 1);  // b takes over
+    EXPECT_EQ(threats.front().robot.id(), 1);
+    threats = {a, b};
+    holdPrimaryThreat(threats, 1, state, 1);  // a is held once
+    EXPECT_EQ(threats.front().robot.id(), 1);
+    threats = {a, b};
+    holdPrimaryThreat(threats, 1, state, 1);  // then takes over
+    EXPECT_EQ(threats.front().robot.id(), 0);
+}
+
+TEST(HoldPrimaryThreatTest, an_unchanged_primary_saturates_the_hold_counter)
+{
+    auto a = makeThreat(0, false, 30, 0);
+    auto b = makeThreat(1, false, 20, 0);
+    PrimaryThreatHold state;
+    for (int i = 0; i < 100; i++)
+    {
+        std::vector<EnemyThreat> threats = {a, b};
+        holdPrimaryThreat(threats, 0, state, 5);
+    }
+    EXPECT_EQ(state.updates_held, 5);
+
+    // So the next real change is not held
+    std::vector<EnemyThreat> threats = {b, a};
+    holdPrimaryThreat(threats, 0, state, 5);
+    EXPECT_EQ(threats.front().robot.id(), 1);
+}
+
+TEST(HoldPrimaryThreatTest, a_previous_primary_two_passes_away_does_not_contest_the_ball)
+{
+    auto previous = makeThreat(0, false, 30, 2);
+    auto leader   = makeThreat(1, false, 20, 1);
+    PrimaryThreatHold state;
+    std::vector<EnemyThreat> threats = {leader, previous};
+    holdPrimaryThreat(threats, 0, state, 5);
+    EXPECT_EQ(threats.front().robot.id(), 1);
 }
