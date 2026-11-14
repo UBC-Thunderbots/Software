@@ -1,11 +1,10 @@
 name: Environment Setup
+description: Sets up the environment
 
-on:
-  workflow_call:
-    inputs: 
-      os: 
-        required: true
-        type: string
+inputs: 
+  os: 
+    required: true
+    type: string
 
 runs:
   using: "composite"
