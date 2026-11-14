@@ -83,7 +83,7 @@ At a high-level, our system is split into several independent processes that [co
 
 - The [**Simulator**](#simulator) provides a physics simulation of the world (robots, ball, and field), enabling testing of our gameplay when we don't have access to a real field. This process is optional and used only for development and testing purposes; in a real match, our system will receive data from [SSL-Vision](#ssl-vision).
 
-- [**Thunderloop**](/docs/robot-software-architecture.md#thunderloop) is the software that runs onboard our robots. It is responsible for coordinating communication between our [AI](#ai) computer and the motor and power boards in our robots. It is part our robot software architecture, which is documented [here](/docs/robot-software-architecture.md).
+- [**Thunderloop**](/docs/working_with_hardware/robot-software-architecture.md#thunderloop) is the software that runs onboard our robots. It is responsible for coordinating communication between our [AI](#ai) computer and the motor and power boards in our robots. It is part our robot software architecture, which is documented [here](/docs/working_with_hardware/robot-software-architecture.md).
 
 ## League-Maintained Software
 

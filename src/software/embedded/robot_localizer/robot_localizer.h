@@ -7,7 +7,6 @@
 
 #include "proto/primitive.pb.h"
 #include "software/embedded/robot_localizer/robot_localizer_constants.h"
-#include "software/embedded/services/imu.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"

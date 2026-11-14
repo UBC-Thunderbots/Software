@@ -240,7 +240,6 @@ constexpr int NUM_ESTOP_USB_DEVICE_IDS =
 // Number of times thunderloop should tick per second
 static const unsigned THUNDERLOOP_HZ = 300u;
 
-static const unsigned NUM_GENEVA_ANGLES = 5;
 
 
 static constexpr double RTT_S = 0.03;

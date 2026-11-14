@@ -6,6 +6,9 @@
 #include <thread>
 #include <utility>
 
+#include "shared/constants.h"
+#include "software/constants.h"
+#include "software/embedded/toml_config/toml_config_client.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 
@@ -156,14 +159,19 @@ static std::vector<int16_t> parseSetpoints(const std::string& setpoints_str)
 static std::unordered_set<MotorIndex> parseEnabledMotors(
     const std::string& enabled_motors_str)
 {
-    if (enabled_motors_str == "all")
+    std::string enabled_motors_lowercase_str = enabled_motors_str;
+    std::transform(enabled_motors_str.begin(), enabled_motors_str.end(),
+                   enabled_motors_lowercase_str.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
+    if (enabled_motors_lowercase_str == "all")
     {
         constexpr auto all_motors = driveMotors();
         return {all_motors.begin(), all_motors.end()};
     }
 
     std::unordered_set<MotorIndex> enabled_motors;
-    std::stringstream ss(enabled_motors_str);
+    std::stringstream ss(enabled_motors_lowercase_str);
     std::string item;
 
     while (std::getline(ss, item, ','))
@@ -191,7 +199,13 @@ static std::unordered_set<MotorIndex> parseEnabledMotors(
 
 int main(int argc, char** argv)
 {
-    NetworkLoggerSingleton::initializeLogger(0, true);
+    TomlConfigClient toml_client(TOML_CONFIG_FILE_PATH);
+
+    const RobotId robot_id = std::stoi(toml_client.get(ROBOT_ID_CONFIG_KEY));
+    const std::string network_interface =
+        toml_client.get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY);
+
+    NetworkLoggerSingleton::initializeLogger(robot_id, true, network_interface);
 
     StSpinMotorControllerTest::CommandLineArgs args;
 
