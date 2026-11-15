@@ -1,5 +1,7 @@
 """Reusable config_settings for selecting platform-specific binaries."""
 
+# TODO: #4022 - use these platform constraints across the repo instead of directly using @platforms
+
 # Maps a platform name to the @platforms constraints that identify it.
 SUPPORTED_PLATFORMS = {
     "linux_amd64": [
