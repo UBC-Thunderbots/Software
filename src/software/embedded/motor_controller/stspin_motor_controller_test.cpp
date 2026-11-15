@@ -201,7 +201,8 @@ int main(int argc, char** argv)
 {
     TomlConfigClient toml_client(TOML_CONFIG_FILE_PATH);
 
-    const RobotId robot_id = std::stoi(toml_client.get(ROBOT_ID_CONFIG_KEY));
+    const RobotId robot_id =
+        static_cast<const RobotId>(std::stoul(toml_client.get(ROBOT_ID_CONFIG_KEY)));
     const std::string network_interface =
         toml_client.get(ROBOT_NETWORK_INTERFACE_CONFIG_KEY);
 
