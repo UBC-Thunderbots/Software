@@ -69,12 +69,12 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values(
         /** @brief Test if robot can spin counterclockwise. */
         TestInputStepTrivial{.expected    = AngularVelocity{Angle::quarter() * proportional},
-                             .orientation = Angle::half(),
+                             .orientation = Angle::threeQuarter(),
                              .trajectory  = create_trajectory_path(Angle::zero())},
         /** @brief Test if robot can spin clockwise. */
         TestInputStepTrivial{
             .expected    = AngularVelocity{-Angle::quarter() * proportional},
-            .orientation = Angle::threeQuarter(),
+            .orientation = Angle::quarter(),
             .trajectory  = create_trajectory_path(Angle::zero())}));
 
 BangBangTrajectory1DAngular create_trajectory_path(const Angle& final_orienation)
