@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <cmath>
 #include <memory>
+#include <numbers>
 
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
 #include "software/ai/navigator/trajectory/kinematic_constraints.h"
@@ -19,7 +19,6 @@ const PositionController _position_controller;
 const PidController<double> _x_pid = _position_controller.getXPid();
 const PidController<double> _y_pid = _position_controller.getYPid();
 
-const double sqrt2          = std::sqrt(2.0);
 const double x_proportional = _x_pid.getProportional();
 const double x_derivative   = _x_pid.getDerivative();
 const double x_integral     = _x_pid.getIntegral();
@@ -55,7 +54,7 @@ TEST_P(TestStepTrivial, TestStepTrivial)
 
 /** @brief Construct a TrajectoryPath object.
  * @details Passes values directly to a constructor of BangBangTrajectory2D.
- * @note Initializes with kinematic constraints of  maximum velocity, acceleration, and
+ * @note Initializes with kinematic constraints of maximum velocity, acceleration, and
  * decceleration values of 10.
  */
 TrajectoryPath create_trajectory_path(const Point& initial_pos, const Point& final_pos);
@@ -129,9 +128,9 @@ class TestStepErrorCorrectionOnce
 };
 
 /** @brief Parametrized test for a single instance of error correction.
- * @details ils From 0uns^-1, we accelerate at 1uns^-2 for 2s to reach 1uns^-1,
+ * @details From 0uns^-1, we accelerate at 1uns^-2 for 2s to reach 1uns^-1,
  * plateau for (4sqrt2-2)s, and decelerate at 1uns^-2 for 2s to reach 0uns^1,
- * covering (8sqrt2)un of distance in (4qrt2+2)s.
+ * covering (8sqrt2)un of distance in (4sqrt2+2)s.
  */
 TEST_P(TestStepErrorCorrectionOnce, TestStepErrorCorrectionOnce)
 {
@@ -163,41 +162,36 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values(
         /** @brief Test for no error correction. */
         TestInputStepErrorCorrection{
-            .expected = Vector{sqrt2, sqrt2},
-            .position = Point{4.0 / sqrt2, 4.0 / sqrt2},
+            .expected = Vector{std::numbers::sqrt2, std::numbers::sqrt2},
+            .position = Point{4.0 / std::numbers::sqrt2, 4.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is short of expected position. */
         TestInputStepErrorCorrection{
-            .expected = (Vector{sqrt2, sqrt2} +
-                         Vector{x_proportional / sqrt2, y_proportional / sqrt2}),
-            .position = Point{3.0 / sqrt2, 3.0 / sqrt2},
+            .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} +
+                         Vector{x_proportional / std::numbers::sqrt2, y_proportional / std::numbers::sqrt2}),
+            .position = Point{3.0 / std::numbers::sqrt2, 3.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is beyond expected position. */
         TestInputStepErrorCorrection{
-            .expected = (Vector{sqrt2, sqrt2} -
-                         Vector{x_proportional / sqrt2, y_proportional / sqrt2}),
-            .position = Point{5.0 / sqrt2, 5.0 / sqrt2},
+            .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} -
+                         Vector{x_proportional / std::numbers::sqrt2, y_proportional / std::numbers::sqrt2}),
+            .position = Point{5.0 / std::numbers::sqrt2, 5.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is off to the side and above the expected
          * position.
          */
         TestInputStepErrorCorrection{
-            .expected = (Vector{sqrt2, sqrt2} +
-                         Vector{x_proportional / sqrt2, -y_proportional / sqrt2}),
-            .position = Point{3.0 / sqrt2, 5.0 / sqrt2},
+            .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} +
+                         Vector{x_proportional / std::numbers::sqrt2, -y_proportional / std::numbers::sqrt2}),
+            .position = Point{3.0 / std::numbers::sqrt2, 5.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is off to the side and below the expected
          * position.
          */
         TestInputStepErrorCorrection{
-            .expected = (Vector{sqrt2, sqrt2} +
-                         Vector{-x_proportional / sqrt2, y_proportional / sqrt2}),
-            .position = Point{5.0 / sqrt2, 3.0 / sqrt2},
+            .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} +
+                         Vector{-x_proportional / std::numbers::sqrt2, y_proportional / std::numbers::sqrt2}),
+            .position = Point{5.0 / std::numbers::sqrt2, 3.0 / std::numbers::sqrt2},
         }));
 
-// !!! test integral
-
-// !!! test derivative
-
-// !!! test continuous movement error correction, where each error amount is within a
-// margin?
+// TODO #4043: after tuning PIDs, we need to test for other PID values

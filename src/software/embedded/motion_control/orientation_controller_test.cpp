@@ -148,3 +148,5 @@ INSTANTIATE_TEST_SUITE_P(
         TestInputStepErrorCorrection{
             .expected    = AngularVelocity{pi_over_4 - pi_over_4 / 2.0 * proportional},
             .orientation = (pi_over_4 + pi_over_4 / 2.0)}));
+
+// TODO #4043: after tuning PIDs, we need to test for other PID values
