@@ -13,24 +13,23 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # The root bazel directory
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
 
-TOOLS_DIR="$(mktemp -d)"
-trap 'rm -rf "$TOOLS_DIR"' EXIT
+LINT_TOOLS=(ansible_lint clang_format codespell md_toc ruff)
+TARGETS=()
 
-function build_tool(){
-    (cd "$BAZEL_ROOT_DIR" && bazel run --script_path="$TOOLS_DIR/$1" "//starlark/lint:$1")
-
-    if [[ "$?" != 0 ]]; then
-        printf "\n***Failed to build //starlark/lint:$1!***\n\n"
-        exit 1
-    fi
-}
+for tool in "${LINT_TOOLS[@]}"
+    do
+        TARGETS+=("//starlark/lint:$tool")
+    done
 
 printf "Building lint and format tools...\n\n"
-build_tool ansible_lint
-build_tool clang_format
-build_tool codespell
-build_tool md_toc
-build_tool ruff
+(cd "$BAZEL_ROOT_DIR" && bazel build "${TARGETS[@]}")
+
+if [[ "$?" != 0 ]]; then
+    printf "\n***Failed to build lint and format tools!***\n\n"
+    exit 1
+fi
+
+TOOLS_DIR="$(cd "$BAZEL_ROOT_DIR" && bazel info bazel-bin)/starlark/lint"
 
 export CLANG_BIN="$TOOLS_DIR/clang_format"
 
