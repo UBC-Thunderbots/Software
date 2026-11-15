@@ -25,7 +25,7 @@ const double x_integral     = _x_pid.getIntegral();
 const double y_proportional = _y_pid.getProportional();
 const double y_derivative   = _y_pid.getDerivative();
 const double y_integral     = _y_pid.getIntegral();
-}
+}  // namespace
 
 struct TestInputStepTrivial
 {
@@ -168,13 +168,15 @@ INSTANTIATE_TEST_SUITE_P(
         /** @brief Test when actual position is short of expected position. */
         TestInputStepErrorCorrection{
             .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} +
-                         Vector{x_proportional / std::numbers::sqrt2, y_proportional / std::numbers::sqrt2}),
+                         Vector{x_proportional / std::numbers::sqrt2,
+                                y_proportional / std::numbers::sqrt2}),
             .position = Point{3.0 / std::numbers::sqrt2, 3.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is beyond expected position. */
         TestInputStepErrorCorrection{
             .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} -
-                         Vector{x_proportional / std::numbers::sqrt2, y_proportional / std::numbers::sqrt2}),
+                         Vector{x_proportional / std::numbers::sqrt2,
+                                y_proportional / std::numbers::sqrt2}),
             .position = Point{5.0 / std::numbers::sqrt2, 5.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is off to the side and above the expected
@@ -182,7 +184,8 @@ INSTANTIATE_TEST_SUITE_P(
          */
         TestInputStepErrorCorrection{
             .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} +
-                         Vector{x_proportional / std::numbers::sqrt2, -y_proportional / std::numbers::sqrt2}),
+                         Vector{x_proportional / std::numbers::sqrt2,
+                                -y_proportional / std::numbers::sqrt2}),
             .position = Point{3.0 / std::numbers::sqrt2, 5.0 / std::numbers::sqrt2},
         },
         /** @brief Test when actual position is off to the side and below the expected
@@ -190,7 +193,8 @@ INSTANTIATE_TEST_SUITE_P(
          */
         TestInputStepErrorCorrection{
             .expected = (Vector{std::numbers::sqrt2, std::numbers::sqrt2} +
-                         Vector{-x_proportional / std::numbers::sqrt2, y_proportional / std::numbers::sqrt2}),
+                         Vector{-x_proportional / std::numbers::sqrt2,
+                                y_proportional / std::numbers::sqrt2}),
             .position = Point{5.0 / std::numbers::sqrt2, 3.0 / std::numbers::sqrt2},
         }));
 

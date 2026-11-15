@@ -18,7 +18,7 @@ const Angle pi_over_4     = Angle::quarter() / 2.0;
 const double proportional = _pid.getProportional();
 const double integral     = _pid.getIntegral();
 const double derivative   = _pid.getDerivative();
-}
+}  // namespace
 
 struct TestInputStepTrivial
 {
@@ -42,7 +42,8 @@ TEST_P(TestStepTrivial, TestOrientationControllerStep)
         OrientationController().step(input.orientation, input.trajectory, time, time);
 
     EXPECT_NEAR(input.expected.toRadians(), actual.toRadians(), tolerance);
-    // TODO: #3093 - Optimally, we should use EXPECT_EQ, however, due to the wrapping implementation in Angle, we must use EXPECT_NEAR
+    // TODO: #3093 - Optimally, we should use EXPECT_EQ, however, due to the wrapping
+    // implementation in Angle, we must use EXPECT_NEAR
 }
 
 /** @brief Creates a trajectory.
@@ -68,7 +69,7 @@ INSTANTIATE_TEST_SUITE_P(
     TestStepGenericMovement, TestStepTrivial,
     testing::Values(
         /** @brief Test if robot can spin counterclockwise. */
-        TestInputStepTrivial{.expected    = AngularVelocity{Angle::quarter() * proportional},
+        TestInputStepTrivial{.expected = AngularVelocity{Angle::quarter() * proportional},
                              .orientation = Angle::threeQuarter(),
                              .trajectory  = create_trajectory_path(Angle::zero())},
         /** @brief Test if robot can spin clockwise. */
