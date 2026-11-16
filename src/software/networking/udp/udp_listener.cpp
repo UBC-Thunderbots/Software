@@ -92,6 +92,33 @@ void UdpListener::setupMulticast(const boost::asio::ip::address& ip_address,
 
 UdpListener::~UdpListener() {}
 
+void UdpListener::sendTo(const std::string& message,
+                         const boost::asio::ip::udp::endpoint& destination)
+{
+    auto buf = std::make_shared<std::string>(message);
+    // sockets aren't thread-safe, so the actual send needs to happen on the io_context
+    // thread
+    boost::asio::post(socket_.get_executor(),
+                      [this, buf, destination]() { doSend(buf, destination); });
+}
+
+void UdpListener::doSend(std::shared_ptr<std::string> buf,
+                         const boost::asio::ip::udp::endpoint& destination)
+{
+    socket_.async_send_to(boost::asio::buffer(*buf), destination,
+                          [buf](const boost::system::error_code& ec, std::size_t)
+                          {
+                              // this callback runs on io_context post-send. `buf` is
+                              // captured by this, which means that the shared pointer
+                              // lives right up until this lambda finishes running.
+                              if (ec)
+                              {
+                                  LOG(WARNING)
+                                      << "send failed from UdpListener: " << ec.message();
+                              }
+                          });
+}
+
 void UdpListener::close()
 {
     running_ = false;
@@ -131,7 +158,8 @@ void UdpListener::handleDataReception(const boost::system::error_code& error,
     if (!error)
     {
         // Call the receive callback with the received data
-        receive_callback_(raw_received_data_.data(), num_bytes_received);
+        receive_callback_(raw_received_data_.data(), num_bytes_received,
+                          sender_endpoint_);
     }
     else
     {
