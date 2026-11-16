@@ -3,7 +3,6 @@ from __future__ import annotations
 import fcntl
 import itertools
 import logging
-import math
 import os
 import queue
 import random
@@ -30,6 +29,7 @@ from software.thunderscope.binary_context_managers.util import kill_cmd_if_runni
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
+from software.thunderscope.field_frame import rotate_pose_180
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
@@ -594,9 +594,15 @@ class Gamecontroller:
                 world_state.blue_robots.robot_states,
                 world_state.yellow_robots.robot_states,
             ):
-                robot.current_state.global_position.x_meters *= -1
-                robot.current_state.global_position.y_meters *= -1
-                robot.current_state.global_orientation.radians += math.pi
+                state = robot.current_state
+                x, y, angle = rotate_pose_180(
+                    state.global_position.x_meters,
+                    state.global_position.y_meters,
+                    state.global_orientation.radians,
+                )
+                state.global_position.x_meters = x
+                state.global_position.y_meters = y
+                state.global_orientation.radians = angle
 
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
