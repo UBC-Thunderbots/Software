@@ -6,6 +6,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import SimRobot, SimulatorState
 from pyqtgraph.Qt import QtGui
 from software.py_constants import BALL_MAX_RADIUS_METERS
 from software.thunderscope.constants import LINE_WIDTH, Colors, DepthValues
+from software.thunderscope.field_frame import rotate_pose_180
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -73,7 +74,7 @@ class GLSimulatorLayer(GLLayer):
         :return: x, y, and angle in the frame the fused World is drawn in
         """
         if self.defending_positive_side:
-            return -x, -y, angle + math.pi
+            return rotate_pose_180(x, y, angle)
         return x, y, angle
 
     def _make_robot_outline(
