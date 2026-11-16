@@ -53,6 +53,9 @@ message RealismConfigErForce
     // Simulates an offset of all reported object positions (robots, ball) at this
     // magnitude [m]
     optional float object_position_offset = 16;
+    // The time it takes for the robot to receive a command after the simulator
+    // receives it [ns]. Field number matches the upstream ER-Force framework.
+    optional int64 command_delay = 18;
 
     // Config for Thunderbots' robot and sensors
     // 100 in case er force have some updates w new fields at 17, ...
