@@ -1,10 +1,3 @@
-"""Half-turn about the origin, shared by the Thunderscope frame conversions.
-
-Sensor fusion applies the same rotation in C++ when this team defends the
-positive half. Applying this function twice returns the original pose, with
-the heading shifted by a full turn.
-"""
-
 import math
 
 

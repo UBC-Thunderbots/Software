@@ -595,14 +595,15 @@ class Gamecontroller:
                 world_state.yellow_robots.robot_states,
             ):
                 state = robot.current_state
-                x, y, angle = rotate_pose_180(
+                (
+                    state.global_position.x_meters,
+                    state.global_position.y_meters,
+                    state.global_orientation.radians,
+                ) = rotate_pose_180(
                     state.global_position.x_meters,
                     state.global_position.y_meters,
                     state.global_orientation.radians,
                 )
-                state.global_position.x_meters = x
-                state.global_position.y_meters = y
-                state.global_orientation.radians = angle
 
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
