@@ -1,3 +1,6 @@
+from software.gameplay_tests.open_loop_field_test_runner import (
+    MOTOR_CONTROL_RESEND_PERIOD_S,
+)
 from software.logger.logger import create_logger
 
 logger = create_logger(__name__)
@@ -59,6 +62,41 @@ def run_segments(open_loop_field_test_runner, segments):
         open_loop_field_test_runner.stop()
 
 
+def drive_ramp(open_loop_field_test_runner, x, y, w, ramp_duration_s):
+    """Linearly ramp the commanded velocity from zero up to (x, y, w) over
+    ramp_duration_s, leaving the final velocity commanded.
+
+    :param open_loop_field_test_runner: the open loop field test runner
+    :param x: final forward velocity in m/s
+    :param y: final leftward velocity in m/s
+    :param w: final angular velocity in rad/s
+    :param ramp_duration_s: how long the ramp takes
+    """
+    logger.info(f"Ramping to x={x} y={y} w={w} over {ramp_duration_s}s")
+    num_steps = max(1, round(ramp_duration_s / MOTOR_CONTROL_RESEND_PERIOD_S))
+    for step in range(1, num_steps + 1):
+        fraction = step / num_steps
+        open_loop_field_test_runner.drive(
+            x_m_per_s=x * fraction,
+            y_m_per_s=y * fraction,
+            angular_velocity_rad_per_s=w * fraction,
+            duration_s=ramp_duration_s / num_steps,
+        )
+
+
+def start_tracked_robot(open_loop_field_test_runner):
+    """Control the lowest-id connected robot, wait for the estop to be in PLAY,
+    and start sending the expected path and the vision position to PlotJuggler.
+
+    :param open_loop_field_test_runner: the open loop field test runner
+    """
+    robot_id = min(open_loop_field_test_runner.connected_robot_ids)
+    logger.info(f"Running test on robot {robot_id}")
+    open_loop_field_test_runner.set_controlled_robots([robot_id])
+    open_loop_field_test_runner.wait_for_estop_play()
+    open_loop_field_test_runner.start_path_tracking(robot_id)
+
+
 def run_tracked_segments(open_loop_field_test_runner, segments):
     """Run segments on the lowest-id connected robot once the estop is in
     PLAY, sending the expected path and the vision position to PlotJuggler.
@@ -66,9 +104,5 @@ def run_tracked_segments(open_loop_field_test_runner, segments):
     :param open_loop_field_test_runner: the open loop field test runner
     :param segments: list of (x_m_per_s, y_m_per_s, angular_velocity_rad_per_s, duration_s)
     """
-    robot_id = min(open_loop_field_test_runner.connected_robot_ids)
-    logger.info(f"Running test on robot {robot_id}")
-    open_loop_field_test_runner.set_controlled_robots([robot_id])
-    open_loop_field_test_runner.wait_for_estop_play()
-    open_loop_field_test_runner.start_path_tracking(robot_id)
+    start_tracked_robot(open_loop_field_test_runner)
     run_segments(open_loop_field_test_runner, segments)

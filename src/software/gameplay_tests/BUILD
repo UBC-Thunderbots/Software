@@ -151,6 +151,7 @@ py_library(
         "open_loop_field_test_helpers.py",
     ],
     deps = [
+        ":open_loop_field_test_runner",
         "//software/logger:py_logger",
     ],
 )

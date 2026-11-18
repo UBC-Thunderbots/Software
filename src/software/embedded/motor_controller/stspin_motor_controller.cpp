@@ -38,21 +38,24 @@ void StSpinMotorController::setup()
 {
     reset();
 
+    LOG(INFO) << "Pause for encoder calibration";
     for (const MotorIndex motor : reflective_enum::values<MotorIndex>())
     {
         motor_status_[motor]         = MotorStatus();
         motor_status_[motor].enabled = true;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    LOG(INFO) << "Done pausing for encoder calibration";
 
-    for (const MotorIndex motor : driveMotors())
-    {
-        sendAndReceiveMessage(motor,
-                              SetPidSpeedKpKiMessage{.kp = SPEED_PID_PROPORTIONAL_GAIN,
-                                                     .ki = SPEED_PID_INTEGRAL_GAIN});
-        sendAndReceiveMessage(motor,
-                              SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
-                                                      .ki = TORQUE_PID_INTEGRAL_GAIN});
-    }
+    //for (const MotorIndex motor : driveMotors())
+    //{
+    //    sendAndReceiveMessage(motor,
+    //                          SetPidSpeedKpKiMessage{.kp = SPEED_PID_PROPORTIONAL_GAIN,
+    //                                                 .ki = SPEED_PID_INTEGRAL_GAIN});
+    //    sendAndReceiveMessage(motor,
+    //                          SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
+    //                                                  .ki = TORQUE_PID_INTEGRAL_GAIN});
+    //}
 }
 
 void StSpinMotorController::reset()
