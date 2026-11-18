@@ -83,7 +83,7 @@ class UnixPrimitiveInterface : public SimulatorTeamInterface
    private:
     std::string world_input_path;
     std::string primitive_set_input_path;
-    
+
     TbotsProto::World team_vision;
 
     std::optional<ThreadedProtoUnixListener<TbotsProto::PrimitiveSet>>
