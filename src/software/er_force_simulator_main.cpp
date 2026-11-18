@@ -4,6 +4,7 @@
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/world.pb.h"
+#include "shared/constants.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
         uint16_t yellow_udp_port         = YELLOW_UDP_PORT;
         uint16_t ssl_vision_port         = SSL_VISION_PORT;
         std::string ssl_vision_address   = SSL_VISION_ADDRESS;
-        std::string ssl_vision_interface = "lo";
+        std::string ssl_vision_interface = LOOPBACK_INTERFACE;
     };
 
     CommandLineArgs args;
