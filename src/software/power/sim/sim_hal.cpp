@@ -31,8 +31,7 @@ bool SimHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
         return false;
     }
 
-    if (pulse_width_us == 0 ||
-        (output != ChickerOutput::Kicker && output != ChickerOutput::Chipper))
+    if (pulse_width_us == 0)
     {
         return false;
     }
