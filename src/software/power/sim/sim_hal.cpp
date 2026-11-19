@@ -205,23 +205,42 @@ void SimHal::updateHardwarePhysicsLocked(uint32_t delta_us)
         return;
     }
 
-    const float delta_s  = static_cast<float>(delta_us) / 1000000.0f;
-    const float delta_ms = static_cast<float>(delta_us) / 1000.0f;
-
+    uint32_t pulse_delta_us = 0;
     if (state.pulse_active && (state.kicker_pin_high || state.chipper_pin_high))
     {
+        if (faults.disable_auto_isr_expiry)
+        {
+            pulse_delta_us = delta_us;
+        }
+        else
+        {
+            const uint32_t elapsed_us =
+                static_cast<uint32_t>(state.current_time_us - state.pulse_started_us);
+            const uint32_t remaining_pulse_us =
+                elapsed_us < state.pulse_width_us ? state.pulse_width_us - elapsed_us : 0;
+            pulse_delta_us = std::min(delta_us, remaining_pulse_us);
+        }
+
+        const float pulse_delta_ms = static_cast<float>(pulse_delta_us) / 1000.0f;
         state.capacitor_voltage = std::max(
-            0.0f, state.capacitor_voltage - physics.pulse_discharge_v_per_ms * delta_ms);
+            0.0f, state.capacitor_voltage -
+                      physics.pulse_discharge_v_per_ms * pulse_delta_ms);
         if (state.capacitor_voltage < physics.target_capacitor_voltage)
         {
             state.capacitor_charge_done = false;
         }
     }
-    else if (state.charger_enabled_pin && !faults.force_charge_never_done)
+
+    const uint32_t post_pulse_delta_us = delta_us - pulse_delta_us;
+    if (post_pulse_delta_us > 0 && state.charger_enabled_pin &&
+        !faults.force_charge_never_done)
     {
+        const float post_pulse_delta_s =
+            static_cast<float>(post_pulse_delta_us) / 1000000.0f;
         state.capacitor_voltage =
             std::min(physics.target_capacitor_voltage,
-                     state.capacitor_voltage + physics.charge_rate_v_per_s * delta_s);
+                     state.capacitor_voltage +
+                         physics.charge_rate_v_per_s * post_pulse_delta_s);
         if (state.capacitor_voltage >= physics.target_capacitor_voltage)
         {
             state.capacitor_charge_done = true;
