@@ -53,24 +53,20 @@ void StSpinMotorController::setup()
                               SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
                                                       .ki = TORQUE_PID_INTEGRAL_GAIN});
 
-        // set response type to MOTOR_STATE to check alignment + state       
         sendAndReceiveMessage(motor, 
             SetResponseTypeMessage{StSpinResponseType::MOTOR_STATE});              
 
-        // enable motor at 0 rpm -> calls MC_StartMotor1() on f/w side
         sendAndReceiveMessage(motor, 
             SetTargetSpeedMessage{
                 .motor_enabled = true,
                 .motor_target_speed_rpm = 0});
     }
 
-    // poll each motor until they are 1) aligned and 2) in RUN state
     for (const MotorIndex motor: driveMotors())
     {
         waitUntilAlignedAndRunning(motor);
     }
 
-    // restore SPEED_AND_FAULTS response type
     for (const MotorIndex motor: driveMotors())
     {
         sendAndReceiveMessage(motor, 
@@ -532,7 +528,6 @@ void StSpinMotorController::waitUntilAlignedAndRunning(const MotorIndex motor)
 
     while (std::chrono::steady_clock::now() < deadline) 
     {
-        // poll TX response by sending NoOp message
         sendAndReceiveMessage(motor, NoOpMessage{});
 
         if (status.state == StSpinMotorState::FAULT_NOW || 
