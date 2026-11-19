@@ -26,6 +26,7 @@ py_library(
     deps = [
         "//proto:import_all_protos",
         "//software/networking:ssl_proto_communication",
+        "//software/thunderscope:field_frame",
         "//software/thunderscope:util",
         "//software/thunderscope/common:thread_safe_circular_buffer",
         requirement("netifaces"),

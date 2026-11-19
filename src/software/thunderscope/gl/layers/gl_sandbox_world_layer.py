@@ -1,4 +1,3 @@
-import math
 from typing import Optional, override
 
 import proto.import_all_protos as protos
@@ -7,6 +6,7 @@ from software.py_constants import (
     MILLIMETERS_PER_METER,
     ROBOT_MAX_RADIUS_MILLIMETERS,
 )
+from software.thunderscope.field_frame import rotate_pose_180
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -642,11 +642,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :return: The inverted location [x, y] and orientation (if needed to be inverted)
 
         """
-        converted_point = self._invert_position_if_defending_negative_half(point)
-
         if self._should_invert_coordinate_frame():
-            return converted_point, orientation - math.pi
-        return converted_point, orientation
+            x, y, angle = rotate_pose_180(point[0], point[1], orientation)
+            return QtGui.QVector3D(x, y, point[2]), angle
+        return point, orientation
 
     # # # # # # # # # # # # # # # # # # # #
     #       GRAPHICS UPDATE METHODS       #
