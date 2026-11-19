@@ -159,7 +159,7 @@ class StSpinMotorController : public MotorController
      * 2) motor is in RUN state
      * 
      */
-    void waitUntilAlignedAndRunning(MotorIndex motor);
+    void waitUntilAlignedAndRunning();
 
     friend class StSpinMotorControllerTest;
 };
