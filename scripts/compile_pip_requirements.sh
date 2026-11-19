@@ -29,6 +29,7 @@ retry bazel run //software/embedded/ansible:requirements.update
 retry bazel run //software/gameplay_tests:requirements.update
 retry bazel run //software/embedded/robot_diagnostics_cli:requirements.update
 retry bazel run //starlark/nanopb:requirements.update
+retry bazel run //cli:requirements.update
 
 # Restore any lock file a failed update left empty so we don't commit a deleted lock file,
 # then exit non-zero so we know to re-run the failed script
