@@ -52,20 +52,9 @@ void StSpinMotorController::setup()
         sendAndReceiveMessage(motor,
                               SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
                                                       .ki = TORQUE_PID_INTEGRAL_GAIN});
-
-        sendAndReceiveMessage(motor, 
-            SetResponseTypeMessage{StSpinResponseType::MOTOR_STATE});              
-
-        sendAndReceiveMessage(motor, 
-            SetTargetSpeedMessage{
-                .motor_enabled = true,
-                .motor_target_speed_rpm = 0});
     }
 
-    for (const MotorIndex motor: driveMotors())
-    {
-        waitUntilAlignedAndRunning(motor);
-    }
+    waitUntilAlignedAndRunning();
 
     for (const MotorIndex motor: driveMotors())
     {
@@ -492,7 +481,7 @@ void StSpinMotorController::processRx(const MotorIndex motor,
         {
             motor_status_[motor].state = static_cast<StSpinMotorState>(rx[opcode_index + 1]);
 
-            motor_status_[motor].aligned = (rx[opcode_index + 2] & 0x80) != 0;
+            motor_status_[motor].aligned = rx[opcode_index + 2] != 0;
 
             break;
         }
@@ -520,39 +509,57 @@ void StSpinMotorController::sendMotorStatusToPlotJuggler(const MotorIndex motor)
     });
 }
 
-void StSpinMotorController::waitUntilAlignedAndRunning(const MotorIndex motor)
+void StSpinMotorController::waitUntilAlignedAndRunning()
 {
-    const auto deadline = std::chrono::steady_clock::now() + WAIT_ALIGNED_RUNNING_TIMEOUT;
-
-    const MotorStatus& status = motor_status_.at(motor);
-
-    while (std::chrono::steady_clock::now() < deadline) 
+    for (const MotorIndex motor: driveMotors())
     {
-        sendAndReceiveMessage(motor, NoOpMessage{});
+        sendAndReceiveMessage(motor, 
+        SetResponseTypeMessage{StSpinResponseType::MOTOR_STATE});              
 
-        if (status.state == StSpinMotorState::FAULT_NOW || 
-            status.state == StSpinMotorState::FAULT_OVER) 
-            {
-                LOG(WARNING) << "Motor " << motor << " fault on alignment check (state: " << static_cast<int>(status.state) << ")";
-
-                motor_status_.at(motor).enabled = false;
-                return;
-            }
-
-        if (status.aligned && status.state == StSpinMotorState::RUN) 
-        {
-            LOG(INFO) << "motor " << motor << " is aligned and running";
-            return;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        sendAndReceiveMessage(motor, 
+        SetTargetSpeedMessage{
+            .motor_enabled = true,
+            .motor_target_speed_rpm = 0});
     }
 
-    LOG(WARNING)
-        << "Motor " << motor << " not aligned and in RUN state "
-        << "within " << WAIT_ALIGNED_RUNNING_TIMEOUT.count() << "ms "
-        << "(aligned: " << status.aligned << ", state: " 
-        << static_cast<int>(status.state) << ")";
+    for (const MotorIndex motor: driveMotors())
+    {
+        const auto deadline = std::chrono::steady_clock::now() + WAIT_ALIGNED_RUNNING_TIMEOUT;
+        bool ready = false;
 
-    motor_status_.at(motor).enabled = false;
+        const MotorStatus& status = motor_status_.at(motor);
+
+        while (std::chrono::steady_clock::now() < deadline) 
+        {
+            sendAndReceiveMessage(motor, NoOpMessage{});
+
+            if (status.state == StSpinMotorState::FAULT_NOW || 
+                status.state == StSpinMotorState::FAULT_OVER) 
+                {
+                    LOG(WARNING) << "Motor " << motor << " fault on alignment check (state: " << static_cast<int>(status.state) << ")";
+
+                    break;
+                }
+
+            if (status.aligned && status.state == StSpinMotorState::RUN) 
+            {
+                LOG(INFO) << "motor " << motor << " is aligned and running";
+                ready = true;
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+        if (!ready) 
+        {
+            LOG(WARNING)
+            << "Motor " << motor << " not aligned and in RUN state "
+            << "within " << WAIT_ALIGNED_RUNNING_TIMEOUT.count() << "ms "
+            << "(aligned: " << status.aligned << ", state: " 
+            << static_cast<int>(status.state) << ")";
+
+            motor_status_.at(motor).enabled = false;
+        }
+    }
 }

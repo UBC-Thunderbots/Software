@@ -72,7 +72,7 @@ class StSpinMotorController : public MotorController
     static constexpr int TORQUE_PID_INTEGRAL_GAIN     = 170;
 
     static constexpr std::chrono::milliseconds WAIT_ALIGNED_RUNNING_TIMEOUT{10000}; 
-    
+
     robot_constants::RobotConstants robot_constants_;
 
     // SPI file descriptors
@@ -158,7 +158,6 @@ class StSpinMotorController : public MotorController
      * 1) motor alignment is complete
      * 2) motor is in RUN state
      * 
-     * @param motor the motor to check for alignment and RUN state
      */
     void waitUntilAlignedAndRunning(MotorIndex motor);
 
