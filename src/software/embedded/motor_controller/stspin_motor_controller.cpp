@@ -550,7 +550,6 @@ void StSpinMotorController::waitUntilAlignedAndRunning(const MotorIndex motor)
             return;
         }
 
-        // poll every 10 ms
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
