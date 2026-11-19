@@ -222,9 +222,9 @@ void SimHal::updateHardwarePhysicsLocked(uint32_t delta_us)
         }
 
         const float pulse_delta_ms = static_cast<float>(pulse_delta_us) / 1000.0f;
-        state.capacitor_voltage = std::max(
-            0.0f, state.capacitor_voltage -
-                      physics.pulse_discharge_v_per_ms * pulse_delta_ms);
+        state.capacitor_voltage =
+            std::max(0.0f, state.capacitor_voltage -
+                               physics.pulse_discharge_v_per_ms * pulse_delta_ms);
         if (state.capacitor_voltage < physics.target_capacitor_voltage)
         {
             state.capacitor_charge_done = false;
@@ -237,10 +237,9 @@ void SimHal::updateHardwarePhysicsLocked(uint32_t delta_us)
     {
         const float post_pulse_delta_s =
             static_cast<float>(post_pulse_delta_us) / 1000000.0f;
-        state.capacitor_voltage =
-            std::min(physics.target_capacitor_voltage,
-                     state.capacitor_voltage +
-                         physics.charge_rate_v_per_s * post_pulse_delta_s);
+        state.capacitor_voltage = std::min(
+            physics.target_capacitor_voltage,
+            state.capacitor_voltage + physics.charge_rate_v_per_s * post_pulse_delta_s);
         if (state.capacitor_voltage >= physics.target_capacitor_voltage)
         {
             state.capacitor_charge_done = true;
