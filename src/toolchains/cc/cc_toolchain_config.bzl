@@ -668,12 +668,13 @@ def _stm32_gcc_impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = [
-                            # Compile for the Cortex M0
-                            "-mcpu=cortex-m0",
+                            # Compile for the Cortex M4 (STM32G431)
+                            "-mcpu=cortex-m4",
                             # Use Thumb-2 instruction set
                             "-mthumb",
-                            # No floating point unit
-                            "-mfloat-abi=soft",
+                            # Single-precision hardware FPU (FPv4-SP-D16)
+                            "-mfpu=fpv4-sp-d16",
+                            "-mfloat-abi=hard",
                         ],
                     ),
                 ],

@@ -12,9 +12,9 @@
 /**
  * Motor controller for controlling our 6th generation STSPIN motor drivers.
  *
- * We communicate with our MDv6 boards over SPI in full-duplex mode using a custom
- * frame-based protocol. This protocol is documented in the MDv6 firmware repo, which
- * can be found at https://github.com/UBC-Thunderbots/MDv6_Firmware
+ * We communicate with our MDv6.5 boards over SPI in full-duplex mode using a custom
+ * frame-based protocol. This protocol is documented in the MDv6.5 firmware repo, which
+ * can be found at https://github.com/UBC-Thunderbots/MDv6.5_Firmware
  */
 class StSpinMotorController : public MotorController
 {
