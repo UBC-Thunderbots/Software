@@ -1,4 +1,5 @@
 from __future__ import annotations
+from python.runfiles import runfiles
 
 import logging
 import os
@@ -40,8 +41,7 @@ class TigersAutoref:
     BUFFER_TIMEOUT = 10
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
-    AUTOREF_DIR = "/opt/tbots/autoReferee"
-    AUTOREF_BINARY = "bin/autoReferee"
+    AUTOREF_JAVA_BINARY = "Thunderbots/software/autoref/autoref_java"
 
     def __init__(
         self,
@@ -76,12 +76,6 @@ class TigersAutoref:
         self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
-        if not os.path.exists(Path(self.AUTOREF_DIR) / self.AUTOREF_BINARY):
-            logging.warning(
-                "Could not find autoref binary, did you run ./setup_software.sh"
-            )
-            return
-
         self.auto_ref_proc_thread = threading.Thread(
             target=self._start_autoref, daemon=True
         )
@@ -216,28 +210,29 @@ class TigersAutoref:
 
     def _start_autoref(self) -> None:
         """Starts the TigersAutoref binary."""
-        autoref_cmd = self.AUTOREF_BINARY
-        kill_cmd_if_running([autoref_cmd])
-        autoref_cmd += " -a"
+        runfiles_instance = runfiles.Create()
+        autoref_java = runfiles_instance.Rlocation(self.AUTOREF_JAVA_BINARY)
+
+        if not autoref_java or not os.path.exists(autoref_java):
+            logging.warning(
+                "Could not find Bazel AutoRef launcher: %s",
+                self.AUTOREF_JAVA_BINARY,
+            )
+            return
+
+        autoref_args = [autoref_java, "-a"]
 
         if not self.show_gui:
-            autoref_cmd += " -hl"
+            autoref_args.append("-hl")
 
         if self.ci_mode:
-            autoref_cmd += " --ci"
+            autoref_args.append("--ci")
 
         if self.suppress_logs:
             with open(os.devnull, "w") as fp:
-                self.tigers_autoref_proc = Popen(
-                    autoref_cmd.split(" "),
-                    stdout=fp,
-                    stderr=fp,
-                    cwd=self.AUTOREF_DIR,
-                )
+                self.tigers_autoref_proc = Popen(autoref_args, stdout=fp, stderr=fp)
         else:
-            self.tigers_autoref_proc = Popen(
-                autoref_cmd.split(" "), cwd=self.AUTOREF_DIR
-            )
+            self.tigers_autoref_proc = Popen(autoref_args)
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
         """Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the

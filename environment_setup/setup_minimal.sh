@@ -44,10 +44,5 @@ chmod +x /opt/tbots/bin/bazel
 wget -O /opt/tbots/bin/gamecontroller "https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_${OS}_${ARCH}"
 chmod +x /opt/tbots/bin/gamecontroller
 
-# Install TIGERS AutoReferee
-wget -O /opt/tbots/autoReferee.zip https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip
-unzip /opt/tbots/autoReferee.zip -d /opt/tbots/
-rm /opt/tbots/autoReferee.zip
-
 echo "Setup successful!"
 echo "source /opt/tbots/bin/activate"
