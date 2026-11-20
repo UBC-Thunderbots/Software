@@ -4,7 +4,11 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ 
+      master,
+      avah/minimal_environment_setup_tscope,
+      grant/add_macos_action_runners
+    ]
   schedule:
     - cron: '0 8 * * *'  # 12 AM PST / 8 AM UTC
   workflow_dispatch:
@@ -25,7 +29,14 @@ concurrency:
 
 jobs:
   check-and-clear-cache:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
@@ -39,17 +50,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           SHOULD_RUN=true
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            COMMITS=$(git log --oneline --since="24 hours ago")
-            if [ -z "$COMMITS" ]; then
-              echo "No commits in the last 24 hours. Skipping."
-              SHOULD_RUN=false
-            else
-              echo "Commits found in the last 24 hours. Clearing cache..."
-              gh extension install actions/gh-actions-cache || true
-              gh actions-cache delete --all --confirm || true
-              gh cache delete --all || true
-            fi
+          if [ "${{ github.event_name }}" == "pull_request" ] && \
+            [ "${{ github.event.action }}" == "opened" ]; then
+            echo "Initial commit. Clearing cache..."
+            gh extension install actions/gh-actions-cache || true
+            gh actions-cache delete --all --confirm || true
+            gh cache delete --all || true
           elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             if [ "${{ github.event.inputs.clear_cache }}" == "true" ]; then
               echo "Manual trigger with clear_cache. Clearing cache..."
@@ -63,12 +69,8 @@ jobs:
   multiplatform-build:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
-    strategy:
-      matrix:
-        platform: [ ubuntu-24.04-arm ]
-
     name: Ubuntu Alternate Builds
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -95,7 +97,14 @@ jobs:
 
   motor-firmware:
     name: Motor Firmware
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -109,7 +118,14 @@ jobs:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Software Tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -124,11 +140,18 @@ jobs:
             -//software/ai/navigator/...     \
             -//software:unix_full_system_tar_gen
 
-  robot-tests:
+  robot-tests: # cross compile test
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Robot Software Tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -142,7 +165,14 @@ jobs:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Simulated Gameplay Tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -179,7 +209,14 @@ jobs:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: AutoRef'd Game (3 Minutes)
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -187,7 +224,11 @@ jobs:
       - name: AI vs AI (3 minutes)
         run: |
           cd src
-          bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          else
+            bazel run //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          fi
 
       - name: Upload AI vs AI logs
         # Ensure that simulated test logs get uploaded

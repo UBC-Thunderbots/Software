@@ -1,11 +1,10 @@
 name: Environment Setup
+description: Sets up the environment
 
-on:
-  workflow_call:
-    inputs: 
-      os: 
-        required: true
-        type: string
+inputs: 
+  os: 
+    required: true
+    type: string
 
 runs:
   using: "composite"
@@ -29,6 +28,13 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get install xvfb libxcb-cursor0 python3-pyqt6
+    
+    - name: Install GUI dependencies for macOS
+      shell: bash
+      if: runner.os == 'macOS'
+      run: |
+        brew update
+        brew install pyqt@6
 
     - name: Cache Bazel disk cache
       uses: actions/cache@v4
