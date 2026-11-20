@@ -75,10 +75,6 @@ class SimHal final : public PowerHAL
         float dribbler_max_current_amp  = 2.0f;
     };
 
-    State state{};
-    FaultConfig faults{};
-    PhysicsConfig physics{};
-
     explicit SimHal(bool auto_orchestrate = false, double time_scale = 1.0);
     ~SimHal() override;
 
@@ -98,6 +94,17 @@ class SimHal final : public PowerHAL
     float getBatteryVoltage() override;
     float getCurrentDrawAmp() override;
 
+    /** Copy the current simulated state. Safe while background orchestration runs. */
+    State stateSnapshot() const;
+    /** Return a copy of the current fault configuration. */
+    FaultConfig faultConfig() const;
+    /** Replace the fault configuration. */
+    void setFaultConfig(FaultConfig config);
+    /** Return a copy of the current physics configuration. */
+    PhysicsConfig physicsConfig() const;
+    /** Replace the physics configuration. */
+    void setPhysicsConfig(PhysicsConfig config);
+
     // Manual orchestration
     /** Set time and expire any due pulse. */
     void setMicros(uint32_t time_us);
@@ -105,7 +112,7 @@ class SimHal final : public PowerHAL
     void advanceMicros(uint32_t delta_us);
     /** Simulated timer ISR; lowers both chicker pins and clears pulse state. */
     void pulseTimerISR();
-    /** Reset state, faults, and physics to defaults. */
+    /** Reset runtime state while preserving fault and physics configuration. */
     void reset();
 
     // Background orchestration
@@ -121,6 +128,10 @@ class SimHal final : public PowerHAL
     void pulseTimerISRLocked();
     void updateHardwarePhysicsLocked(uint32_t delta_us);
     void backgroundLoop();
+
+    State state_{};
+    FaultConfig faults_{};
+    PhysicsConfig physics_{};
 
     mutable std::mutex mutex_;
     std::atomic<bool> auto_running_{false};

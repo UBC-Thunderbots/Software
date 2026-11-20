@@ -7,7 +7,7 @@ SimHal::SimHal(bool auto_orchestrate, double time_scale)
 {
     if (auto_orchestrate)
     {
-        physics.simulate_capacitor_physics = true;
+        physics_.simulate_capacitor_physics = true;
         startAutoOrchestration(time_scale);
     }
 }
@@ -20,13 +20,13 @@ SimHal::~SimHal()
 uint32_t SimHal::micros() const
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return state.current_time_us;
+    return state_.current_time_us;
 }
 
 bool SimHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (faults.fail_start_chicker_pulse)
+    if (faults_.fail_start_chicker_pulse)
     {
         return false;
     }
@@ -36,19 +36,19 @@ bool SimHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
         return false;
     }
 
-    if (state.pulse_active)
+    if (state_.pulse_active)
     {
         return false;
     }
 
-    state.pulse_active          = true;
-    state.pulse_started_us      = state.current_time_us;
-    state.pulse_width_us        = pulse_width_us;
-    state.last_pulse_width_us   = pulse_width_us;
-    state.active_or_last_output = output;
-    state.kicker_pin_high       = (output == ChickerOutput::Kicker);
-    state.chipper_pin_high      = (output == ChickerOutput::Chipper);
-    ++state.pulse_count;
+    state_.pulse_active          = true;
+    state_.pulse_started_us      = state_.current_time_us;
+    state_.pulse_width_us        = pulse_width_us;
+    state_.last_pulse_width_us   = pulse_width_us;
+    state_.active_or_last_output = output;
+    state_.kicker_pin_high       = (output == ChickerOutput::Kicker);
+    state_.chipper_pin_high      = (output == ChickerOutput::Chipper);
+    ++state_.pulse_count;
 
     return true;
 }
@@ -56,77 +56,107 @@ bool SimHal::startChickerPulse(ChickerOutput output, uint32_t pulse_width_us)
 void SimHal::stopChickerPulse()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    state.pulse_active     = false;
-    state.pulse_width_us   = 0;
-    state.kicker_pin_high  = false;
-    state.chipper_pin_high = false;
+    state_.pulse_active     = false;
+    state_.pulse_width_us   = 0;
+    state_.kicker_pin_high  = false;
+    state_.chipper_pin_high = false;
 }
 
 bool SimHal::isChickerPulseActive() const
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return state.pulse_active;
+    return state_.pulse_active;
 }
 
 bool SimHal::getBreakBeamTripped()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return state.break_beam_tripped;
+    return state_.break_beam_tripped;
 }
 
 void SimHal::setDribblerPwm(uint8_t duty_cycle)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!faults.stuck_dribbler_pwm)
+    if (!faults_.stuck_dribbler_pwm)
     {
-        state.dribbler_pwm = duty_cycle;
+        state_.dribbler_pwm = duty_cycle;
     }
-    state.dribbler_pwm_history.push_back(state.dribbler_pwm);
+    state_.dribbler_pwm_history.push_back(state_.dribbler_pwm);
 }
 
 void SimHal::setCapacitorCharging(bool enabled)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!faults.stuck_charger_pin)
+    if (!faults_.stuck_charger_pin)
     {
-        state.charger_enabled_pin = enabled;
+        state_.charger_enabled_pin = enabled;
     }
-    state.charger_enable_history.emplace_back(state.current_time_us,
-                                              state.charger_enabled_pin);
+    state_.charger_enable_history.emplace_back(state_.current_time_us,
+                                               state_.charger_enabled_pin);
 }
 
 bool SimHal::isCapacitorChargeDone()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (faults.force_charge_never_done)
+    if (faults_.force_charge_never_done)
     {
         return false;
     }
-    return state.capacitor_charge_done;
+    return state_.capacitor_charge_done;
 }
 
 float SimHal::getCapacitorVoltage()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return state.capacitor_voltage;
+    return state_.capacitor_voltage;
 }
 
 float SimHal::getBatteryVoltage()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return state.battery_voltage;
+    return state_.battery_voltage;
 }
 
 float SimHal::getCurrentDrawAmp()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return state.current_draw_amp;
+    return state_.current_draw_amp;
+}
+
+SimHal::State SimHal::stateSnapshot() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return state_;
+}
+
+SimHal::FaultConfig SimHal::faultConfig() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return faults_;
+}
+
+void SimHal::setFaultConfig(FaultConfig config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    faults_ = config;
+}
+
+SimHal::PhysicsConfig SimHal::physicsConfig() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return physics_;
+}
+
+void SimHal::setPhysicsConfig(PhysicsConfig config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    physics_ = config;
 }
 
 void SimHal::setMicros(uint32_t time_us)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    state.current_time_us = time_us;
+    state_.current_time_us = time_us;
     checkAndExpirePulseLocked();
 }
 
@@ -134,7 +164,7 @@ void SimHal::advanceMicros(uint32_t delta_us)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     updateHardwarePhysicsLocked(delta_us);
-    state.current_time_us += delta_us;
+    state_.current_time_us += delta_us;
     checkAndExpirePulseLocked();
 }
 
@@ -146,19 +176,17 @@ void SimHal::pulseTimerISR()
 
 void SimHal::pulseTimerISRLocked()
 {
-    state.kicker_pin_high  = false;
-    state.chipper_pin_high = false;
-    state.pulse_active     = false;
-    state.pulse_width_us   = 0;
-    ++state.isr_trigger_count;
+    state_.kicker_pin_high  = false;
+    state_.chipper_pin_high = false;
+    state_.pulse_active     = false;
+    state_.pulse_width_us   = 0;
+    ++state_.isr_trigger_count;
 }
 
 void SimHal::reset()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    state   = State{};
-    faults  = FaultConfig{};
-    physics = PhysicsConfig{};
+    state_ = State{};
 }
 
 void SimHal::startAutoOrchestration(double time_scale)
@@ -185,14 +213,14 @@ bool SimHal::isAutoOrchestrationRunning() const
 
 void SimHal::checkAndExpirePulseLocked()
 {
-    if (!state.pulse_active || faults.disable_auto_isr_expiry)
+    if (!state_.pulse_active || faults_.disable_auto_isr_expiry)
     {
         return;
     }
 
     const uint32_t elapsed_us =
-        static_cast<uint32_t>(state.current_time_us - state.pulse_started_us);
-    if (elapsed_us >= state.pulse_width_us)
+        static_cast<uint32_t>(state_.current_time_us - state_.pulse_started_us);
+    if (elapsed_us >= state_.pulse_width_us)
     {
         pulseTimerISRLocked();
     }
@@ -200,60 +228,61 @@ void SimHal::checkAndExpirePulseLocked()
 
 void SimHal::updateHardwarePhysicsLocked(uint32_t delta_us)
 {
-    if (!physics.simulate_capacitor_physics || delta_us == 0)
+    if (!physics_.simulate_capacitor_physics || delta_us == 0)
     {
         return;
     }
 
     uint32_t pulse_delta_us = 0;
-    if (state.pulse_active && (state.kicker_pin_high || state.chipper_pin_high))
+    if (state_.pulse_active && (state_.kicker_pin_high || state_.chipper_pin_high))
     {
-        if (faults.disable_auto_isr_expiry)
+        if (faults_.disable_auto_isr_expiry)
         {
             pulse_delta_us = delta_us;
         }
         else
         {
             const uint32_t elapsed_us =
-                static_cast<uint32_t>(state.current_time_us - state.pulse_started_us);
-            const uint32_t remaining_pulse_us =
-                elapsed_us < state.pulse_width_us ? state.pulse_width_us - elapsed_us : 0;
-            pulse_delta_us = std::min(delta_us, remaining_pulse_us);
+                static_cast<uint32_t>(state_.current_time_us - state_.pulse_started_us);
+            const uint32_t remaining_pulse_us = elapsed_us < state_.pulse_width_us
+                                                    ? state_.pulse_width_us - elapsed_us
+                                                    : 0;
+            pulse_delta_us                    = std::min(delta_us, remaining_pulse_us);
         }
 
         const float pulse_delta_ms = static_cast<float>(pulse_delta_us) / 1000.0f;
-        state.capacitor_voltage =
-            std::max(0.0f, state.capacitor_voltage -
-                               physics.pulse_discharge_v_per_ms * pulse_delta_ms);
-        if (state.capacitor_voltage < physics.target_capacitor_voltage)
+        state_.capacitor_voltage =
+            std::max(0.0f, state_.capacitor_voltage -
+                               physics_.pulse_discharge_v_per_ms * pulse_delta_ms);
+        if (state_.capacitor_voltage < physics_.target_capacitor_voltage)
         {
-            state.capacitor_charge_done = false;
+            state_.capacitor_charge_done = false;
         }
     }
 
     const uint32_t post_pulse_delta_us = delta_us - pulse_delta_us;
-    if (post_pulse_delta_us > 0 && state.charger_enabled_pin &&
-        !faults.force_charge_never_done)
+    if (post_pulse_delta_us > 0 && state_.charger_enabled_pin &&
+        !faults_.force_charge_never_done)
     {
         const float post_pulse_delta_s =
             static_cast<float>(post_pulse_delta_us) / 1000000.0f;
-        state.capacitor_voltage = std::min(
-            physics.target_capacitor_voltage,
-            state.capacitor_voltage + physics.charge_rate_v_per_s * post_pulse_delta_s);
-        if (state.capacitor_voltage >= physics.target_capacitor_voltage)
+        state_.capacitor_voltage = std::min(
+            physics_.target_capacitor_voltage,
+            state_.capacitor_voltage + physics_.charge_rate_v_per_s * post_pulse_delta_s);
+        if (state_.capacitor_voltage >= physics_.target_capacitor_voltage)
         {
-            state.capacitor_charge_done = true;
+            state_.capacitor_charge_done = true;
         }
     }
 
-    float current_draw = physics.idle_current_draw_amp;
-    if (state.charger_enabled_pin && !state.capacitor_charge_done)
+    float current_draw = physics_.idle_current_draw_amp;
+    if (state_.charger_enabled_pin && !state_.capacitor_charge_done)
     {
-        current_draw += physics.charging_current_draw_amp;
+        current_draw += physics_.charging_current_draw_amp;
     }
-    current_draw += (static_cast<float>(state.dribbler_pwm) / 255.0f) *
-                    physics.dribbler_max_current_amp;
-    state.current_draw_amp = current_draw;
+    current_draw += (static_cast<float>(state_.dribbler_pwm) / 255.0f) *
+                    physics_.dribbler_max_current_amp;
+    state_.current_draw_amp = current_draw;
 }
 
 void SimHal::backgroundLoop()
