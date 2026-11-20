@@ -63,7 +63,7 @@ def _fetch_github_releases() -> list[RuntimeRelease]:
 
 
 @dataclass(frozen=True)
-class CatalogSnapshot:
+class RuntimeCatalog:
     """Runtime discovery results from the packaged local and installed manifests."""
 
     selectable_manifests: list[RuntimeManifest]
@@ -78,17 +78,15 @@ class CatalogSnapshot:
 
         raise ValueError(f"ID {id!r} does not correspond to a single runtime")
 
+    @classmethod
+    def discover(cls) -> "RuntimeCatalog":
+        """Discover available runtimes from manifests"""
+        manifests, diagnostics = cls._read_manifests()
+        selectable = cls._filter_selectable_manifests(manifests, diagnostics)
+        return cls(selectable, manifests, diagnostics)
 
-class RuntimeCatalog:
-    """Discover manifest-backed runtimes and compatible remote releases"""
-
-    def get(self) -> CatalogSnapshot:
-        """Discover runtimes from manifests"""
-        manifests, diagnostics = self._read_manifests()
-        selectable = self._filter_selectable_manifests(manifests, diagnostics)
-        return CatalogSnapshot(selectable, manifests, diagnostics)
-
-    def fetch_releases(self) -> list[RuntimeRelease]:
+    @staticmethod
+    def fetch_releases() -> list[RuntimeRelease]:
         """Fetch compatible Thunderbots releases from GitHub for installation"""
         platform_name = platform.system()
         machine = platform.machine()
@@ -113,9 +111,8 @@ class RuntimeCatalog:
 
         return releases
 
-    def _read_manifests(
-        self,
-    ) -> tuple[list[RuntimeManifest], list[ManifestError]]:
+    @staticmethod
+    def _read_manifests() -> tuple[list[RuntimeManifest], list[ManifestError]]:
         local_path = Path(__file__).with_name("local_runtime.json")
         local = RuntimeManifest.from_file(local_path)
 
@@ -138,8 +135,8 @@ class RuntimeCatalog:
 
         return manifests, diagnostics
 
+    @staticmethod
     def _filter_selectable_manifests(
-        self,
         manifests: list[RuntimeManifest],
         diagnostics: list[ManifestError],
     ) -> list[RuntimeManifest]:

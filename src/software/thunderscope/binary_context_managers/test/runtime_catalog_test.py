@@ -13,11 +13,9 @@ from software.thunderscope.binary_context_managers.runtime_catalog import (
 
 
 @pytest.fixture
-def catalog(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> RuntimeCatalog:
+def runtime_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(runtime_catalog, "RUNTIME_ROOT", tmp_path)
-    monkeypatch.setattr(runtime_catalog.platform, "system", lambda: "Linux")
-    monkeypatch.setattr(runtime_catalog.platform, "machine", lambda: "x86_64")
-    return RuntimeCatalog()
+    return tmp_path
 
 
 def _write_manifest(root: Path, name: str, data: dict[str, Any]) -> Path:
@@ -36,63 +34,60 @@ def _release(version: str, target: str) -> RuntimeRelease:
 
 
 def test_catalog_skips_invalid_manifests(
-    tmp_path: Path,
-    catalog: RuntimeCatalog,
+    runtime_root: Path,
     manifest_data: dict[str, Any],
 ) -> None:
-    binary = tmp_path / "unix_full_system_v1"
+    binary = runtime_root / "unix_full_system_v1"
     binary.write_text("#!/bin/sh\n")
     binary.chmod(0o755)
-    _write_manifest(tmp_path, "valid.json", manifest_data)
-    (tmp_path / "manifests" / "broken.json").write_text("{")
+    _write_manifest(runtime_root, "valid.json", manifest_data)
+    (runtime_root / "manifests" / "broken.json").write_text("{")
 
-    snapshot = catalog.get()
-    manifests = snapshot.selectable_manifests
+    catalog = RuntimeCatalog.discover()
+    manifests = catalog.selectable_manifests
 
     assert [entry.name for entry in manifests] == [
         "Current Fullsystem",
         "Test runtime",
     ]
-    assert len(snapshot.diagnostics) == 1
-    assert "broken.json" in str(snapshot.diagnostics[0])
+    assert len(catalog.diagnostics) == 1
+    assert "broken.json" in str(catalog.diagnostics[0])
 
-    assert snapshot.lookup(manifests[1].id) == manifests[1]
+    assert catalog.lookup(manifests[1].id) == manifests[1]
 
 
 def test_catalog_rejects_duplicate_ids(
-    tmp_path: Path,
-    catalog: RuntimeCatalog,
+    runtime_root: Path,
     manifest_data: dict[str, Any],
 ) -> None:
     for name in ("a.json", "b.json"):
-        _write_manifest(tmp_path, name, manifest_data)
+        _write_manifest(runtime_root, name, manifest_data)
 
-    snapshot = catalog.get()
-    assert len(snapshot.selectable_manifests) == 1
-    assert len(snapshot.manifests) == 3
-    assert len(snapshot.diagnostics) == 2
+    catalog = RuntimeCatalog.discover()
+    assert len(catalog.selectable_manifests) == 1
+    assert len(catalog.manifests) == 3
+    assert len(catalog.diagnostics) == 2
 
-    assert "a.json" in str(snapshot.diagnostics[0])
-    assert "b.json" in str(snapshot.diagnostics[0])
+    assert "a.json" in str(catalog.diagnostics[0])
+    assert "b.json" in str(catalog.diagnostics[0])
 
     with pytest.raises(ValueError):
-        snapshot.lookup("test.runtime")
+        catalog.lookup("test.runtime")
 
 
 def test_catalog_rejects_reserved_id(
-    tmp_path: Path,
-    catalog: RuntimeCatalog,
+    runtime_root: Path,
     manifest_data: dict[str, Any],
 ) -> None:
     manifest_data["id"] = "thunderbots.local"
-    path = _write_manifest(tmp_path, "reserved.json", manifest_data)
+    path = _write_manifest(runtime_root, "reserved.json", manifest_data)
 
-    snapshot = catalog.get()
-    assert len(snapshot.manifests) == 1
-    assert len(snapshot.diagnostics) == 1
-    assert snapshot.lookup("thunderbots.local").version == "local"
+    catalog = RuntimeCatalog.discover()
+    assert len(catalog.manifests) == 1
+    assert len(catalog.diagnostics) == 1
+    assert catalog.lookup("thunderbots.local").version == "local"
 
-    error = snapshot.diagnostics[0]
+    error = catalog.diagnostics[0]
     assert error.manifest_path == path
     assert error.field == "id"
     assert "reserved" in error.reason
@@ -106,7 +101,6 @@ def test_catalog_rejects_reserved_id(
     ],
 )
 def test_fetch_releases_filter_deduplicate_limit(
-    catalog: RuntimeCatalog,
     monkeypatch: pytest.MonkeyPatch,
     platform_name: str,
     machine: str,
@@ -125,11 +119,12 @@ def test_fetch_releases_filter_deduplicate_limit(
     monkeypatch.setattr(runtime_catalog.platform, "system", lambda: platform_name)
     monkeypatch.setattr(runtime_catalog.platform, "machine", lambda: machine)
 
-    assert catalog.fetch_releases() == [_release(f"v{i}", target) for i in range(5)]
+    assert RuntimeCatalog.fetch_releases() == [
+        _release(f"v{i}", target) for i in range(5)
+    ]
 
 
 def test_fetch_releases_parses_assets(
-    catalog: RuntimeCatalog,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     url = "https://example.test/v1/unix_full_system_ubuntu-x86.tar.gz"
@@ -150,8 +145,10 @@ def test_fetch_releases_parses_assets(
         },
     ]
     monkeypatch.setattr(runtime_catalog.requests, "get", Mock(return_value=response))
+    monkeypatch.setattr(runtime_catalog.platform, "system", lambda: "Linux")
+    monkeypatch.setattr(runtime_catalog.platform, "machine", lambda: "x86_64")
 
-    assert catalog.fetch_releases() == [RuntimeRelease("ubuntu-x86", "v1", url)]
+    assert RuntimeCatalog.fetch_releases() == [RuntimeRelease("ubuntu-x86", "v1", url)]
     response.raise_for_status.assert_called_once()
 
 
