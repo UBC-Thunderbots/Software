@@ -107,6 +107,17 @@ pip.parse(
     ],
 )
 use_repo(pip, "lint_deps")
+pip.parse(
+    hub_name = "tbots_cli_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//cli:requirements_lock.txt",
+    target_platforms = [
+        "linux_x86_64",
+        "linux_aarch64",
+        "osx_aarch64",
+    ],
+)
+use_repo(pip, "tbots_cli_deps")
 
 ##############################################
 # Configure Dependencies
@@ -126,6 +137,7 @@ use_repo(pybind11_configure, "pybind11")
 # The exception to this is if the repo does not contain a MODULE.bazel support
 ###########################################################################
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 http_archive(
     name = "tomlplusplus",
@@ -274,6 +286,31 @@ http_archive(
     build_file = "@//extlibs:cppcrc.bzl",
     strip_prefix = "cppcrc-6360eee1c8966d32b2552ce156b135ec6a3235f1",
     url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
+)
+
+# SSL Game Controller binaries, v3.23.0
+http_file(
+    name = "ssl_game_controller_linux_amd64",
+    downloaded_file_path = "gamecontroller",
+    executable = True,
+    sha256 = "2d0da78cfbb962878a2a207886d6a9cd3e196304f980c1c3191c1da73d6e6877",
+    urls = ["https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_linux_amd64"],
+)
+
+http_file(
+    name = "ssl_game_controller_linux_arm64",
+    downloaded_file_path = "gamecontroller",
+    executable = True,
+    sha256 = "98234531212be3fa1bbd1b466f13cd4605ebff89c4f06722d35526d88800dac4",
+    urls = ["https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_linux_arm64"],
+)
+
+http_file(
+    name = "ssl_game_controller_darwin_arm64",
+    downloaded_file_path = "gamecontroller",
+    executable = True,
+    sha256 = "0524896e5cae5441a7295d8109b8a25a9d60b063ce8e77c0a039b9347baec5f3",
+    urls = ["https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_darwin_arm64"],
 )
 
 bazel_dep(name = "toolchains_arm_gnu")

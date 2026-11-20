@@ -15,9 +15,9 @@ from software.gameplay_tests.validation.validation import (
 )
 
 
-class HRVORobotEntersRegionAndStops:
+class TrajectoryPlannerRobotEntersRegionAndStops:
     """Checks if a specific robot enters the provided regions and stops there for the provided time
-    Only used for HRVO tests
+    Only used for trajectory planner tests
     """
 
     ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.01
@@ -100,11 +100,11 @@ class HRVORobotEntersRegionAndStops:
 
 
 (
-    HRVORobotEventuallyEntersRegionAndStops,
-    HRVORobotEventuallyExitsRegionAndMoves,
-    HRVORobotAlwaysStaysInRegionStationary,
-    HRVORobotNeverEntersRegionAndMoves,
-) = create_validation_types(HRVORobotEntersRegionAndStops)
+    TrajectoryPlannerRobotEventuallyEntersRegionAndStops,
+    TrajectoryPlannerRobotEventuallyExitsRegionAndMoves,
+    TrajectoryPlannerRobotAlwaysStaysInRegionStationary,
+    TrajectoryPlannerRobotNeverEntersRegionAndMoves,
+) = create_validation_types(TrajectoryPlannerRobotEntersRegionAndStops)
 
 
 def create_zig_zag_path_test_params(
@@ -160,7 +160,7 @@ def create_robot_circle_pos_params(radius: float, num_robots: int, start: bool):
     ]
 
 
-def hrvo_setup(
+def trajectory_planner_setup(
     friendly_robots_positions: list[tbots.Point],
     friendly_robots_destinations: list[tbots.Point],
     friendly_robots_final_orientations: list[tbots.Angle],
@@ -168,7 +168,7 @@ def hrvo_setup(
     enemy_robots_destinations: list[tbots.Point],
     gameplay_test_runner,
 ):
-    """Setup for the hrvo tests
+    """Setup for the trajectory planner tests
 
     :param friendly_robots_positions: starting positions of friendly robots
     :param friendly_robots_destinations: destinations of friendly robots
@@ -471,7 +471,7 @@ def test_robot_movement(
     )
 
     gameplay_test_runner.run_test(
-        setup=lambda: hrvo_setup(
+        setup=lambda: trajectory_planner_setup(
             friendly_robot_positions,
             friendly_robot_destinations,
             friendly_robots_final_orientations,
@@ -497,7 +497,7 @@ def get_reached_destination_validation(robot_destinations: list[tbots.Point]):
     # Eventually Validation
     return [
         [
-            HRVORobotEventuallyEntersRegionAndStops(
+            TrajectoryPlannerRobotEventuallyEntersRegionAndStops(
                 robot_id,
                 region=tbots.Circle(
                     tbots.Point(destination.x(), destination.y()), threshold

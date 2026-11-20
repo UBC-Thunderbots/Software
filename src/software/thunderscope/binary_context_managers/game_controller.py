@@ -3,7 +3,6 @@ from __future__ import annotations
 import fcntl
 import itertools
 import logging
-import math
 import os
 import queue
 import random
@@ -17,6 +16,7 @@ import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from python.runfiles import runfiles
 from software.networking.ssl_proto_communication import (
     SslSocket,
     SslSocketProtoParseException,
@@ -30,6 +30,7 @@ from software.thunderscope.binary_context_managers.util import kill_cmd_if_runni
 from software.thunderscope.common.thread_safe_circular_buffer import (
     ThreadSafeCircularBuffer,
 )
+from software.thunderscope.field_frame import rotate_pose_180
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
@@ -47,6 +48,11 @@ class Gamecontroller:
 
     GC_PORT_LOCK = "/tmp/tbots_gc_port.lock"
     GC_PORT_STATE = "/tmp/tbots_gc_last_port.txt"
+
+    # Bazel stages the Gamecontroller binary at this path
+    GAMECONTROLLER_RUNFILES_PATH: Final = (
+        "_main/software/thunderscope/binary_context_managers/gamecontroller"
+    )
 
     def __init__(
         self,
@@ -98,7 +104,7 @@ class Gamecontroller:
 
         :return: gamecontroller context managed instance
         """
-        command = ["/opt/tbots/bin/gamecontroller", "--timeAcquisitionMode", "ci"]
+        command = [self.__get_gamecontroller_path(), "--timeAcquisitionMode", "ci"]
 
         lock_fd = None
         if not self.use_conventional_port:
@@ -594,9 +600,17 @@ class Gamecontroller:
                 world_state.blue_robots.robot_states,
                 world_state.yellow_robots.robot_states,
             ):
-                robot.current_state.global_position.x_meters *= -1
-                robot.current_state.global_position.y_meters *= -1
-                robot.current_state.global_orientation.radians += math.pi
+                state = robot.current_state
+
+                x, y, angle = rotate_pose_180(
+                    state.global_position.x_meters,
+                    state.global_position.y_meters,
+                    state.global_orientation.radians,
+                )
+
+                state.global_position.x_meters = x
+                state.global_position.y_meters = y
+                state.global_orientation.radians = angle
 
         # Send out updated world state
         self.simulator_proto_unix_io.send_proto(protos.WorldState, world_state)
@@ -657,3 +671,11 @@ class Gamecontroller:
             return interface_name
 
         raise RuntimeError("Could not determine the default network interface on macOS")
+
+    def __get_gamecontroller_path(self) -> str:
+        """Locate the SSL Gamecontroller binary in the Bazel runfiles.
+
+        :return: path to the SSL Gamecontroller binary
+        """
+        runfiles_instance = runfiles.Create()
+        return runfiles_instance.Rlocation(self.GAMECONTROLLER_RUNFILES_PATH)
