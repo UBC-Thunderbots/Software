@@ -75,7 +75,7 @@ jobs:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Ubuntu Alternate Builds
-    runs-on: ubuntu-24.04-arm # !!!
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -227,7 +227,7 @@ jobs:
       - uses: ./.github/actions/environment-setup
 
       - name: AI vs AI (3 minutes)
-        run: | # !!!
+        run: |
           cd src
           if [ "$RUNNER_OS" == "Linux" ]; then
             bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
