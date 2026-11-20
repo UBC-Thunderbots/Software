@@ -13,7 +13,7 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # The root bazel directory
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
 
-LINT_TOOLS=(ansible_lint clang_format codespell md_toc ruff)
+LINT_TOOLS=(ansible ansible_lint clang_format codespell md_toc ruff)
 TARGETS=()
 
 for tool in "${LINT_TOOLS[@]}"

@@ -11,6 +11,12 @@ compile_pip_requirements(
 )
 
 py_console_script_binary(
+    name = "ansible",
+    pkg = "@lint_deps//ansible_core",
+    script = "ansible",
+)
+
+py_console_script_binary(
     name = "ansible_lint",
     pkg = "@lint_deps//ansible_lint",
     script = "ansible-lint",
