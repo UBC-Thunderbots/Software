@@ -114,7 +114,14 @@ jobs:
   upload_assets:
     needs: prepare_release
     if: needs.prepare_release.outputs.should_release == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     permissions:
       contents: write
     steps:
@@ -141,7 +148,14 @@ jobs:
 
   publish_release:
     needs: [prepare_release, upload_assets]
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     permissions:
       contents: write
     steps:
