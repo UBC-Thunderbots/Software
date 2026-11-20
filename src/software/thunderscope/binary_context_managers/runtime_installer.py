@@ -4,7 +4,7 @@ import tarfile
 from pathlib import Path
 
 import requests
-from software.thunderscope.constants import RuntimeManagerConstants
+from software.thunderscope.constants import RuntimeServiceConstants
 
 
 class RuntimeInstaller:
@@ -19,7 +19,7 @@ class RuntimeInstaller:
         :return: A unique list of names for available runtimes
         """
         releases = requests.get(
-            RuntimeManagerConstants.RELEASES_URL,
+            RuntimeServiceConstants.RELEASES_URL,
             headers={"Accept": "application/vnd.github+json"},
         ).json()
 
@@ -38,7 +38,7 @@ class RuntimeInstaller:
                     version_names.append(version)
                     self.runtime_install_targets[version] = url
 
-        return version_names[: RuntimeManagerConstants.MAX_RELEASES_FETCHED]
+        return version_names[: RuntimeServiceConstants.MAX_RELEASES_FETCHED]
 
     def install_runtime(self, version: str) -> None:
         """Installs the runtime of the specified version or throws an error upon failure.
@@ -48,7 +48,7 @@ class RuntimeInstaller:
         url = self.runtime_install_targets[version]
 
         filename = Path(url).name
-        target_dir = Path(RuntimeManagerConstants.EXTERNAL_RUNTIMES_PATH)
+        target_dir = Path(RuntimeServiceConstants.EXTERNAL_RUNTIMES_PATH)
         tmp_dir = Path("/tmp")
         tmp_path = tmp_dir / filename
         extracted_binary_name = "unix_full_system"
