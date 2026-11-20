@@ -31,6 +31,7 @@ class SimulatedTestRunner(TbotsTestRunner):
         yellow_full_system_proto_unix_io,
         gamecontroller,
         ci_mode=False,
+        owns_thunderscope=True,
     ):
         """Initialize the SimulatorTestRunner
 
@@ -41,6 +42,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         :param yellow_full_system_proto_unix_io: The yellow full system proto unix io to use
         :param gamecontroller: The gamecontroller context managed instance
         :param ci_mode: Run test as fast as possible
+        :param owns_thunderscope: Whether this runner controls the Thunderscope
+            lifecycle (False when binding to an open Thunderscope in test mode)
         """
         super(SimulatedTestRunner, self).__init__(
             test_name,
@@ -48,6 +51,7 @@ class SimulatedTestRunner(TbotsTestRunner):
             blue_full_system_proto_unix_io,
             yellow_full_system_proto_unix_io,
             gamecontroller,
+            owns_thunderscope=owns_thunderscope,
         )
         self.simulator_proto_unix_io = simulator_proto_unix_io
         self.ci_mode = ci_mode
