@@ -20,14 +20,14 @@ void setup() {}
 void loop() {}
 #else
 
-std::shared_ptr<EspHal> power_hal;
-std::shared_ptr<PowerBoardRuntime> runtime;
+std::unique_ptr<EspHal> power_hal;
+std::unique_ptr<PowerBoardRuntime> runtime;
 
 void setup()
 {
     Serial.begin(460800, SERIAL_8N1);
-    power_hal = std::make_shared<EspHal>();
-    runtime   = std::make_shared<PowerBoardRuntime>(*power_hal);
+    power_hal.reset(new EspHal());
+    runtime.reset(new PowerBoardRuntime(*power_hal));
 }
 
 void loop()
