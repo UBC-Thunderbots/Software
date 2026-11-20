@@ -5,8 +5,8 @@ import os
 import queue
 import threading
 import time
-from subprocess import Popen
 from pathlib import Path
+from subprocess import Popen
 
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp

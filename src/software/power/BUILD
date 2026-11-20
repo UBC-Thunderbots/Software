@@ -73,7 +73,6 @@ platformio_project(
     name = "powerloop_main",
     src = "powerloop_main.cc",
     board = "pico32",
-    platformio = "//starlark/platformio:platformio",
     build_flags = ["-DPB_FIELD_32BIT=1"] + select({
         #Makes platformio use 16 bit numbers for size
         ":debug_powerloop_enabled": ["-DDEBUG_POWERLOOP"],
@@ -82,6 +81,7 @@ platformio_project(
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+    platformio = "//starlark/platformio:platformio",
     deps = [
         ":control_executor",
         ":esp_hal",

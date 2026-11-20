@@ -183,8 +183,8 @@ void PowerService::updateDribblerStatus(
     const TbotsProto::DirectControlPrimitive& direct_control,
     TbotsProto::RobotStatus& robot_status)
 {
-    const uint32_t dribbler_rpm =
-        static_cast<uint32_t>(std::abs(direct_control.motor_control().dribbler_speed_rpm()));
+    const uint32_t dribbler_rpm = static_cast<uint32_t>(
+        std::abs(direct_control.motor_control().dribbler_speed_rpm()));
     dribbler_command_ = createNanoPbDribblerControl(dribbler_rpm);
 
     TbotsProto::DribblerStatus& dribbler_status =

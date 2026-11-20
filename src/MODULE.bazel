@@ -137,6 +137,7 @@ use_repo(pybind11_configure, "pybind11")
 # The exception to this is if the repo does not contain a MODULE.bazel support
 ###########################################################################
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 http_archive(
