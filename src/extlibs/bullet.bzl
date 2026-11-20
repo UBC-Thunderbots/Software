@@ -1,80 +1,150 @@
-"""
-    Copyright 2020 Robert MacGregor
+# BUILD file for the Bullet Physics SDK (bullet3).
+#
+# Bullet is a CMake project with no upstream Bazel support, so this file
+# mirrors the library layout in src/CMakeLists.txt: one cc_library per
+# component, with dependencies derived from the components' #include graph.
+#
+# Bullet headers are included relative to "src" (for example
+# "LinearMath/btVector3.h" or "BulletCollision/..."), so every target exposes
+# "src" as an include directory; it propagates to consumers transitively.
+#
+# The defaults match Bullet's default CMake options: single precision (float)
+# and no multithreading. To build with doubles instead, pass
+# "--copt=-DBT_USE_DOUBLE_PRECISION" so that every translation unit (including
+# yours) agrees on the ABI.
+#
+# Deliberately not covered (they need toolchains/tooling beyond the core libs):
+#   * src/Bullet3OpenCL and src/clew  (require an OpenCL SDK)
+#   * Extras/ and examples/           (graphics, serialization, robotics, ...)
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-    to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-    and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+package(default_visibility = ["//visibility:public"])
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-"""
+# Clang's SLP vectorization (-O2/-O3) rewrites Bullet's guarded scalar divisions
+# (for example "inertia.x() != 0 ? 1/inertia.x() : 0" in btRigidBody.cpp) into
+# packed divps instructions whose zero-filled padding lanes evaluate 0/0. Under
+# the default (masked) IEEE FP environment those dead lanes are harmless, but our
+# gtest harness unmasks FE_INVALID (see shared/test_util/tbots_gtest_main.cpp),
+# which turns them into a SIGFPE that aborts the test process. The affected code
+# lives in several Bullet components (btRigidBody::setMassProps,
+# btSequentialImpulseConstraintSolver::convertContact,
+# btCollisionWorld::rayTest, ...), so disable SLP vectorization for every Bullet
+# translation unit.
+BULLET_COPTS = ["-fno-slp-vectorize"]
 
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
-
-filegroup(
-    name = "bullet_files",
-    srcs = glob(
-        include = [
-            "**/*",
-        ],
-    ),
+cc_library(
+    name = "LinearMath",
+    srcs = glob(["src/LinearMath/**/*.cpp"]),
+    hdrs = glob(["src/LinearMath/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
 )
 
-cmake(
-    name = "bullet_build",
-    cache_entries = {
-        "BUILD_BULLET3": "ON",
-        "USE_MSVC_RUNTIME_LIBRARY_DLL": "ON",
-        "BUILD_PYBULLET": "OFF",
-        "BUILD_EXTRAS": "OFF",
-        "BUILD_EGL": "OFF",
-        # Force built libs to be installed
-        "INSTALL_LIBS": "ON",
-        "BUILD_UNIT_TESTS": "OFF",
-        "BUILD_OPENGL3_DEMOS": "OFF",
-        "BUILD_BULLET2_DEMOS": "OFF",
-    },
-    generate_args = select({
-        "@bazel_tools//src/conditions:windows": ["-GNinja"],
-        "//conditions:default": None,
-    }),
-    generate_crosstool_file = select({
-        "@bazel_tools//src/conditions:windows": True,
-        "//conditions:default": False,
-    }),
-    lib_source = ":bullet_files",
-    out_static_libs = select({
-        "@bazel_tools//src/conditions:windows": [
-            "BulletDynamics.lib",
-            "BulletCollision.lib",
-            "Bullet3Collision.lib",
-            "LinearMath.lib",
-            "Bullet3Common.lib",
-        ],
-
-        # Linux
-        "//conditions:default": [
-            "libBulletDynamics.a",
-            "libBulletCollision.a",
-            "libBullet3Collision.a",
-            "libLinearMath.a",
-            "libBullet3Common.a",
-        ],
-    }),
+cc_library(
+    name = "BulletCollision",
+    srcs = glob(["src/BulletCollision/**/*.cpp"]),
+    hdrs = glob(["src/BulletCollision/**/*.h"]) + ["src/btBulletCollisionCommon.h"],
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [":LinearMath"],
 )
 
-# NOTE: This is necessary because of the way the bullet includes work
+cc_library(
+    name = "BulletDynamics",
+    srcs = glob(["src/BulletDynamics/**/*.cpp"]),
+    hdrs = glob(["src/BulletDynamics/**/*.h"]) + ["src/btBulletDynamicsCommon.h"],
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [
+        ":Bullet3Common",
+        ":BulletCollision",
+        ":LinearMath",
+    ],
+)
+
+cc_library(
+    name = "BulletSoftBody",
+    srcs = glob(["src/BulletSoftBody/**/*.cpp"]),
+    hdrs = glob(["src/BulletSoftBody/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [
+        ":BulletCollision",
+        ":BulletDynamics",
+        ":LinearMath",
+    ],
+)
+
+cc_library(
+    name = "Bullet3Common",
+    srcs = glob(["src/Bullet3Common/**/*.cpp"]),
+    hdrs = glob(["src/Bullet3Common/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+)
+
+cc_library(
+    name = "BulletInverseDynamics",
+    srcs = glob(["src/BulletInverseDynamics/**/*.cpp"]),
+    hdrs = glob(["src/BulletInverseDynamics/**/*.hpp"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [
+        ":Bullet3Common",
+        ":LinearMath",
+    ],
+)
+
+cc_library(
+    name = "Bullet3Geometry",
+    srcs = glob(["src/Bullet3Geometry/**/*.cpp"]),
+    hdrs = glob(["src/Bullet3Geometry/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [":Bullet3Common"],
+)
+
+cc_library(
+    name = "Bullet3Collision",
+    srcs = glob(["src/Bullet3Collision/**/*.cpp"]),
+    hdrs = glob(["src/Bullet3Collision/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [
+        ":Bullet3Common",
+        ":Bullet3Geometry",
+    ],
+)
+
+cc_library(
+    name = "Bullet3Dynamics",
+    srcs = glob(["src/Bullet3Dynamics/**/*.cpp"]),
+    hdrs = glob(["src/Bullet3Dynamics/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [
+        ":Bullet3Collision",
+        ":Bullet3Common",
+    ],
+)
+
+cc_library(
+    name = "Bullet2FileLoader",
+    srcs = glob(["src/Bullet3Serialize/Bullet2FileLoader/**/*.cpp"]),
+    hdrs = glob(["src/Bullet3Serialize/Bullet2FileLoader/**/*.h"]),
+    copts = BULLET_COPTS,
+    includes = ["src"],
+    deps = [":Bullet3Common"],
+)
+
+# Convenience umbrella for the classic rigid-body physics libraries.
 cc_library(
     name = "bullet",
-    includes = [
-        "bullet_build/include/bullet",
-    ],
-    visibility = ["//visibility:public"],
     deps = [
-        ":bullet_build",
+        ":BulletCollision",
+        ":BulletDynamics",
+        ":BulletSoftBody",
+        ":LinearMath",
     ],
 )

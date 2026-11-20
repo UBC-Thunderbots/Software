@@ -19,9 +19,9 @@ TEST(Polynomial2dTest, default_constructor)
 
     for (int i = -10; i < 10; i++)
     {
-        EXPECT_DOUBLE_EQ(p_x.getCoeff(i), 0);
+        EXPECT_DOUBLE_EQ(p_x.getCoeff(static_cast<unsigned int>(i)), 0);
         EXPECT_DOUBLE_EQ(p_x.valueAt(i), 0);
-        EXPECT_DOUBLE_EQ(p_y.getCoeff(i), 0);
+        EXPECT_DOUBLE_EQ(p_y.getCoeff(static_cast<unsigned int>(i)), 0);
         EXPECT_DOUBLE_EQ(p_y.valueAt(i), 0);
     }
     EXPECT_DOUBLE_EQ(p_x.getOrder(), 0);

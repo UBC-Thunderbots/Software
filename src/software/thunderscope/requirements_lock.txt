@@ -414,9 +414,7 @@ pyqt6-qt6==6.10.0 \
     --hash=sha256:9b48d9eba795a78d21393b1909e7a0406512038ea4667463e4882e284bf95817 \
     --hash=sha256:cd38b281bb7229b8114f13126aacd77f831a97105fdb1d900260a48ead8c9fcd \
     --hash=sha256:d11bc03908cacbd2e3426289ad51dcf6d2896af6ffec595626ce9cf9b93e770d
-    # via
-    #   -r software/thunderscope/requirements.in
-    #   pyqt6
+    # via pyqt6
 pyqt6-sip==13.12.0 \
     --hash=sha256:00f670fbebf811a835257353d1facc8da6e33951d904865d172e0d46d12fc898 \
     --hash=sha256:0874073287e6d5b900768b95fca3f0ea23209c1bef5321bb2422f5dca455a899 \

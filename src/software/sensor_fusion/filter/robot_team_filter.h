@@ -34,5 +34,5 @@ class RobotTeamFilter
 
     // A map used to store a separate robot filter for each robot on this team, so
     // each robot can be filtered and handled separately
-    std::map<int, RobotFilter> robot_filters;
+    std::map<RobotId, RobotFilter> robot_filters;
 };
