@@ -28,7 +28,15 @@ on:
 
 jobs:
   prepare_release:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          ubuntu-24.04-arm,
+          macos-latest
+        ]
     outputs:
       tag: ${{ steps.bump_logic.outputs.tag }}
       should_release: ${{ steps.check.outputs.count > 0 }}
@@ -120,6 +128,7 @@ jobs:
       matrix:
         os: [
           ubuntu-24.04,
+          ubuntu-24.04-arm,
           macos-latest
         ]
     permissions:
@@ -154,6 +163,7 @@ jobs:
       matrix:
         os: [
           ubuntu-24.04,
+          ubuntu-24.04-arm,
           macos-latest
         ]
     permissions:
