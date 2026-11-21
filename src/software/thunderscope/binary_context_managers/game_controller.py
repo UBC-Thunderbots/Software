@@ -104,7 +104,11 @@ class Gamecontroller:
 
         :return: gamecontroller context managed instance
         """
+<<<<<<< HEAD
         command = [self.__get_gamecontroller_path(), "--timeAcquisitionMode", "ci"]
+=======
+        command = ["/opt/tbots/bin/gamecontroller", "--timeAcquisitionMode", "ci"]
+>>>>>>> avah/minimal_environment_setup_tscope
 
         lock_fd = None
         if not self.use_conventional_port:

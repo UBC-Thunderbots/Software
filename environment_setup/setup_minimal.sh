@@ -40,6 +40,10 @@ echo 'export PATH="/opt/tbots/bin:$PATH"' > /opt/tbots/bin/activate
 wget -O /opt/tbots/bin/bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-${OS}-${ARCH}"
 chmod +x /opt/tbots/bin/bazel
 
+# Install SSL gamecontroller
+wget -O /opt/tbots/bin/gamecontroller "https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_${OS}_${ARCH}"
+chmod +x /opt/tbots/bin/gamecontroller
+
 # Install TIGERS AutoReferee
 wget -O /opt/tbots/autoReferee.zip https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip
 unzip /opt/tbots/autoReferee.zip -d /opt/tbots/
