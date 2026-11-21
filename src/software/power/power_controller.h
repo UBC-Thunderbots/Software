@@ -33,9 +33,10 @@ class PowerController
         return active;
     }
 
+    static bool hasElapsed(uint32_t now_us, uint32_t start_us, uint32_t duration_us);
     bool isValidPulseWidth(uint32_t pulse_width_us) const;
-    void requestPulse(ChickerOutput output, uint32_t pulse_width_us);
-    void requestArm(ChickerOutput output, uint32_t pulse_width_us);
+    void requestPulse(ChickerOutput output, uint32_t pulse_width_us,
+                      bool require_break_beam = false);
 
     PowerHAL& hal_;
     boost::sml::sm<PowerStateMachine> fsm_;
@@ -44,15 +45,10 @@ class PowerController
     uint32_t cooldown_started_us_      = 0;
     uint32_t charge_started_us_        = 0;
     uint32_t restart_stage_started_us_ = 0;
-    uint32_t arm_refreshed_us_         = 0;
-
-    uint32_t target_dribbler_rpm_  = 0;
-    uint32_t current_dribbler_rpm_ = 0;
 
     // Values carried over from the original power_controller.h.
     static constexpr uint32_t COOLDOWN_US                = 3000000;
     static constexpr uint32_t CHARGE_TOGGLE_DELAY_US     = 5000;
     static constexpr uint32_t MAX_CHARGE_DURATION_US     = 2000000;
     static constexpr uint32_t MAX_CHICKER_PULSE_WIDTH_US = 20000;
-    static constexpr uint32_t ARM_TIMEOUT_US             = 100000;
 };

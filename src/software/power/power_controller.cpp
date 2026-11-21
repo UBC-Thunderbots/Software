@@ -15,31 +15,23 @@ bool PowerController::isValidPulseWidth(uint32_t pulse_width_us) const
     return pulse_width_us > 0 && pulse_width_us <= MAX_CHICKER_PULSE_WIDTH_US;
 }
 
-void PowerController::requestPulse(ChickerOutput output, uint32_t pulse_width_us)
+bool PowerController::hasElapsed(uint32_t now_us, uint32_t start_us, uint32_t duration_us)
 {
-    if (!isValidPulseWidth(pulse_width_us))
-    {
-        return;
-    }
-
-    // Only the chicker region handles KickRequested. The transition succeeds
-    // only when the HAL actually starts a pulse (the FSM guard checks this).
-    if (fsm_.process_event(PowerStateMachine::KickRequested{output, pulse_width_us}))
-    {
-        cooldown_started_us_ = hal_.micros();
-    }
+    return static_cast<uint32_t>(now_us - start_us) >= duration_us;
 }
 
-void PowerController::requestArm(ChickerOutput output, uint32_t pulse_width_us)
+void PowerController::requestPulse(ChickerOutput output, uint32_t pulse_width_us,
+                                   bool require_break_beam)
 {
     if (!isValidPulseWidth(pulse_width_us))
     {
         return;
     }
 
-    if (fsm_.process_event(PowerStateMachine::ArmRequested{output, pulse_width_us}))
+    if (fsm_.process_event(PowerStateMachine::PulseRequested{output, pulse_width_us,
+                                                             require_break_beam}))
     {
-        arm_refreshed_us_ = hal_.micros();
+        cooldown_started_us_ = hal_.micros();
     }
 }
 
@@ -55,12 +47,12 @@ void PowerController::chip(uint32_t pulse_width_us)
 
 void PowerController::autokick(uint32_t pulse_width_us)
 {
-    requestArm(ChickerOutput::Kicker, pulse_width_us);
+    requestPulse(ChickerOutput::Kicker, pulse_width_us, true);
 }
 
 void PowerController::autochip(uint32_t pulse_width_us)
 {
-    requestArm(ChickerOutput::Chipper, pulse_width_us);
+    requestPulse(ChickerOutput::Chipper, pulse_width_us, true);
 }
 
 void PowerController::update()
@@ -77,37 +69,21 @@ void PowerController::update()
 
     // The cooldown deadline is measured from the start of the pulse.
     if (isInState<PowerStateMachine::Cooldown>() &&
-        static_cast<uint32_t>(now_us - cooldown_started_us_) >= COOLDOWN_US)
+        hasElapsed(now_us, cooldown_started_us_, COOLDOWN_US))
     {
         fsm_.process_event(PowerStateMachine::CooldownFinished{});
-    }
-
-    if (isInState<PowerStateMachine::Armed>())
-    {
-        if (static_cast<uint32_t>(now_us - arm_refreshed_us_) >= ARM_TIMEOUT_US)
-        {
-            fsm_.process_event(PowerStateMachine::ArmExpired{});
-        }
-        else if (hal_.getBreakBeamTripped() &&
-                 fsm_.process_event(PowerStateMachine::BeamTripped{}))
-        {
-            // Record only a successful automatic pulse, not the arm request.
-            cooldown_started_us_ = hal_.micros();
-        }
     }
 
     // Preserve the original 5 ms wait, LOW, 5 ms wait, HIGH sequence.
     // Both delays remain provisional pending hardware/team verification.
     if (isInState<PowerStateMachine::Restarting>() &&
-        static_cast<uint32_t>(now_us - restart_stage_started_us_) >=
-            CHARGE_TOGGLE_DELAY_US)
+        hasElapsed(now_us, restart_stage_started_us_, CHARGE_TOGGLE_DELAY_US))
     {
         fsm_.process_event(PowerStateMachine::RestartDisableElapsed{});
         restart_stage_started_us_ = now_us;
     }
     else if (isInState<PowerStateMachine::RestartLow>() &&
-             static_cast<uint32_t>(now_us - restart_stage_started_us_) >=
-                 CHARGE_TOGGLE_DELAY_US)
+             hasElapsed(now_us, restart_stage_started_us_, CHARGE_TOGGLE_DELAY_US))
     {
         fsm_.process_event(PowerStateMachine::RestartEnableElapsed{});
         charge_started_us_ = now_us;
@@ -118,8 +94,7 @@ void PowerController::update()
         {
             fsm_.process_event(PowerStateMachine::ChargeCompleted{});
         }
-        else if (static_cast<uint32_t>(now_us - charge_started_us_) >=
-                 MAX_CHARGE_DURATION_US)
+        else if (hasElapsed(now_us, charge_started_us_, MAX_CHARGE_DURATION_US))
         {
             fsm_.process_event(PowerStateMachine::ChargeTimedOut{});
         }

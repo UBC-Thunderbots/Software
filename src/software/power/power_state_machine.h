@@ -17,26 +17,11 @@ class PowerStateMachine
     explicit PowerStateMachine(PowerHAL& hal);
 
     // Events contain validated requests or report observations made by the controller.
-    struct KickRequested
+    struct PulseRequested
     {
         ChickerOutput output;
         uint32_t pulse_width_us;
-    };
-
-    struct ArmRequested
-    {
-        ChickerOutput output;
-        uint32_t pulse_width_us;
-    };
-
-    struct DisarmRequested
-    {
-    };
-    struct BeamTripped
-    {
-    };
-    struct ArmExpired
-    {
+        bool require_break_beam;
     };
     struct PulseFinished
     {
@@ -59,9 +44,6 @@ class PowerStateMachine
 
     // Chicker region.
     struct Ready
-    {
-    };
-    struct Armed
     {
     };
     struct Pulsing
@@ -92,38 +74,23 @@ class PowerStateMachine
     {
         using namespace boost::sml;
 
-        // These guards deliberately attempt the pulse. The HAL returns false
-        // if it cannot fire, so the FSM must not enter Pulsing in that case.
-        // Pulse-width validation happens in PowerController.
-        const auto pulseStarted = [this](const KickRequested& event)
-        { return tryStartPulse(event); };
-
-        const auto armedPulseStarted = [this](const BeamTripped& event)
-        { return tryStartArmedPulse(event); };
-
-        const auto rememberArmRequest = [this](const ArmRequested& event)
-        { rememberArm(event); };
+        // Auto requests only fire if the beam is tripped when the command arrives.
+        // The HAL also decides whether the pulse can actually start.
+        const auto pulseStarted = [this](const PulseRequested& event)
+        {
+            return (!event.require_break_beam || hal_.getBreakBeamTripped()) &&
+                   tryStartPulse(event);
+        };
 
         const auto lowerChargePin = [this] { setCharging(false); };
 
         const auto raiseChargePin = [this] { setCharging(true); };
 
         return make_transition_table(
-            // Chicker: manual commands can fire from Ready or Armed.
-            *state<Ready> + event<KickRequested>[pulseStarted] = state<Pulsing>,
-
-            state<Ready> + event<ArmRequested> / rememberArmRequest = state<Armed>,
-
-            state<Armed> + event<ArmRequested> / rememberArmRequest,
-
-            state<Armed> + event<KickRequested>[pulseStarted] = state<Pulsing>,
-
-            state<Armed> + event<BeamTripped>[armedPulseStarted] = state<Pulsing>,
-
-            state<Armed> + event<ArmExpired>          = state<Ready>,
-            state<Armed> + event<DisarmRequested>     = state<Ready>,
-            state<Pulsing> + event<PulseFinished>     = state<Cooldown>,
-            state<Cooldown> + event<CooldownFinished> = state<Ready>,
+            // Manual and automatic requests share the same ready-to-pulse transition.
+            *state<Ready> + event<PulseRequested>[pulseStarted] = state<Pulsing>,
+            state<Pulsing> + event<PulseFinished>               = state<Cooldown>,
+            state<Cooldown> + event<CooldownFinished>           = state<Ready>,
 
             // Charger: reacts independently to the same PulseFinished event.
             *state<Charging> + event<ChargeCompleted>                = state<Charged>,
@@ -141,13 +108,9 @@ class PowerStateMachine
                 state<Charging>);
     }
 
-    bool tryStartPulse(const KickRequested& event);
-    bool tryStartArmedPulse(const BeamTripped& event);
-    void rememberArm(const ArmRequested& event);
+    bool tryStartPulse(const PulseRequested& event);
     void setCharging(bool enabled);
 
    private:
     PowerHAL& hal_;
-    ChickerOutput armed_output_    = ChickerOutput::Kicker;
-    uint32_t armed_pulse_width_us_ = 0;
 };
