@@ -4,11 +4,12 @@ from python.runfiles import runfiles
 import logging
 import os
 import queue
+import shutil
+import tempfile
 import threading
 import time
 from pathlib import Path
-import shutil
-import tempfile
+from subprocess import Popen
 
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
@@ -18,7 +19,6 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
 )
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
