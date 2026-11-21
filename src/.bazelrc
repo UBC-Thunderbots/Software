@@ -64,6 +64,9 @@ common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
 ################# Build Configurations #################
+# AutoRef requires Java 21; use Bazel's hermetic remote JDK.
+build --java_runtime_version=remotejdk_21
+
 # Lock C++ version
 build --cxxopt="-std=c++2a"
 
