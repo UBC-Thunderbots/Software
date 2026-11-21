@@ -50,9 +50,10 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         getBestRobotDetection(new_robot_data);
 
 
-    // If the current_time called is ahead of current time, then runs predict step
-    // Updates the last_predict_timestamp to the current time called.
-    // Therefore, we must keey estimating with further points ahead.
+    // If the current_time called is ahead of last time it predicted, then runs the
+    // predict step. This means we throw out stale packets. The goal is to either compare
+    // prediction and update on same time or just keep prediction if we temporarily miss a
+    // detection.
     if (last_predict_timestamp && current_time > *last_predict_timestamp)
     {
         predict((current_time - *last_predict_timestamp).toSeconds());
@@ -98,6 +99,7 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         // 2. Statistical gating using Mahalanobis distance
         // TODO: mahalanobisDistance and update both calculate pseudoinverse. is this a
         // problem?
+        // Kinda related: #4075, #3939
         else if (isWithinMaxRobotSpeed(best_robot_detection->position, current_time) &&
                  kalman_filter.mahalanobisDistance(gating_measurement) <
                      RF_MAHALANOBIS_GATE_THRESHOLD)
@@ -134,13 +136,13 @@ std::optional<Robot> RobotFilter::estimateRobotState(
         return std::nullopt;
     }
 
-    const Eigen::Vector<double, STATE_SIZE> state = kalman_filter.state_estimate;
+    const auto& state = kalman_filter.state_estimate;
     const Point robot_position(state(POS_X), state(POS_Y));
     const Vector robot_velocity(state(VEL_X), state(VEL_Y));
     const Angle robot_orientation = Angle::fromRadians(state(POS_W)).clamp();
     const AngularVelocity robot_angular_velocity =
         AngularVelocity::fromRadians(state(VEL_W));
-    bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
+    const bool breakbeam_tripped = breakbeam_tripped_id == getRobotId();
     this->current_robot_state =
         Robot(this->getRobotId(), robot_position, robot_velocity, robot_orientation,
               robot_angular_velocity, current_time, breakbeam_tripped);
@@ -233,8 +235,8 @@ void RobotFilter::predict(double delta_t)
 bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
                                         const Timestamp& current_time) const
 {
-    // Without a previous detection there is no interval to reason over, so we have no
-    // grounds to call this one impossible
+    // We need to initialize the robot somewhere at the start. Without a previous
+    // detection, we cannot call this one impossible.
     if (!prev_detection_timestamp)
     {
         return true;
