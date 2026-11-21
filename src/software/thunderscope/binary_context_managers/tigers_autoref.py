@@ -1,5 +1,4 @@
 from __future__ import annotations
-from python.runfiles import runfiles
 
 import logging
 import os
@@ -14,6 +13,7 @@ from subprocess import Popen
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from python.runfiles import runfiles
 from software.networking.ssl_proto_communication import (
     SslSocket,
     SslSocketProtoParseException,

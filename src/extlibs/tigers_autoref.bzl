@@ -3,7 +3,7 @@
 #   https://github.com/TIGERs-Mannheim/AutoReferee
 #
 #   This BUILD overlay exposes the prebuilt distribution downloaded by
-#   http_archive in MODULE.bazel. 
+#   http_archive in MODULE.bazel.
 #
 #   This target provides runtime files only. Starting AutoRef with a
 #   Bazel-managed Java runtime is handled separately.
