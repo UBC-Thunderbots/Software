@@ -1,17 +1,7 @@
 # BUILD file for the Bullet Physics SDK (bullet3).
 #
 # Bullet is a CMake project with no upstream Bazel support, so this file
-# mirrors the library layout in src/CMakeLists.txt: one cc_library per
-# component, with dependencies derived from the components' #include graph.
-#
-# Bullet headers are included relative to "src" (for example
-# "LinearMath/btVector3.h" or "BulletCollision/..."), so every target exposes
-# "src" as an include directory; it propagates to consumers transitively.
-#
-# The defaults match Bullet's default CMake options: single precision (float)
-# and no multithreading. To build with doubles instead, pass
-# "--copt=-DBT_USE_DOUBLE_PRECISION" so that every translation unit (including
-# yours) agrees on the ABI.
+# mirrors the library layout in src/CMakeLists.txt.
 #
 # Deliberately not covered (they need toolchains/tooling beyond the core libs):
 #   * src/Bullet3OpenCL and src/clew  (require an OpenCL SDK)

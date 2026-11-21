@@ -12,7 +12,7 @@
 # Pycache
 *.pyc
 
-# HRVO Outputs
+# Simulated test outputs
 *.gif
 *.png
 

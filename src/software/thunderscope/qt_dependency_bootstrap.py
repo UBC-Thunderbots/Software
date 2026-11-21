@@ -1,7 +1,6 @@
-# import ctypes
-# import glob
 import os
 import sys
+from pathlib import Path
 
 """Make the Qt6 binaries bundled in the ``PyQt6-Qt6`` wheel discoverable.
 
@@ -16,8 +15,6 @@ dynamic loader when the process starts, so setting them from Python is too
 late. Instead we locate the Qt6 directory on ``sys.path`` and re-exec the
 interpreter once with the variables in place.
 """
-
-from pathlib import Path
 
 _READY = "BAZEL_PYQT_QT6_ENV_READY"
 

@@ -1,7 +1,5 @@
-#!/opt/tbotspython/bin/python3
-
-import re
 import os
+import re
 from pathlib import Path
 
 OUTPUT_FILE_PATH = "docs/fsm-diagrams.md"
@@ -105,8 +103,10 @@ def generate_diagram(fsm):
 
 
 if __name__ == "__main__":
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    ai_dir = os.path.join(root_dir, "src/software/ai")
+    # `bazel run` sets this to the Bazel workspace root (src/). The repository
+    # root, where docs/ lives, is its parent.
+    root_dir = Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]).parent
+    ai_dir = root_dir / "src/software/ai"
 
     fsm_diagrams = {}
     fsm_file_paths = {}
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                 fsm_diagrams[fsm_name] = diagram
                 fsm_file_paths[fsm_name] = file_path
 
-    output_file_path = os.path.join(root_dir, OUTPUT_FILE_PATH)
+    output_file_path = root_dir / OUTPUT_FILE_PATH
     with open(output_file_path, "w") as output_file:
         print("# Play and Tactic FSM Diagrams\n", file=output_file)
 

@@ -6,7 +6,6 @@ import os
 import queue
 import threading
 import time
-from subprocess import Popen
 from pathlib import Path
 import shutil
 import tempfile

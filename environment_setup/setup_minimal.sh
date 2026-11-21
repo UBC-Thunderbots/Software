@@ -8,7 +8,8 @@
 #
 # Requirements: wget, unzip
 #
-# NOTE: Currently WIP, only partial support for macOS (ARM64) and Ubuntu (AMD64)
+# NOTE: Only officially supports macOS (ARM64) and Ubuntu 24.04 (ARM64/AMD64)
+#       Any other OS, OS Version, Architecture may work, but not tested in CI.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Exit immediately after failed command
@@ -39,10 +40,6 @@ echo 'export PATH="/opt/tbots/bin:$PATH"' > /opt/tbots/bin/activate
 # Install bazelisk
 wget -O /opt/tbots/bin/bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-${OS}-${ARCH}"
 chmod +x /opt/tbots/bin/bazel
-
-# Install SSL gamecontroller
-wget -O /opt/tbots/bin/gamecontroller "https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_${OS}_${ARCH}"
-chmod +x /opt/tbots/bin/gamecontroller
 
 echo "Setup successful!"
 echo "source /opt/tbots/bin/activate"

@@ -14,10 +14,10 @@ compile_pip_requirements(
 cross_compiled_filegroup(
     name = "robot_binaries",
     deps = [
-        "//software/embedded:thunderloop_main",
         "//software/embedded:hash_thunderloop_binary.sh",
         "//software/embedded:setup_openocd_deps",
         "//software/embedded:setup_robot_software_deps",
+        "//software/embedded:thunderloop_main",
         "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
         "//software/embedded/motor_controller:stspin_motor_controller_test",
@@ -33,8 +33,8 @@ py_binary(
     ],
     data = [
         ":playbooks",
-        ":tasks",
         ":robot_binaries",
+        ":tasks",
     ],
     deps = [
         requirement("ansible"),
