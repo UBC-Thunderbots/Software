@@ -28,7 +28,7 @@ config_setting(
 
 platformio_library(
     name = "power_hal",
-    hdr = "power_hal.h"
+    hdr = "power_hal.h",
 )
 
 cc_library(
