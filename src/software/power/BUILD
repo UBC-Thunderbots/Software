@@ -101,10 +101,15 @@ genrule(
     outs = ["powerloop.tar.gz"],
     cmd = """
         TARGET_DIR=$$(dirname $(location :powerloop_main))
-        cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
-        chmod +w "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
-        echo "" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
-        echo "extra_scripts = pre:auto_reset.py" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        if [ ! -f "$$TARGET_DIR/powerloop_main_workdir/auto_reset.py" ]; then
+            cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
+        fi
+        INI="$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        if [ -f "$$INI" ] && ! grep -q '^extra_scripts = pre:auto_reset.py$$' "$$INI"; then
+            chmod +w "$$INI"
+            echo "" >> "$$INI"
+            echo "extra_scripts = pre:auto_reset.py" >> "$$INI"
+        fi
         tar -C "$$TARGET_DIR" -czhf $@ "powerloop_main_workdir"
     """,
     local = True,
