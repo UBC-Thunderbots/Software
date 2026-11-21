@@ -77,10 +77,12 @@ class PowerBoardRuntimeTest : public ::testing::Test
 
 TEST_F(PowerBoardRuntimeTest, ReportsHalReadingsInStatusFrame)
 {
-    hal_.state.battery_voltage    = 24.5f;
-    hal_.state.capacitor_voltage  = 170.0f;
-    hal_.state.current_draw_amp   = 2.25f;
-    hal_.state.break_beam_tripped = true;
+    SimHal::State state      = hal_.stateSnapshot();
+    state.battery_voltage    = 24.5f;
+    state.capacitor_voltage  = 170.0f;
+    state.current_draw_amp   = 2.25f;
+    state.break_beam_tripped = true;
+    hal_.setState(state);
 
     const TbotsProto_PowerFrame first_status = receiveStatus();
     ASSERT_EQ(first_status.which_power_msg, TbotsProto_PowerFrame_power_status_tag);
@@ -106,16 +108,16 @@ TEST_F(PowerBoardRuntimeTest, DribblerCommandChangesHalPwm)
         runtime_.receiveByte(packet[i]);
     }
     static_cast<void>(runtime_.tick());
-    EXPECT_EQ(hal_.state.dribbler_pwm, 0);
+    EXPECT_EQ(hal_.stateSnapshot().dribbler_pwm, 0);
 
     runtime_.receiveByte(packet.back());
     static_cast<void>(runtime_.tick());
-    EXPECT_GT(hal_.state.dribbler_pwm, 0);
+    EXPECT_GT(hal_.stateSnapshot().dribbler_pwm, 0);
 
     control.dribbler_speed = 0;
     sendCommand(control);
     static_cast<void>(runtime_.tick());
-    EXPECT_EQ(hal_.state.dribbler_pwm, 0);
+    EXPECT_EQ(hal_.stateSnapshot().dribbler_pwm, 0);
 }
 
 TEST_F(PowerBoardRuntimeTest, KickCommandStartsAndExpiresHalPulse)
@@ -124,14 +126,14 @@ TEST_F(PowerBoardRuntimeTest, KickCommandStartsAndExpiresHalPulse)
     sendCommand(makeKickControl(pulse_width_us));
     static_cast<void>(runtime_.tick());
 
-    EXPECT_TRUE(hal_.state.kicker_pin_high);
-    EXPECT_FALSE(hal_.state.chipper_pin_high);
+    EXPECT_TRUE(hal_.stateSnapshot().kicker_pin_high);
+    EXPECT_FALSE(hal_.stateSnapshot().chipper_pin_high);
     EXPECT_TRUE(hal_.isChickerPulseActive());
 
     hal_.advanceMicros(pulse_width_us);
     static_cast<void>(runtime_.tick());
 
-    EXPECT_FALSE(hal_.state.kicker_pin_high);
+    EXPECT_FALSE(hal_.stateSnapshot().kicker_pin_high);
     EXPECT_FALSE(hal_.isChickerPulseActive());
 }
 
@@ -141,14 +143,14 @@ TEST_F(PowerBoardRuntimeTest, ChipCommandStartsAndExpiresHalPulse)
     sendCommand(makeChipControl(pulse_width_us));
     static_cast<void>(runtime_.tick());
 
-    EXPECT_FALSE(hal_.state.kicker_pin_high);
-    EXPECT_TRUE(hal_.state.chipper_pin_high);
+    EXPECT_FALSE(hal_.stateSnapshot().kicker_pin_high);
+    EXPECT_TRUE(hal_.stateSnapshot().chipper_pin_high);
     EXPECT_TRUE(hal_.isChickerPulseActive());
 
     hal_.advanceMicros(pulse_width_us);
     static_cast<void>(runtime_.tick());
 
-    EXPECT_FALSE(hal_.state.chipper_pin_high);
+    EXPECT_FALSE(hal_.stateSnapshot().chipper_pin_high);
     EXPECT_FALSE(hal_.isChickerPulseActive());
 }
 
@@ -160,10 +162,12 @@ TEST_F(PowerBoardRuntimeTest, AutokickRequiresTrippedBreakBeam)
     static_cast<void>(runtime_.tick());
     EXPECT_FALSE(hal_.isChickerPulseActive());
 
-    hal_.state.break_beam_tripped = true;
+    SimHal::State state      = hal_.stateSnapshot();
+    state.break_beam_tripped = true;
+    hal_.setState(state);
     sendCommand(control);
     static_cast<void>(runtime_.tick());
     EXPECT_TRUE(hal_.isChickerPulseActive());
-    EXPECT_TRUE(hal_.state.kicker_pin_high);
+    EXPECT_TRUE(hal_.stateSnapshot().kicker_pin_high);
 }
 }  // namespace
