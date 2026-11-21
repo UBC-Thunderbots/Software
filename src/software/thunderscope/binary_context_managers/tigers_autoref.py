@@ -75,7 +75,6 @@ class TigersAutoref:
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
         self.initial_timestamp = time.time_ns()
-        self.autoref_runtime_dir = None
 
     def __enter__(self) -> TigersAutoref:
         self.auto_ref_proc_thread = threading.Thread(
