@@ -96,6 +96,8 @@ class SimHal final : public PowerHAL
 
     /** Copy the current simulated state. Safe while background orchestration runs. */
     State stateSnapshot() const;
+    /** Replace the simulated state. */
+    void setState(State state);
     /** Return a copy of the current fault configuration. */
     FaultConfig faultConfig() const;
     /** Replace the fault configuration. */

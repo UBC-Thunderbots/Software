@@ -129,6 +129,12 @@ SimHal::State SimHal::stateSnapshot() const
     return state_;
 }
 
+void SimHal::setState(State state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    state_ = std::move(state);
+}
+
 SimHal::FaultConfig SimHal::faultConfig() const
 {
     std::lock_guard<std::mutex> lock(mutex_);
