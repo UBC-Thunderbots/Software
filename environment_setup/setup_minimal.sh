@@ -8,7 +8,8 @@
 #
 # Requirements: wget, unzip
 #
-# NOTE: Currently WIP, only partial support for macOS (ARM64) and Ubuntu (AMD64)
+# NOTE: Only officially supports macOS (ARM64) and Ubuntu 24.04 (ARM64/AMD64)
+#       Any other OS, OS Version, Architecture may work, but not tested in CI.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Exit immediately after failed command
