@@ -17,13 +17,6 @@ genrule(
     cmd = "mkdir -p $(@D) && printf '#pragma once\\n\\n#define G3LOG_DEBUG DEBUG\\n' > $@",
 )
 
-# hermetic-llvm tags its musl platforms with this constraint. musl provides no
-# <execinfo.h>/backtrace(), so build g3log without stack traces there.
-config_setting(
-    name = "musl",
-    constraint_values = ["@llvm//constraints/libc:musl"],
-)
-
 # Non-Windows sources: everything under src/ except the Windows crash handler
 # and Windows stacktrace (see Build.cmake).
 cc_library(
