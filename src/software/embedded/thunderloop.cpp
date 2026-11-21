@@ -197,7 +197,7 @@ void Thunderloop::runLoop()
         const auto iter_start_time      = std::chrono::steady_clock::now();
         const auto time_since_prev_iter = iter_start_time - prev_iter_start_time;
         const Duration delta_time       = Duration::fromSeconds(
-            std::chrono::duration<double>(time_since_prev_iter).count());
+                  std::chrono::duration<double>(time_since_prev_iter).count());
 
         FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 

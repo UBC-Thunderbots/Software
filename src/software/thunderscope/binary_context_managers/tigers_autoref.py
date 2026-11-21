@@ -3,20 +3,22 @@ from __future__ import annotations
 import logging
 import os
 import queue
+import shutil
+import tempfile
 import threading
 import time
-from subprocess import Popen
 from pathlib import Path
+from subprocess import Popen
 
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from python.runfiles import runfiles
 from software.networking.ssl_proto_communication import (
     SslSocket,
     SslSocketProtoParseException,
 )
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.binary_context_managers.util import kill_cmd_if_running
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import time_provider_instance
@@ -40,8 +42,7 @@ class TigersAutoref:
     BUFFER_TIMEOUT = 10
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
-    AUTOREF_DIR = "/opt/tbots/autoReferee"
-    AUTOREF_BINARY = "bin/autoReferee"
+    AUTOREF_JAVA_BINARY = "_main/software/autoref/autoref_java"
 
     def __init__(
         self,
@@ -76,12 +77,6 @@ class TigersAutoref:
         self.initial_timestamp = time.time_ns()
 
     def __enter__(self) -> TigersAutoref:
-        if not os.path.exists(Path(self.AUTOREF_DIR) / self.AUTOREF_BINARY):
-            logging.warning(
-                "Could not find autoref binary, did you run ./setup_software.sh"
-            )
-            return
-
         self.auto_ref_proc_thread = threading.Thread(
             target=self._start_autoref, daemon=True
         )
@@ -215,29 +210,50 @@ class TigersAutoref:
         return self.gamecontroller.send_ci_input(ci_input)
 
     def _start_autoref(self) -> None:
-        """Starts the TigersAutoref binary."""
-        autoref_cmd = self.AUTOREF_BINARY
-        kill_cmd_if_running([autoref_cmd])
-        autoref_cmd += " -a"
+        """Start AutoRef with Bazel-provided Java and a writable config copy."""
+        runtime_files = runfiles.Create()
 
+        autoref_java = runtime_files.Rlocation(self.AUTOREF_JAVA_BINARY)
+
+        config_file = runtime_files.Rlocation(
+            "tigers_autoref/config/moduli/autoreferee-ci.xml"
+        )
+
+        # Preserve the runfiles layout rather than resolving the file's symlink.
+        config_dir = Path(config_file).parent.parent
+
+        autoref_args = [autoref_java, "-a"]
         if not self.show_gui:
-            autoref_cmd += " -hl"
-
+            autoref_args.append("-hl")
         if self.ci_mode:
-            autoref_cmd += " --ci"
+            autoref_args.append("--ci")
 
-        if self.suppress_logs:
-            with open(os.devnull, "w") as fp:
+        autoref_env = os.environ.copy()
+        autoref_env.update(runtime_files.EnvVars())
+
+        with tempfile.TemporaryDirectory(prefix="tbots-autoref-") as runtime_dir:
+            shutil.copytree(config_dir, Path(runtime_dir) / "config")
+
+            logging.info("Starting AutoRef in %s", runtime_dir)
+
+            if self.suppress_logs:
+                with open(os.devnull, "w") as fp:
+                    self.tigers_autoref_proc = Popen(
+                        autoref_args,
+                        stdout=fp,
+                        stderr=fp,
+                        env=autoref_env,
+                        cwd=runtime_dir,
+                    )
+            else:
                 self.tigers_autoref_proc = Popen(
-                    autoref_cmd.split(" "),
-                    stdout=fp,
-                    stderr=fp,
-                    cwd=self.AUTOREF_DIR,
+                    autoref_args,
+                    env=autoref_env,
+                    cwd=runtime_dir,
                 )
-        else:
-            self.tigers_autoref_proc = Popen(
-                autoref_cmd.split(" "), cwd=self.AUTOREF_DIR
-            )
+
+            return_code = self.tigers_autoref_proc.wait()
+            logging.info("AutoRef exited with code %s", return_code)
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
         """Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the

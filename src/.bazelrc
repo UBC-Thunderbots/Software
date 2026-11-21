@@ -25,10 +25,6 @@ build --test_env=DISPLAY
 build --test_env=WAYLAND_DISPLAY
 build --test_env=QT_QPA_PLATFORM
 
-# Setup python bin/lib to point to our venv
-build --action_env=PYTHON_BIN_PATH=/opt/tbotspython/bin/python3.12
-build --action_env=PYTHON_LIB_PATH=/opt/tbotspython/lib/python3.12
-
 # The hermetic rules_python toolchain creates the interpreter symlink in a
 # py_binary's venv with `declare_symlink()` using a path relative to the
 # runfiles tree. rules_pkg cannot package those symlinks (it follows them and
@@ -68,6 +64,9 @@ common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
 ################# Build Configurations #################
+# AutoRef requires Java 21; use Bazel's hermetic remote JDK.
+build --java_runtime_version=remotejdk_21
+
 # Lock C++ version
 build --cxxopt="-std=c++2a"
 
