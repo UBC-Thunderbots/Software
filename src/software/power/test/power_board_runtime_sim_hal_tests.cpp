@@ -43,7 +43,7 @@ TbotsProto_PowerPulseControl makeAutokickControl(uint32_t pulse_width_us)
     return control;
 }
 
-class PowerBoardRuntimeTest : public ::testing::Test
+class PowerBoardRuntimeSimHalTest : public ::testing::Test
 {
    protected:
     void sendCommand(const TbotsProto_PowerPulseControl& control)
@@ -75,7 +75,7 @@ class PowerBoardRuntimeTest : public ::testing::Test
     PowerBoardRuntime runtime_{hal_};
 };
 
-TEST_F(PowerBoardRuntimeTest, ReportsHalReadingsInStatusFrame)
+TEST_F(PowerBoardRuntimeSimHalTest, ReportsHalReadingsInStatusFrame)
 {
     SimHal::State state      = hal_.stateSnapshot();
     state.battery_voltage    = 24.5f;
@@ -96,7 +96,7 @@ TEST_F(PowerBoardRuntimeTest, ReportsHalReadingsInStatusFrame)
     EXPECT_EQ(second_status.power_msg.power_status.sequence_num, 1u);
 }
 
-TEST_F(PowerBoardRuntimeTest, DribblerCommandChangesHalPwm)
+TEST_F(PowerBoardRuntimeSimHalTest, DribblerCommandChangesHalPwm)
 {
     TbotsProto_DribblerControl control = TbotsProto_DribblerControl_init_default;
     control.dribbler_speed             = 8000;
@@ -120,7 +120,7 @@ TEST_F(PowerBoardRuntimeTest, DribblerCommandChangesHalPwm)
     EXPECT_EQ(hal_.stateSnapshot().dribbler_pwm, 0);
 }
 
-TEST_F(PowerBoardRuntimeTest, KickCommandStartsAndExpiresHalPulse)
+TEST_F(PowerBoardRuntimeSimHalTest, KickCommandStartsAndExpiresHalPulse)
 {
     constexpr uint32_t pulse_width_us = 1000;
     sendCommand(makeKickControl(pulse_width_us));
@@ -137,7 +137,7 @@ TEST_F(PowerBoardRuntimeTest, KickCommandStartsAndExpiresHalPulse)
     EXPECT_FALSE(hal_.isChickerPulseActive());
 }
 
-TEST_F(PowerBoardRuntimeTest, ChipCommandStartsAndExpiresHalPulse)
+TEST_F(PowerBoardRuntimeSimHalTest, ChipCommandStartsAndExpiresHalPulse)
 {
     constexpr uint32_t pulse_width_us = 1000;
     sendCommand(makeChipControl(pulse_width_us));
@@ -154,7 +154,7 @@ TEST_F(PowerBoardRuntimeTest, ChipCommandStartsAndExpiresHalPulse)
     EXPECT_FALSE(hal_.isChickerPulseActive());
 }
 
-TEST_F(PowerBoardRuntimeTest, AutokickRequiresTrippedBreakBeam)
+TEST_F(PowerBoardRuntimeSimHalTest, AutokickRequiresTrippedBreakBeam)
 {
     const auto control = makeAutokickControl(1000);
 
