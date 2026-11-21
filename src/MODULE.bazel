@@ -96,7 +96,6 @@ pip.parse(
     ],
 )
 use_repo(pip, "platformio_deps")
-<<<<<<< HEAD
 pip.parse(
     hub_name = "tbots_cli_deps",
     python_version = PYTHON_VERSION,
@@ -108,8 +107,6 @@ pip.parse(
     ],
 )
 use_repo(pip, "tbots_cli_deps")
-=======
->>>>>>> avah/minimal_environment_setup_tscope
 
 ##############################################
 # Configure Dependencies
@@ -280,7 +277,6 @@ http_archive(
     url = "https://github.com/DarrenLevine/cppcrc/archive/6360eee1c8966d32b2552ce156b135ec6a3235f1.zip",
 )
 
-<<<<<<< HEAD
 # SSL Game Controller binaries, v3.23.0
 http_file(
     name = "ssl_game_controller_linux_amd64",
@@ -306,8 +302,6 @@ http_file(
     urls = ["https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.23.0/ssl-game-controller_v3.23.0_darwin_arm64"],
 )
 
-=======
->>>>>>> avah/minimal_environment_setup_tscope
 bazel_dep(name = "toolchains_arm_gnu")
 archive_override(
     module_name = "toolchains_arm_gnu",
