@@ -94,7 +94,7 @@ build --per_file_copt=.*\.pb\.(h|cc|cpp)$@-w
 build --per_file_copt=^external/.*,^bazel-out/.*@-w
 build --host_per_file_copt=^external/.*,^bazel-out/.*@-w
 
-# Don't make optimizatinos that might cause floating point exceptions
+# Don't make optimizations that might cause floating point exceptions
 build --copt="-ftrapping-math"
 
 # Define Robot Versions
