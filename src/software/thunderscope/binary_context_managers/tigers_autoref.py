@@ -42,7 +42,7 @@ class TigersAutoref:
     BUFFER_TIMEOUT = 10
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
-    AUTOREF_JAVA_BINARY = "Thunderbots/software/autoref/autoref_java"
+    AUTOREF_JAVA_BINARY = "_main/software/autoref/autoref_java"
 
     def __init__(
         self,
