@@ -39,7 +39,7 @@ from software.thunderscope.util import is_current_platform_macos
 class Gamecontroller:
     """Gamecontroller Context Manager"""
 
-    CI_MODE_LAUNCH_DELAY_S = 0.3
+    CI_MODE_LAUNCH_DELAY_S = 2.0
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
     REFEREE_IP = "224.5.23.1"
     RESET_MATCH_DELAY_S = 1

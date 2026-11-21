@@ -30,3 +30,9 @@ filegroup(
     srcs = glob(AUTOREF_RUNTIME_FILES),
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "config",
+    srcs = glob(["config/**"]),
+    visibility = ["//visibility:public"],
+)

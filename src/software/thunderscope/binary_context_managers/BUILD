@@ -54,6 +54,7 @@ py_library(
     ],
     data = [
     "//software/autoref:autoref_java",
+    "@tigers_autoref//:config",
     ],
     deps = [
         ":game_controller",

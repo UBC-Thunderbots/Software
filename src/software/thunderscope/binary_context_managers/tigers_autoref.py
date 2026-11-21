@@ -8,6 +8,8 @@ import threading
 import time
 from subprocess import Popen
 from pathlib import Path
+import shutil
+import tempfile
 
 import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
@@ -74,6 +76,7 @@ class TigersAutoref:
         self.tick_rate_ms = tick_rate_ms
         self.show_gui = show_gui
         self.initial_timestamp = time.time_ns()
+        self.autoref_runtime_dir = None
 
     def __enter__(self) -> TigersAutoref:
         self.auto_ref_proc_thread = threading.Thread(
@@ -209,30 +212,61 @@ class TigersAutoref:
         return self.gamecontroller.send_ci_input(ci_input)
 
     def _start_autoref(self) -> None:
-        """Starts the TigersAutoref binary."""
-        runfiles_instance = runfiles.Create()
-        autoref_java = runfiles_instance.Rlocation(self.AUTOREF_JAVA_BINARY)
+        """Start AutoRef with Bazel-provided Java and a writable config copy."""
+        runtime_files = runfiles.Create()
+        if runtime_files is None:
+            raise RuntimeError("Bazel runfiles environment is unavailable")
 
-        if not autoref_java or not os.path.exists(autoref_java):
-            logging.warning(
-                "Could not find Bazel AutoRef launcher: %s",
-                self.AUTOREF_JAVA_BINARY,
+        autoref_java = runtime_files.Rlocation(self.AUTOREF_JAVA_BINARY)
+        if not autoref_java or not Path(autoref_java).is_file():
+            raise FileNotFoundError(
+                f"Could not find Bazel AutoRef launcher: {self.AUTOREF_JAVA_BINARY}"
             )
-            return
+
+        config_file = runtime_files.Rlocation(
+            "tigers_autoref/config/moduli/autoreferee-ci.xml"
+        )
+        if not config_file or not Path(config_file).is_file():
+            raise FileNotFoundError(
+                "Could not find AutoRef config/moduli/autoreferee-ci.xml "
+                "in Bazel runfiles"
+            )
+
+        # Preserve the runfiles layout rather than resolving the file's symlink.
+        config_dir = Path(config_file).parent.parent
 
         autoref_args = [autoref_java, "-a"]
-
         if not self.show_gui:
             autoref_args.append("-hl")
-
         if self.ci_mode:
             autoref_args.append("--ci")
 
-        if self.suppress_logs:
-            with open(os.devnull, "w") as fp:
-                self.tigers_autoref_proc = Popen(autoref_args, stdout=fp, stderr=fp)
-        else:
-            self.tigers_autoref_proc = Popen(autoref_args)
+        autoref_env = os.environ.copy()
+        autoref_env.update(runtime_files.EnvVars())
+
+        with tempfile.TemporaryDirectory(prefix="tbots-autoref-") as runtime_dir:
+            shutil.copytree(config_dir, Path(runtime_dir) / "config")
+
+            logging.info("Starting AutoRef in %s", runtime_dir)
+
+            if self.suppress_logs:
+                with open(os.devnull, "w") as fp:
+                    self.tigers_autoref_proc = Popen(
+                        autoref_args,
+                        stdout=fp,
+                        stderr=fp,
+                        env=autoref_env,
+                        cwd=runtime_dir,
+                    )
+            else:
+                self.tigers_autoref_proc = Popen(
+                    autoref_args,
+                    env=autoref_env,
+                    cwd=runtime_dir,
+                )
+
+            return_code = self.tigers_autoref_proc.wait()
+            logging.info("AutoRef exited with code %s", return_code)
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
         """Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
