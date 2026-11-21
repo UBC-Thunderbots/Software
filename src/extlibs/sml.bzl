@@ -5,6 +5,9 @@
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
+# Expose the repository-pinned header for the PlatformIO packaging target.
+exports_files(["include/boost/sml.hpp"])
+
 cc_library(
     name = "sml",
     hdrs = ["include/boost/sml.hpp"],
