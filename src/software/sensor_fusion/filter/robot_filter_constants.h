@@ -60,12 +60,11 @@ const Eigen::Matrix<double, RobotFilter::STATE_SIZE, RobotFilter::STATE_SIZE>
             .asDiagonal();
 
 const Eigen::Matrix<double, RobotFilter::MEASUREMENT_SIZE, RobotFilter::MEASUREMENT_SIZE>
-    RF_MEASUREMENT_COVARIANCE =
-        Eigen::Vector<double, RobotFilter::MEASUREMENT_SIZE>(
-            RF_POS_VISION_NOISE_M * RF_POS_VISION_NOISE_M,
-            RF_POS_VISION_NOISE_M* RF_POS_VISION_NOISE_M,
-            RF_ANG_VISION_NOISE_RAD* RF_ANG_VISION_NOISE_RAD)
-            .asDiagonal();
+    RF_MEASUREMENT_COVARIANCE = Eigen::Vector<double, RobotFilter::MEASUREMENT_SIZE>(
+                                    RF_POS_VISION_NOISE_M * RF_POS_VISION_NOISE_M,
+                                    RF_POS_VISION_NOISE_M* RF_POS_VISION_NOISE_M,
+                                    RF_ANG_VISION_NOISE_RAD* RF_ANG_VISION_NOISE_RAD)
+                                    .asDiagonal();
 
 // Vision measures robot's position, orientation but not its velocity nor angular velocity
 // clang-format off
