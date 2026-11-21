@@ -6,7 +6,7 @@
 # Installs everything into /opt/tbots/, to undo this install script, just run:
 #    sudo rm -rf /opt/tbots/
 #
-# Requirements: wget, unzip
+# Requirements: wget
 #
 # NOTE: Only officially supports macOS (ARM64) and Ubuntu 24.04 (ARM64/AMD64)
 #       Any other OS, OS Version, Architecture may work, but not tested in CI.
@@ -40,11 +40,6 @@ echo 'export PATH="/opt/tbots/bin:$PATH"' > /opt/tbots/bin/activate
 # Install bazelisk
 wget -O /opt/tbots/bin/bazel "https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-${OS}-${ARCH}"
 chmod +x /opt/tbots/bin/bazel
-
-# Install TIGERS AutoReferee
-wget -O /opt/tbots/autoReferee.zip https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip
-unzip /opt/tbots/autoReferee.zip -d /opt/tbots/
-rm /opt/tbots/autoReferee.zip
 
 echo "Setup successful!"
 echo "source /opt/tbots/bin/activate"

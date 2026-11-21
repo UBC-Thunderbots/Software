@@ -25,7 +25,7 @@ bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
 bazel_dep(name = "pybind11_protobuf", version = "0.0.0-20250210-f02a2b7")
 bazel_dep(name = "bazel_lib", version = "3.1.0")
 bazel_dep(name = "llvm", version = "0.8.21")
-
+bazel_dep(name = "rules_java", version = "9.3.0")
 ##############################################
 # Load PIP packages and our Requirements
 ##############################################
@@ -139,6 +139,15 @@ use_repo(pybind11_configure, "pybind11")
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_archive(
+    name = "tigers_autoref",
+    build_file = "@//extlibs:tigers_autoref.bzl",
+    sha256 = "31bc916126e262093d539a15a60418e3b54712ba6525f4758adc7ff3109e8ed6",
+    strip_prefix = "autoReferee",
+    urls = ["https://github.com/TIGERs-Mannheim/AutoReferee/releases/download/1.7.1/autoReferee.zip",
+    ],
+)
 
 http_archive(
     name = "tomlplusplus",

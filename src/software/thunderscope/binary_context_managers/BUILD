@@ -74,11 +74,13 @@ py_library(
         "tigers_autoref.py",
     ],
     data = [
-        "//software/autoref:run_autoref",
+    "//software/autoref:autoref_java",
+    "@tigers_autoref//:config",
     ],
     deps = [
         ":game_controller",
         "//software/thunderscope:time_provider",
+        "@rules_python//python/runfiles",
     ],
 )
 
