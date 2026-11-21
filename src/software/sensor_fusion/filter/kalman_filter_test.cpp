@@ -5,8 +5,9 @@
 #include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
 #include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 
-namespace {
-    constexpr double TOLERANCE = 1e-13;
+namespace
+{
+constexpr double TOLERANCE = 1e-13;
 }
 
 struct KalmanParamsMath
