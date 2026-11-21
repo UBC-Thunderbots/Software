@@ -2,11 +2,7 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ 
-      master,
-      avah/minimal_environment_setup_tscope,
-      grant/add_macos_action_runners
-     ]
+    branches: [ master ]
   pull_request:
     branches: [ 
       master,
@@ -53,6 +49,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          SHOULD_RUN=true
           if [ "${{ github.event_name }}" == "schedule" ]; then
             COMMITS=$(git log --oneline --since="24 hours ago")
             if [ -z "$COMMITS" ]; then
