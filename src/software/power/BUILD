@@ -43,6 +43,7 @@ cc_library(
     hdrs = ["sim/sim_hal.h"],
     includes = ["sim"],
     deps = [":power_hal_cc"],
+)
 
 # Package the SML version already pinned by Thunderbots for PlatformIO.
 platformio_library(
@@ -57,6 +58,17 @@ platformio_library(
     deps = [
         ":power_hal",
         ":sml_headers",
+    ],
+)
+
+cc_library(
+    name = "power_state_machine_cc",
+    srcs = ["power_state_machine.cpp"],
+    hdrs = ["power_state_machine.h"],
+    includes = ["."],
+    deps = [
+        ":power_hal_cc",
+        "@sml",
     ],
 )
 
@@ -92,7 +104,10 @@ cc_library(
     srcs = ["power_controller.cpp"],
     hdrs = ["power_controller.h"],
     includes = ["."],
-    deps = [":power_hal_cc"],
+    deps = [
+        ":power_hal_cc",
+        ":power_state_machine_cc",
+    ],
 )
 
 platformio_library(

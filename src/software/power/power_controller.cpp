@@ -1,6 +1,7 @@
 #include "power_controller.h"
 
-PowerController::PowerController(PowerHAL& hal) : hal_(hal)
+PowerController::PowerController(PowerHAL& hal)
+    : hal_(hal), fsm_(PowerStateMachine{hal}), charge_started_us_(hal.micros())
 {
 }
 
