@@ -6,7 +6,7 @@
 
 // How many milliseconds a robot must not be seen in vision before it is
 // considered as "gone" and no longer reported.
-static constexpr unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 200;
+static constexpr unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 1000;
 
 // Unix Socket Paths
 const std::string TACTIC_OVERRIDE_PATH                   = "/tactic_override";
