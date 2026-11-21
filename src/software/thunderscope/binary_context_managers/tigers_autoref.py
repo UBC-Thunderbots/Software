@@ -212,23 +212,12 @@ class TigersAutoref:
     def _start_autoref(self) -> None:
         """Start AutoRef with Bazel-provided Java and a writable config copy."""
         runtime_files = runfiles.Create()
-        if runtime_files is None:
-            raise RuntimeError("Bazel runfiles environment is unavailable")
 
         autoref_java = runtime_files.Rlocation(self.AUTOREF_JAVA_BINARY)
-        if not autoref_java or not Path(autoref_java).is_file():
-            raise FileNotFoundError(
-                f"Could not find Bazel AutoRef launcher: {self.AUTOREF_JAVA_BINARY}"
-            )
 
         config_file = runtime_files.Rlocation(
             "tigers_autoref/config/moduli/autoreferee-ci.xml"
         )
-        if not config_file or not Path(config_file).is_file():
-            raise FileNotFoundError(
-                "Could not find AutoRef config/moduli/autoreferee-ci.xml "
-                "in Bazel runfiles"
-            )
 
         # Preserve the runfiles layout rather than resolving the file's symlink.
         config_dir = Path(config_file).parent.parent
