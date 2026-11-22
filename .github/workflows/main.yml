@@ -152,7 +152,7 @@ jobs:
           cd src
           bazel test //software/gameplay_tests:requirements.test
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps \
-            --local_test_jobs=50                                         \
+            --local_test_jobs=50                                          \
             --test_arg="--ci_mode"                                        \
             -- //software:unix_full_system                                \
             -//software/gameplay_tests:requirements.test                  \
