@@ -353,7 +353,7 @@ We use Ansible to automatically update software running on the robot. [More info
 To update binaries on a working robot, you can run:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 Where `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
