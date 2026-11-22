@@ -169,10 +169,7 @@ def create_command(config: BuildConfig, extra_args: list[str]) -> list[str]:
         BazelFlag.DEBUG_BUILD: config.debug_build or bool(config.select_debug_binaries),
         BazelFlag.OPTIMIZED: not config.debug_build
         and (not config.no_optimized_build or bool(config.flash_robots)),
-        BazelFlag.ROBOT_PLATFORM: (
-            config.robot_platform
-            or bool(config.flash_robots or config.ansible_playbook)
-        ),
+        BazelFlag.ROBOT_PLATFORM: config.robot_platform,
         BazelFlag.TRACY: config.tracy,
         BazelFlag.THUNDERSCOPE: config.enable_thunderscope,
         BazelFlag.NO_CACHE_TESTS: config.action == ActionArgument.test,
