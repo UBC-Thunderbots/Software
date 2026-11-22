@@ -6,7 +6,6 @@
 #include <chrono>
 #include <iomanip>
 #include <thread>
-#include "software/embedded/motor_controller/motor_index.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
