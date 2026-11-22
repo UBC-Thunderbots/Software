@@ -39,8 +39,8 @@ py_test(
     srcs = [
         "dribble_tactic_test.py",
     ],
-    main = "dribble_tactic_test.py",
     args = ["--test_filter='test_dribble and not excessive'"],
+    main = "dribble_tactic_test.py",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
@@ -54,8 +54,8 @@ py_test(
     srcs = [
         "dribble_tactic_test.py",
     ],
-    main = "dribble_tactic_test.py",
     args = ["--test_filter=test_excessive_dribbling_without_enemies"],
+    main = "dribble_tactic_test.py",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
@@ -70,8 +70,8 @@ py_test(
     srcs = [
         "dribble_tactic_test.py",
     ],
-    main = "dribble_tactic_test.py",
     args = ["--test_filter=test_dribble_with_excessive_dribbling"],
+    main = "dribble_tactic_test.py",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
@@ -85,8 +85,8 @@ py_test(
     srcs = [
         "dribble_tactic_test.py",
     ],
-    main = "dribble_tactic_test.py",
     args = ["--test_filter=test_run_into_enemy_robot_knock_ball_away"],
+    main = "dribble_tactic_test.py",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
@@ -100,8 +100,8 @@ py_test(
     srcs = [
         "dribble_tactic_test.py",
     ],
-    main = "dribble_tactic_test.py",
     args = ["--test_filter=test_robot_not_bumping_ball_when_turning"],
+    main = "dribble_tactic_test.py",
     tags = ["exclusive"],
     deps = [
         "//software:conftest",
