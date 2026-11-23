@@ -14,6 +14,7 @@ constexpr double RF_INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
 constexpr double RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
 // 1.732 is the square root of 3. std::sqrt is not constexpr in C++23 and earlier.
 constexpr double RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD  = M_PI / 1.732;
+constexpr double RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 2 * M_PI;
 
 // The fastest we will believe the robot could be travelling when deciding whether a
 // detection could plausibly belong to it.
@@ -34,8 +35,6 @@ constexpr double RF_MAHALANOBIS_GATE_THRESHOLD = 5;
 // How many detections in a row may be rejected as outliers before we conclude the
 // estimate itself is wrong and reset onto the newest detection
 constexpr int RF_CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
-
-constexpr double RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 4 * M_PI * M_PI;
 
 // How much noise (standard deviation) there is to be expected from camera measurements 
 constexpr double RF_POS_VISION_NOISE_M   = 0.001;

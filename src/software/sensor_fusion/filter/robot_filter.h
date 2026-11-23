@@ -121,7 +121,7 @@ class RobotFilter
      * @param detection_position The position of the detection to check
      * @param current_time The time the detection was taken at
      *
-     * @return whether the detection is within reach of the current estimate
+     * @return whether the detection is within reach of the last accepted detection
      */
     bool isWithinMaxRobotSpeed(const Point& detection_position,
                                const Timestamp& current_time) const;

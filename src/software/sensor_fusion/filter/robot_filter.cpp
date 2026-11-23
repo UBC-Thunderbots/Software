@@ -237,19 +237,21 @@ bool RobotFilter::isWithinMaxRobotSpeed(const Point& detection_position,
 {
     // We need to initialize the robot somewhere at the start. Without a previous
     // detection, we cannot call this one impossible.
-    if (!prev_detection_timestamp)
+    if (!prev_detection_timestamp || !prev_measurement)
     {
         return true;
     }
 
+    // Measured from the last accepted detection rather than the estimate, since by now
+    // the estimate has already been predicted forward over the same interval
     const double delta_t = (current_time - *prev_detection_timestamp).toSeconds();
-    const Point predicted_position(kalman_filter.state_estimate(POS_X),
-                                   kalman_filter.state_estimate(POS_Y));
+    const Point prev_detection_position((*prev_measurement)(MEAS_X),
+                                        (*prev_measurement)(MEAS_Y));
     const double reachable_distance =
         RF_MAX_ROBOT_SPEED_M_PER_S * std::max(delta_t, 0.0) +
         RF_MAX_ROBOT_SPEED_GATE_TOLERANCE_M;
 
-    return (detection_position - predicted_position).length() <= reachable_distance;
+    return (detection_position - prev_detection_position).length() <= reachable_distance;
 }
 
 void RobotFilter::reset(const Measurement& measurement, const Timestamp& current_time)
