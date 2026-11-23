@@ -66,20 +66,20 @@ class StSpinMotorController : public MotorController
 
     static constexpr int RESET_GPIO_PIN = 12;
 
+    // pid gains for speed
     static constexpr int FRONT_SPEED_PID_PROPORTIONAL_GAIN  = 439;
     static constexpr int FRONT_SPEED_PID_INTEGRAL_GAIN      = 535;
-    static constexpr int FRONT_TORQUE_PID_PROPORTIONAL_GAIN = 336;
-    static constexpr int FRONT_TORQUE_PID_INTEGRAL_GAIN     = 170;
-
-    static constexpr int FRONT_SPEED_FEED_FORWARD_KV        = 500;
-    static constexpr int FRONT_SPEED_FEED_FORWARD_KA        = 500;
-    static constexpr int FRONT_SPEED_FEED_FORWARD_KS        = 0;
-
     static constexpr int BACK_SPEED_PID_PROPORTIONAL_GAIN   = 439;
     static constexpr int BACK_SPEED_PID_INTEGRAL_GAIN       = 535;
+    // pid gains for torque
+    static constexpr int FRONT_TORQUE_PID_PROPORTIONAL_GAIN = 336;
+    static constexpr int FRONT_TORQUE_PID_INTEGRAL_GAIN     = 170;
     static constexpr int BACK_TORQUE_PID_PROPORTIONAL_GAIN  = 336;
     static constexpr int BACK_TORQUE_PID_INTEGRAL_GAIN      = 170;
-
+    // feed forward values for speed
+    static constexpr int FRONT_SPEED_FEED_FORWARD_KA        = 500;
+    static constexpr int FRONT_SPEED_FEED_FORWARD_KV        = 500;
+    static constexpr int FRONT_SPEED_FEED_FORWARD_KS        = 0;
     static constexpr int BACK_SPEED_FEED_FORWARD_KV         = 500;
     static constexpr int BACK_SPEED_FEED_FORWARD_KA         = 500;
     static constexpr int BACK_SPEED_FEED_FORWARD_KS         = 0;
