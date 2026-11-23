@@ -71,10 +71,18 @@ class StSpinMotorController : public MotorController
     static constexpr int FRONT_TORQUE_PID_PROPORTIONAL_GAIN = 336;
     static constexpr int FRONT_TORQUE_PID_INTEGRAL_GAIN     = 170;
 
-    static constexpr int BACK_SPEED_PID_PROPORTIONAL_GAIN  = 439;
-    static constexpr int BACK_SPEED_PID_INTEGRAL_GAIN      = 535;
-    static constexpr int BACK_TORQUE_PID_PROPORTIONAL_GAIN = 336;
-    static constexpr int BACK_TORQUE_PID_INTEGRAL_GAIN     = 170;
+    static constexpr int FRONT_SPEED_FEED_FORWARD_KV        = 535;
+    static constexpr int FRONT_SPEED_FEED_FORWARD_KA        = 336;
+    static constexpr int FRONT_SPEED_FEED_FORWARD_KS        = 170;
+
+    static constexpr int BACK_SPEED_PID_PROPORTIONAL_GAIN   = 439;
+    static constexpr int BACK_SPEED_PID_INTEGRAL_GAIN       = 535;
+    static constexpr int BACK_TORQUE_PID_PROPORTIONAL_GAIN  = 336;
+    static constexpr int BACK_TORQUE_PID_INTEGRAL_GAIN      = 170;
+
+    static constexpr int BACK_SPEED_FEED_FORWARD_KV         = 535;
+    static constexpr int BACK_SPEED_FEED_FORWARD_KA         = 336;
+    static constexpr int BACK_SPEED_FEED_FORWARD_KS         = 170;
 
     robot_constants::RobotConstants robot_constants_;
 

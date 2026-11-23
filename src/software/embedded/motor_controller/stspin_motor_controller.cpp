@@ -54,6 +54,11 @@ void StSpinMotorController::setup()
             sendAndReceiveMessage(motor,
                                 SetPidTorqueKpKiMessage{.kp = FRONT_TORQUE_PID_PROPORTIONAL_GAIN,
                                                         .ki = FRONT_TORQUE_PID_INTEGRAL_GAIN});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKaKvMessage{.ka = FRONT_SPEED_FEED_FORWARD_KA,
+                                                        .kv = FRONT_SPEED_FEED_FORWARD_KV});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKsMessage{.ks = FRONT_SPEED_FEED_FORWARD_KS});
         }
         else if (motor == MotorIndex::BACK_LEFT || motor == MotorIndex::BACK_RIGHT)
         {
@@ -63,6 +68,11 @@ void StSpinMotorController::setup()
             sendAndReceiveMessage(motor,
                                 SetPidTorqueKpKiMessage{.kp = BACK_TORQUE_PID_PROPORTIONAL_GAIN,
                                                         .ki = BACK_TORQUE_PID_INTEGRAL_GAIN});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKaKvMessage{.ka = BACK_SPEED_FEED_FORWARD_KA,
+                                                        .kv = BACK_SPEED_FEED_FORWARD_KV});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKsMessage{.ks = BACK_SPEED_FEED_FORWARD_KS});
         }
     }
 }
