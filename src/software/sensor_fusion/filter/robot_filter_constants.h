@@ -12,7 +12,8 @@
 // entirely, letting it converge onto the robot within a few frames.
 constexpr double RF_INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
 constexpr double RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
-constexpr double RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD  = M_PI * M_PI / 3;
+// 1.732 is the square root of 3. std::sqrt is not constexpr in C++23 and earlier.
+constexpr double RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD  = M_PI / 1.732;
 
 // The fastest we will believe the robot could be travelling when deciding whether a
 // detection could plausibly belong to it.
@@ -36,10 +37,9 @@ constexpr int RF_CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 
 constexpr double RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 4 * M_PI * M_PI;
 
-// How noisy we expect SSL Vision's robot position detections to be. Measure this by
-// logging a stationary robot and taking the standard deviation of the detections.
-constexpr double RF_POS_VISION_NOISE_M   = 0.01;
-constexpr double RF_ANG_VISION_NOISE_RAD = .1;
+// How much noise (standard deviation) there is to be expected from camera measurements 
+constexpr double RF_POS_VISION_NOISE_M   = 0.001;
+constexpr double RF_ANG_VISION_NOISE_RAD = 0.01;
 
 
 const Eigen::Vector<double, RobotFilter::STATE_SIZE> RF_INITIAL_STATE =

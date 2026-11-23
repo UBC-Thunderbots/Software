@@ -200,20 +200,20 @@ void RobotFilter::predict(double delta_t)
     // since last prediction
     const double acceleration_variance =
         RF_ACCELERATION_NOISE_M_PER_S_SQUARED * RF_ACCELERATION_NOISE_M_PER_S_SQUARED;
-    const double delta_t_squared = delta_t * delta_t;
-    const double position_noise =
-        acceleration_variance * delta_t_squared * delta_t_squared / 4.0;
-    const double correlation_noise =
-        acceleration_variance * delta_t_squared * delta_t / 2.0;
-    const double velocity_noise = acceleration_variance * delta_t_squared;
+    const double delta_t_squared   = delta_t * delta_t;
+    const double delta_t_cubed     = delta_t * delta_t * delta_t;
+    const double delta_t_fourth    = delta_t * delta_t * delta_t * delta_t;
+    const double position_noise    = acceleration_variance * delta_t_fourth / 4.0;
+    const double correlation_noise = acceleration_variance * delta_t_cubed / 2.0;
+    const double velocity_noise    = acceleration_variance * delta_t_squared;
 
     // For angle kalman, we compute the angle process covariance with Continuous White
     // Noise Acceleration model, as process model assumes constant velocity (no
     // acceleration).
     const double ang_acceleration_variance = RF_ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED *
                                              RF_ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED;
-    const double angle_noise =
-        ang_acceleration_variance * delta_t_squared * delta_t / 3.0;
+
+    const double angle_noise = ang_acceleration_variance * delta_t_cubed / 3.0;
     const double ang_correlation_noise =
         ang_acceleration_variance * delta_t_squared / 2.0;
     const double ang_velocity_noise = ang_acceleration_variance * delta_t;
