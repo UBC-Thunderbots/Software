@@ -1,46 +1,52 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 #include "power_hal.h"
+#include "power_state_machine.h"
 
-/** Transitional power logic, intended to be replaced by the Boost.SML state machine. */
+/** Converts power requests and sensor/timer observations into FSM events. */
 class PowerController
 {
    public:
     explicit PowerController(PowerHAL& hal);
     ~PowerController();
 
-    // Chicker policy.
     void kick(uint32_t pulse_width_us);
     void chip(uint32_t pulse_width_us);
     void autokick(uint32_t pulse_width_us);
     void autochip(uint32_t pulse_width_us);
 
-    // Chicker and charging policies.
     void update();
 
    private:
-    enum class ChargeToggleState : uint8_t
+    // SML's single-argument is(state<X>) only tests the first parallel region
+    // in the team's pinned version. Visit both regions instead.
+    template <typename State>
+    bool isInState() const
     {
-        Idle,
-        WaitToDisable,
-        WaitToEnable,
-    };
+        bool active = false;
+        fsm_.visit_current_states(
+            [&active](auto current)
+            { active |= std::is_same<typename decltype(current)::type, State>::value; });
+        return active;
+    }
 
-    // Chicker and charging sequencing.
-    void startChickerPulse(ChickerOutput output, uint32_t pulse_width_us);
-    void restartCapacitorCharging(uint32_t now_us);
+    static bool hasElapsed(uint32_t now_us, uint32_t start_us, uint32_t duration_us);
+    bool isValidPulseWidth(uint32_t pulse_width_us) const;
+    void requestPulse(ChickerOutput output, uint32_t pulse_width_us,
+                      bool require_break_beam = false);
 
     PowerHAL& hal_;
-    bool pulsing_                          = false;
-    bool on_cooldown_                      = false;
-    bool charging_                         = false;
-    ChargeToggleState charge_toggle_state_ = ChargeToggleState::Idle;
-    uint32_t cooldown_started_us_          = 0;
-    uint32_t charge_toggle_started_us_     = 0;
-    uint32_t charge_started_us_            = 0;
+    boost::sml::sm<PowerStateMachine> fsm_;
 
+    // Timing only. Operating states belong to the FSM, not to these members.
+    uint32_t cooldown_started_us_      = 0;
+    uint32_t charge_started_us_        = 0;
+    uint32_t restart_stage_started_us_ = 0;
+
+    // Values carried over from the original power_controller.h.
     static constexpr uint32_t COOLDOWN_US                = 3000000;
     static constexpr uint32_t CHARGE_TOGGLE_DELAY_US     = 5000;
     static constexpr uint32_t MAX_CHARGE_DURATION_US     = 2000000;

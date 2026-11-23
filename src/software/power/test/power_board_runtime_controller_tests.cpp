@@ -118,6 +118,9 @@ TEST_F(PowerBoardRuntimeControllerTest, AutochipRequiresTrippedBreakBeam)
     EXPECT_FALSE(hal_.isChickerPulseActive());
 
     setBreakBeamTripped(true);
+    tick();
+    EXPECT_FALSE(hal_.isChickerPulseActive());
+
     sendCommand(control);
     tick();
     EXPECT_TRUE(hal_.isChickerPulseActive());

@@ -165,6 +165,9 @@ TEST_F(PowerBoardRuntimeSimHalTest, AutokickRequiresTrippedBreakBeam)
     SimHal::State state      = hal_.stateSnapshot();
     state.break_beam_tripped = true;
     hal_.setState(state);
+    static_cast<void>(runtime_.tick());
+    EXPECT_FALSE(hal_.isChickerPulseActive());
+
     sendCommand(control);
     static_cast<void>(runtime_.tick());
     EXPECT_TRUE(hal_.isChickerPulseActive());
