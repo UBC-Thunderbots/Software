@@ -91,7 +91,7 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DefenseState
-DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]\n<i>shadowAndBlockShots</i>
+DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]<br><i>shadowAndBlockShots</i>
 DefenseState --> DefenseState : <i>blockShots</i>
 AggressiveDefenseState --> DefenseState : [!shouldDefendAggressively]\n<i>blockShots</i>
 AggressiveDefenseState --> AggressiveDefenseState : <i>shadowAndBlockShots</i>
