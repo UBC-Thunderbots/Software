@@ -26,7 +26,7 @@
 
 For a more detailed look at how Ansible works, [see the RFC](https://docs.google.com/document/d/1hN3Us2Vjr8z6ihqUVp_3L7rrjKc-EZ-l2hZJc31gNOc/edit)
 
-Example command: `bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+Example command: `bazel run //software/embedded/ansible:run_ansible -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 * <robot_ip>: IP address of the robot
 * <robot_password>: Password of the robot
 

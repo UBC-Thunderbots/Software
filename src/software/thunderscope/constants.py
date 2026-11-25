@@ -118,7 +118,7 @@ ERROR_CODE_MESSAGES = {
     protos.ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
 }
 
-SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
+SAVED_LAYOUT_PATH = "/opt/tbots/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
 LAST_OPENED_LAYOUT_PATH = (
     f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
@@ -260,6 +260,8 @@ class Colors:
     SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
+    SIM_YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 150)
+    SIM_BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 150)
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
@@ -348,7 +350,7 @@ class DiagnosticsConstants:
 
 
 class ProtoConfigurationConstant:
-    DEFAULT_SAVE_DIRECTORY = "/opt/tbotspython/thunderbots_configuration_proto"
+    DEFAULT_SAVE_DIRECTORY = "/opt/tbots/thunderbots_configuration_proto"
     DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_configuration.proto"
 
 
@@ -392,7 +394,7 @@ class RuntimeManagerConstants:
     RUNTIME_CONFIG_YELLOW_KEY = "yellow_runtime_name"
     DEFAULT_BINARY_PATH = "software/unix_full_system"
     DEFAULT_BINARY_NAME = "Current Fullsystem"
-    EXTERNAL_RUNTIMES_PATH = "/opt/tbotspython/external_runtimes"
+    EXTERNAL_RUNTIMES_PATH = "/opt/tbots/external_runtimes"
     RUNTIME_CONFIG_PATH = f"{EXTERNAL_RUNTIMES_PATH}/runtime_config.toml"
 
     RUNTIME_EVENTS_DIRECTORY_PATH = "/tmp/tbots/stats"

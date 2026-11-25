@@ -484,7 +484,7 @@ class InteractiveCli:
 
             case InteractiveCli.Category.FLASH:
                 config.action = ActionArgument.run
-                config.search_query = "ansible"
+                config.search_query = "run_ansible"
                 flash_cmd_label, playbook, debug_powerloop = questionary.select(
                     "Select playbook:",
                     choices=InteractiveCli.PLAYBOOK_CHOICES,

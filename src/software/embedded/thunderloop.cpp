@@ -85,7 +85,8 @@ Thunderloop::Thunderloop(const robot_constants::RobotConstants& robot_constants,
     : toml_config_client_(std::make_unique<TomlConfigClient>(TOML_CONFIG_FILE_PATH)),
       loop_hz_(loop_hz)
 {
-    const RobotId robot_id = std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY));
+    const RobotId robot_id =
+        static_cast<RobotId>(std::stoi(toml_config_client_->get(ROBOT_ID_CONFIG_KEY)));
     const int channel_id =
         std::stoi(toml_config_client_->get(ROBOT_MULTICAST_CHANNEL_CONFIG_KEY));
     const std::string network_interface =

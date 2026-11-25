@@ -1,5 +1,7 @@
 #include "software/util/typename/typename.h"
 
+#include <cstdlib>
+
 std::string demangleTypeId(const char* mangled_name)
 {
     auto demangled_name_char_ptr = abi::__cxa_demangle(mangled_name, NULL, NULL, NULL);
