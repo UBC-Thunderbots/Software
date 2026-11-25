@@ -30,23 +30,33 @@ void PrimitiveExecutor::updatePrimitive(const TbotsProto::Primitive& primitive_m
 
     if (current_primitive_.has_move())
     {
-        const auto new_trajectory_path =
-            createTrajectoryPathFromParams(current_primitive_.move().xy_traj_params(),
-                                           robot_state_.velocity(), robot_constants_);
+        // Start the trajectories from the current robot state rather than the vision
+        // start state in the primitive. The robot state already has that (delayed)
+        // vision measurement fused in and is propagated to the current time, so
+        // the trajectories start now and need no vision delay compensation.
+        TbotsProto::TrajectoryPathParams2D xy_traj_params =
+            current_primitive_.move().xy_traj_params();
+        *(xy_traj_params.mutable_start_position()) =
+            *createPointProto(robot_state_.position());
+
+        TbotsProto::TrajectoryParamsAngular1D w_traj_params =
+            current_primitive_.move().w_traj_params();
+        *(w_traj_params.mutable_start_angle()) =
+            *createAngleProto(robot_state_.orientation());
+
+        const auto new_trajectory_path = createTrajectoryPathFromParams(
+            xy_traj_params, robot_state_.velocity(), robot_constants_);
 
         const auto new_angular_trajectory = createAngularTrajectoryFromParams(
-            current_primitive_.move().w_traj_params(), robot_state_.angularVelocity(),
-            robot_constants_);
+            w_traj_params, robot_state_.angularVelocity(), robot_constants_);
 
         trajectory_path_ = new_trajectory_path;
         position_controller_.reset();
-        time_since_linear_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        time_since_linear_trajectory_creation_ = Duration::fromSeconds(0);
 
         angular_trajectory_ = new_angular_trajectory;
         orientation_controller_.reset();
-        time_since_angular_trajectory_creation_ =
-            Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        time_since_angular_trajectory_creation_ = Duration::fromSeconds(0);
     }
 
     const auto update_end = std::chrono::steady_clock::now();

@@ -1,6 +1,7 @@
 #include "software/embedded/thunderloop.h"
 
 #include <Tracy.hpp>
+#include <algorithm>
 #include <chrono>
 #include <csignal>
 #include <iostream>
@@ -42,6 +43,39 @@ struct CrashContext
 };
 
 CrashContext crash_context;
+
+// Bounds on the estimated vision age. Estimates outside of these are clamped.
+constexpr double MIN_VISION_AGE_S = 0.0;
+constexpr double MAX_VISION_AGE_S = 0.2;
+
+/**
+ * Estimates how old the vision data a primitive was planned from is right now.
+ *
+ * The age is the vision age when Thunderscope sent the primitive, plus the one-way
+ * network latency to the robot, plus how long the primitive has been waiting on the
+ * robot. Unknown terms fall back to RTT_S / 2.
+ *
+ * @param primitive The received primitive
+ * @param seconds_since_received How long ago the primitive was received
+ *
+ * @return the estimated vision age in seconds
+ */
+double estimateVisionAgeSeconds(const TbotsProto::Primitive& primitive,
+                                double seconds_since_received)
+{
+    if (primitive.vision_age_at_send_s() <= 0.0)
+    {
+        return RTT_S / 2;
+    }
+
+    const double one_way_latency_s = primitive.estimated_one_way_latency_s() > 0.0
+                                         ? primitive.estimated_one_way_latency_s()
+                                         : RTT_S / 2;
+
+    return std::clamp(primitive.vision_age_at_send_s() + one_way_latency_s +
+                          std::max(seconds_since_received, 0.0),
+                      MIN_VISION_AGE_S, MAX_VISION_AGE_S);
+}
 }  // namespace
 
 /**
@@ -208,7 +242,6 @@ void Thunderloop::runLoop()
         if (primitive.has_value())
         {
             updateRobotLocalizer(primitive.value());
-            primitive_executor_->updatePrimitive(primitive.value(), robot_status_);
         }
 
         robot_localizer_->predict(primitive_executor_->getPrevCommandedVelocity(),
@@ -216,6 +249,13 @@ void Thunderloop::runLoop()
         updateRobotLocalizer(robot_status_);
 
         primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
+
+        // Update the primitive after the robot state so that new trajectories start
+        // from this tick's localizer estimate
+        if (primitive.has_value())
+        {
+            primitive_executor_->updatePrimitive(primitive.value(), robot_status_);
+        }
 
         imu_service_->poll(robot_status_);
 
@@ -259,8 +299,17 @@ void Thunderloop::updateRobotLocalizer(const TbotsProto::Primitive& primitive)
             createPoint(primitive.move().xy_traj_params().start_position());
         const Angle orientation =
             createAngle(primitive.move().w_traj_params().start_angle());
+        const double seconds_since_received =
+            network_service_->getSecondsSinceReturnedPrimitiveReceived();
+        const double vision_age_s =
+            estimateVisionAgeSeconds(primitive, seconds_since_received);
+        LOG(INFO) << "Total vision age: " << vision_age_s * 1000.0 << " ms"
+                  << " (at send: " << primitive.vision_age_at_send_s() * 1000.0
+                  << " ms, one-way: "
+                  << primitive.estimated_one_way_latency_s() * 1000.0
+                  << " ms, on robot: " << seconds_since_received * 1000.0 << " ms)";
         robot_localizer_->update(
-            RobotLocalizer::VisionData{position, orientation, RTT_S / 2});
+            RobotLocalizer::VisionData{position, orientation, vision_age_s});
     }
 }
 

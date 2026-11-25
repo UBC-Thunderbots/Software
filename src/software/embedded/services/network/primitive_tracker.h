@@ -40,6 +40,20 @@ class PrimitiveTracker
     std::optional<TbotsProto::Primitive> getLatestPrimitive();
 
     /**
+     * Returns the epoch time at which the latest valid primitive was received.
+     *
+     * @return the receive time in seconds, or 0 if no primitive has been received
+     */
+    double getLatestPrimitiveReceivedTimeSeconds() const;
+
+    /**
+     * Returns the current epoch time, used to timestamp received primitives.
+     *
+     * @return the current epoch time in seconds
+     */
+    static double getCurrentEpochTimeInSeconds();
+
+    /**
      * Updates the robot status with the timestamp Thunderscope uses to calculate the
      * round-trip time of the most recently handled primitive.
      *
@@ -67,13 +81,6 @@ class PrimitiveTracker
      */
     float calculateLossRate(uint64_t seq_num) const;
 
-    /**
-     * Returns the current epoch time, used to timestamp received primitives.
-     *
-     * @return the current epoch time in seconds
-     */
-    static double getCurrentEpochTimeInSeconds();
-
     // Minimum distance away from latest known sequence number for primitive
     // to be considered out of date
     static constexpr uint8_t RECENT_PRIMITIVE_LOSS_PERIOD = 100;
@@ -92,4 +99,7 @@ class PrimitiveTracker
 
     // The latest valid primitive
     std::optional<TbotsProto::Primitive> latest_primitive;
+
+    // Epoch time in seconds at which the latest valid primitive was received
+    double latest_primitive_received_time_seconds = 0.0;
 };

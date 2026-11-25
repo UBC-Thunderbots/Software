@@ -114,6 +114,18 @@ message Primitive
 
     // Epoch timestamp when primitives were assigned
     Timestamp time_sent = 5;
+
+    // Capture time (on the SSL Vision clock, in seconds) of the vision frame this
+    // primitive was planned from. 0 if unknown. Set by the AI.
+    double vision_capture_time_s = 6;
+
+    // Age of the vision frame this primitive was planned from at the moment the
+    // primitive was sent to the robot, in seconds. 0 if unknown. Set by Thunderscope.
+    double vision_age_at_send_s = 7;
+
+    // Estimated one-way network latency from Thunderscope to the robot, in seconds.
+    // 0 if unknown. Set by Thunderscope.
+    double estimated_one_way_latency_s = 8;
 }
 
 message MovePrimitive

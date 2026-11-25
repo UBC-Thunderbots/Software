@@ -34,6 +34,8 @@ void PrimitiveTracker::track(const TbotsProto::Primitive& primitive)
     }
     proto_loss_rate = calculateLossRate(seq_num);
 
+    const double received_time_seconds = getCurrentEpochTimeInSeconds();
+
     // Log the primitive for round-trip time calculations
     if (primitive_rtt.size() >= PRIMITIVE_DEQUE_MAX_SIZE)
     {
@@ -46,11 +48,17 @@ void PrimitiveTracker::track(const TbotsProto::Primitive& primitive)
             .primitive_sequence_num = seq_num,
             .thunderscope_sent_time_seconds =
                 primitive.time_sent().epoch_timestamp_seconds(),
-            .thunderloop_received_time_seconds = getCurrentEpochTimeInSeconds(),
+            .thunderloop_received_time_seconds = received_time_seconds,
         });
     }
 
-    latest_primitive = primitive;
+    latest_primitive                       = primitive;
+    latest_primitive_received_time_seconds = received_time_seconds;
+}
+
+double PrimitiveTracker::getLatestPrimitiveReceivedTimeSeconds() const
+{
+    return latest_primitive_received_time_seconds;
 }
 
 float PrimitiveTracker::getPrimitiveLossRate() const

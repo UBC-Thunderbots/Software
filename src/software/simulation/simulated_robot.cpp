@@ -40,6 +40,9 @@ void SimulatedRobot::setPrimitive(const TbotsProto::Primitive& primitive,
     if (robot_localizer_)
     {
         updateRobotLocalizer(primitive);
+        // New trajectories start from the robot state, so give the executor the
+        // estimate that includes this vision measurement
+        primitive_executor_->updateRobotState(robot_localizer_->getRobotState());
     }
     else
     {

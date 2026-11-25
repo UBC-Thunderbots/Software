@@ -1,5 +1,7 @@
 import logging
+import statistics
 import time
+from collections import deque
 from threading import Lock, Thread
 from typing import Any, Callable, Self, Type
 
@@ -30,11 +32,72 @@ DISCONNECTED = "DISCONNECTED"
 logger = create_logger(name=__name__, log_level=logging.DEBUG)
 
 
+class RollingMin:
+    """Thread-safe minimum of the samples added within a sliding time window."""
+
+    def __init__(self, window_s: float):
+        """Creates an empty rolling minimum
+
+        :param window_s: how long, in seconds, a sample is kept for
+        """
+        self.window_s = window_s
+        # (time added, value) with strictly increasing values, so the front is the min
+        self.samples: deque[tuple[float, float]] = deque()
+        self.lock = Lock()
+
+    def add(self, value: float, now: float) -> None:
+        """Adds a sample
+
+        :param value: the sample value
+        :param now: the current time in seconds
+        """
+        with self.lock:
+            while self.samples and self.samples[-1][1] >= value:
+                self.samples.pop()
+            self.samples.append((now, value))
+            self.__expire(now)
+
+    def get(self, now: float) -> float | None:
+        """Returns the minimum of the samples in the window, or None if there are none
+
+        :param now: the current time in seconds
+        """
+        with self.lock:
+            self.__expire(now)
+            return self.samples[0][1] if self.samples else None
+
+    def clear(self) -> None:
+        """Removes all samples"""
+        with self.lock:
+            self.samples.clear()
+
+    def __expire(self, now: float) -> None:
+        while self.samples and self.samples[0][0] < now - self.window_s:
+            self.samples.popleft()
+
+
 class WifiCommunicationManager:
     """Manages WiFi communication between different modules of the system."""
 
     BROADCAST_HZ = 1.0
     """The frequency at which to broadcast the full system IP address"""
+
+    VISION_CLOCK_OFFSET_WINDOW_S = 5.0
+    """How long to keep vision clock offset samples. The minimum over this window
+    approximates the offset between the SSL Vision clock and this computer's clock"""
+
+    VISION_CLOCK_JUMP_THRESHOLD_S = 1.0
+    """If a new vision clock offset sample differs from the current estimate by more
+    than this, the vision clock was reset and the old samples are discarded"""
+
+    MAX_VALID_VISION_AGE_S = 0.5
+    """Vision ages outside (0, this] are treated as invalid and not sent"""
+
+    RTT_SAMPLE_COUNT = 20
+    """Number of recent round-trip time samples per robot to take the median of"""
+
+    RTT_STALE_TIMEOUT_S = 2.0
+    """Round-trip time estimates older than this are not sent"""
 
     def __init__(
         self,
@@ -69,6 +132,15 @@ class WifiCommunicationManager:
         self.fullsystem_ip_broadcaster: tuple[
             Lock, tbots_cpp.FullsystemIpBroadcast | None, protos.IpNotification
         ] = (Lock(), None, protos.IpNotification())
+
+        ## Latency estimation ##
+        # Offset from the SSL Vision clock to this computer's clock
+        self.vision_clock_offset = RollingMin(self.VISION_CLOCK_OFFSET_WINDOW_S)
+        # Per robot: (lock, recent round-trip times, time of the latest sample)
+        self.robot_rtts: list[tuple[Lock, deque[float], list[float]]] = [
+            (Lock(), deque(maxlen=self.RTT_SAMPLE_COUNT), [0.0])
+            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
+        ]
 
         ## ProtoUnixIO ##
         self.current_proto_unix_io = current_proto_unix_io
@@ -207,9 +279,19 @@ class WifiCommunicationManager:
 
         :param robot_status: RobotStatus to forward to fullsystem
         """
-        round_trip_time_seconds = time.time() - (
+        now = time.time()
+        round_trip_time_seconds = now - (
             robot_status.adjusted_time_sent.epoch_timestamp_seconds
         )
+        if (
+            robot_status.HasField("adjusted_time_sent")
+            and 0 <= robot_status.robot_id < MAX_ROBOT_IDS_PER_SIDE
+            and 0.0 < round_trip_time_seconds < self.MAX_VALID_VISION_AGE_S
+        ):
+            lock, rtts, last_sample_time = self.robot_rtts[robot_status.robot_id]
+            with lock:
+                rtts.append(round_trip_time_seconds)
+                last_sample_time[0] = now
         self.__forward_to_proto_unix_io(
             protos.RobotStatistic,
             protos.RobotStatistic(
@@ -218,6 +300,52 @@ class WifiCommunicationManager:
             ),
         )
         self.__forward_to_proto_unix_io(protos.RobotStatus, robot_status)
+
+    def __receive_ssl_wrapper(self, ssl_wrapper: Message) -> None:
+        """Updates the vision clock offset estimate and forwards the given SSL wrapper
+        packet to the full system
+
+        :param ssl_wrapper: SSL_WrapperPacket received from SSL Vision
+        """
+        if ssl_wrapper.HasField("detection"):
+            now = time.time()
+            # Local receive time minus vision send time is the clock offset plus the
+            # network delay, so the minimum over a window approximates the offset
+            offset_sample = now - ssl_wrapper.detection.t_sent
+            current_offset = self.vision_clock_offset.get(now)
+            if (
+                current_offset is not None
+                and abs(offset_sample - current_offset)
+                > self.VISION_CLOCK_JUMP_THRESHOLD_S
+            ):
+                self.vision_clock_offset.clear()
+            self.vision_clock_offset.add(offset_sample, now)
+
+        self.__forward_to_proto_unix_io(protos.SSL_WrapperPacket, ssl_wrapper)
+
+    def __stamp_latency_estimates(
+        self, robot_id: int, primitive: protos.Primitive
+    ) -> None:
+        """Fills in the vision age and network latency estimates of the given primitive,
+        right before it is sent. Estimates that are unknown are set to 0.
+
+        :param robot_id: the id of the robot the primitive is sent to
+        :param primitive: the primitive to update
+        """
+        now = time.time()
+
+        primitive.vision_age_at_send_s = 0.0
+        vision_clock_offset = self.vision_clock_offset.get(now)
+        if primitive.vision_capture_time_s > 0.0 and vision_clock_offset is not None:
+            vision_age_s = now - (primitive.vision_capture_time_s + vision_clock_offset)
+            if 0.0 < vision_age_s <= self.MAX_VALID_VISION_AGE_S:
+                primitive.vision_age_at_send_s = vision_age_s
+
+        primitive.estimated_one_way_latency_s = 0.0
+        lock, rtts, last_sample_time = self.robot_rtts[robot_id]
+        with lock:
+            if rtts and now - last_sample_time[0] < self.RTT_STALE_TIMEOUT_S:
+                primitive.estimated_one_way_latency_s = statistics.median(rtts) / 2
 
     def __setup_full_system(
         self, referee_interface: str, vision_interface: str
@@ -255,9 +383,7 @@ class WifiCommunicationManager:
                     SSL_VISION_ADDRESS,
                     SSL_VISION_PORT,
                     vision_interface,
-                    lambda data: self.__forward_to_proto_unix_io(
-                        protos.SSL_WrapperPacket, data
-                    ),
+                    self.__receive_ssl_wrapper,
                     True,
                 )
                 self.current_network_config.vision_interface = vision_interface
@@ -415,6 +541,7 @@ class WifiCommunicationManager:
         :param primitive: the primitive to send
         """
         logger.debug(f"Sending primitive to robot {robot_id}")
+        self.__stamp_latency_estimates(robot_id, primitive)
         with self.primitive_senders[robot_id][0]:
             primitive_sender = self.primitive_senders[robot_id][1]
             if primitive_sender is not None:

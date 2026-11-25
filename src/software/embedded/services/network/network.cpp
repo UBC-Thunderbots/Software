@@ -195,6 +195,12 @@ void NetworkService::sendIpNotificationIfNeeded(
     robot_to_fullsystem_ip_sender->sendProto(robot_ip_notification_msg, true);
 }
 
+double NetworkService::getSecondsSinceReturnedPrimitiveReceived() const
+{
+    return PrimitiveTracker::getCurrentEpochTimeInSeconds() -
+           returned_primitive_received_time_s_;
+}
+
 std::optional<TbotsProto::Primitive> NetworkService::getPrimitiveToExecute(
     const double time_elapsed_since_last_poll_s)
 {
@@ -202,6 +208,11 @@ std::optional<TbotsProto::Primitive> NetworkService::getPrimitiveToExecute(
     {
         std::scoped_lock lock(primitive_tracker_mutex);
         latest_primitive = primitive_tracker.getLatestPrimitive();
+        if (latest_primitive.has_value())
+        {
+            returned_primitive_received_time_s_ =
+                primitive_tracker.getLatestPrimitiveReceivedTimeSeconds();
+        }
     }
 
     if (latest_primitive.has_value())

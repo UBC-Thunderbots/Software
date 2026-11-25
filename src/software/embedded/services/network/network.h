@@ -72,6 +72,14 @@ class NetworkService
         TbotsProto::RobotStatus& robot_status,
         const Duration& time_elapsed_since_last_poll);
 
+    /**
+     * Returns how long ago the primitive most recently returned by poll() was
+     * received from the network.
+     *
+     * @return the time since that primitive was received, in seconds
+     */
+    double getSecondsSinceReturnedPrimitiveReceived() const;
+
    private:
     /**
      * Wait for networking communication to be established. This function is blocking.
@@ -190,6 +198,10 @@ class NetworkService
     double time_since_last_robot_status_sent_s_    = 0.0;
     double time_since_last_ip_notification_sent_s_ = 0.0;
     double time_since_last_primitive_received_s_   = 0.0;
+
+    // Epoch time in seconds at which the primitive most recently returned by poll()
+    // was received
+    double returned_primitive_received_time_s_ = 0.0;
 
     // Mutex protects the primitive tracker
     std::mutex primitive_tracker_mutex;

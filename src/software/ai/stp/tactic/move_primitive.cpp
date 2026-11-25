@@ -167,6 +167,10 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     primitive_proto->mutable_move()->set_dribbler_mode(dribbler_mode);
 
+    // Capture time of the vision frame start_position/start_angle came from, used to
+    // estimate how old that vision data is by the time the robot receives it
+    primitive_proto->set_vision_capture_time_s(robot.timestamp().toSeconds());
+
     if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {
         primitive_proto->mutable_move()
