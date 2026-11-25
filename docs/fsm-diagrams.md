@@ -8,25 +8,25 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> Halt
-Halt --> Stop : [gameStateStopped]<br><i>setupStopPlay</i>
-Halt --> Playing : [gameStatePlaying]<br><i>setupOffensePlay</i>
-Halt --> SetPlay : [gameStateSetupRestart]<br><i>setupSetPlay</i>
+Halt --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
+Halt --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+Halt --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Halt --> Halt : <i>setupOverridePlay</i>
 Halt --> Halt : <i>resetPlaySelection</i>
-Stop --> Halt : [gameStateHalted]<br><i>setupHaltPlay</i>
-Stop --> Playing : [gameStatePlaying]<br><i>setupOffensePlay</i>
-Stop --> SetPlay : [gameStateSetupRestart]<br><i>setupSetPlay</i>
+Stop --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Stop --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Stop --> Stop : <i>setupOverridePlay</i>
 Stop --> Halt : <i>resetPlaySelection</i>
-Playing --> Halt : [gameStateHalted]<br><i>setupHaltPlay</i>
-Playing --> Stop : [gameStateStopped]<br><i>setupStopPlay</i>
-Playing --> SetPlay : [gameStateSetupRestart]<br><i>setupSetPlay</i>
+Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
+Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
+Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Playing --> Playing : <i>setupOverridePlay</i>
 Playing --> Halt : <i>resetPlaySelection</i>
-SetPlay --> Halt : [gameStateHalted]<br><i>resetSetPlay, setupHaltPlay</i>
-SetPlay --> Stop : [gameStateStopped]<br><i>resetSetPlay, setupStopPlay</i>
-SetPlay --> Playing : [gameStatePlaying]<br><i>resetSetPlay, setupOffensePlay</i>
-SetPlay --> SetPlay : [gameStateSetupRestart]<br><i>setupSetPlay</i>
+SetPlay --> Halt : [gameStateHalted]\n<i>resetSetPlay, setupHaltPlay</i>
+SetPlay --> Stop : [gameStateStopped]\n<i>resetSetPlay, setupStopPlay</i>
+SetPlay --> Playing : [gameStatePlaying]\n<i>resetSetPlay, setupOffensePlay</i>
+SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 SetPlay --> SetPlay : <i>setupOverridePlay</i>
 SetPlay --> Halt : <i>resetPlaySelection</i>
 Terminate:::terminate --> Terminate:::terminate
@@ -53,20 +53,20 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StartState
-StartState --> AlignPlacementState : [!shouldKickOffWall]<br><i>alignPlacement</i>
+StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
 StartState --> KickOffWallState : [shouldKickOffWall]
-KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]<br><i>kickOffWall</i>
+KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
 KickOffWallState --> KickOffWallState : [kickDone]
 KickOffWallState --> AlignPlacementState : [!kickDone]
 AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
-AlignPlacementState --> AlignPlacementState : [!alignDone]<br><i>alignPlacement</i>
+AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
 AlignPlacementState --> PlaceBallState : [alignDone]
-PlaceBallState --> PlaceBallState : [!ballPlaced]<br><i>placeBall</i>
-PlaceBallState --> WaitState : [ballPlaced]<br><i>startWait</i>
+PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
+PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
 WaitState --> WaitState : [!waitDone]
 WaitState --> RetreatState : [waitDone]
 RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
-RetreatState --> RetreatState : [ballPlaced]<br><i>retreat</i>
+RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
 
 ```
 
@@ -91,9 +91,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DefenseState
-DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]<br><i>shadowAndBlockShots</i>
+DefenseState --> AggressiveDefenseState : [shouldDefendAggressively]\n<i>shadowAndBlockShots</i>
 DefenseState --> DefenseState : <i>blockShots</i>
-AggressiveDefenseState --> DefenseState : [!shouldDefendAggressively]<br><i>blockShots</i>
+AggressiveDefenseState --> DefenseState : [!shouldDefendAggressively]\n<i>blockShots</i>
 AggressiveDefenseState --> AggressiveDefenseState : <i>shadowAndBlockShots</i>
 Terminate:::terminate --> Terminate:::terminate
 
@@ -107,11 +107,11 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitState
-WaitState --> AvoidState : [hasPlacementPoint]<br><i>setPlacementPoint</i>
+WaitState --> AvoidState : [hasPlacementPoint]\n<i>setPlacementPoint</i>
 WaitState --> WaitState : [!hasPlacementPoint]
-AvoidState --> AvoidState : [!isNearlyPlaced]<br><i>avoid</i>
+AvoidState --> AvoidState : [!isNearlyPlaced]\n<i>avoid</i>
 AvoidState --> DefenseState : [isNearlyPlaced]
-DefenseState --> DefenseState : [isNearlyPlaced]<br><i>enterDefensiveFormation</i>
+DefenseState --> DefenseState : [isNearlyPlaced]\n<i>enterDefensiveFormation</i>
 DefenseState --> AvoidState : [!isNearlyPlaced]
 
 ```
@@ -150,18 +150,18 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> SetupPositionState
-SetupPositionState --> SetupPositionState : [!setupDone]<br><i>setupPosition</i>
+SetupPositionState --> SetupPositionState : [!setupDone]\n<i>setupPosition</i>
 SetupPositionState --> ShootState : [shotFound]
-ShootState --> ShootState : [!shotDone]<br><i>shootBall</i>
+ShootState --> ShootState : [!shotDone]\n<i>shootBall</i>
 ShootState --> Terminate:::terminate : [shotDone]
 SetupPositionState --> AttemptPassState : <i>startLookingForPass</i>
 AttemptPassState --> ChipState : [timeExpired]
-AttemptPassState --> AttemptPassState : [!passFound]<br><i>lookForPass</i>
+AttemptPassState --> AttemptPassState : [!passFound]\n<i>lookForPass</i>
 AttemptPassState --> PassState : [passFound]
 PassState --> AttemptPassState : [shouldAbortPass]
-PassState --> PassState : [!passDone]<br><i>passBall</i>
+PassState --> PassState : [!passDone]\n<i>passBall</i>
 PassState --> Terminate:::terminate : [passDone]
-ChipState --> ChipState : [!chipDone]<br><i>chipBall</i>
+ChipState --> ChipState : [!chipDone]\n<i>chipBall</i>
 ChipState --> Terminate:::terminate : [chipDone]
 
 ```
@@ -199,9 +199,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> SetupState
-SetupState --> SetupState : [!isSetupDone]<br><i>setupKickoff</i>
+SetupState --> SetupState : [!isSetupDone]\n<i>setupKickoff</i>
 SetupState --> ChipState : [isSetupDone]
-ChipState --> ChipState : [!isPlaying]<br><i>chipBall</i>
+ChipState --> ChipState : [!isPlaying]\n<i>chipBall</i>
 ChipState --> Terminate:::terminate : [isPlaying]
 Terminate:::terminate --> Terminate:::terminate
 
@@ -215,9 +215,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> OffensiveState
-OffensiveState --> DefensiveState : [enemyHasPossession]<br><i>setupDefensiveStrategy</i>
+OffensiveState --> DefensiveState : [enemyHasPossession]\n<i>setupDefensiveStrategy</i>
 OffensiveState --> OffensiveState : <i>setupOffensiveStrategy</i>
-DefensiveState --> OffensiveState : [!enemyHasPossession]<br><i>setupOffensiveStrategy</i>
+DefensiveState --> OffensiveState : [!enemyHasPossession]\n<i>setupOffensiveStrategy</i>
 DefensiveState --> DefensiveState : <i>setupDefensiveStrategy</i>
 Terminate:::terminate --> Terminate:::terminate
 
@@ -231,9 +231,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> SetupPositionState
-SetupPositionState --> SetupPositionState : [!setupPositionDone]<br><i>setupPosition</i>
+SetupPositionState --> SetupPositionState : [!setupPositionDone]\n<i>setupPosition</i>
 SetupPositionState --> PerformKickState : [setupPositionDone]
-PerformKickState --> PerformKickState : [!kickDone]<br><i>performKick</i>
+PerformKickState --> PerformKickState : [!kickDone]\n<i>performKick</i>
 PerformKickState --> Terminate:::terminate : [kickDone]
 Terminate:::terminate --> Terminate:::terminate
 
@@ -247,8 +247,8 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> SetupPositionState
-SetupPositionState --> SetupPositionState : [!setupPositionDone]<br><i>setupPosition</i>
-SetupPositionState --> DefendKickState : [setupPositionDone]<br><i>defendKick</i>
+SetupPositionState --> SetupPositionState : [!setupPositionDone]\n<i>setupPosition</i>
+SetupPositionState --> DefendKickState : [setupPositionDone]\n<i>defendKick</i>
 DefendKickState --> DefendKickState : <i>defendKick</i>
 Terminate:::terminate --> Terminate:::terminate
 
@@ -262,8 +262,8 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> ShootOrChipState
-ShootOrChipState --> ShootOrChipState : [!attackerDone]<br><i>updateShootOrChip</i>
-ShootOrChipState --> Terminate:::terminate : [attackerDone]<br><i>updateShootOrChip</i>
+ShootOrChipState --> ShootOrChipState : [!attackerDone]\n<i>updateShootOrChip</i>
+ShootOrChipState --> Terminate:::terminate : [attackerDone]\n<i>updateShootOrChip</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -277,12 +277,12 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StartState
 StartState --> AttemptShotState : <i>startLookingForPass</i>
-AttemptShotState --> TakePassState : [passFound]<br><i>takePass</i>
+AttemptShotState --> TakePassState : [passFound]\n<i>takePass</i>
 AttemptShotState --> Terminate:::terminate : [tookShot]
-AttemptShotState --> AttemptShotState : [!passFound]<br><i>lookForPass</i>
-TakePassState --> AttemptShotState : [shouldAbortPass]<br><i>startLookingForPass</i>
-TakePassState --> TakePassState : [!passCompleted]<br><i>takePass</i>
-TakePassState --> Terminate:::terminate : [passCompleted]<br><i>takePass</i>
+AttemptShotState --> AttemptShotState : [!passFound]\n<i>lookForPass</i>
+TakePassState --> AttemptShotState : [shouldAbortPass]\n<i>startLookingForPass</i>
+TakePassState --> TakePassState : [!passCompleted]\n<i>takePass</i>
+TakePassState --> Terminate:::terminate : [passCompleted]\n<i>takePass</i>
 Terminate:::terminate --> AttemptShotState : <i>startLookingForPass</i>
 
 ```
@@ -295,9 +295,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
-DribbleFSM --> PivotKickFSM : [shouldKick]<br><i>pivotKick</i>
-DribbleFSM --> KeepAwayFSM : [!shouldKick]<br><i>keepAway</i>
-KeepAwayFSM --> PivotKickFSM : [shouldKick]<br><i>pivotKick</i>
+DribbleFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
+DribbleFSM --> KeepAwayFSM : [!shouldKick]\n<i>keepAway</i>
+KeepAwayFSM --> PivotKickFSM : [shouldKick]\n<i>pivotKick</i>
 KeepAwayFSM --> KeepAwayFSM : <i>keepAway</i>
 KeepAwayFSM --> DribbleFSM
 PivotKickFSM --> PivotKickFSM : <i>pivotKick</i>
@@ -314,12 +314,12 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
-MoveFSM --> DribbleFSM : [ballNearbyWithoutThreat]<br><i>prepareGetPossession</i>
+MoveFSM --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 MoveFSM --> MoveFSM : <i>blockThreat</i>
 MoveFSM --> Terminate:::terminate
-DribbleFSM --> MoveFSM : [!ballNearbyWithoutThreat]<br><i>blockThreat</i>
+DribbleFSM --> MoveFSM : [!ballNearbyWithoutThreat]\n<i>blockThreat</i>
 DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
-Terminate:::terminate --> DribbleFSM : [ballNearbyWithoutThreat]<br><i>prepareGetPossession</i>
+Terminate:::terminate --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
 
 ```
@@ -332,16 +332,16 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> GetPossession
-GetPossession --> Dribble : [havePossession]<br><i>dribble</i>
-GetPossession --> GetPossession : [!havePossession]<br><i>getPossession</i>
-Dribble --> LoseBall : [shouldLoseBall]<br><i>loseBall</i>
-Dribble --> GetPossession : [lostPossession]<br><i>getPossession</i>
-Dribble --> Dribble : [!dribblingDone]<br><i>dribble</i>
-Dribble --> Terminate:::terminate : [dribblingDone]<br><i>dribble</i>
-LoseBall --> LoseBall : [shouldLoseBall]<br><i>loseBall</i>
-LoseBall --> GetPossession : [!shouldLoseBall]<br><i>getPossession</i>
-Terminate:::terminate --> GetPossession : [lostPossession]<br><i>getPossession</i>
-Terminate:::terminate --> Dribble : [!dribblingDone]<br><i>dribble</i>
+GetPossession --> Dribble : [havePossession]\n<i>dribble</i>
+GetPossession --> GetPossession : [!havePossession]\n<i>getPossession</i>
+Dribble --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+Dribble --> GetPossession : [lostPossession]\n<i>getPossession</i>
+Dribble --> Dribble : [!dribblingDone]\n<i>dribble</i>
+Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
+LoseBall --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+LoseBall --> GetPossession : [!shouldLoseBall]\n<i>getPossession</i>
+Terminate:::terminate --> GetPossession : [lostPossession]\n<i>getPossession</i>
+Terminate:::terminate --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Terminate:::terminate --> Terminate:::terminate : <i>dribble</i>
 
 ```
@@ -354,9 +354,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> GetBehindBallState
-GetBehindBallState --> GetBehindBallState : [!behindBall]<br><i>updateMove</i>
-GetBehindBallState --> Terminate:::terminate : [behindBall]<br><i>updateMove</i>
-Terminate:::terminate --> GetBehindBallState : [!behindBall]<br><i>updateMove</i>
+GetBehindBallState --> GetBehindBallState : [!behindBall]\n<i>updateMove</i>
+GetBehindBallState --> Terminate:::terminate : [behindBall]\n<i>updateMove</i>
+Terminate:::terminate --> GetBehindBallState : [!behindBall]\n<i>updateMove</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -369,24 +369,24 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> PositionToBlock
-PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]<br><i>moveToGoalLine</i>
-PositionToBlock --> DribbleFSM : [shouldEvacuateCrease]<br><i>retrieveFromDeadZone</i>
-PositionToBlock --> Panic : [shouldPanic]<br><i>panic</i>
-PositionToBlock --> PivotKickFSM : [shouldPivotChip]<br><i>updatePivotKick</i>
+PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PositionToBlock --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
+PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
+PositionToBlock --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
-DribbleFSM --> PivotKickFSM : [retrieveDone]<br><i>updatePivotKick</i>
-DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]<br><i>moveToGoalLine</i>
-DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]<br><i>retrieveFromDeadZone</i>
-DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]<br><i>positionToBlock</i>
-Panic --> MoveToGoalLine : [shouldMoveToGoalLine]<br><i>moveToGoalLine</i>
-Panic --> PivotKickFSM : [shouldPivotChip]<br><i>updatePivotKick</i>
-Panic --> PositionToBlock : [panicDone]<br><i>positionToBlock</i>
+DribbleFSM --> PivotKickFSM : [retrieveDone]\n<i>updatePivotKick</i>
+DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>retrieveFromDeadZone</i>
+DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
+Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+Panic --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
+Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
 Panic --> Panic : <i>panic</i>
-PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]<br><i>moveToGoalLine</i>
-PivotKickFSM --> PivotKickFSM : [ballInInflatedDefenseArea]<br><i>updatePivotKick</i>
-PivotKickFSM --> PositionToBlock : [!ballInInflatedDefenseArea]<br><i>positionToBlock</i>
-MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]<br><i>moveToGoalLine</i>
-MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]<br><i>positionToBlock</i>
+PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PivotKickFSM --> PivotKickFSM : [ballInInflatedDefenseArea]\n<i>updatePivotKick</i>
+PivotKickFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
+MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]\n<i>positionToBlock</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -399,10 +399,10 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StopState
-StopState --> StopState : [!stopDone]<br><i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]<br><i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]<br><i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]<br><i>updateStop</i>
+StopState --> StopState : [!stopDone]\n<i>updateStop</i>
+StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
+Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
 
 ```
 
@@ -430,9 +430,9 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> KickOrChipState
-KickOrChipState --> GetBehindBallFSM : [shouldRealignWithBall]<br><i>updateGetBehindBall</i>
-KickOrChipState --> KickOrChipState : [!ballChicked]<br><i>kickOrChipBall</i>
-KickOrChipState --> Terminate:::terminate : [ballChicked]<br><i>SET_STOP_PRIMITIVE_ACTION</i>
+KickOrChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
+KickOrChipState --> KickOrChipState : [!ballChicked]\n<i>kickOrChipBall</i>
+KickOrChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -445,9 +445,9 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveState
-MoveState --> MoveState : [!moveDone]<br><i>updateMove</i>
-MoveState --> Terminate:::terminate : [moveDone]<br><i>updateMove</i>
-Terminate:::terminate --> MoveState : [!moveDone]<br><i>updateMove</i>
+MoveState --> MoveState : [!moveDone]\n<i>updateMove</i>
+MoveState --> Terminate:::terminate : [moveDone]\n<i>updateMove</i>
+Terminate:::terminate --> MoveState : [!moveDone]\n<i>updateMove</i>
 Terminate:::terminate --> Terminate:::terminate : <i>updateMove</i>
 
 ```
@@ -460,11 +460,11 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> BlockPassState
-BlockPassState --> InterceptBallState : [passStarted]<br><i>interceptBall</i>
+BlockPassState --> InterceptBallState : [passStarted]\n<i>interceptBall</i>
 BlockPassState --> BlockPassState : <i>blockPass</i>
-InterceptBallState --> BlockPassState : [ballDeflected]<br><i>blockPass</i>
-InterceptBallState --> DribbleFSM : [ballNearbyWithoutThreat]<br><i>prepareGetPossession</i>
-DribbleFSM --> BlockPassState : [!ballNearbyWithoutThreat]<br><i>blockPass</i>
+InterceptBallState --> BlockPassState : [ballDeflected]\n<i>blockPass</i>
+InterceptBallState --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+DribbleFSM --> BlockPassState : [!ballNearbyWithoutThreat]\n<i>blockPass</i>
 DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
 InterceptBallState --> InterceptBallState : <i>interceptBall</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -479,8 +479,8 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
-DribbleFSM --> DribbleFSM : [!takePenaltyShot]<br><i>updateApproachKeeper</i>
-DribbleFSM --> KickOrChipFSM : [timeOutApproach]<br><i>shoot</i>
+DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
+DribbleFSM --> KickOrChipFSM : [timeOutApproach]\n<i>shoot</i>
 DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
 DribbleFSM --> KickOrChipFSM
 KickOrChipFSM --> KickOrChipFSM : <i>shoot</i>
@@ -500,8 +500,8 @@ direction LR
 StartState --> DribbleFSM : <i>getPossessionAndPivot</i>
 DribbleFSM --> DribbleFSM : <i>getPossessionAndPivot</i>
 DribbleFSM --> KickState
-KickState --> KickState : [!ballKicked]<br><i>kickBall</i>
-KickState --> Terminate:::terminate : [ballKicked]<br><i>SET_STOP_PRIMITIVE_ACTION</i>
+KickState --> KickState : [!ballKicked]\n<i>kickBall</i>
+KickState --> Terminate:::terminate : [ballKicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -514,14 +514,14 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitingForPassState
-WaitingForPassState --> WaitingForPassState : [!passStarted]<br><i>updateReceive</i>
-WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]<br><i>updateOnetouch</i>
-WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]<br><i>updateReceive</i>
-ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]<br><i>adjustReceive</i>
-OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]<br><i>updateOnetouch</i>
-OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]<br><i>adjustReceive</i>
-ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]<br><i>adjustReceive</i>
-OneTouchShotState --> Terminate:::terminate : [passFinished]<br><i>updateOnetouch</i>
+WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
+WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
+WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
+ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]\n<i>adjustReceive</i>
+OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]\n<i>updateOnetouch</i>
+OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]\n<i>adjustReceive</i>
+ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]\n<i>adjustReceive</i>
+OneTouchShotState --> Terminate:::terminate : [passFinished]\n<i>updateOnetouch</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
@@ -534,19 +534,19 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
-MoveFSM --> BlockPassState : [!enemyThreatHasBall]<br><i>blockPass</i>
-MoveFSM --> GoAndStealState : [blockedShot]<br><i>goAndSteal</i>
+MoveFSM --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
+MoveFSM --> GoAndStealState : [blockedShot]\n<i>goAndSteal</i>
 MoveFSM --> MoveFSM : <i>blockShot</i>
 MoveFSM --> GoAndStealState
-BlockPassState --> BlockPassState : [!enemyThreatHasBall]<br><i>blockPass</i>
-BlockPassState --> MoveFSM : [enemyThreatHasBall]<br><i>blockShot</i>
-GoAndStealState --> GoAndStealState : [enemyThreatHasBall && !contestedBall]<br><i>goAndSteal</i>
-GoAndStealState --> StealAndPullState : [enemyThreatHasBall && contestedBall]<br><i>goAndSteal</i>
-GoAndStealState --> Terminate:::terminate : [!enemyThreatHasBall]<br><i>blockPass</i>
-StealAndPullState --> StealAndPullState : [enemyThreatHasBall]<br><i>stealAndPull</i>
-StealAndPullState --> Terminate:::terminate : [!enemyThreatHasBall]<br><i>blockPass</i>
-Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]<br><i>blockPass</i>
-Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]<br><i>blockShot</i>
+BlockPassState --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
+BlockPassState --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
+GoAndStealState --> GoAndStealState : [enemyThreatHasBall && !contestedBall]\n<i>goAndSteal</i>
+GoAndStealState --> StealAndPullState : [enemyThreatHasBall && contestedBall]\n<i>goAndSteal</i>
+GoAndStealState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
+StealAndPullState --> StealAndPullState : [enemyThreatHasBall]\n<i>stealAndPull</i>
+StealAndPullState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPass</i>
+Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
+Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```
