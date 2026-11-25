@@ -4,11 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ 
-      master,
-      avah/minimal_environment_setup_tscope,
-      grant/add_macos_action_runners
-    ]
+    branches: [ master ]
   schedule:
     - cron: '0 8 * * *'  # 12 AM PST / 8 AM UTC
   workflow_dispatch:
