@@ -143,7 +143,8 @@ jobs:
             -//software/gameplay_tests/...  \
             -//software/ai/stp/...            \
             -//software/ai/navigator/...     \
-            -//software:unix_full_system_tar_gen
+            -//software:unix_full_system_tar_gen \
+            -//software/power:powerloop_tar
 
   robot-tests: # cross compile test
     needs: check-and-clear-cache
