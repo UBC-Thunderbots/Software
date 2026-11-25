@@ -59,7 +59,7 @@ std::vector<uint8_t> serializeToVector(const T& data)
         throw std::runtime_error("Unexpected type as argument");
     }
 
-    std::vector<uint8_t> buffer(size);
+    std::vector<uint8_t> buffer(static_cast<size_t>(size));
     pb_ostream_t stream =
         pb_ostream_from_buffer(static_cast<uint8_t*>(buffer.data()), buffer.size());
     if (!pb_encode(&stream, fields, &data))
@@ -102,14 +102,15 @@ void inline setPowerMsg(TbotsProto_PowerFrame& frame,
  *
  * @return a nanopb power status msg with provided fields
  */
-TbotsProto_PowerStatus inline createNanoPbPowerStatus(
-    float battery_voltage, float capacitor_voltage, float current_draw,
-    TbotsProto_Geneva_Slot geneva_slot, uint32_t sequence_num, bool breakbeam_tripped)
+TbotsProto_PowerStatus inline createNanoPbPowerStatus(float battery_voltage,
+                                                      float capacitor_voltage,
+                                                      float current_draw,
+                                                      uint32_t sequence_num,
+                                                      bool breakbeam_tripped)
 {
     TbotsProto_PowerStatus status = {.battery_voltage   = battery_voltage,
                                      .capacitor_voltage = capacitor_voltage,
                                      .current_draw      = current_draw,
-                                     .geneva_slot       = geneva_slot,
                                      .sequence_num      = sequence_num,
                                      .breakbeam_tripped = breakbeam_tripped};
     return status;
@@ -170,7 +171,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.chip_pulse_width = chip_pulse_width;
+            nanopb_control.chicker.chicker_command.chip_pulse_width =
+                static_cast<uint32_t>(chip_pulse_width);
             break;
         case TbotsProto::PowerControl::ChickerControl::kKickPulseWidth:
             nanopb_control.chicker.which_chicker_command =
@@ -205,7 +207,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autochip_pulse_width = chip_pulse_width;
+                        .auto_chip_or_kick.autochip_pulse_width =
+                        static_cast<uint32_t>(chip_pulse_width);
                     break;
                 case TbotsProto::AutoChipOrKick::kAutokickPulseWidth:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
@@ -234,28 +237,9 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         default:
             break;
     }
-    switch (power_control.geneva_slot())
-    {
-        case TbotsProto::Geneva::LEFT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_LEFT;
-            break;
-        case TbotsProto::Geneva::CENTRE_LEFT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_CENTRE_LEFT;
-            break;
-        case TbotsProto::Geneva::CENTRE:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_CENTRE;
-            break;
-        case TbotsProto::Geneva::CENTRE_RIGHT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_CENTRE_RIGHT;
-            break;
-        case TbotsProto::Geneva::RIGHT:
-            nanopb_control.geneva_slot = TbotsProto_Geneva_Slot_RIGHT;
-            break;
-        default:
-            break;
-    }
     return nanopb_control;
 }
+
 /**
  * Creates a nanopb power control msg with provided fields
  * Note: Currently only used for testing
@@ -265,8 +249,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     ChickerCommandMode chicker_command, uint32_t kick_pulse_width,
     uint32_t chip_pulse_width, AutoChipOrKickMode auto_chip_or_kick,
-    uint32_t autochip_pulse_width, uint32_t autokick_pulse_width,
-    TbotsProto_Geneva_Slot geneva_slot)
+    uint32_t autochip_pulse_width, uint32_t autokick_pulse_width)
 {
     TbotsProto_PowerPulseControl control = TbotsProto_PowerPulseControl_init_default;
     TbotsProto_PowerPulseControl_ChickerControl chicker =
@@ -310,7 +293,6 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
 
     control.has_chicker = true;
     control.chicker     = chicker;
-    control.geneva_slot = geneva_slot;
 
     return control;
 }
@@ -325,7 +307,8 @@ std::unique_ptr<TbotsProto::PowerStatus> inline createTbotsPowerStatus(
 {
     auto buffer       = serializeToVector(status);
     auto proto_status = std::make_unique<TbotsProto::PowerStatus>();
-    proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
+    std::ignore =
+        proto_status->ParseFromString(std::string(buffer.begin(), buffer.end()));
     return proto_status;
 }
 

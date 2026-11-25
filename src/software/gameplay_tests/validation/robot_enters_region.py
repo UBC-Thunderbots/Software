@@ -1,12 +1,12 @@
-import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+from typing import override
 
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-from typing import override
 
 
 class MinNumberOfRobotsEntersRegion(Validation):
@@ -24,7 +24,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
         self.robot_in_zone = {}
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if a specific number of robots enter the provided set of regions
 
         :param world: The world msg to validate
@@ -42,12 +42,12 @@ class MinNumberOfRobotsEntersRegion(Validation):
 
         # Validate on length of set robots_in_regions
         if len(robots_in_regions) >= self.req_robot_cnt:
-            return ValidationStatus.PASSING
+            return protos.ValidationStatus.PASSING
 
-        return ValidationStatus.FAILING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """(override) shows region to enter"""
         return create_validation_geometry(self.regions)
 

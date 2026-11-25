@@ -1,17 +1,14 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.py_constants import ROBOT_MAX_RADIUS_METERS
-from software.thunderscope.constants import Colors, LINE_WIDTH
-
-from software.thunderscope.gl.graphics.gl_shape import GLShape
-import software.thunderscope.gl.helpers.triangulate as triangulate
-
+import math
 from typing import Optional, override
 
-import math
 import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from software.thunderscope.constants import LINE_WIDTH, Colors
+from software.thunderscope.gl.graphics.gl_shape import GLShape
+from software.thunderscope.gl.helpers import triangulate
 
 
 class GLRobotOutline(GLShape):
@@ -87,5 +84,5 @@ class GLRobotOutline(GLShape):
 
         if self.fill_graphic:
             faces = triangulate.earclip(self.points)
-            meshdata = MeshData(vertexes=self.points, faces=np.array(faces))
+            meshdata = gl.MeshData(vertexes=self.points, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)

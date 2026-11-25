@@ -10,7 +10,7 @@
 #include "software/constants.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/subject.hpp"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 UnixSimulatorBackend::UnixSimulatorBackend(
     std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger)
@@ -53,6 +53,10 @@ UnixSimulatorBackend::UnixSimulatorBackend(
         new ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>(
             runtime_dir + VALIDATION_PROTO_SET_PATH,
             [](TbotsProto::ValidationProtoSet& v) {}, proto_logger));
+
+    simulator_state_listener.reset(new ThreadedProtoUnixListener<world::SimulatorState>(
+        runtime_dir + SIMULATOR_STATE_PATH, [](world::SimulatorState& v) {},
+        proto_logger));
 
     robot_log_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotLog>(
         runtime_dir + ROBOT_LOG_PATH, [](TbotsProto::RobotLog& v) {}, proto_logger));

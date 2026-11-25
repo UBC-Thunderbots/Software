@@ -1,6 +1,6 @@
-import time
 import collections
 import statistics
+import time
 
 
 class FrameTimeCounter:

@@ -1,9 +1,9 @@
 import textwrap
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt.QtWidgets import *
+
+from pyqtgraph.Qt import QtCore, QtWidgets
 
 
-class GLToolbar(QWidget):
+class GLToolbar(QtWidgets.QWidget):
     """Base class for a toolbar in our UI
 
     Has a refresh method to update UI
@@ -13,7 +13,7 @@ class GLToolbar(QWidget):
     BUTTON_ICON_COLOR = "white"
     DISABLED_BUTTON_ICON_COLOR = "#969696"
 
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QtWidgets.QWidget):
         """Sets the base formatting for a toolbar
 
         :param parent: the parent to overlay this toolbar over
@@ -21,10 +21,12 @@ class GLToolbar(QWidget):
         super(GLToolbar, self).__init__(parent=parent)
 
         # Setup toolbar
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed
+        )
         self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
-        self.setLayout(QHBoxLayout())
+        self.setLayout(QtWidgets.QHBoxLayout())
 
     def refresh(self) -> None:
         """Refreshes the UI (overridden by child classes)"""

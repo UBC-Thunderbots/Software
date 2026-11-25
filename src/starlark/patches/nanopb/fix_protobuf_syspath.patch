@@ -1,0 +1,24 @@
+--- extra/bazel/protoc-gen-nanopb-bazel.py
++++ extra/bazel/protoc-gen-nanopb-bazel.py
+@@ -4,9 +4,21 @@
+ # generator must not try to rebuild it inside the build action sandbox.
+
+ import os
++import sys
+
+ os.environ["NANOPB_PB2_NO_REBUILD"] = "1"
+
++# Prefer the Bazel-managed protobuf over any system-installed one by moving
++# the runfiles paths to the front of sys.path and dropping system site-packages.
++_bazel_protobuf_paths = []
++for _i, _p in reversed(list(enumerate(sys.path))):
++    if "protobuf+" in _p.replace("\\", "/"):
++        _bazel_protobuf_paths.append(sys.path.pop(_i))
++    elif _p.endswith("-packages") and ".runfiles" not in _p:
++        sys.path.pop(_i)
++for _p in _bazel_protobuf_paths:
++    sys.path.insert(0, _p)
++
+ from nanopb_generator import main_plugin
+
+ if __name__ == "__main__":

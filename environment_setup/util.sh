@@ -37,7 +37,7 @@ install_clang_format() {
 }
 
 install_cross_compiler() {
-    commit_hash="2ddeadde3fe1f3adb1746a8e21889010a9ea77cb"
+    commit_hash="4d595097dd14104dbd6ca1f42ad8c8fdcb68db6b"
 
     file_name=aarch64-tbots-linux-gnu-for-aarch64
     if is_x86 $1; then
@@ -77,9 +77,9 @@ install_gamecontroller () {
 
 install_java () {
     java_home=""
-    java_download=https://download.oracle.com/java/21/latest/jdk-21_linux-aarch64_bin.tar.gz
+    java_download=https://download.oracle.com/java/21/archive/jdk-21.0.12.1_linux-aarch64_bin.tar.gz 
     if is_x86 $1; then
-        java_download=https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
+        java_download=https://download.oracle.com/java/21/archive/jdk-21.0.12.1_linux-x64_bin.tar.gz 
     fi
     wget -N $java_download -O /tmp/tbots_download_cache/jdk-21.tar.gz
     tar -xzf /tmp/tbots_download_cache/jdk-21.tar.gz -C /opt/tbotspython/

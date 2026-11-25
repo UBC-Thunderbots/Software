@@ -26,44 +26,32 @@ config_setting(
 # more information can be found here: https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
 
 platformio_library(
-    name = "chicker",
-    src = "chicker.cpp",
-    hdr = "chicker.h",
-    deps = [":pins"],
+    name = "power_hal",
+    hdr = "power_hal.h",
 )
 
 platformio_library(
-    name = "dribbler",
-    src = "dribbler.cpp",
-    hdr = "dribbler.h",
-    deps = [":pins"],
-)
-
-platformio_library(
-    name = "geneva",
-    src = "geneva.cpp",
-    hdr = "geneva.h",
-    deps = [
-        ":pins",
-        "//proto:tbots_nanopb_proto",
+    name = "esp_hal",
+    src = "esp/esp_hal.cpp",
+    add_srcs = [
+        "esp/charger.cpp",
+        "esp/chicker.cpp",
+        "esp/dribbler.cpp",
+        "esp/power_monitor.cpp",
     ],
-)
-
-platformio_library(
-    name = "charger",
-    src = "charger.cpp",
-    hdr = "charger.h",
-    deps = [":pins"],
-)
-
-platformio_library(
-    name = "power_monitor",
-    src = "power_monitor.cpp",
-    hdr = "power_monitor.h",
+    hdr = "esp/esp_hal.h",
     deps = [
         ":pins",
+        ":power_hal",
         "@LTC4151//:LTC4151_platformio",
     ],
+)
+
+platformio_library(
+    name = "power_controller",
+    src = "power_controller.cpp",
+    hdr = "power_controller.h",
+    deps = [":power_hal"],
 )
 
 platformio_library(
@@ -71,17 +59,14 @@ platformio_library(
     src = "control_executor.cpp",
     hdr = "control_executor.h",
     deps = [
-        ":charger",
-        ":chicker",
-        ":geneva",
-        ":pins",
+        ":power_controller",
         "//proto:tbots_nanopb_proto",
     ],
 )
 
 platformio_library(
     name = "pins",
-    hdr = "pins.h",
+    hdr = "esp/pins.h",
 )
 
 platformio_project(
@@ -95,15 +80,14 @@ platformio_project(
     }),
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
-    platform = "espressif32\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+    platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+    platformio = "//starlark/platformio:platformio",
     deps = [
-        ":charger",
-        ":chicker",
         ":control_executor",
-        ":dribbler",
-        ":geneva",
+        ":esp_hal",
         ":pins",
-        ":power_monitor",
+        ":power_controller",
+        ":power_hal",
         "//proto:tbots_nanopb_proto",
         "//shared:constants_platformio",
         "//shared/uart_framing:uart_framing_platformio",
@@ -117,10 +101,16 @@ genrule(
     outs = ["powerloop.tar.gz"],
     cmd = """
         TARGET_DIR=$$(dirname $(location :powerloop_main))
-        cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
-        chmod +w "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
-        echo "" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
-        echo "extra_scripts = pre:auto_reset.py" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        mkdir -p "$$TARGET_DIR/powerloop_main_workdir"
+        if [ ! -e "$$TARGET_DIR/powerloop_main_workdir/auto_reset.py" ]; then
+            cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
+        fi
+        INI="$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        if [ -f "$$INI" ] && ! grep -q '^extra_scripts = pre:auto_reset.py$$' "$$INI"; then
+            chmod +w "$$INI"
+            echo "" >> "$$INI"
+            echo "extra_scripts = pre:auto_reset.py" >> "$$INI"
+        fi
         tar -C "$$TARGET_DIR" -czhf $@ "powerloop_main_workdir"
     """,
     local = True,

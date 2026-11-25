@@ -1,0 +1,172 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_test(
+    name = "penalty_setup_tactic_test",
+    srcs = ["penalty_setup_tactic_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "all_tactics",
+    hdrs = ["all_tactics.h"],
+    deps = [
+        ":tactic",
+        "//software/ai/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/stp/tactic/halt:halt_tactic",
+        "//software/ai/stp/tactic/kick_or_chip:kick_or_chip_tactic",
+        "//software/ai/stp/tactic/move:move_tactic",
+        "//software/ai/stp/tactic/pass_defender:pass_defender_tactic",
+        "//software/ai/stp/tactic/penalty_kick:penalty_kick_tactic",
+        "//software/ai/stp/tactic/pivot_kick:pivot_kick_tactic",
+        "//software/ai/stp/tactic/receiver:receiver_tactic",
+        "//software/ai/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+    ],
+)
+
+cc_library(
+    name = "tactic",
+    hdrs = [
+        "tactic.h",
+        "tactic_base.hpp",
+        "tactic_fsm.h",
+        "tactic_visitor.h",
+    ],
+    deps = [
+        ":stop_primitive",
+        ":transition_conditions",
+        "//proto/primitive:primitive_msg_factory",
+        "//software/util/sml_fsm",
+        "//software/util/typename",
+        "//software/world",
+        "@tracy",
+    ],
+)
+
+cc_library(
+    name = "transition_conditions",
+    srcs = ["transition_conditions.cpp"],
+    hdrs = ["transition_conditions.h"],
+    deps = [
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "transition_conditions_test",
+    srcs = ["transition_conditions_test.cpp"],
+    deps = [
+        ":tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "fsm_state_test",
+    srcs = ["fsm_state_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/stp/tactic/attacker:attacker_tactic",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "tactic_factory",
+    srcs = ["tactic_factory.cpp"],
+    hdrs = [
+        "tactic_factory.h",
+    ],
+    deps = [
+        ":all_tactics",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
+    ],
+)
+
+cc_library(
+    name = "primitive",
+    hdrs = [
+        "primitive.h",
+    ],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/ai/navigator/trajectory:trajectory_path",
+    ],
+)
+
+cc_library(
+    name = "move_primitive",
+    srcs = ["move_primitive.cpp"],
+    hdrs = [
+        "move_primitive.h",
+    ],
+    deps = [
+        ":primitive",
+        ":vis_proto_deduper",
+        "//proto/message_translation:tbots_protobuf",
+        "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/trajectory:trajectory_planner",
+        "//software/geom/algorithms:end_in_obstacle_sample",
+    ],
+)
+
+cc_library(
+    name = "stop_primitive",
+    srcs = ["stop_primitive.cpp"],
+    hdrs = [
+        "stop_primitive.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+    ],
+)
+
+cc_test(
+    name = "primitive_test",
+    srcs = ["primitive_test.cpp"],
+    deps = [
+        ":move_primitive",
+        ":stop_primitive",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "vis_proto_deduper",
+    srcs = ["vis_proto_deduper.cpp"],
+    hdrs = [
+        "vis_proto_deduper.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/util/hash:hash_combine",
+    ],
+)
+
+cc_test(
+    name = "vis_proto_deduper_test",
+    srcs = ["vis_proto_deduper_test.cpp"],
+    deps = [
+        ":primitive",
+        ":vis_proto_deduper",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)

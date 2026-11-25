@@ -1,14 +1,12 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-
-from software.thunderscope.constants import Colors, LINE_WIDTH
-from software.thunderscope.gl.graphics.gl_shape import GLShape
-
+import math
 from typing import Optional, override
 
-import math
 import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
+from software.thunderscope.constants import LINE_WIDTH, Colors
+from software.thunderscope.gl.graphics.gl_shape import GLShape
 
 
 class GLCircle(GLShape):
@@ -85,5 +83,5 @@ class GLCircle(GLShape):
             for index in range(len(vertexes) - 2):
                 faces.append([index, index + 1, len(vertexes) - 1])
 
-            meshdata = MeshData(vertexes=vertexes, faces=np.array(faces))
+            meshdata = gl.MeshData(vertexes=vertexes, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)

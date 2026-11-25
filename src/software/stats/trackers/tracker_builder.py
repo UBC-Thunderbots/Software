@@ -1,8 +1,9 @@
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.stats.trackers.tracker import Tracker
-from typing import Type, Self
-from software.stats.logs.event_log import Team
 import queue
+from typing import Self, Type
+
+import proto.import_all_protos as protos
+from software.stats.trackers.tracker import Tracker
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class TrackerBuilder:
@@ -11,9 +12,9 @@ class TrackerBuilder:
     def __init__(
         self,
         proto_unix_io: ProtoUnixIO,
-        from_team: Team,
+        from_team: protos.Team,
         event_queue: queue.Queue,
-        for_team: Team | None = None,
+        for_team: protos.Team | None = None,
         buffer_size: int = 5,
     ) -> None:
         """Initializes the builder

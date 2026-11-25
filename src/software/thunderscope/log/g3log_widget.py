@@ -1,22 +1,20 @@
-from pyqtgraph.Qt.QtWidgets import *
-from software.py_constants import *
+import proto.import_all_protos as protos
 import pyqtgraph.console as pg_console
-from proto.robot_log_msg_pb2 import RobotLog, LogLevel
-from proto.import_all_protos import *
-
-import software.thunderscope.constants as constants
+from pyqtgraph.Qt import QtWidgets
+from software.py_constants import MAX_ROBOT_IDS_PER_SIDE
+from software.thunderscope import constants
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class g3logWidget(QWidget):
+class g3logWidget(QtWidgets.QWidget):
     def __init__(self, buffer_size: int = 10):
         """The g3log widget is a console widget that displays g3log messages
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
-        QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
 
         self.console_widget = pg_console.ConsoleWidget()
         self.console_widget.setStyleSheet(
@@ -27,7 +25,7 @@ class g3logWidget(QWidget):
             """
         )
 
-        self.layout = QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
         # disable input and buttons
         self.console_widget.input.hide()
@@ -40,7 +38,7 @@ class g3logWidget(QWidget):
 
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
-        self.log_buffer = ThreadSafeBuffer(buffer_size, RobotLog)
+        self.log_buffer = ThreadSafeBuffer(buffer_size, protos.RobotLog)
 
         self.layout.addWidget(self.console_widget)
         self.layout.addWidget(self.checkbox_widget)
@@ -52,11 +50,11 @@ class g3logWidget(QWidget):
 
         # LogLevel to string conversion map
         self.log_level_str_map = {
-            LogLevel.DEBUG: "DEBUG",
-            LogLevel.INFO: "INFO",
-            LogLevel.WARNING: "WARNING",
-            LogLevel.FATAL: "FATAL",
-            LogLevel.CONTRACT: "CONTRACT",
+            protos.LogLevel.DEBUG: "DEBUG",
+            protos.LogLevel.INFO: "INFO",
+            protos.LogLevel.WARNING: "WARNING",
+            protos.LogLevel.FATAL: "FATAL",
+            protos.LogLevel.CONTRACT: "CONTRACT",
         }
 
     def refresh(self) -> None:
@@ -70,23 +68,23 @@ class g3logWidget(QWidget):
         # Checks whether this type of log is enabled from checkboxes
         if (
             (
-                log.log_level == LogLevel.DEBUG
+                log.log_level == protos.LogLevel.DEBUG
                 and self.checkbox_widget.debug_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.INFO
+                log.log_level == protos.LogLevel.INFO
                 and self.checkbox_widget.info_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.WARNING
+                log.log_level == protos.LogLevel.WARNING
                 and self.checkbox_widget.warning_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.CONTRACT
+                log.log_level == protos.LogLevel.CONTRACT
                 and self.checkbox_widget.fatal_checkbox.isChecked()
             )
             or (
-                log.log_level == LogLevel.FATAL
+                log.log_level == protos.LogLevel.FATAL
                 and self.checkbox_widget.fatal_checkbox.isChecked()
             )
         ):

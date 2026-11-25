@@ -1,0 +1,161 @@
+# Kickoff (ball still at midfield)
+# +------------------+------------------+
+# | FRIENDLY HALF    | ENEMY HALF       |
+# |                  |                  |
+# | all 6 robots  ---|--> illegal       |
+# |                  |                  |
+# |               +--+--+               |
+# |               | CC  |               |
+# |               +--+--+               |
+# | friendly kickoff: <=1 in CC         |
+# | enemy kickoff:    0 in CC           |
+# +------------------+------------------+
+# After ball leaves center: half/CC rules no longer enforced here.
+
+import proto.import_all_protos as protos
+import pytest
+import software.python_bindings as tbots_cpp
+from proto.message_translation.tbots_protobuf import create_world_state
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.gameplay_tests.util import pytest_main
+from software.gameplay_tests.validation.ball_enters_region import (
+    BallEventuallyExitsRegion,
+    BallNeverEntersRegion,
+)
+from software.gameplay_tests.validation.or_validation import OrValidation
+from software.gameplay_tests.validation.robot_enters_region import (
+    NumberOfRobotsAlwaysStaysInRegion,
+    NumberOfRobotsNeverEntersRegion,
+    RobotNeverEntersRegion,
+)
+
+NORMAL_START_DELAY_S = 4.0
+
+
+@pytest.mark.parametrize("is_friendly_test", [True, False])
+def test_kickoff_play(gameplay_test_runner, is_friendly_test):
+    ball_initial_pos = tbots_cpp.Point(0, 0)
+
+    def setup():
+        blue_bots = [
+            tbots_cpp.Point(-3, 2.5),
+            tbots_cpp.Point(-3, 1.5),
+            tbots_cpp.Point(-3, 0.5),
+            tbots_cpp.Point(-3, -0.5),
+            tbots_cpp.Point(-3, -1.5),
+            tbots_cpp.Point(-3, -2.5),
+        ]
+
+        yellow_bots = [
+            tbots_cpp.Point(1, 0),
+            tbots_cpp.Point(1, 2.5),
+            tbots_cpp.Point(1, -2.5),
+            tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
+        ]
+
+        gameplay_test_runner.set_world_state(
+            create_world_state(
+                yellow_robot_locations=yellow_bots,
+                blue_robot_locations=blue_bots,
+                ball_location=ball_initial_pos,
+                ball_velocity=tbots_cpp.Vector(0, 0),
+            ),
+        )
+
+        gameplay_test_runner.send_gamecontroller_command(
+            gc_command=protos.Command.Type.STOP, team=SslTeam.UNKNOWN
+        )
+
+        if is_friendly_test:
+            gameplay_test_runner.send_gamecontroller_command(
+                gc_command=protos.Command.Type.KICKOFF, team=SslTeam.BLUE
+            )
+            blue_play = protos.PlayName.KickoffFriendlyPlay
+            yellow_play = protos.PlayName.KickoffEnemyPlay
+        else:
+            gameplay_test_runner.send_gamecontroller_command(
+                gc_command=protos.Command.Type.KICKOFF, team=SslTeam.YELLOW
+            )
+            blue_play = protos.PlayName.KickoffEnemyPlay
+            yellow_play = protos.PlayName.KickoffFriendlyPlay
+
+        gameplay_test_runner.set_plays(blue_play=blue_play, yellow_play=yellow_play)
+
+    # Always Validation
+    always_validation_sequence_set = [[]]
+
+    ball_has_left_center = BallNeverEntersRegion(
+        regions=[tbots_cpp.Circle(tbots_cpp.Point(0, 0), 0.05)]
+    )
+
+    expected_center_circle_or_validation_set = [
+        ball_has_left_center,
+        RobotNeverEntersRegion(
+            regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
+        ),
+    ]
+
+    friendly_half = tbots_cpp.Field.createSSLDivisionBField().friendlyHalf()
+    friendly_goal = tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()
+    center_circle = tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+
+    friendly_regions = [friendly_half, friendly_goal, center_circle]
+
+    if is_friendly_test:
+        # this expected_center_circle_or_validation_set version checks
+        # that either 0 or 1 robots are in centerCircle OR ball moves from center point
+        expected_center_circle_or_validation_set.append(
+            NumberOfRobotsNeverEntersRegion(
+                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
+                req_robot_cnt=2,
+            )
+        )
+    else:
+        # Checks that 0 robots are in centerCircle OR ball moves from center point
+        friendly_regions.remove(center_circle)
+
+    # Checks that there are 6 friendly robots in friendly_regions
+    # friendly_regions definition depends on if/else case above
+    expected_robot_regions_or_validations_set = [
+        ball_has_left_center,
+        NumberOfRobotsAlwaysStaysInRegion(
+            regions=friendly_regions,
+            req_robot_cnt=6,
+        ),
+    ]
+
+    always_validation_sequence_set[0] = [
+        OrValidation(expected_center_circle_or_validation_set),
+        OrValidation(expected_robot_regions_or_validations_set),
+    ]
+
+    eventually_validation_sequence_set = [[]]
+
+    # Eventually Validation
+    if is_friendly_test:
+        # Checks that ball leaves center point by 0.05 meters within 10 seconds of kickoff
+        eventually_validation_sequence_set[0].append(
+            BallEventuallyExitsRegion(
+                regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+            )
+        )
+
+    gameplay_test_runner.run_test(
+        setup=setup,
+        eventually_validation_sequence_set=eventually_validation_sequence_set,
+        always_validation_sequence_set=always_validation_sequence_set,
+        gc_cmd_with_delay=[
+            (NORMAL_START_DELAY_S, protos.Command.Type.NORMAL_START, SslTeam.BLUE),
+        ],
+        test_timeout_s=10,
+    )
+
+
+if __name__ == "__main__":
+    pytest_main(__file__)

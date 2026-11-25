@@ -94,14 +94,14 @@ class UartFramingTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        test_message = createNanoPbPowerPulseControl(
-            ChickerCommandMode::AUTOCHIPORKICK, 1.0, 2.0, AutoChipOrKickMode::AUTOCHIP,
-            3.0, 4.0, TbotsProto_Geneva_Slot_LEFT);
+        test_message =
+            createNanoPbPowerPulseControl(ChickerCommandMode::AUTOCHIPORKICK, 1.0, 2.0,
+                                          AutoChipOrKickMode::AUTOCHIP, 3.0, 4.0);
     }
 
     TbotsProto_PowerPulseControl test_message;
 
-    const uint16_t TEST_MESSAGE_CRC = 60410;
+    const uint16_t TEST_MESSAGE_CRC = 53610;
 };
 
 bool operator==(const TbotsProto_PowerPulseControl& lhs,

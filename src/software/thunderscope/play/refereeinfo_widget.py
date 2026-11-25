@@ -1,12 +1,13 @@
 from collections import defaultdict
-from pyqtgraph.Qt.QtWidgets import *
-from proto.import_all_protos import *
+
+import proto.import_all_protos as protos
+from pyqtgraph.Qt import QtWidgets
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
-class RefereeInfoWidget(QWidget):
+class RefereeInfoWidget(QtWidgets.QWidget):
     NUM_ROWS = 13
     NUM_COLS = 3
 
@@ -14,28 +15,57 @@ class RefereeInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
+    # TeamInfo field holding the remaining time of each active yellow card
+    YELLOW_CARD_TIMES_FIELD = "yellow_card_times"
+
     def __init__(self, buffer_size: int = 1) -> None:
         """Shows the referee information
 
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
         """
-        QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
 
-        self.referee_table = QTableWidget(
+        self.referee_table = QtWidgets.QTableWidget(
             RefereeInfoWidget.NUM_ROWS, RefereeInfoWidget.NUM_COLS
         )
-        self.referee_info = QLabel()
-        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.referee_info = QtWidgets.QLabel()
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, protos.Referee, False)
         self.referee_table.verticalHeader().setVisible(False)
 
-        self.vertical_layout = QVBoxLayout()
+        self.vertical_layout = QtWidgets.QVBoxLayout()
         self.vertical_layout.addWidget(self.referee_table)
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
         # Team info table data, indexed by [field_name]["blue" | "yellow"]
         self.team_info = defaultdict(dict)
+
+    @staticmethod
+    def _format_field(team_info: protos.Referee.TeamInfo, field_name: str) -> str:
+        """Format one TeamInfo field for display in the referee table.
+
+        The table lists every TeamInfo field for both teams, not just the fields
+        that are populated, so this returns a default "-" for unset fields and
+        empty repeated fields instead of leaving the row missing
+
+        :param team_info: the TeamInfo proto for one team
+        :param field_name: the name of the field to format
+        :return: the value as a string, or "-" if the field has no value
+        """
+        value = getattr(team_info, field_name)
+        field = team_info.DESCRIPTOR.fields_by_name[field_name]
+
+        # Repeated (list) fields have no HasField(), so check for an empty list
+        if field.is_repeated:
+            if field_name == RefereeInfoWidget.YELLOW_CARD_TIMES_FIELD:
+                return (
+                    ", ".join(f"{t * SECONDS_PER_MICROSECOND:.1f}s" for t in value)
+                    or "-"
+                )
+            return ", ".join(str(v) for v in value) or "-"
+
+        return str(value) if team_info.HasField(field_name) else "-"
 
     def refresh(self) -> None:
         """Update the referee info widget with new referee information"""
@@ -50,22 +80,27 @@ class RefereeInfoWidget(QWidget):
             f"Packet Timestamp: {round(referee.packet_timestamp * SECONDS_PER_MICROSECOND, 3)}\n"
             + f"Stage Time Left: {int(stage_time_left_s / SECONDS_PER_MINUTE):02d}"
             + f":{int(stage_time_left_s % SECONDS_PER_MINUTE):02d}\n"
-            + f"Stage: {Referee.Stage.Name(referee.stage)}\n"
-            + f"Command: {Referee.Command.Name(referee.command)}\n"
+            + f"Stage: {protos.Referee.Stage.Name(referee.stage)}\n"
+            + f"Command: {protos.Referee.Command.Name(referee.command)}\n"
             + f"Blue Team on Positive Half: {referee.blue_team_on_positive_half}\n"
         )
 
-        for field_descriptor, field_val in referee.blue.ListFields():
-            self.team_info[field_descriptor.name]["blue"] = field_val
+        # Use every TeamInfo field (not just populated ones) so both teams
+        # always have a value for each row
+        field_names = [f.name for f in protos.Referee.TeamInfo.DESCRIPTOR.fields]
 
-        for field_descriptor, field_val in referee.yellow.ListFields():
-            self.team_info[field_descriptor.name]["yellow"] = field_val
-
+        self.referee_table.setRowCount(len(field_names))
         set_table_data(
             {
-                "Team Info": self.team_info.keys(),
-                "Blue": [val["blue"] for val in self.team_info.values()],
-                "Yellow": [val["yellow"] for val in self.team_info.values()],
+                "Team Info": field_names,
+                "Blue": [
+                    RefereeInfoWidget._format_field(referee.blue, f)
+                    for f in field_names
+                ],
+                "Yellow": [
+                    RefereeInfoWidget._format_field(referee.yellow, f)
+                    for f in field_names
+                ],
             },
             self.referee_table,
             RefereeInfoWidget.HEADER_SIZE_HINT_WIDTH_EXPANSION,
@@ -75,7 +110,7 @@ class RefereeInfoWidget(QWidget):
         self.referee_table.resizeColumnsToContents()
         self.referee_table.resizeRowsToContents()
 
-    def parse_yellow_card_times(self, team_info: TeamInfo) -> str:
+    def parse_yellow_card_times(self, team_info: protos.TeamInfo) -> str:
         """Parses yellow card times from a TeamInfo Protobuf dict as a string output.
 
         :param team_info: TeamInfo protobuf dict to parse

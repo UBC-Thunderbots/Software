@@ -1,16 +1,16 @@
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt import QtGui
-from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team as SslTeam
-from typing import Callable, override
 import webbrowser
-from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
-from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from typing import Callable, override
+
+import proto.import_all_protos as protos
+import qtawesome as qta
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from pyqtgraph.Qt import QtGui, QtWidgets
 from software.thunderscope.gl.widgets.gl_runtime_installer import (
     GLRuntimeInstallerDialog,
 )
-import qtawesome as qta
+from software.thunderscope.gl.widgets.gl_runtime_selector import GLRuntimeSelectorDialog
+from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class GamecontrollerPlays:
@@ -38,7 +38,10 @@ class GLGamecontrollerToolbar(GLToolbar):
     GAME_CONTROLLER_URL = "http://localhost:8081"
 
     def __init__(
-        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool
+        self,
+        parent: QtWidgets.QWidget,
+        proto_unix_io: ProtoUnixIO,
+        friendly_color_yellow: bool,
     ):
         """Initializes the toolbar and constructs its layout
 
@@ -80,9 +83,9 @@ class GLGamecontrollerToolbar(GLToolbar):
         )
 
         # set up the menu for selecting plays
-        self.plays_menu = QMenu()
+        self.plays_menu = QtWidgets.QMenu()
 
-        self.plays_menu_button = QPushButton()
+        self.plays_menu_button = QtWidgets.QPushButton()
         self.plays_menu_button.setText("Plays")
         self.plays_menu_button.setStyleSheet(self.get_button_style())
         self.plays_menu_button.setMenu(self.plays_menu)
@@ -117,7 +120,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
 
-        self.layout().addWidget(QLabel("<b>Gamecontroller</b>"))
+        self.layout().addWidget(QtWidgets.QLabel("<b>Gamecontroller</b>"))
         self.__add_separator(self.layout())
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
@@ -137,13 +140,13 @@ class GLGamecontrollerToolbar(GLToolbar):
         """Refreshes the UI to update toolbar position"""
         self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
-    def __add_separator(self, layout: QBoxLayout) -> None:
+    def __add_separator(self, layout: QtWidgets.QBoxLayout) -> None:
         """Adds a separator line with enough spacing to the given layout
 
         :param layout: the layout to add the separator to
         """
         layout.addSpacing(10)
-        layout.addWidget(QLabel("<b>|</b>"))
+        layout.addWidget(QtWidgets.QLabel("<b>|</b>"))
         layout.addSpacing(10)
 
     def __add_plays_menu_items(self, is_blue: bool) -> None:
@@ -179,13 +182,13 @@ class GLGamecontrollerToolbar(GLToolbar):
 
         command_type = None
         if play == GamecontrollerPlays.DIRECT:
-            command_type = Command.Type.DIRECT
+            command_type = protos.Command.Type.DIRECT
         elif play == GamecontrollerPlays.INDIRECT:
-            command_type = Command.Type.INDIRECT
+            command_type = protos.Command.Type.INDIRECT
         elif play == GamecontrollerPlays.KICKOFF:
-            command_type = Command.Type.KICKOFF
+            command_type = protos.Command.Type.KICKOFF
         else:
-            command_type = Command.Type.PENALTY
+            command_type = protos.Command.Type.PENALTY
 
         self.__send_gc_command(
             command_type,
@@ -216,7 +219,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         tooltip: str,
         callback: Callable[[], None],
         display_text: str = None,
-    ) -> QPushButton:
+    ) -> QtWidgets.QPushButton:
         """Sets up a button with the given name and callback
 
         :param icon: the icon displayed on the button
@@ -225,7 +228,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param display_text: optional param if button needs both text and an icon
         :return: the button
         """
-        button = QPushButton()
+        button = QtWidgets.QPushButton()
         button.setIcon(icon)
         button.setToolTip(tooltip)
         button.setStyleSheet(self.get_button_style())
@@ -237,29 +240,31 @@ class GLGamecontrollerToolbar(GLToolbar):
 
     def __send_stop_command(self) -> None:
         """Sends a STOP command to the gamecontroller"""
-        self.__send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
+        self.__send_gc_command(protos.Command.Type.STOP, SslTeam.UNKNOWN)
 
     def __send_force_start_command(self) -> None:
         """Sends a FORCE_START command for the current friendly team to the gamecontroller"""
-        self.__send_gc_command(Command.Type.FORCE_START, SslTeam.UNKNOWN)
+        self.__send_gc_command(protos.Command.Type.FORCE_START, SslTeam.UNKNOWN)
 
     def __send_halt_command(self) -> None:
         """Sends a HALT command for the current friendly team to the gamecontroller"""
-        self.__send_gc_command(Command.Type.HALT, SslTeam.UNKNOWN)
+        self.__send_gc_command(protos.Command.Type.HALT, SslTeam.UNKNOWN)
 
     def __send_normal_start_command(self) -> None:
         """Sends a NORMAL START command for the current friendly team to the gamecontroller
         And resets the plays menu selection
         """
         if self.normal_start_enabled:
-            self.__send_gc_command(Command.Type.NORMAL_START, SslTeam.UNKNOWN)
+            self.__send_gc_command(protos.Command.Type.NORMAL_START, SslTeam.UNKNOWN)
 
             self.__toggle_normal_start_button()
 
             self.plays_menu_button.setText("Plays")
             self.plays_menu_button.setIcon(QtGui.QIcon())
 
-    def __send_gc_command(self, command: Command.Type, team: Team) -> None:
+    def __send_gc_command(
+        self, command: protos.Command.Type, team: protos.Team
+    ) -> None:
         """Sends the given command to the gamecontroller for the given Team
         If ball_pos is defined, sets the ball position
 
@@ -267,8 +272,10 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param team the team the command should be sent for (BLUE, YELLOW, or UNKNOWN)
         :param ball_pos if defined, sets the position of the ball on field
         """
-        command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
-        self.proto_unix_io.send_proto(ManualGCCommand, command)
+        command = protos.ManualGCCommand(
+            manual_command=protos.Command(type=command, for_team=team)
+        )
+        self.proto_unix_io.send_proto(protos.ManualGCCommand, command)
 
     def __open_runtime_installer_dialog(self) -> None:
         """Opens the runtime installer modal, initializing if first time"""

@@ -1,17 +1,15 @@
-from pyqtgraph.Qt import QtGui
-from pyqtgraph.opengl import *
-from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from typing import Optional
 
+import numpy as np
+import pyqtgraph.opengl as gl
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from pyqtgraph.Qt import QtGui
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import Colors
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
-from typing import Optional
 
-import numpy as np
-
-
-class GLRobot(GLMeshItem):
+class GLRobot(gl.GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 
     def __init__(
@@ -66,7 +64,7 @@ class GLRobot(GLMeshItem):
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
 
-    def __get_mesh_data(self) -> MeshData:
+    def __get_mesh_data(self) -> gl.MeshData:
         """Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder with a flat side wall.
         This represents the geometry of a robot.
@@ -94,7 +92,7 @@ class GLRobot(GLMeshItem):
         for index in range(len(top_face_points) - 1):
             faces.append([index, index + 1, len(circle_points)])
 
-        return MeshData(
+        return gl.MeshData(
             vertexes=np.array(points),
             faces=np.array(faces),
         )
@@ -105,11 +103,11 @@ def init_robot_shader():
     global list of shaders. The front of the robot is brightened
     to make it easier to see which way they're facing.
     """
-    shaders.Shaders.append(
-        shaders.ShaderProgram(
+    gl.shaders.Shaders.append(
+        gl.shaders.ShaderProgram(
             "robotShader",
             [
-                shaders.VertexShader("""
+                gl.shaders.VertexShader("""
                 varying vec3 normal;
                 void main() {
                     // find vertex normals and positions
@@ -119,7 +117,7 @@ def init_robot_shader():
                     gl_Position = ftransform();
                 }
             """),
-                shaders.FragmentShader("""
+                gl.shaders.FragmentShader("""
                 varying vec3 normal;
                 void main() {
                     // create an alternate robot color (blue becomes teal, yellow becomes orange)

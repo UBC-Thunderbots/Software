@@ -95,7 +95,8 @@ class SensorFusion
      *
      * @return Ball if filtered from ball detections
      */
-    std::optional<Ball> createBall(const std::vector<BallDetection>& ball_detections);
+    std::optional<Ball> createBall(const std::vector<BallDetection>& ball_detections,
+                                   const Timestamp& current_time);
 
     /**
      * Create team from a list of robot detections
@@ -104,8 +105,10 @@ class SensorFusion
      *
      * @return team
      */
-    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections);
-    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections);
+    Team createFriendlyTeam(const std::vector<RobotDetection>& robot_detections,
+                            const Timestamp& capture_timestamp);
+    Team createEnemyTeam(const std::vector<RobotDetection>& robot_detections,
+                         const Timestamp& capture_timestamp);
 
 
     /**

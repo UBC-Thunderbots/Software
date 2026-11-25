@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_library")
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
@@ -76,6 +77,7 @@ py_library(
     srcs = ["gl_world_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope:field_frame",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_goal",
@@ -92,6 +94,7 @@ py_library(
     srcs = ["gl_sandbox_world_layer.py"],
     deps = [
         ":gl_world_layer",
+        "//software/thunderscope:field_frame",
         requirement("pyqtgraph"),
     ],
 )
@@ -101,6 +104,7 @@ py_library(
     srcs = ["gl_simulator_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope:field_frame",
         "//software/thunderscope/gl/graphics:gl_sphere",
         requirement("pyqtgraph"),
     ],

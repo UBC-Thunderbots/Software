@@ -1,3 +1,7 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -20,10 +24,6 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
-    linkopts = select({
-        "@platforms//os:linux": ["-lstdc++fs"],
-        "//conditions:default": [],
-    }),
     deps = [
         ":coloured_cout_sink",
         ":compat_flags",

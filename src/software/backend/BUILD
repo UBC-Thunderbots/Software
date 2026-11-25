@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -19,6 +21,7 @@ cc_library(
     hdrs = ["unix_simulator_backend.h"],
     deps = [
         ":backend",
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
         "//proto:tbots_cc_proto",
         "//proto:validation_cc_proto",
         "//proto/message_translation:ssl_wrapper",

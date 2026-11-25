@@ -1,11 +1,11 @@
-from pyqtgraph.Qt.QtCore import Qt
-from pyqtgraph.Qt.QtWidgets import *
-from proto.import_all_protos import *
 from enum import IntEnum
-import software.python_bindings as tbots_cpp
 
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
+from pyqtgraph.Qt import QtWidgets
+from pyqtgraph.Qt.QtCore import Qt
 from software.thunderscope.common import common_widgets
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class ControlMode(IntEnum):
@@ -15,7 +15,7 @@ class ControlMode(IntEnum):
     MOTOR = 1
 
 
-class DriveAndDribblerWidget(QWidget):
+class DriveAndDribblerWidget(QtWidgets.QWidget):
     """This widget provides an interface for controlling our robots'
     drive and dribbler functionalities. It has sliders for manipulating
     the direct velocity of the robot's motors as well as the speed of the
@@ -37,7 +37,7 @@ class DriveAndDribblerWidget(QWidget):
         self.enabled = True
         self.control_mode = ControlMode.VELOCITY
 
-        layout = QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.__setup_drive_switch_radio())
         layout.addWidget(self.__setup_direct_velocity_widgets())
         layout.addWidget(self.__setup_per_motor_widgets())
@@ -82,7 +82,7 @@ class DriveAndDribblerWidget(QWidget):
         common_widgets.disable_button(self.stop_and_reset_dribbler)
         common_widgets.disable_button(self.stop_and_reset_direct)
 
-    def override_slider_values(self, motor_control: MotorControl) -> None:
+    def override_slider_values(self, motor_control: protos.MotorControl) -> None:
         """Set the widget's sliders to match the values in the given MotorControl
 
         :param motor_control: the MotorControl values to override the widget's sliders with
@@ -115,7 +115,7 @@ class DriveAndDribblerWidget(QWidget):
 
     def refresh(self) -> None:
         """Refresh the widget and send the MotorControl message with the current values depending on the ControlMode"""
-        motor_control = MotorControl()
+        motor_control = protos.MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
         if self.control_mode == ControlMode.VELOCITY:
             motor_control.direct_velocity_control.velocity.x_component_meters = (
@@ -139,9 +139,9 @@ class DriveAndDribblerWidget(QWidget):
                 self.back_right_motor_slider.value()
             )
 
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        self.proto_unix_io.send_proto(protos.MotorControl, motor_control)
 
-    def __setup_direct_velocity_widgets(self) -> QGroupBox:
+    def __setup_direct_velocity_widgets(self) -> QtWidgets.QGroupBox:
         """Create a widget to control the direct velocity of the robot's motors
 
         :returns: a QGroupBox containing sliders and controls for controlling the
@@ -191,10 +191,10 @@ class DriveAndDribblerWidget(QWidget):
             lambda new_value: self.angular_velocity_label.setText("%.2f" % new_value)
         )
 
-        self.stop_and_reset_direct = QPushButton("Stop and Reset")
+        self.stop_and_reset_direct = QtWidgets.QPushButton("Stop and Reset")
         self.stop_and_reset_direct.clicked.connect(self.__reset_direct_sliders)
 
-        vbox = QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addLayout(x_layout)
         vbox.addLayout(y_layout)
         vbox.addLayout(dps_layout)
@@ -202,13 +202,13 @@ class DriveAndDribblerWidget(QWidget):
             self.stop_and_reset_direct, alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        group_box = QGroupBox("Velocity Control")
+        group_box = QtWidgets.QGroupBox("Velocity Control")
         group_box.setLayout(vbox)
         self.direct_velocity_widget = group_box
 
         return group_box
 
-    def __setup_per_motor_widgets(self) -> QGroupBox:
+    def __setup_per_motor_widgets(self) -> QtWidgets.QGroupBox:
         """:returns: a QGroupBox containing sliders and controls for controlling individual
         speed of the robot's motors.
         """
@@ -270,10 +270,10 @@ class DriveAndDribblerWidget(QWidget):
             lambda new_value: self.back_right_motor_label.setText("%.2f" % new_value)
         )
 
-        self.stop_and_reset_per_motor = QPushButton("Stop and Reset")
+        self.stop_and_reset_per_motor = QtWidgets.QPushButton("Stop and Reset")
         self.stop_and_reset_per_motor.clicked.connect(self.__reset_motor_sliders)
 
-        vbox = QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addLayout(fl_layout)
         vbox.addLayout(fr_layout)
         vbox.addLayout(bl_layout)
@@ -282,20 +282,20 @@ class DriveAndDribblerWidget(QWidget):
             self.stop_and_reset_per_motor, alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        group_box = QGroupBox("Per Motor Control")
+        group_box = QtWidgets.QGroupBox("Per Motor Control")
         group_box.setLayout(vbox)
         self.per_motor_widget = group_box
 
         return group_box
 
-    def __setup_drive_switch_radio(self) -> QGroupBox:
+    def __setup_drive_switch_radio(self) -> QtWidgets.QGroupBox:
         """Create a radio button widget to switch between per-motor and velocity drive modes
 
         :returns: The group box of the radio button switch.
         """
-        group_box = QGroupBox()
-        vbox = QVBoxLayout()
-        self.connect_options_group = QButtonGroup()
+        group_box = QtWidgets.QGroupBox()
+        vbox = QtWidgets.QVBoxLayout()
+        self.connect_options_group = QtWidgets.QButtonGroup()
         radio_button_names = ["Velocity Control", "Per Motor Control"]
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             radio_button_names, self.connect_options_group
@@ -313,7 +313,7 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def __setup_dribbler_widgets(self) -> QGroupBox:
+    def __setup_dribbler_widgets(self) -> QtWidgets.QGroupBox:
         """Create a widget to control the dribbler speed
 
         :returns: a QGroupBox containing a slider and controls for controlling the
@@ -335,16 +335,16 @@ class DriveAndDribblerWidget(QWidget):
             lambda new_value: self.dribbler_speed_rpm_label.setText("%.2f" % new_value)
         )
 
-        self.stop_and_reset_dribbler = QPushButton("Stop and Reset")
+        self.stop_and_reset_dribbler = QtWidgets.QPushButton("Stop and Reset")
         self.stop_and_reset_dribbler.clicked.connect(self.__reset_dribbler_slider)
 
-        vbox = QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addLayout(dribbler_layout)
         vbox.addWidget(
             self.stop_and_reset_dribbler, alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        group_box = QGroupBox("Dribbler")
+        group_box = QtWidgets.QGroupBox("Dribbler")
         group_box.setLayout(vbox)
 
         return group_box
@@ -359,7 +359,7 @@ class DriveAndDribblerWidget(QWidget):
         self.__reset_motor_sliders()
         self.__reset_direct_sliders()
 
-        motor_control = MotorControl()
+        motor_control = protos.MotorControl()
         if use_control_mode == ControlMode.VELOCITY:
             # Show the direct velocity widget
             motor_control.ClearField("direct_per_wheel_control")
@@ -370,7 +370,7 @@ class DriveAndDribblerWidget(QWidget):
             motor_control.ClearField("direct_velocity_control")
             self.direct_velocity_widget.setVisible(False)
             self.per_motor_widget.setVisible(True)
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        self.proto_unix_io.send_proto(protos.MotorControl, motor_control)
 
     def __reset_direct_sliders(self) -> None:
         """Reset the direct velocity sliders back to 0"""

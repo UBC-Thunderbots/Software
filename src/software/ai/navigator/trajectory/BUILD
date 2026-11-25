@@ -1,4 +1,7 @@
 load("@gameplay_tests_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 
 package(default_visibility = [
     "//software/ai:__subpackages__",
@@ -151,8 +154,8 @@ cc_test(
 )
 
 py_test(
-    name = "simulated_hrvo_test",
-    srcs = ["simulated_hrvo_test.py"],
+    name = "simulated_trajectory_planner_test",
+    srcs = ["simulated_trajectory_planner_test.py"],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software:conftest",

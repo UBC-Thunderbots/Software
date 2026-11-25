@@ -1,12 +1,12 @@
-import software.python_bindings as tbots_cpp
-from proto.import_all_protos import *
+from typing import override
 
+import proto.import_all_protos as protos
+import software.python_bindings as tbots_cpp
 from software.gameplay_tests.validation.validation import (
     Validation,
     create_validation_geometry,
     create_validation_types,
 )
-from typing import override
 
 
 class RobotAtAngularVelocity(Validation):
@@ -24,7 +24,7 @@ class RobotAtAngularVelocity(Validation):
         self.threshold = threshold
 
     @override
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world) -> protos.ValidationStatus:
         """Checks if the robot is at the expected angular velocity
 
         :param world: The world msg to validate
@@ -40,11 +40,11 @@ class RobotAtAngularVelocity(Validation):
                     robot_ang_vel.toRadians() - self.angular_velocity.toRadians()
                 )
                 if angle_diff < self.threshold:
-                    return ValidationStatus.PASSING
-        return ValidationStatus.FAILING
+                    return protos.ValidationStatus.PASSING
+        return protos.ValidationStatus.FAILING
 
     @override
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> protos.ValidationGeometry:
         """Returns the angular velocity of the robot for visualization
 
         :param world: The world msg to create validation geometry from

@@ -1,0 +1,16 @@
+--- refresh_compile_commands.bzl
++++ refresh_compile_commands.bzl
+@@ -1,3 +1,4 @@
++load("@rules_python//python:defs.bzl", "py_binary")
+ """ refresh_compile_commands rule
+
+ When `bazel run`, these rules refresh the compile_commands.json in the root of your Bazel workspace
+@@ -92,7 +93,7 @@
+     _expand_template(name = script_name, labels_to_flags = targets, exclude_headers = exclude_headers, exclude_external_sources = exclude_external_sources, **kwargs)
+
+     # Combine them so the wrapper calls the main script
+-    native.py_binary(
++    py_binary(
+         name = name,
+         main = version_checker_script_name,
+         srcs = [version_checker_script_name, script_name],

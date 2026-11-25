@@ -1,18 +1,19 @@
-import time
-import shelve
 import logging
-import pathlib
 import os
-
-import pyqtgraph
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtWidgets import *
-
+import pathlib
+import shelve
+import time
 from typing import Callable
 
-from software.py_constants import *
-from software.thunderscope.constants import *
-
+import pyqtgraph
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
+from software.thunderscope.constants import (
+    LAST_OPENED_LAYOUT_PATH,
+    LAYOUT_FILE_EXTENSION,
+    SAVED_LAYOUT_PATH,
+    THUNDERSCOPE_HELP_TEXT,
+    THUNDERSCOPE_REFRESH_INTERVAL_MS,
+)
 from software.thunderscope.thunderscope_config import TScopeConfig
 
 
@@ -57,10 +58,10 @@ class Thunderscope:
         # initialize proto unix io map with initial values or default if not provided
         self.proto_unix_io_map = config.proto_unix_io_map
 
-        self.tabs = QTabWidget()
+        self.tabs = QtWidgets.QTabWidget()
         self.tab_dock_map = {}
 
-        self.window = QMainWindow()
+        self.window = QtWidgets.QMainWindow()
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowIcon(
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
@@ -106,14 +107,16 @@ class Thunderscope:
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
         self.show_help.activated.connect(
-            lambda: QMessageBox.information(self.window, "Help", THUNDERSCOPE_HELP_TEXT)
+            lambda: QtWidgets.QMessageBox.information(
+                self.window, "Help", THUNDERSCOPE_HELP_TEXT
+            )
         )
 
     def reset_layout(self) -> None:
         """Reset the layout to the default layout"""
         saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
         saved_layout_path.unlink(missing_ok=True)
-        QMessageBox.information(
+        QtWidgets.QMessageBox.information(
             self.window,
             "Restart Required",
             "Restart thunderscope to reset the layout.",
@@ -131,11 +134,11 @@ class Thunderscope:
                 f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
             )
 
-        filename, _ = QFileDialog.getSaveFileName(
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
             f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
-            options=QFileDialog.Option.DontUseNativeDialog,
+            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog,
         )
 
         if not filename:
@@ -163,11 +166,11 @@ class Thunderscope:
                          open a file dialog.
         """
         if filename is None:
-            filename, _ = QFileDialog.getOpenFileName(
+            filename, _ = QtWidgets.QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
                 f"{SAVED_LAYOUT_PATH}/",
-                options=QFileDialog.Option.DontUseNativeDialog,
+                options=QtWidgets.QFileDialog.Option.DontUseNativeDialog,
             )
 
             if not filename:

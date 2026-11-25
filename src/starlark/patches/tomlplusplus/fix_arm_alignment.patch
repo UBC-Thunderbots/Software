@@ -1,0 +1,12 @@
+--- include/toml++/impl/parser.inl
++++ include/toml++/impl/parser.inl
+@@ -224,7 +224,7 @@
+
+ #endif
+
+-#if defined(__APPLE__) || defined(__MINGW32__) || defined(__MINGW64__)
++#if defined(__APPLE__) || defined(__MINGW32__) || defined(__MINGW64__) || defined(__arm__) || defined(__aarch64__)
+ #define TOML_OVERALIGNED
+ #else
+ #define TOML_OVERALIGNED alignas(32)
+ #endif

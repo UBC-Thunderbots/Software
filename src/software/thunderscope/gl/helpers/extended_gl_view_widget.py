@@ -1,9 +1,9 @@
+from typing import override
+
+import pyqtgraph.opengl as gl
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.opengl import *
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
-from typing import override
 
 
 class MouseInSceneEvent:
@@ -29,7 +29,7 @@ class MouseInSceneEvent:
         self.multi_plane_points = multi_plane_points
 
 
-class ExtendedGLViewWidget(GLViewWidget):
+class ExtendedGLViewWidget(gl.GLViewWidget):
     """Extends GLViewWidget with ability to determine coordinates of the
     mouse cursor position in the 3D scene
     """

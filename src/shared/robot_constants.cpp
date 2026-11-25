@@ -30,7 +30,7 @@ RobotConstants createRobotConstants()
         .max_force_dribbler_speed_rpm  = -12000,
 
         // Motor constant
-        .motor_max_acceleration_m_per_s_2 = 2.0f,
+        .motor_max_acceleration_m_per_s_2 = 4.5f,
 
         // Robot's linear movement constants
         .robot_max_speed_m_per_s            = 3.0f,
@@ -53,11 +53,16 @@ RobotConstants createRobotConstants()
 
         // Kalman filter variances for robot localizer
         .kalman_process_noise_variance_rad_per_s_4      = 1.0f,
-        .kalman_vision_noise_variance_rad_2             = 0.01f * 0.01f,
-        .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5f};
+        .kalman_vision_noise_variance_rad_2             = 0.0001f,
+        .kalman_motor_sensor_noise_variance_rad_per_s_2 = 0.5f,
+        .kalman_motor_sensor_noise_variance_m_per_s_2   = 0.05f,
+
+        // Imu variance set here for dependency issues
+        .imu_variance = (4.0 * 14.4222 / 1000.0 * M_PI / 180.0) *
+                        (4.0 * 14.4222 / 1000.0 * M_PI / 180.0)};
 }
 #elif CHECK_VERSION(2021)
-RobotConstants createRobotConstants()
+constexpr RobotConstants createRobotConstants()
 {
     return {
         .robot_radius_m        = static_cast<float>(ROBOT_MAX_RADIUS_METERS),
