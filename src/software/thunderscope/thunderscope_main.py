@@ -2,10 +2,10 @@
 # below deliberately come after preload_bundled_qt_libs().
 # ruff: noqa: E402
 
-from software.thunderscope.qt_dependency_bootstrap import preload_bundled_qt_libs
+from software.thunderscope.qt_dependency_bootstrap import prepare
 
 # Must run before importing any Qt bindings (see qt_dependency_bootstrap).
-preload_bundled_qt_libs()
+prepare()
 
 import argparse
 import contextlib
@@ -17,7 +17,6 @@ import threading
 import google.protobuf
 import software.thunderscope.thunderscope_config as config
 from google.protobuf.internal import api_implementation
-from pyqtgraph.Qt.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
 from software.py_constants import (
     DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
     DIV_B_NUM_ROBOTS,
@@ -50,9 +49,6 @@ from software.thunderscope.util import (
     sync_simulation,
 )
 from software.thunderscope.wifi_communication_manager import WifiCommunicationManager
-
-print(PYQT_VERSION_STR)
-print(QT_VERSION_STR)
 
 protobuf_impl_type = api_implementation.Type()
 assert protobuf_impl_type == "upb", (

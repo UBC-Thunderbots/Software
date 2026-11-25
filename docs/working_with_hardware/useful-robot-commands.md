@@ -61,7 +61,7 @@ Individual miscellaneous tasks (ex reboot, shutdown, rtt test) can be run throug
 To view a list of supported arguments, run:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -h
+bazel run //software/embedded/ansible:run_ansible -h
 ```
 
 If desired, the `-ho`, `--hosts` argument can be replaced with `-p`, `--port`, defining a port to listen to for Announcements from hosts.
@@ -77,7 +77,7 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 * <robot_ip> is the IP address of the robot
@@ -102,7 +102,7 @@ This will flash powerloop, the current firmware in `software/power/`, onto the p
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 ## Flashing the Motor Driver Boards from Raspberry Pi
@@ -121,7 +121,7 @@ This section refers to setting up the computer on the robot for the first time. 
 ### Raspberry Pi
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>
 ```
 
 ## Robot Diagnostics
@@ -154,7 +154,7 @@ Deploys the STSPIN Motor Controller Test binary onto a robot through Ansible.
 From Software/src:
 
 ```bash
-bazel run //software/embedded/ansible:run_ansible --platforms=//toolchains/cc:robot -- --playbook deploy_stspin_motor_controller_test.yml --hosts <robot_name> --ssh_pass <robot_password>
+bazel run //software/embedded/ansible:run_ansible -- --playbook deploy_stspin_motor_controller_test.yml --hosts <robot_name> --ssh_pass <robot_password>
 ```
 
 * replace the \<robot_ip\> with the actual ip address of the Raspberry Pi for the ssh connection.

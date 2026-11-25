@@ -81,6 +81,7 @@ platformio_project(
     framework = "arduino",
     lib_deps = ["Nanopb@^0.4.91"],
     platform = "espressif32@7.1.0\nupload_port = /dev/ttyAMA0\nboard_upload.before_reset = no_reset\nupload_speed = 115200",
+    platformio = "//starlark/platformio:platformio",
     deps = [
         ":control_executor",
         ":esp_hal",
@@ -100,10 +101,16 @@ genrule(
     outs = ["powerloop.tar.gz"],
     cmd = """
         TARGET_DIR=$$(dirname $(location :powerloop_main))
-        cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
-        chmod +w "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
-        echo "" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
-        echo "extra_scripts = pre:auto_reset.py" >> "$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        mkdir -p "$$TARGET_DIR/powerloop_main_workdir"
+        if [ ! -e "$$TARGET_DIR/powerloop_main_workdir/auto_reset.py" ]; then
+            cp $(location :auto_reset.py) "$$TARGET_DIR/powerloop_main_workdir/"
+        fi
+        INI="$$TARGET_DIR/powerloop_main_workdir/platformio.ini"
+        if [ -f "$$INI" ] && ! grep -q '^extra_scripts = pre:auto_reset.py$$' "$$INI"; then
+            chmod +w "$$INI"
+            echo "" >> "$$INI"
+            echo "extra_scripts = pre:auto_reset.py" >> "$$INI"
+        fi
         tar -C "$$TARGET_DIR" -czhf $@ "powerloop_main_workdir"
     """,
     local = True,

@@ -16,7 +16,7 @@ std::string runtime_dir = "/tmp/tbots/yellow_test";
  * @param excepts A bitmask of floating-point exceptions to be enabled.
  * @return True on success, false on failure to set floating-point exceptions.
  */
-bool enable_fp_exceptions(unsigned int excepts)
+bool enable_fp_exceptions(int excepts)
 {
 #if defined(__linux__) && defined(__GNUC__)
     feenableexcept(excepts);

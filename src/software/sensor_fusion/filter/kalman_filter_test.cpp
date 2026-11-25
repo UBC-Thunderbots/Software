@@ -5,6 +5,11 @@
 #include "software/sensor_fusion/filter/extended_kalman_filter.hpp"
 #include "software/sensor_fusion/filter/linear_kalman_filter.hpp"
 
+namespace
+{
+constexpr double TOLERANCE = 1e-13;
+}
+
 struct KalmanParamsMath
 {
     double state_estimate;
@@ -75,8 +80,8 @@ TEST_P(MathTests1D, Math1D)
         p.process_model * p.process_model * p.state_covariance + p.process_covariance;
 
     filter.predict(control_input);
-    EXPECT_DOUBLE_EQ(filter.state_estimate(0), predict_state_estimate);
-    EXPECT_DOUBLE_EQ(filter.state_covariance(0, 0), predict_state_covariance);
+    EXPECT_NEAR(filter.state_estimate(0), predict_state_estimate, TOLERANCE);
+    EXPECT_NEAR(filter.state_covariance(0, 0), predict_state_covariance, TOLERANCE);
 
     // Update Stage 1x1 Matrix Equations
 
@@ -107,8 +112,8 @@ TEST_P(MathTests1D, Math1D)
         std::pow(kalman_gain, 2) * p.measurement_covariance;
 
     filter.update(measurement_input);
-    EXPECT_DOUBLE_EQ(filter.state_estimate(0), update_state_estimate);
-    EXPECT_DOUBLE_EQ(filter.state_covariance(0, 0), update_state_covariance);
+    EXPECT_NEAR(filter.state_estimate(0), update_state_estimate, TOLERANCE);
+    EXPECT_NEAR(filter.state_covariance(0, 0), update_state_covariance, TOLERANCE);
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -17,5 +17,6 @@ repos:
 
     -   id: generate_fsm_diagrams
         name: generate new FSM diagrams
-        language: python
-        entry: scripts/fsm_diagram_generator.py
+        language: system
+        entry: scripts/generate_fsm_diagrams.sh
+        pass_filenames: false

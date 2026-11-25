@@ -16,6 +16,7 @@ import proto.import_all_protos as protos
 import software.python_bindings as tbots_cpp
 from proto.message_translation.tbots_protobuf import create_default_world_state
 from proto.ssl_gc_common_pb2 import Team as SslTeam
+from python.runfiles import runfiles
 from software.networking.ssl_proto_communication import (
     SslSocket,
     SslSocketProtoParseException,
@@ -47,6 +48,11 @@ class Gamecontroller:
 
     GC_PORT_LOCK = "/tmp/tbots_gc_port.lock"
     GC_PORT_STATE = "/tmp/tbots_gc_last_port.txt"
+
+    # Bazel stages the Gamecontroller binary at this path
+    GAMECONTROLLER_RUNFILES_PATH: Final = (
+        "_main/software/thunderscope/binary_context_managers/gamecontroller"
+    )
 
     def __init__(
         self,
@@ -98,7 +104,7 @@ class Gamecontroller:
 
         :return: gamecontroller context managed instance
         """
-        command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+        command = [self.__get_gamecontroller_path(), "--timeAcquisitionMode", "ci"]
 
         lock_fd = None
         if not self.use_conventional_port:
@@ -665,3 +671,11 @@ class Gamecontroller:
             return interface_name
 
         raise RuntimeError("Could not determine the default network interface on macOS")
+
+    def __get_gamecontroller_path(self) -> str:
+        """Locate the SSL Gamecontroller binary in the Bazel runfiles.
+
+        :return: path to the SSL Gamecontroller binary
+        """
+        runfiles_instance = runfiles.Create()
+        return runfiles_instance.Rlocation(self.GAMECONTROLLER_RUNFILES_PATH)
