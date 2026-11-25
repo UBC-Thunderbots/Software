@@ -46,12 +46,34 @@ void StSpinMotorController::setup()
 
     for (const MotorIndex motor : driveMotors())
     {
-        sendAndReceiveMessage(motor,
-                              SetPidSpeedKpKiMessage{.kp = SPEED_PID_PROPORTIONAL_GAIN,
-                                                     .ki = SPEED_PID_INTEGRAL_GAIN});
-        sendAndReceiveMessage(motor,
-                              SetPidTorqueKpKiMessage{.kp = TORQUE_PID_PROPORTIONAL_GAIN,
-                                                      .ki = TORQUE_PID_INTEGRAL_GAIN});
+        if (motor == MotorIndex::FRONT_LEFT || motor == MotorIndex::FRONT_RIGHT)
+        {
+            sendAndReceiveMessage(motor,
+                                SetPidSpeedKpKiMessage{.kp = FRONT_SPEED_PID_PROPORTIONAL_GAIN,
+                                                        .ki = FRONT_SPEED_PID_INTEGRAL_GAIN});
+            sendAndReceiveMessage(motor,
+                                SetPidTorqueKpKiMessage{.kp = FRONT_TORQUE_PID_PROPORTIONAL_GAIN,
+                                                        .ki = FRONT_TORQUE_PID_INTEGRAL_GAIN});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKaKvMessage{.ka = FRONT_SPEED_FEED_FORWARD_KA,
+                                                        .kv = FRONT_SPEED_FEED_FORWARD_KV});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKsMessage{.ks = FRONT_SPEED_FEED_FORWARD_KS});
+        }
+        else if (motor == MotorIndex::BACK_LEFT || motor == MotorIndex::BACK_RIGHT)
+        {
+            sendAndReceiveMessage(motor,
+                                SetPidSpeedKpKiMessage{.kp = BACK_SPEED_PID_PROPORTIONAL_GAIN,
+                                                        .ki = BACK_SPEED_PID_INTEGRAL_GAIN});
+            sendAndReceiveMessage(motor,
+                                SetPidTorqueKpKiMessage{.kp = BACK_TORQUE_PID_PROPORTIONAL_GAIN,
+                                                        .ki = BACK_TORQUE_PID_INTEGRAL_GAIN});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKaKvMessage{.ka = BACK_SPEED_FEED_FORWARD_KA,
+                                                        .kv = BACK_SPEED_FEED_FORWARD_KV});
+            sendAndReceiveMessage(motor,
+                                SetSpeedFeedForwardKsMessage{.ks = BACK_SPEED_FEED_FORWARD_KS});
+        }
     }
 }
 
