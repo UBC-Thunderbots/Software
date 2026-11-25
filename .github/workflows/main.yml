@@ -4,7 +4,11 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ 
+      master,
+      avah/minimal_environment_setup_tscope,
+      grant/add_macos_action_runners
+    ]
   schedule:
     - cron: '0 8 * * *'  # 12 AM PST / 8 AM UTC
   workflow_dispatch:
@@ -25,7 +29,14 @@ concurrency:
 
 jobs:
   check-and-clear-cache:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
@@ -63,12 +74,8 @@ jobs:
   multiplatform-build:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
-    strategy:
-      matrix:
-        platform: [ ubuntu-24.04-arm ]
-
     name: Ubuntu Alternate Builds
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -76,7 +83,7 @@ jobs:
       - name: Software Build Test
         run: |
           cd src
-          bazel build --show_timestamps --copt=-O3 --verbose_failures \
+          bazel build --show_timestamps --copt=-O3 --verbose_failures --keep_going \
             -- //... -//software:unix_full_system   \
             -//software/gameplay_tests/...         \
             -//software/ai/stp/...                   \
@@ -86,7 +93,7 @@ jobs:
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=@llvm//platforms:linux_x86_64_gnu.2.28
 
       - name: Motor Firmware build Test
         run: |
@@ -95,7 +102,14 @@ jobs:
 
   motor-firmware:
     name: Motor Firmware
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -109,7 +123,14 @@ jobs:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Software Tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -117,18 +138,26 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --copt=-O3 --show_timestamps --verbose_failures \
+          bazel test --copt=-O3 --show_timestamps --verbose_failures --keep_going \
             -- //... -//software:unix_full_system \
             -//software/gameplay_tests/...  \
             -//software/ai/stp/...            \
             -//software/ai/navigator/...     \
-            -//software:unix_full_system_tar_gen
+            -//software:unix_full_system_tar_gen \
+            -//software/power:powerloop_tar
 
-  robot-tests:
+  robot-tests: # cross compile test
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Robot Software Tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -136,14 +165,20 @@ jobs:
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains/cc:robot
-
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=@llvm//platforms:linux_x86_64_gnu.2.28
 
   simulated-gameplay-tests:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: Simulated Gameplay Tests
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -180,7 +215,14 @@ jobs:
     needs: check-and-clear-cache
     if: needs.check-and-clear-cache.outputs.should_run == 'true'
     name: AutoRef'd Game (3 Minutes)
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          ubuntu-24.04,
+          macos-latest
+        ]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/environment-setup
@@ -188,7 +230,11 @@ jobs:
       - name: AI vs AI (3 minutes)
         run: |
           cd src
-          bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          else
+            bazel run //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
+          fi
 
       - name: Upload AI vs AI logs
         # Ensure that simulated test logs get uploaded

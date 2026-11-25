@@ -67,6 +67,11 @@ py_library(
 )
 
 py_library(
+    name = "field_frame",
+    srcs = ["field_frame.py"],
+)
+
+py_library(
     name = "time_provider",
     srcs = ["time_provider.py"],
 )

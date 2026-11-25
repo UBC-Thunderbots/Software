@@ -1,5 +1,7 @@
 #include "software/geom/algorithms/find_open_circles.h"
 
+#include <iterator>
+
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/furthest_point.h"

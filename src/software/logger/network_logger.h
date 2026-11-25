@@ -22,7 +22,7 @@ class NetworkLoggerSingleton
      * called once at the start of a program.
      */
     static void initializeLogger(RobotId robot_id, bool enable_log_merging,
-                                 const std::string& network_interface = "tbotswifi5");
+                                 const std::string& network_interface);
 
     /**
      * Updates the underlying UDP sender associated with this network sink. Useful when a
