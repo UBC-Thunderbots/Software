@@ -275,6 +275,7 @@ def configure_base_simulated_test(
     full_system_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
+    extra_widgets: list[TScopeWidget] = [],
 ) -> list:
     """Returns a list of widget data for a FullSystem tab
     along with any extra widgets passed in
@@ -282,11 +283,7 @@ def configure_base_simulated_test(
     :param full_system_proto_unix_io: the proto unix io to configure widgets with
     :param sim_proto_unix_io: the proto unix io for the simulator
     :param friendly_colour_yellow: if this is Yellow FullSystem (True) or Blue (False)
-    :param visualization_buffer_size: The size of the visualization buffer.
-            Increasing this will increase smoothness but will be less realtime.
-    :param frame_swap_counter: a FrameTimeCounter for the GLWidget to track
-                               the time between frame swaps
-    :param refresh_counter: a FrameTimeCounter for the refresh function
+    :param extra_widgets: a list of additional widget data to append
     :return: list of widget data for FullSystem when running simulated tests
     """
     return [
@@ -313,7 +310,7 @@ def configure_base_simulated_test(
             position=WidgetPosition.BOTTOM,
             stretch=WidgetStretchData(y=3),
         ),
-    ]
+    ] + extra_widgets
 
 
 def configure_two_ai_gamecontroller_view(
@@ -383,6 +380,7 @@ def configure_simulated_test_view(
     simulator_proto_unix_io: ProtoUnixIO,
     blue_full_system_proto_unix_io: ProtoUnixIO,
     yellow_full_system_proto_unix_io: ProtoUnixIO,
+    extra_widgets: list[TScopeWidget] = [],
 ) -> TScopeConfig:
     """Constructs the Thunderscope Config for simulated tests
     A view with 2 FullSystem tabs (Blue and Yellow)
@@ -391,8 +389,7 @@ def configure_simulated_test_view(
     :param simulator_proto_unix_io: the proto unix io for the simulator
     :param blue_full_system_proto_unix_io: the proto unix io for the blue fullsystem
     :param yellow_full_system_proto_unix_io: the proto unix io for the yellow fullsystem
-    :param visualization_buffer_size: The size of the visualization buffer.
-            Increasing this will increase smoothness but will be less realtime.
+    :param extra_widgets: additional widget data to add to the Blue FullSystem tab
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {
@@ -413,6 +410,7 @@ def configure_simulated_test_view(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
+                    extra_widgets=extra_widgets,
                 ),
             ),
             TScopeTab(
@@ -435,6 +433,7 @@ def configure_field_test_view(
     yellow_full_system_proto_unix_io: ProtoUnixIO,
     visualization_buffer_size: int = 5,
     yellow_is_friendly: bool = False,
+    extra_widgets: list[TScopeWidget] = [],
 ) -> TScopeConfig:
     """Constructs the Thunderscope Config for field tests
     A view with 2 FullSystem tabs (Blue and Yellow)
@@ -445,6 +444,8 @@ def configure_field_test_view(
     :param yellow_full_system_proto_unix_io: the proto unix io for the yellow fullsystem
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
+    :param yellow_is_friendly: whether the friendly team is yellow
+    :param extra_widgets: additional widget data to add to the friendly FullSystem tab
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {
@@ -469,7 +470,7 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets=extra_widgets,
                 ),
             )
         ]
@@ -482,7 +483,7 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets=extra_widgets,
                 ),
             )
         ]
