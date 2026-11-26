@@ -24,6 +24,7 @@ enum class StSpinResponseType
     IQ_AND_IQ_REF             = 0x05,
     ID_AND_ID_REF             = 0x06,
     SPEED_AND_SPEED_REF       = 0x07,
+    MOTOR_STATE               = 0x08,
 };
 
 enum class StSpinFaultCode
@@ -40,6 +41,25 @@ enum class StSpinFaultCode
     SAMPLE_FAULT = 0x0100,
     OVERCURR_SW  = 0x0200,
     DP_FAULT     = 0x0400
+};
+
+enum class StSpinMotorState
+{
+    // mirrors MCI_State_t enum in mc_interface.h in MD f/w    
+    ICLWAIT         = 12,
+    IDLE            = 0,
+    ALIGNMENT       = 2,
+    CHARGE_BOOT_CAP = 16,
+    OFFSET_CALIB    = 17,  
+    START           = 4,
+    SWITCH_OVER     = 19,
+    RUN             = 6,
+    STOP            = 8,
+    FAULT_NOW       = 10,
+    FAULT_OVER      = 11,
+    WAIT_STOP_MOTOR = 20,
+    OTF_DETECTION   = 21,
+    OTF_BRAKE       = 22
 };
 
 struct NoOpMessage
