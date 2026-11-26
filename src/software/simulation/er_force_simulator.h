@@ -153,7 +153,7 @@ class ErForceSimulator
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
-        std::unordered_map<RobotId, SimulatedRobot>& simulated_robots,
+        std::map<RobotId, SimulatedRobot>& simulated_robots,
         const RobotState& robot_state);
 
     /**
@@ -190,7 +190,7 @@ class ErForceSimulator
      * @return robot control
      */
     SSLSimulationProto::RobotControl updateSimulatorRobots(
-        std::unordered_map<RobotId, SimulatedRobot>& simulated_robots,
+        std::map<RobotId, SimulatedRobot>& simulated_robots,
         const TbotsProto::World& world_msg, const Duration& time_step,
         gameController::Team side);
 
@@ -217,8 +217,8 @@ class ErForceSimulator
         const std::string& path);
 
     // Map of Robot id to the simulated robot running its firmware
-    std::unordered_map<RobotId, SimulatedRobot> yellow_simulated_robots;
-    std::unordered_map<RobotId, SimulatedRobot> blue_simulated_robots;
+    std::map<RobotId, SimulatedRobot> yellow_simulated_robots;
+    std::map<RobotId, SimulatedRobot> blue_simulated_robots;
 
     // Whether each team's robots were moved since the last physics step
     bool yellow_robots_moved = false;

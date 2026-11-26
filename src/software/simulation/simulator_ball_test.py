@@ -147,5 +147,4 @@ def test_ball_robot_collision(gameplay_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
     pytest_main(__file__)

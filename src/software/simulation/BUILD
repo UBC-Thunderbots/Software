@@ -6,6 +6,12 @@ load("@rules_python//python:defs.bzl", "py_test")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "avah_logger",
+    hdrs = ["avah_logger.hpp"],
+    deps = ["//software/logger"],
+)
+
+cc_library(
     name = "er_force_simulator",
     srcs = ["er_force_simulator.cpp"],
     hdrs = ["er_force_simulator.h"],
@@ -16,6 +22,7 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:realistic.txt",
     ],
     deps = [
+        ":avah_logger",
         ":simulated_robot",
         "//extlibs/er_force_sim/src/amun/simulator",
         "//proto/message_translation:ssl_detection",
