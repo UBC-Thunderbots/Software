@@ -92,7 +92,7 @@ def generate_diagram(fsm):
             diagram += f" : [{guard}]"
 
             if action:
-                diagram += f"\n<i>{action}</i>"
+                diagram += f"<br><i>{action}</i>"
 
         elif action:
             diagram += f" : <i>{action}</i>"
