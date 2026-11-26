@@ -37,6 +37,12 @@ message Geometry
     optional float defense_height                    = 17 [default = 1.0];
     optional GeometryType type                       = 18 [default = TYPE_2014];
     optional Division division                       = 19 [default = A];
+    // Field numbers match the upstream ER-Force framework
+    optional float corner_block_cathetus_length = 21;
+    // Boundary width behind the goal lines, if different from boundary_width [m]
+    optional float boundary_width_goal_line = 22;
+    // Width of the goal substitution area [m], currently unused by the simulator
+    optional float goal_substitution_area_width = 23;
 }
 
 message BallPosition

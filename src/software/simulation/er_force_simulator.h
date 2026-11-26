@@ -244,6 +244,8 @@ class ErForceSimulator
     const bool enable_robot_localizer;
     const SimulatedRobotSensorNoise robot_sensor_noise;
 
-    const std::string CONFIG_FILE      = "simulator/2020";
+    // there is no 2026 division B config upstream, so division B uses the 2023 one
+    const std::string CONFIG_FILE_DIV_A = "simulator/2026.txt";
+    const std::string CONFIG_FILE_DIV_B = "simulator/2023B.txt";
     const std::string CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
 };
