@@ -21,6 +21,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include <deque>
 #include <memory>
 #include <random>
 #include <utility>
@@ -128,6 +129,16 @@ class camun::simulator::Simulator
     void initializeDetection(SSLProto::SSL_DetectionFrame& detection, size_t cameraId);
 
    private:
+    // a robot control message waiting for its command delay to pass
+    struct QueuedRobotControl
+    {
+        SSLSimulationProto::RobotControl control;
+        int64_t receive_time;  // simulator time [ns] at which it was received
+    };
+
+    std::deque<QueuedRobotControl> m_blueCommands;
+    std::deque<QueuedRobotControl> m_yellowCommands;
+
     std::unique_ptr<SimulatorData> m_data;
 
     bool m_enabled;
@@ -204,6 +215,7 @@ struct camun::simulator::SimulatorData
     float robotReplyPacketLoss;
     float missingBallDetections;
     bool dribblePerfect;
+    int64_t commandDelay;  // [ns] time for a robot to receive a command
 };
 
 #endif  // SIMULATOR_H

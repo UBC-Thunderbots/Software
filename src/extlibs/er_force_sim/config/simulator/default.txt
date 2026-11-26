@@ -13,3 +13,4 @@ missing_ball_detections: 0
 vision_delay: 0
 vision_processing_time: 0
 simulate_dribbling: false
+command_delay: 0
