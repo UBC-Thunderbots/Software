@@ -16,9 +16,7 @@ MotorService::MotorService(const robot_constants::RobotConstants& robot_constant
 {
 }
 
-void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
-                        TbotsProto::RobotStatus& robot_status,
-                        const Duration& time_elapsed_since_last_poll)
+void MotorService::poll(TbotsProto::RobotStatus& robot_status)
 {
     ZoneNamedN(_tracy_motor_service_poll, "Thunderloop: Poll MotorService", true);
 
@@ -26,11 +24,9 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
 
     resetMotorsIfNeeded();
 
-    const auto [current_wheel_velocities, dribbler_rpm] = driveMotors();
+    const auto [current_wheel_velocities, dribbler_rpm] = readMotors();
 
     checkForMotorRunaway(current_wheel_velocities);
-
-    updateTargetVelocities(primitive, time_elapsed_since_last_poll.toSeconds());
 
     updateMotorStatus(robot_status, current_wheel_velocities, dribbler_rpm);
 
@@ -40,6 +36,28 @@ void MotorService::poll(const TbotsProto::DirectControlPrimitive& primitive,
 
     robot_status.mutable_thunderloop_status()->set_motor_service_poll_time_ms(
         poll_time.count());
+}
+
+void MotorService::send(const TbotsProto::DirectControlPrimitive& primitive,
+                        TbotsProto::RobotStatus& robot_status,
+                        const Duration& time_elapsed_since_last_poll)
+{
+    ZoneNamedN(_tracy_motor_service_send, "Thunderloop: Send MotorService", true);
+
+    const auto send_start = std::chrono::steady_clock::now();
+
+    updateTargetVelocities(primitive, time_elapsed_since_last_poll.toSeconds());
+
+    writeMotors();
+
+    const auto send_end    = std::chrono::steady_clock::now();
+    using Millis           = std::chrono::duration<double, std::milli>;
+    const Millis send_time = std::chrono::duration_cast<Millis>(send_end - send_start);
+
+    // Report the combined time spent in poll and send
+    auto* thunderloop_status = robot_status.mutable_thunderloop_status();
+    thunderloop_status->set_motor_service_poll_time_ms(
+        thunderloop_status->motor_service_poll_time_ms() + send_time.count());
 }
 
 void MotorService::setup()
@@ -65,7 +83,17 @@ void MotorService::resetMotorsIfNeeded()
     }
 }
 
-std::pair<WheelSpace_t, double> MotorService::driveMotors()
+std::pair<WheelSpace_t, double> MotorService::readMotors()
+{
+    return transferMotors();
+}
+
+void MotorService::writeMotors()
+{
+    transferMotors();
+}
+
+std::pair<WheelSpace_t, double> MotorService::transferMotors()
 {
     const Eigen::Vector4<int> target_wheel_rpms =
         (target_wheel_velocities_ / drive_motor_mps_per_rpm_).cast<int>();
