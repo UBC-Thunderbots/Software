@@ -89,7 +89,7 @@ jobs:
       - name: Raspberry Pi Build Test
         run: |
           cd src
-          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=@llvm//platforms:linux_x86_64_gnu.2.28
+          bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains:robot
 
       - name: Motor Firmware build Test
         run: |
@@ -161,7 +161,7 @@ jobs:
       - name: Raspberry Pi Build
         run: |
          cd src
-         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=@llvm//platforms:linux_x86_64_gnu.2.28
+         bazel build //software/embedded:thunderloop_main --copt=-O3 --platforms=//toolchains:robot
 
   simulated-gameplay-tests:
     needs: check-and-clear-cache
