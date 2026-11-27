@@ -145,19 +145,30 @@ void MotorService::updateTargetVelocities(
     {
         const auto& direct_velocity = motor_control.direct_velocity_control();
 
-        const EuclideanSpace_t target_euclidean_velocity = {
+        EuclideanSpace_t target_euclidean_velocity = {
             direct_velocity.velocity().x_component_meters(),
             direct_velocity.velocity().y_component_meters(),
             direct_velocity.angular_velocity().radians_per_second()};
+
+        const double vx    = target_euclidean_velocity[0];
+        const double vy    = target_euclidean_velocity[1];
+        const double speed = std::hypot(vx, vy);
+
+        // Compensate for the robot over-delivering forward/backward motion on diagonals
+        // (see RobotConstants::diagonal_forward_reduction). |sin(2θ)| is 0 on the axes
+        // and 1 at 45/135/225/315 degrees.
+        if (speed > 1e-3)
+        {
+            const double diagonal_fraction = 2.0 * std::abs(vx * vy) / (speed * speed);
+            target_euclidean_velocity[0] *=
+                1.0 - robot_constants_.diagonal_forward_reduction * diagonal_fraction;
+        }
 
         target_wheel_velocities_ =
             euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
 
         // Compensate for the front wheels under-delivering sideways motion relative to
         // the back wheels (see RobotConstants::front_wheel_sideways_gain)
-        const double vx    = target_euclidean_velocity[0];
-        const double vy    = target_euclidean_velocity[1];
-        const double speed = std::hypot(vx, vy);
         if (speed > 1e-3)
         {
             const double front_scale =

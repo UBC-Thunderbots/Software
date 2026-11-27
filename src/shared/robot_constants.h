@@ -133,6 +133,14 @@ struct RobotConstants
     // speed loop.
     float front_wheel_sideways_gain;
 
+    // Fractional reduction of the commanded forward/backward velocity on diagonals,
+    // scaled by |sin(2θ)| (0 on the axes, full at 45/135 degrees), so 0.15 means vx is
+    // cut by 15% at 45 degrees. Empirical: on diagonals the robot over-delivers vx
+    // (~1.15-1.18x) while vy is on target, bending the path toward the x axis. Likely
+    // caused by the slow wheels overspinning their speed targets; re-fit or remove once
+    // the motor speed loop tracks low speeds accurately.
+    float diagonal_forward_reduction;
+
     // Various variances for the robot localizer Kalman filter
     float kalman_process_noise_variance_rad_per_s_4;
 

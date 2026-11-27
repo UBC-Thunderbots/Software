@@ -53,6 +53,7 @@ RobotConstants createRobotConstants()
 
         // From Nov 2026 open-loop strafing tests with the 35/40 kinematics matrix
         .front_wheel_sideways_gain = 0.08f,
+        .diagonal_forward_reduction = 0.15f,
 
         // Kalman filter variances for robot localizer
         .kalman_process_noise_variance_rad_per_s_4      = 1.0f,
@@ -97,7 +98,8 @@ constexpr RobotConstants createRobotConstants()
 
         .wheel_radius_meters = 0.03f,
 
-        .front_wheel_sideways_gain = 0.0f,
+        .front_wheel_sideways_gain  = 0.0f,
+        .diagonal_forward_reduction = 0.0f,
 
         // Kalman filter variances for robot localizer
         .kalman_process_noise_variance_rad_per_s_4      = 0.5f,
