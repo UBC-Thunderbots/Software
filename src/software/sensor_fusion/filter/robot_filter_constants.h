@@ -10,15 +10,15 @@
 // enough to cover anywhere on the field it might be and any speed it might legally be
 // moving at. This makes the filter trust the first detections it sees almost
 // entirely, letting it converge onto the robot within a few frames.
-constexpr double RF_INITIAL_POSITION_UNCERTAINTY_M       = 1.0;
-constexpr double RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 6.5;
+constexpr double RF_INITIAL_POSITION_UNCERTAINTY_M       = 12.8;
+constexpr double RF_INITIAL_VELOCITY_UNCERTAINTY_M_PER_S = 10.0;
 // 1.732 is the square root of 3. std::sqrt is not constexpr in C++23 and earlier.
 constexpr double RF_INITIAL_ORIENTATION_UNCERTAINTY_RAD        = M_PI / 1.732;
-constexpr double RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 2 * M_PI;
+constexpr double RF_INITIAL_ANG_VELOCITY_UNCERTAINTY_RAD_PER_S = 9.0;
 
 // The fastest we will believe the robot could be travelling when deciding whether a
 // detection could plausibly belong to it.
-constexpr double RF_MAX_ROBOT_SPEED_M_PER_S = 6.0;
+constexpr double RF_MAX_ROBOT_SPEED_M_PER_S = 10.0;
 
 // Slack on the max robot speed gate, so that vision noise on a robot that has been
 // sitting still cannot by itself push a detection out of reach of the estimate
