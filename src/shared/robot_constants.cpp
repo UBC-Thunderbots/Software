@@ -51,6 +51,9 @@ RobotConstants createRobotConstants()
 
         .expected_lever_arm = 0.0749f,
 
+        // From Nov 2026 open-loop strafing tests with the 35/40 kinematics matrix
+        .front_wheel_sideways_gain = 0.08f,
+
         // Kalman filter variances for robot localizer
         .kalman_process_noise_variance_rad_per_s_4      = 1.0f,
         .kalman_vision_noise_variance_rad_2             = 0.0001f,
@@ -93,6 +96,8 @@ constexpr RobotConstants createRobotConstants()
         .robot_max_ang_acceleration_rad_per_s_2   = 30.0f,
 
         .wheel_radius_meters = 0.03f,
+
+        .front_wheel_sideways_gain = 0.0f,
 
         // Kalman filter variances for robot localizer
         .kalman_process_noise_variance_rad_per_s_4      = 0.5f,

@@ -1,6 +1,7 @@
 #include "software/embedded/services/motor.h"
 
 #include <Tracy.hpp>
+#include <cmath>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/embedded/motor_controller/stspin_motor_controller.h"
@@ -151,6 +152,19 @@ void MotorService::updateTargetVelocities(
 
         target_wheel_velocities_ =
             euclidean_to_four_wheel_.getWheelVelocity(target_euclidean_velocity);
+
+        // Compensate for the front wheels under-delivering sideways motion relative to
+        // the back wheels (see RobotConstants::front_wheel_sideways_gain)
+        const double vx    = target_euclidean_velocity[0];
+        const double vy    = target_euclidean_velocity[1];
+        const double speed = std::hypot(vx, vy);
+        if (speed > 1e-3)
+        {
+            const double front_scale =
+                1.0 + robot_constants_.front_wheel_sideways_gain * std::abs(vy) / speed;
+            target_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX] *= front_scale;
+            target_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX] *= front_scale;
+        }
     }
 
     // Ramp the target velocities to keep acceleration compared to current velocities

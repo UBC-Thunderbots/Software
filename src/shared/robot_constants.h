@@ -125,6 +125,14 @@ struct RobotConstants
     // Front wheel arm = Rear wheel arm. See ASCII image above.
     float expected_lever_arm;
 
+    // Fractional boost applied to the front wheels' target velocities in proportion to
+    // how sideways the commanded translation is (|vy| / |v|), so 0.08 means +8% at pure
+    // sideways motion. This is an empirical compensation, not geometry: with the measured
+    // wheel angles, the back wheels deliver more sideways motion than the front, so the
+    // robot rotates while strafing. Re-fit after changes to the wheels or the motor
+    // speed loop.
+    float front_wheel_sideways_gain;
+
     // Various variances for the robot localizer Kalman filter
     float kalman_process_noise_variance_rad_per_s_4;
 
