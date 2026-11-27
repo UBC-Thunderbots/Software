@@ -7,7 +7,7 @@ from software.thunderscope.binary_context_managers.runtime_loader import (
 )
 
 
-class RuntimeManager:
+class RuntimeService:
     """Class for interfacing with AI runtimes/backends (full system or external) on the disk"""
 
     def __init__(self):
@@ -46,4 +46,4 @@ class RuntimeManager:
         return self.runtime_loader.fetch_runtime_config()
 
 
-runtime_manager_instance = RuntimeManager()
+runtime_service_instance = RuntimeService()
