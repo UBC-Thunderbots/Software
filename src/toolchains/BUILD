@@ -13,8 +13,8 @@ platform(
 platform(
     name = "motor_board",
     constraint_values = [
-        "@platforms//cpu:armv6-m",
         "@platforms//os:none",
+        "@platforms//cpu:armv6-m",
     ],
 )
 
@@ -35,7 +35,7 @@ arm_none_eabi_toolchain(
         "-Wl,--gc-sections",
     ],
     target_compatible_with = [
-        "@platforms//cpu:armv6-m",
         "@platforms//os:none",
+        "@platforms//cpu:armv6-m",
     ],
 )
