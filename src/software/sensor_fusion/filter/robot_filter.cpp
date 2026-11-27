@@ -159,26 +159,26 @@ std::optional<RobotDetection> RobotFilter::getBestRobotDetection(
     const std::vector<RobotDetection>& new_robot_detections)
 {
     const unsigned int target_id = this->current_robot_state.id();
-    int best_index               = -1;
+    std::optional<size_t> best_index;
 
     for (size_t i = 0; i < new_robot_detections.size(); ++i)
     {
         if (new_robot_detections[i].id == target_id)
         {
-            if (best_index == -1 || new_robot_detections[i].confidence >
-                                        new_robot_detections[best_index].confidence)
+            if (!best_index || new_robot_detections[i].confidence >
+                                   new_robot_detections[*best_index].confidence)
             {
-                best_index = static_cast<int>(i);
+                best_index = i;
             }
         }
     }
 
-    if (best_index == -1)
+    if (!best_index)
     {
         return std::nullopt;
     }
 
-    return new_robot_detections[best_index];
+    return new_robot_detections[*best_index];
 }
 
 void RobotFilter::predict(double delta_t)
