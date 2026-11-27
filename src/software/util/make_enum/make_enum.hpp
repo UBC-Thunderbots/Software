@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <stdexcept>
 
 #include "software/util/make_enum/make_enum_helpers.hpp"
@@ -122,7 +123,7 @@ constexpr std::string_view nameOf(const E value)
     // This index lookup relies on the assumption that the enum does not manually
     // specify any values. If it did, the underlying integer of the given value
     // may be out of range of the vector of strings.
-    return reflective_enum::valueNames<E>().at(static_cast<int>(value));
+    return reflective_enum::valueNames<E>().at(static_cast<std::size_t>(value));
 }
 
 /**
