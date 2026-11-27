@@ -1,7 +1,7 @@
 load("@ansible_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-load("//toolchains:transitions.bzl", "cross_compiled_filegroup")
+load("//platforms:transitions.bzl", "cross_compiled_filegroup")
 
 package(default_visibility = ["//visibility:public"])
 
