@@ -1,7 +1,7 @@
 def _cross_compile_transition_impl(settings, attr):
     # This forces Bazel to switch the target platform for anything under this transition
     return {
-        "//command_line_option:platforms": ["//toolchains:robot"],
+        "//command_line_option:platforms": ["//platforms:robot"],
     }
 
 _cross_compile_transition = transition(

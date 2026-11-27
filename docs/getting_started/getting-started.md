@@ -338,7 +338,7 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
 ## Building for the robot
 
-To build for the robot computer, build the target with the `--platforms=//toolchains:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//toolchains:robot //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//platforms:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//platforms:robot //software/geom/...`.
 
 ## Deploying Robot Software to the robot
 
