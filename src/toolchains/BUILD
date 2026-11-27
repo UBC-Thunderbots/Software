@@ -1,5 +1,7 @@
 load("@arm_none_eabi//toolchain:toolchain.bzl", "arm_none_eabi_toolchain")
 
+package(default_visibility = ["//visibility:public"])
+
 arm_none_eabi_toolchain(
     name = "motor_board_toolchain",
     copts = [
@@ -17,7 +19,7 @@ arm_none_eabi_toolchain(
         "-Wl,--gc-sections",
     ],
     target_compatible_with = [
-        "@platforms//cpu:armv6-m",
         "@platforms//os:none",
+        "@platforms//cpu:armv6-m",
     ],
 )

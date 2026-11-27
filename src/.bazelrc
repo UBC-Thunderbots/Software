@@ -33,12 +33,6 @@ build --test_env=QT_QPA_PLATFORM
 # See https://github.com/bazel-contrib/rules_python/issues/2489
 build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
 
-# Automatically set the CPU environment based on the `--cpu` flag as per our
-# defined CPU environments
-build --auto_cpu_environment_group=//toolchains/cc:cpus
-
-# Use Our Custom Toolchain
-build --crosstool_top=//toolchains/cc:toolchain
 common --features=external_include_paths
 common --features=generated_include_paths
 

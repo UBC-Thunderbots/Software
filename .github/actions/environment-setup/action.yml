@@ -17,10 +17,10 @@ runs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
 
-    - name: Run setup_software.sh
+    - name: Run environment_setup.sh
       shell: bash
       run: |
-        sudo "${GITHUB_WORKSPACE}"/environment_setup/setup_minimal.sh
+        sudo "${GITHUB_WORKSPACE}"/scripts/environment_setup.sh
 
     - name: Install GUI dependencies for Linux runner
       shell: bash

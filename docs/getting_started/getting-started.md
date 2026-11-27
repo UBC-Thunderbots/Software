@@ -31,8 +31,6 @@
     - [Tracy](#tracy)
   - [Building for the robot](#building-for-the-robot)
   - [Deploying Robot Software to the robot](#deploying-robot-software-to-the-robot)
-  - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
-    - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
 - [Workflow](#workflow)
   - [Issue and Project Tracking](#issue-and-project-tracking)
     - [Issues](#issues)
@@ -63,15 +61,11 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ### Operating systems
 
-We currently only support Linux, specifically Ubuntu.
+We currently support Linux and macOS, with regular testing being done on Ubuntu 24.04 LTS (x86_64) and macOS (ARM).
 
-If you have a X86_64 machine, we support Ubuntu 22.04 LTS and Ubuntu 24.04 LTS.
+You are welcome to use a different version or distribution of Linux, as well as different CPU architecture (eg. ARM64/AARCH64), but may need to make some tweaks in order for things to work.
 
-If you have a ARM64 (also known as AARCH64) machine, we support Ubuntu 24.04 LTS.
-
-You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
-
-You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+You can use Ubuntu 24.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 
@@ -104,10 +98,10 @@ You can use Ubuntu 22.04 LTS or Ubuntu 24.04 LTS inside Windows through Windows 
 
 ### Installing Software Dependencies
 
-We have several setup scripts to help you easily install the necessary dependencies in order to build and run our code. You will want to run the following scripts, which can all be found in `Software/environment_setup`
+We have a setup script to help you easily install the necessary dependencies in order to build and run our code.
 
-* Inside a terminal, navigate to the environment_setup folder. e.g. `cd path/to/the/repository/Software/environment_setup`
-* Run `./setup_software.sh`
+* Inside a terminal, navigate to the scripts folder. e.g. `cd path/to/the/repository/Software/script`
+* Run `sudo ./environment_setup.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our software 
 
@@ -344,7 +338,7 @@ Tracy also samples call stacks. If the profiled binary is run with root permissi
 
 ## Building for the robot
 
-To build for the robot computer, build the target with the `--platforms=//toolchains/cc:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//toolchains/cc:robot //software/geom/...`.
+To build for the robot computer, build the target with the `--platforms=//platforms:robot` flag and the toolchain will automatically build using the ARM toolchain. For example, `bazel build --platforms=//platforms:robot //software/geom/...`.
 
 ## Deploying Robot Software to the robot
 
@@ -357,14 +351,6 @@ bazel run //software/embedded/ansible:run_ansible -- --playbook deploy_robot_sof
 ```
 
 Where `<robot_ip>` is the IP address of the robot you are deploying to. The `robot_password` is the password used to login to the `robot` user on the robot.
-
-## Setting up Virtual Robocup 2021
-
-### Setting up the SSL Simulation Environment
-
-1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
-2. Clone it.
-3. Follow these [instructions](https://github.com/RoboCup-SSL/ssl-simulation-setup/blob/master/Readme.md) to set up and run the repository.
 
 # Workflow
 
