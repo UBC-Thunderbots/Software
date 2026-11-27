@@ -66,13 +66,13 @@ void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,
             throw TbotsNetworkException(ss.str());
         }
 
-        socket_.set_option(boost::asio::ip::multicast::join_group(
-            ip_address.to_v4(),
+        socket_.set_option(boost::asio::ip::multicast::outbound_interface(
             boost::asio::ip::address::from_string(interface_ip.value()).to_v4()));
         return;
     }
 
-    socket_.set_option(boost::asio::ip::multicast::join_group(ip_address));
+    socket_.set_option(boost::asio::ip::multicast::outbound_interface(
+        static_cast<unsigned int>(ip_address.to_v6().scope_id())));
 }
 
 
