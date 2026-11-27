@@ -171,8 +171,13 @@ void MotorService::updateTargetVelocities(
         // the back wheels (see RobotConstants::front_wheel_sideways_gain)
         if (speed > 1e-3)
         {
+            // |sin θ|^p: 0 driving forward/back, 1 when strafing; higher p backs the
+            // boost off faster on diagonals
+            const double sideways_fraction =
+                std::pow(std::abs(vy) / speed,
+                         robot_constants_.front_wheel_sideways_exponent);
             const double front_scale =
-                1.0 + robot_constants_.front_wheel_sideways_gain * std::abs(vy) / speed;
+                1.0 + robot_constants_.front_wheel_sideways_gain * sideways_fraction;
             target_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX] *= front_scale;
             target_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX] *= front_scale;
         }

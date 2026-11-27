@@ -133,6 +133,12 @@ struct RobotConstants
     // speed loop.
     float front_wheel_sideways_gain;
 
+    // Shape of the front-wheel boost: the boost scales with |sin θ|^p, where θ is the
+    // direction of travel (0 = forward). p = 1 is a plain |sin θ|; higher p keeps the
+    // full boost when strafing but reduces it faster on diagonals (p = 2 gives half
+    // the boost at 45 degrees).
+    float front_wheel_sideways_exponent;
+
     // Fractional reduction of the commanded forward/backward velocity on diagonals,
     // scaled by |sin(2θ)| (0 on the axes, full at 45/135 degrees), so 0.15 means vx is
     // cut by 15% at 45 degrees. Empirical: on diagonals the robot over-delivers vx
