@@ -131,7 +131,7 @@ class BuildConfig:
 class BazelFlag(tuple, Enum):
     DEBUG_BUILD = ("-c", "dbg")
     OPTIMIZED = ("--copt=-O3",)
-    ROBOT_PLATFORM = ("--platforms=//toolchains/cc:robot",)
+    ROBOT_PLATFORM = ("--platforms=//toolchains:robot",)
     TRACY = ("--cxxopt=-DTRACY_ENABLE",)
     THUNDERSCOPE = ("--spawn_strategy=local", "--test_env=DISPLAY=:0")
     NO_CACHE_TESTS = ("--cache_test_results=false",)

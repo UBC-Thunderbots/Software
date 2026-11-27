@@ -1,5 +1,23 @@
 load("@arm_none_eabi//toolchain:toolchain.bzl", "arm_none_eabi_toolchain")
 
+package(default_visibility = ["//visibility:public"])
+
+platform(
+    name = "robot",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+)
+
+platform(
+    name = "motor_board",
+    constraint_values = [
+        "@platforms//cpu:armv6-m",
+        "@platforms//os:none",
+    ],
+)
+
 arm_none_eabi_toolchain(
     name = "motor_board_toolchain",
     copts = [

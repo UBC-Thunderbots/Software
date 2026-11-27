@@ -346,7 +346,7 @@ arm_toolchain = use_extension("@toolchains_arm_gnu//:extensions.bzl", "arm_toolc
 arm_toolchain.arm_none_eabi()
 use_repo(arm_toolchain, "arm_none_eabi")
 
-register_toolchains("//toolchains/stm:motor_board_toolchain")
+register_toolchains("//toolchains:motor_board_toolchain")
 
 ##############################################
 # New local repos for our toolchains/compilers

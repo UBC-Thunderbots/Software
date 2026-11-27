@@ -35,10 +35,10 @@ build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
 
 # Automatically set the CPU environment based on the `--cpu` flag as per our
 # defined CPU environments
-build --auto_cpu_environment_group=//toolchains/cc:cpus
+build --auto_cpu_environment_group=//toolchains:cpus
 
 # Use Our Custom Toolchain
-build --crosstool_top=//toolchains/cc:toolchain
+build --crosstool_top=//toolchains:toolchain
 common --features=external_include_paths
 common --features=generated_include_paths
 
