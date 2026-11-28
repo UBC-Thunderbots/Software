@@ -144,7 +144,6 @@ std::optional<Ball> BallFilter::estimateBallState(
         {
             kalman_filter.update(measurement);
             consecutive_outliers     = 0;
-            prev_measurement         = measurement;
             prev_detection_timestamp = current_time;
         }
         // If rejected, accumulate outliers. Once a threshold is reached we reset to adapt
@@ -370,7 +369,6 @@ void BallFilter::reset(const Measurement& measurement, const Timestamp& current_
     // The reset measurement is now what the estimate is built on, so it becomes the
     // reference for the next timestep. Leaving the old timestamp here would make the
     // next predict() jump forward by the whole rejection streak.
-    prev_measurement         = measurement;
     prev_detection_timestamp = current_time;
     last_predict_timestamp   = current_time;
 }
