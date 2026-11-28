@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <memory>
 #include <string>
 
 typedef std::function<void(const char*, const size_t&,
@@ -54,21 +53,13 @@ class UdpListener
     virtual ~UdpListener();
 
     /**
-     * Sends a datagram through the listening socket.
-     *
-     * This posts to the `io_context`, so that needs to run for the send
-     * to go through.
-     *
-     * @param message The bytes to send
-     * @param destination The recipient's address and port
-     */
-    void sendTo(const std::string& message,
-                const boost::asio::ip::udp::endpoint& destination);
-
-    /**
      * Cleans up all associated networking resources with this listener.
      */
     void close();
+
+   protected:
+    // A UDP socket to receive data on
+    boost::asio::ip::udp::socket socket_;
 
    private:
     /**
@@ -77,12 +68,6 @@ class UdpListener
      */
     void handleDataReception(const boost::system::error_code& error,
                              std::size_t bytes_transferred);
-
-    /**
-     * The sending logic that runs within the `io_context` thread.
-     */
-    void doSend(std::shared_ptr<std::string> buf,
-                const boost::asio::ip::udp::endpoint& destination);
 
     /**
      * Starts listening for data on the socket.
@@ -108,9 +93,6 @@ class UdpListener
 
     // The raw data received from the network
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
-
-    // A UDP socket to receive data on
-    boost::asio::ip::udp::socket socket_;
 
     // The endpoint for the sender
     boost::asio::ip::udp::endpoint sender_endpoint_;

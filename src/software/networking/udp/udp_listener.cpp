@@ -8,7 +8,7 @@ UdpListener::UdpListener(boost::asio::io_service& io_service,
                          const std::string& ip_address, unsigned short port,
                          const std::string& listen_interface, bool multicast,
                          ReceiveCallback receive_callback)
-    : running_(true), socket_(io_service), receive_callback_(receive_callback)
+    : socket_(io_service), running_(true), receive_callback_(receive_callback)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
     if (isIpv6(ip_address))
@@ -44,7 +44,7 @@ UdpListener::UdpListener(boost::asio::io_service& io_service,
 
 UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned short port,
                          ReceiveCallback receive_callback)
-    : running_(true), socket_(io_service), receive_callback_(receive_callback)
+    : socket_(io_service), running_(true), receive_callback_(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
     socket_.open(listen_endpoint.protocol());
@@ -91,33 +91,6 @@ void UdpListener::setupMulticast(const boost::asio::ip::address& ip_address,
 }
 
 UdpListener::~UdpListener() {}
-
-void UdpListener::sendTo(const std::string& message,
-                         const boost::asio::ip::udp::endpoint& destination)
-{
-    auto buf = std::make_shared<std::string>(message);
-    // sockets aren't thread-safe, so the actual send needs to happen on the io_context
-    // thread
-    boost::asio::post(socket_.get_executor(),
-                      [this, buf, destination]() { doSend(buf, destination); });
-}
-
-void UdpListener::doSend(std::shared_ptr<std::string> buf,
-                         const boost::asio::ip::udp::endpoint& destination)
-{
-    socket_.async_send_to(boost::asio::buffer(*buf), destination,
-                          [buf](const boost::system::error_code& ec, std::size_t)
-                          {
-                              // this callback runs on io_context post-send. `buf` is
-                              // captured by this, which means that the shared pointer
-                              // lives right up until this lambda finishes running.
-                              if (ec)
-                              {
-                                  LOG(WARNING)
-                                      << "send failed from UdpListener: " << ec.message();
-                              }
-                          });
-}
 
 void UdpListener::close()
 {

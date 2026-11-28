@@ -138,3 +138,28 @@ cc_test(
         "@boost//:asio",
     ],
 )
+
+cc_library(
+    name = "udp_bidirectional_socket",
+    srcs = [
+        "udp_bidirectional_socket.cpp",
+    ],
+    hdrs = [
+        "udp_bidirectional_socket.h",
+    ],
+    deps = [
+        ":udp_listener",
+        "//software/logger",
+        "@boost//:asio",
+    ],
+)
+
+cc_test(
+    name = "udp_bidirectional_socket_test",
+    srcs = ["udp_bidirectional_socket_test.cpp"],
+    deps = [
+        ":udp_bidirectional_socket",
+        "//shared/test_util:tbots_gtest_main",
+        "@boost//:asio",
+    ],
+)
