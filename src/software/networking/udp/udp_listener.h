@@ -1,8 +1,11 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <string>
 
-typedef std::function<void(const char*, const size_t&)> ReceiveCallback;
+typedef std::function<void(const char*, const size_t&,
+                           const boost::asio::ip::udp::endpoint&)>
+    ReceiveCallback;
 
 /**
  * Creates a UDP listener that can listen on a given port and interface.
@@ -23,7 +26,7 @@ class UdpListener
      * @param multicast If true, the listener will join the multicast group given by
      * `ip_address`, otherwise it will listen on the local interface given by `ip_address`
      * and `interface`
-     * @param receive_callback The callback to call when a new message is received
+     * @param receive_callback Receives packet bytes, byte count, and sender endpoint.
      */
     UdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                 unsigned short port, const std::string& interface, bool multicast,
@@ -39,7 +42,7 @@ class UdpListener
      *
      * @param io_service The service thread to use for the network communication resource
      * @param port The port to listen on
-     * @param receive_callback The callback to call when a new message is received
+     * @param receive_callback Receives packet bytes, byte count, and sender endpoint.
      */
     UdpListener(boost::asio::io_service& io_service, const unsigned short port,
                 ReceiveCallback receive_callback);
@@ -53,6 +56,10 @@ class UdpListener
      * Cleans up all associated networking resources with this listener.
      */
     void close();
+
+   protected:
+    // A UDP socket to receive data on
+    boost::asio::ip::udp::socket socket_;
 
    private:
     /**
@@ -86,9 +93,6 @@ class UdpListener
 
     // The raw data received from the network
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
-
-    // A UDP socket to receive data on
-    boost::asio::ip::udp::socket socket_;
 
     // The endpoint for the sender
     boost::asio::ip::udp::endpoint sender_endpoint_;
