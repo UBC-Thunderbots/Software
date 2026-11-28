@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include <string>
 
-#include "software/networking/udp/udp_listener.h"
+#include "software/networking/udp/udp_bidirectional_socket.h"
 
 template <class ReceiveProtoT, class SendProtoT>
 class ProtoUdpBidirectional
@@ -91,7 +91,7 @@ class ProtoUdpBidirectional
      */
     void startListen();
 
-    UdpListener udp_listener_;  // The underlying UDP listener
+    UdpBidirectionalSocket udp_socket_;  // The underlying UDP socket
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&, const boost::asio::ip::udp::endpoint&)>
         receive_callback;
@@ -104,7 +104,7 @@ ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::ProtoUdpBidirectional(
     std::function<void(ReceiveProtoT&, const boost::asio::ip::udp::endpoint&)>
         receive_callback,
     bool multicast)
-    : udp_listener_(
+    : udp_socket_(
           io_service, ip_address, port, listen_interface, multicast,
           std::bind(
               &ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::handleDataReception,
@@ -118,7 +118,7 @@ ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::ProtoUdpBidirectional(
     boost::asio::io_service& io_service, const unsigned short port,
     std::function<void(ReceiveProtoT&, const boost::asio::ip::udp::endpoint&)>
         receive_callback)
-    : udp_listener_(
+    : udp_socket_(
           io_service, port,
           std::bind(
               &ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::handleDataReception,
@@ -146,7 +146,7 @@ void ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::sendTo(
 {
     std::string data_buffer;
     std::ignore = message.SerializeToString(&data_buffer);
-    udp_listener_.sendTo(data_buffer, endpoint);
+    udp_socket_.sendTo(data_buffer, endpoint);
 }
 
 template <class ReceiveProtoT, class SendProtoT>
@@ -157,5 +157,5 @@ ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::~ProtoUdpBidirectional()
 template <class ReceiveProtoT, class SendProtoT>
 void ProtoUdpBidirectional<ReceiveProtoT, SendProtoT>::close()
 {
-    udp_listener_.close();
+    udp_socket_.close();
 }
