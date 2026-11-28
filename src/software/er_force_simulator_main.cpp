@@ -205,19 +205,19 @@ int main(int argc, char** argv)
                 er_force_sim->stepSimulation(
                     Duration::fromMilliseconds(input.milliseconds()));
 
-                for (const auto packet : er_force_sim->getSSLWrapperPackets())
+                for (const auto& packet : er_force_sim->getSSLWrapperPackets())
                 {
                     blue_ssl_wrapper_output.sendProto(packet);
                     yellow_ssl_wrapper_output.sendProto(packet);
                     common_ssl_wrapper_output.sendProto(packet);
                 }
 
-                for (const auto packet : er_force_sim->getBlueRobotStatuses())
+                for (const auto& packet : er_force_sim->getBlueRobotStatuses())
                 {
                     blue_robot_status_output.sendProto(packet);
                 }
 
-                for (const auto packet : er_force_sim->getYellowRobotStatuses())
+                for (const auto& packet : er_force_sim->getYellowRobotStatuses())
                 {
                     yellow_robot_status_output.sendProto(packet);
                 }

@@ -26,7 +26,6 @@ message PowerPulseControl
             AutoChipOrKick auto_chip_or_kick = 3;
         }
     }
-    reserved 2;
     ChickerControl chicker = 1;
 }
 

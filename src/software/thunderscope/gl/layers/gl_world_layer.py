@@ -23,6 +23,7 @@ from software.thunderscope.constants import (
     DepthValues,
     is_field_message_empty,
 )
+from software.thunderscope.field_frame import rotate_pose_180
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
@@ -754,7 +755,8 @@ class GLWorldLayer(GLLayer):
         :return: The inverted point location [x, y] (if needed to be inverted)
         """
         if self._should_invert_coordinate_frame():
-            return QtGui.QVector3D(-point[0], -point[1], point[2])
+            x, y, _ = rotate_pose_180(point[0], point[1])
+            return QtGui.QVector3D(x, y, point[2])
         return point
 
     def _invert_vector_if_defending_negative_half(
@@ -766,5 +768,6 @@ class GLWorldLayer(GLLayer):
         :return: The vector in display coordinates (if needed to be inverted)
         """
         if self._should_invert_coordinate_frame():
-            return QtGui.QVector3D(-vector.x(), -vector.y(), vector.z())
+            x, y, _ = rotate_pose_180(vector.x(), vector.y())
+            return QtGui.QVector3D(x, y, vector.z())
         return vector

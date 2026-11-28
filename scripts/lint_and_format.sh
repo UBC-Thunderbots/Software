@@ -10,11 +10,28 @@ export CLANG_VERSION=10.0
 # The directory this script is in
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# The path to clang-format
-export CLANG_BIN=/opt/tbotspython/bin/clang-format
-
 # The root bazel directory
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
+
+LINT_TOOLS=(ansible ansible_lint clang_format codespell md_toc ruff)
+TARGETS=()
+
+for tool in "${LINT_TOOLS[@]}"
+    do
+        TARGETS+=("//starlark/lint:$tool")
+    done
+
+printf "Building lint and format tools...\n\n"
+(cd "$BAZEL_ROOT_DIR" && bazel build "${TARGETS[@]}")
+
+if [[ "$?" != 0 ]]; then
+    printf "\n***Failed to build lint and format tools!***\n\n"
+    exit 1
+fi
+
+TOOLS_DIR="$(cd "$BAZEL_ROOT_DIR" && bazel info bazel-bin)/starlark/lint"
+
+export CLANG_BIN="$TOOLS_DIR/clang_format"
 
 # Extensions to check formatting for clang-format
 CLANG_FORMAT_EXTENSIONS=(h cpp c cc hpp tpp proto)
@@ -63,8 +80,8 @@ function run_bazel_formatting () {
 function run_ruff() {
     printf "Running ruff to lint and format Python files...\n\n"
 
-    /opt/tbotspython/bin/python3 -m ruff check $BAZEL_ROOT_DIR --fix && \
-    /opt/tbotspython/bin/python3 -m ruff format $BAZEL_ROOT_DIR
+    "$TOOLS_DIR/ruff" check "$BAZEL_ROOT_DIR" --fix && \
+    "$TOOLS_DIR/ruff" format "$BAZEL_ROOT_DIR"
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to lint/format Python files!***\n\n"
@@ -89,10 +106,10 @@ function run_code_spell(){
     fi
 
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D $CURR_DIR/dictionary/edited_dictionary.txt -I $CURR_DIR/codespell_ignored_words.txt # Skip binaries
-    cd $CURR_DIR/../src/shared && codespell -w -D $CURR_DIR/dictionary/edited_dictionary.txt
-    cd $CURR_DIR/../docs && codespell -w --skip="*.png,*.svg" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip images
-
+    "$TOOLS_DIR/codespell" -w --skip="1,2,0" -D $CURR_DIR/dictionary/edited_dictionary.txt -I $CURR_DIR/codespell_ignored_words.txt "$CURR_DIR/../src/software" # Skip binaries
+    "$TOOLS_DIR/codespell" -w -D $CURR_DIR/dictionary/edited_dictionary.txt "$CURR_DIR/../src/shared"
+    "$TOOLS_DIR/codespell" -w --skip="*.png,*.svg" -D $CURR_DIR/dictionary/edited_dictionary.txt "$CURR_DIR/../docs" # Skip images
+ 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to fix spelling!***\n\n"
         exit 1
@@ -103,7 +120,7 @@ function run_md_toc() {
     printf "Adding table of contents to Markdown files...\n\n"
     for file in $CURR_DIR/../docs/*.md
     do
-      /opt/tbotspython/bin/python3 -m md_toc --in-place --no-list-coherence --skip-lines 1 github $file
+      "$TOOLS_DIR/md_toc" --in-place --no-list-coherence --skip-lines 1 github "$file"
     done
 }
 
@@ -130,7 +147,7 @@ function run_eof_new_line(){
 function run_ansible_lint(){
     printf "Running ansible-lint...\n\n"
 
-    /opt/tbotspython/bin/ansible-lint $CURR_DIR/../src/software/embedded/ansible/**/*.yml --fix
+    "$TOOLS_DIR/ansible_lint" $CURR_DIR/../src/software/embedded/ansible/**/*.yml --fix
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to lint and format Ansible files!***\n\n"

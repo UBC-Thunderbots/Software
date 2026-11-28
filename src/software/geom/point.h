@@ -24,7 +24,7 @@ class Point final
      * @param x the <var>x</var> value of the Point
      * @param y the <var>y</var> value of the Point
      */
-    Point(double x, double y);
+    Point(const double x, const double y);
 
     /**
      * Creates a new Point that is a copy of the given Point
