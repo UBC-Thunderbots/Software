@@ -30,15 +30,15 @@ constexpr double RF_ACCELERATION_NOISE_M_PER_S_SQUARED       = 4.0;
 constexpr double RF_ANG_ACCELERATION_NOISE_RAD_PER_S_SQUARED = 10.0;
 
 // Maximum Mahalanobi's Distance before rejecting as outlier
-constexpr double RF_MAHALANOBIS_GATE_THRESHOLD = 5;
+constexpr double RF_MAHALANOBIS_GATE_THRESHOLD = 13.8;
 
 // How many detections in a row may be rejected as outliers before we conclude the
 // estimate itself is wrong and reset onto the newest detection
 constexpr int RF_CONSECUTIVE_OUTLIERS_THRESHOLD = 3;
 
 // How much noise (standard deviation) there is to be expected from camera measurements
-constexpr double RF_POS_VISION_NOISE_M   = 0.001;
-constexpr double RF_ANG_VISION_NOISE_RAD = 0.01;
+constexpr double RF_POS_VISION_NOISE_M   = 0.008;
+constexpr double RF_ANG_VISION_NOISE_RAD = 0.1;
 
 
 const Eigen::Vector<double, RobotFilter::STATE_SIZE> RF_INITIAL_STATE =
